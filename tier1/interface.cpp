@@ -258,7 +258,7 @@ HMODULE Sys_LoadLibrary( const char *pLibraryName, Sys_Flags flags )
 		const char *pError = dlerror();
 		if ( pError && ( strstr( pError, "No such file" ) == 0 ) && ( strstr( pError, "image not found" ) == 0 ) )
 		{
-			Msg( "failed to dlopen %s error=%s\n", str, pError );
+			Msg( "Failed to load shared library %s\n", pError );
 		}
 	}
 	
