@@ -541,7 +541,7 @@ void    GLMDisplayInfo::PopulateModes( void )
         Assert( !m_modes );
         m_modes = new CUtlVector< GLMDisplayMode* >;
 
-        int nummodes = SDL_GetDisplays(0);
+        int nummodes = SDL_GetDisplays(4);
 
         for ( int i = 0; i < nummodes; i++ )
         {

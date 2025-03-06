@@ -1089,7 +1089,7 @@ COptionsSubVideo::COptionsSubVideo(vgui::Panel *parent) : PropertyPage(parent, N
 	// which is an operation we don't support as it currently stands. The user can 
 	// pass -adapter N to use a different device.
 #if defined( USE_SDL ) && defined( DX_TO_GL_ABSTRACTION )
-	int numVideoDisplays = SDL_GetDisplays(0);
+	int numVideoDisplays = SDL_GetDisplays(4);
 
 	m_pWindowed = new vgui::ComboBox( this, "DisplayModeCombo", 5 + numVideoDisplays, false );
 
@@ -1195,7 +1195,7 @@ void COptionsSubVideo::PrepareResolutionList()
 	gameuifuncs->GetDesktopResolution( desktopWidth, desktopHeight );
 
 #if defined( USE_SDL )
-	bool bFullScreenWithMultipleDisplays = ( !bWindowed && ( SDL_GetDisplays(0) > 1 ) );
+	bool bFullScreenWithMultipleDisplays = ( !bWindowed && ( SDL_GetDisplays(4) > 1 ) );
 	if ( bFullScreenWithMultipleDisplays )
 	{
 		SDL_Rect rect;

@@ -553,7 +553,7 @@ void CVideoMode_Common::ResetCurrentModeForNewResolution( int nWidth, int nHeigh
 			m_nVROverrideX = vrBounds.nX;
 			m_nVROverrideY = vrBounds.nY;
 #elif defined( USE_SDL )
-			for ( int i = 0; i < SDL_GetDisplays(0); i++ )
+			for ( int i = 0; i < SDL_GetDisplays(4); i++ )
 			{
 				SDL_Rect sdlRect;
 				SDL_GetDisplayBounds( i, &sdlRect );

@@ -430,8 +430,7 @@ static void sdl_displayindex_changed( IConVar *pConVar, const char *pOldString, 
 ConVar sdl_displayindex( "sdl_displayindex", "0", FCVAR_HIDDEN, "SDL fullscreen display index.", sdl_displayindex_changed );
 static void sdl_displayindex_changed( IConVar *pConVar, const char *pOldString, float flOldValue )
 {
-	int NumVideoDisplays = 0;
-	SDL_GetDisplays(&NumVideoDisplays);
+	SDL_GetDisplays( 4 );
 
 	if ( ( sdl_displayindex.GetInt() < 0 ) || ( sdl_displayindex.GetInt() >= NumVideoDisplays ) )
 	{
@@ -450,7 +449,7 @@ static int GetLargestDisplaySize( int& Width, int& Height )
 	Width = 640;
 	Height = 480;
 
-	for ( int i = 0; i < (int)SDL_GetDisplays( 0 ); i++ )
+	for ( int i = 0; i < (int)SDL_GetDisplays( 4 ); i++ )
 	{
 		SDL_Rect rect = { 0, 0, 0, 0 };
 
@@ -1500,7 +1499,7 @@ void CSDLMgr::SetWindowFullScreen( bool bFullScreen, int nWidth, int nHeight )
 			int y = 0;
 
 			// If we have more than one display, center the window in the one we've been assigned to.
-			if ( SDL_GetDisplays( 0 ) > 1 )
+			if ( SDL_GetDisplays( 4 ) > 1 )
 			{
 				SDL_Rect rect = { 0, 0, 0, 0 };
 

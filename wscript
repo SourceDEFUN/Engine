@@ -182,12 +182,19 @@ def define_platform(conf):
 	conf.env.TOGLES = conf.options.TOGLES
 	conf.env.GL = conf.options.GL and not conf.options.TESTS and not conf.options.DEDICATED
 	conf.env.OPUS = conf.options.OPUS
-
+	
+	conf.env.CXXFLAGS += ["-m32"]
+	print(conf.env.CXXFLAGS)
 	arch32 = conf.run_test(CPP_32BIT_CHECK, 'Testing 32bit support')
+	conf.env.CXXFLAGS[-1] = "-m64"
+	conf.env.CXXFLAGS += ["-fPIC"]
+	print(conf.env.CXXFLAGS)
 	arch64 = conf.run_test(CPP_64BIT_CHECK, 'Testing 64bit support')
+	conf.env.CXXFLAGS.pop(); conf.env.CXXFLAGS.pop()
+	print(conf.env.CXXFLAGS)
 
 	if not (arch32 ^ arch64):
-		conf.fatal('Cannot use this compiler!')
+		conf.fatal('Cannot continue, for this compiler seemed to fail both previous tests.')
 
 	if conf.options.DEDICATED:
 		conf.options.SDL = False
@@ -456,6 +463,9 @@ def configure(conf):
 	if conf.env.BIT32_MANDATORY:
 		Logs.info('WARNING: will build engine for 32-bit target')
 		conf.load('force_32bit')
+	else: # Secton: JUST SHOVE IT AND COMPILE EVERYTHING AS 64BITS, STOP COMPILING SOME AS 32BITS!!!!
+		conf.load('force_64bit')
+		print("\n", conf.env.CFLAGS, conf.env.CXXFLAGS, "\n")
 
 	define_platform(conf)
 
