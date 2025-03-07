@@ -763,11 +763,13 @@ void CMorph::ComputeTextureDimensions( const CUtlVector< MorphSegmentList_t > &m
 	int nTotalDeltas = DetermineTotalDeltaCount( morphSegments );
 	m_nTextureHeight = ceil( sqrt( (float)nTotalDeltas ) );
 
-	// Round the dimension up to a multiple of 4
+	// DO NOT Round the dimension up to a multiple of 4
+	/*
 	m_nTextureHeight = ( m_nTextureHeight + 3 ) & ( ~0x3 );
 	m_nTextureWidth = ( m_nTextureHeight != 0 ) ? ( nTotalDeltas + ( m_nTextureHeight - 1 ) ) / m_nTextureHeight : 0;
 	m_nTextureWidth = ( m_nTextureWidth + 3 ) & ( ~0x3 );
-
+        */
+        
 	int nTotal4Tuples = Get4TupleCount( m_Format );
 
 	// Make sure it obeys bounds

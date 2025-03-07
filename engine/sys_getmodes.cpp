@@ -553,7 +553,8 @@ void CVideoMode_Common::ResetCurrentModeForNewResolution( int nWidth, int nHeigh
 			m_nVROverrideX = vrBounds.nX;
 			m_nVROverrideY = vrBounds.nY;
 #elif defined( USE_SDL )
-			for ( int i = 0; i < SDL_GetDisplays(4); i++ )
+                        int tempValue1 = NULL; SDL_GetDisplays(&tempValue1);
+			for ( int i = 0; i < tempValue1; i++ )
 			{
 				SDL_Rect sdlRect;
 				SDL_GetDisplayBounds( i, &sdlRect );
@@ -1551,7 +1552,7 @@ void CVideoMode_Common::CenterEngineWindow( void *hWndCenter, int width, int hei
 	static ConVarRef sdl_displayindex( "sdl_displayindex" );
 	int displayindex = sdl_displayindex.IsValid() ? sdl_displayindex.GetInt() : 0;
 
-	const SDL_DisplayMode* mode = SDL_GetCurrentDisplayMode( displayindex );
+	const SDL_DisplayMode* mode = SDL_GetCurrentDisplayMode(SDL_GetPrimaryDisplay());
 
 	const int wide = mode->w;
 	const int tall = mode->h;

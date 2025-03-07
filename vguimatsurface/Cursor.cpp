@@ -482,12 +482,13 @@ void CursorSetPos( void *hwnd, int x, int y )
 }
 
 void CursorGetPos(void *hwnd, int &x, int &y)
-{
+{ printf("Secton DEBUG: %d", s_bCursorVisible);
 #if defined ( USE_SDL ) && !defined( PLATFORM_WINDOWS )
 	if ( s_bCursorVisible )
 	{
-		SDL_GetMouseState( (float*)&x, (float*)&y );
-
+		float floatingX, floatingY;
+		SDL_GetMouseState( &floatingX, &floatingY );
+		x = (int)floatingX; y = (int)floatingY;
 		int windowHeight = 0;
 		int windowWidth = 0;
 		//unsigned int ignored;

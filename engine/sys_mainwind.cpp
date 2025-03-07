@@ -1551,13 +1551,15 @@ void *CGame::GetMainWindowPlatformSpecificHandle( void )
 #ifdef WIN32
 	return (void*)m_hWindow;
 #else // FIXME: i don't know how the hell can i migrate this!!!
-	/*SDL_SysWMinfo pInfo;
+	/*
+	SDL_SysWMinfo pInfo;
 	SDL_VERSION( &pInfo.version );
 	if ( !SDL_GetWindowWMInfo( (SDL_Window*)m_pSDLWindow, &pInfo ) )
 	{
 		Error( "Fatal Error: Unable to get window info from SDL." );
 		return NULL;
-	}*/
+	}
+	*/
 
 #ifdef OSX // partially migrated this, it definitely won't work!
 	NSWindow *nswindow = (__bridge NSWindow *)SDL_GetPointerProperty(SDL_GetWindowProperties(window), SDL_PROP_WINDOW_COCOA_WINDOW_POINTER, NULL);
@@ -1586,12 +1588,12 @@ void CGame::GetDesktopInfo( int &width, int &height, int &refreshrate )
 {
 #if defined( USE_SDL )
 
-	width = 800;
-	height = 600;
+	width = 1280;
+	height = 720;
 	refreshrate = 0;
-
+        int tempValue1 = NULL; SDL_GetDisplays(&tempValue1);
 	// Go through all the displays and return the size of the largest.
-	for( int i = 0; i < SDL_GetDisplays(4); i++ )
+	for( int i = 0; i < tempValue1; i++ )
 	{
 		SDL_Rect rect;
 
@@ -1627,10 +1629,14 @@ void CGame::UpdateDesktopInformation( )
 {
 #if defined( USE_SDL )
 	// Get the size of the display we will be displayed fullscreen on.
-	static ConVarRef sdl_displayindex( "sdl_displayindex" );
-	int displayIndex = sdl_displayindex.IsValid() ? sdl_displayindex.GetInt() : 0;
 
-	const SDL_DisplayMode* mode = SDL_GetDesktopDisplayMode( displayIndex );
+	const SDL_DisplayMode* mode = SDL_GetCurrentDisplayMode(SDL_GetPrimaryDisplay());
+	if (!mode) {
+	    //printf("========== ERROR INFORMATION ==========\ndisplayIndex = %d\n", displayIndex);
+	    Error(SDL_GetError());
+	    return;
+	}
+	
 	
 	m_iDesktopWidth = mode->w;
 	m_iDesktopHeight = mode->h;

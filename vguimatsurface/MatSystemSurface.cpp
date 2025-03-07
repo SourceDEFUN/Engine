@@ -2102,7 +2102,7 @@ void CMatSystemSurface::ClearTemporaryFontCache( void )
 //-----------------------------------------------------------------------------
 void CMatSystemSurface::PrecacheFontCharacters( HFont font, const wchar_t *pCharacterString )
 {
-	wchar_t *pCommonChars = L"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789,.!:-/%";
+	const wchar_t *pCommonChars = L"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789,.!:-/%";
 	MAT_FUNC;
 
 	if ( !pCharacterString || !pCharacterString[0] )
@@ -2860,7 +2860,7 @@ void CMatSystemSurface::SetCursorPos(int x, int y)
 }
 
 void CMatSystemSurface::GetCursorPos(int &x, int &y)
-{
+{ printf("Secton DEBUG: CMatSystemSurface::GetCursorPos");
 	CursorGetPos( m_HWnd, x, y );
 }
 

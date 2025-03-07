@@ -15,7 +15,7 @@
 #if defined( USE_SDL )
 #undef M_PI
 #include <SDL3/SDL.h>
-#include "../engine/igame.h"
+#include "appframework/ilaunchermgr.h"
 static void initKeymap(void);
 #endif
 ConVar joy_xcontroller_found( "joy_xcontroller_found", "1", FCVAR_HIDDEN, "Automatically set to 1 if an xcontroller has been detected." );
@@ -1553,7 +1553,7 @@ ISteamController* CInputSystem::SteamControllerInterface()
 void CInputSystem::StartTextInput()
 {
 #ifdef USE_SDL
-        IGame *thisSucks;
-	SDL_StartTextInput(thisSucks->GetMainWindow());
+	ILauncherMgr *test; // Secton: WHY TF DOESN'T THIS WORK?!?!?!?
+	SDL_StartTextInput((SDL_Window*)test->GetWindowRef());
 #endif
 }

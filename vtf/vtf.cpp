@@ -423,7 +423,9 @@ bool CVTFTexture::Init( int nWidth, int nHeight, int nDepth, ImageFormat fmt, in
 			return false;
 		}
 	}
-
+        
+        // Secton: no more.
+        /*
 	if ( ( fmt == IMAGE_FORMAT_DXT1 ) || ( fmt == IMAGE_FORMAT_DXT3 ) || ( fmt == IMAGE_FORMAT_DXT5 ) ||
 		 ( fmt == IMAGE_FORMAT_DXT1_RUNTIME ) || ( fmt == IMAGE_FORMAT_DXT5_RUNTIME ) )
 	{
@@ -433,7 +435,8 @@ bool CVTFTexture::Init( int nWidth, int nHeight, int nDepth, ImageFormat fmt, in
 			return false;
 		}
 	}
-
+        */
+        
 	if ( fmt == IMAGE_FORMAT_DEFAULT )
 	{
 		fmt = IMAGE_FORMAT_RGBA8888;

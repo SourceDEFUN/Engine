@@ -430,7 +430,7 @@ static void sdl_displayindex_changed( IConVar *pConVar, const char *pOldString, 
 ConVar sdl_displayindex( "sdl_displayindex", "0", FCVAR_HIDDEN, "SDL fullscreen display index.", sdl_displayindex_changed );
 static void sdl_displayindex_changed( IConVar *pConVar, const char *pOldString, float flOldValue )
 {
-	SDL_GetDisplays( 4 );
+	int NumVideoDisplays = NULL; SDL_GetDisplays(&NumVideoDisplays);
 
 	if ( ( sdl_displayindex.GetInt() < 0 ) || ( sdl_displayindex.GetInt() >= NumVideoDisplays ) )
 	{
@@ -448,8 +448,9 @@ static int GetLargestDisplaySize( int& Width, int& Height )
 
 	Width = 640;
 	Height = 480;
-
-	for ( int i = 0; i < (int)SDL_GetDisplays( 4 ); i++ )
+        
+        int tempValue1 = NULL; SDL_GetDisplays(&tempValue1);
+	for ( int i = 0; i < tempValue1; i++ )
 	{
 		SDL_Rect rect = { 0, 0, 0, 0 };
 
@@ -488,7 +489,8 @@ CON_COMMAND( grab_window, "grab/ungrab window." )
 		if ( bGrab != SDL_GetWindowMouseGrab( pWindow ) )
 		{
 			Msg( "SetWindowGrab( %s )\n", bGrab ? "true" : "false" );
-			SDL_SetWindowMouseGrab( pWindow, bGrab );
+			SDL_SetWindowMouseGrab   ( pWindow, bGrab );
+			SDL_SetWindowKeyboardGrab( pWindow, bGrab );
 
 			// force non-fullscreen windows to the foreground if grabbed, so you can't
 			//  get your mouse locked to something in the background.
@@ -533,8 +535,7 @@ InitReturnVal_t CSDLMgr::Init()
 #endif
 	}
 
-	fprintf(stderr, "SDL video target is '%s'\n", SDL_GetCurrentVideoDriver());
-	Msg("SDL video target is '%s'\n", SDL_GetCurrentVideoDriver());
+	Msg("SDL video target is \"%s\"\n", SDL_GetCurrentVideoDriver());
 
 	m_bForbidMouseGrab = true;
 	if ( !CommandLine()->FindParm("-nomousegrab") && CommandLine()->FindParm("-mousegrab") )
@@ -1497,9 +1498,9 @@ void CSDLMgr::SetWindowFullScreen( bool bFullScreen, int nWidth, int nHeight )
 		{
 			int x = 0;
 			int y = 0;
-
+                        int tempValue1 = NULL; SDL_GetDisplays(&tempValue1);
 			// If we have more than one display, center the window in the one we've been assigned to.
-			if ( SDL_GetDisplays( 4 ) > 1 )
+			if ( tempValue1 > 1 )
 			{
 				SDL_Rect rect = { 0, 0, 0, 0 };
 
@@ -1801,6 +1802,7 @@ void CSDLMgr::PumpWindowsMessageLoop()
 			case SDL_EVENT_MOUSE_BUTTON_UP:
 			case SDL_EVENT_MOUSE_BUTTON_DOWN:
 			{
+				printf("Secton DEBUG: Mouse was pressed!\n");
 				// SDL buttons:
 				//  1 = Left button
 				//  2 = Middle button
@@ -1873,7 +1875,7 @@ void CSDLMgr::PumpWindowsMessageLoop()
 				theEvent.m_nMouseClickCount = bDoublePress ? 2 : 1;
 				theEvent.m_MouseButton = cocoaButton;
 				PostEvent( theEvent );
-
+				printf("Secton DEBUG: Finished through!");
 				break;
 			}
 
