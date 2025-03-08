@@ -1,7 +1,5 @@
 # SourceDEFUN
 
-Information from [wikipedia](https://wikipedia.org/wiki/Source_(game_engine)):
-
 Source code is based on 2018 leak of CS:GO and "Source 2013". Don't use it for commercial purposes.
 
 This project is using waf buildsystem. If you have waf-related questions look https://waf.io/book
