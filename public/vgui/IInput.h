@@ -17,6 +17,10 @@
 #include "vgui/MouseCode.h"
 #include "vgui/KeyCode.h"
 
+#ifdef USE_SDL
+#include <SDL3/SDL_mouse.h>
+#endif
+
 namespace vgui
 {
 
@@ -59,7 +63,11 @@ public:
 
 	// mouse state
 	virtual void SetCursorPos(int x, int y) = 0;
+	#ifdef USE_SDL
+	virtual void GetCursorPos(int &x, int &y) { SDL_GetMouseState(x, y); }
+	#else
 	virtual void GetCursorPos(int &x, int &y) = 0;
+	#endif
 	virtual bool WasMousePressed(MouseCode code) = 0;
 	virtual bool WasMouseDoublePressed(MouseCode code) = 0;
 	virtual bool IsMouseDown(MouseCode code) = 0;
@@ -83,7 +91,11 @@ public:
 	// do this when your modal dialog finishes.
 	virtual void ReleaseAppModalSurface() = 0;
 
+#ifdef USE_SDL
+	virtual void GetCursorPosition(int &x, int &y) { SDL_GetMouseState(x, y); }
+#else
 	virtual void GetCursorPosition( int &x, int &y ) = 0;
+#endif
 
 	virtual void SetIMEWindow( void *hwnd ) = 0;
 	virtual void *GetIMEWindow() = 0;

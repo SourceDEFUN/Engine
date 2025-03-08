@@ -482,7 +482,7 @@ void CursorSetPos( void *hwnd, int x, int y )
 }
 
 void CursorGetPos(void *hwnd, int &x, int &y)
-{ printf("Secton DEBUG: %d", s_bCursorVisible);
+{
 #if defined ( USE_SDL ) && !defined( PLATFORM_WINDOWS )
 	if ( s_bCursorVisible )
 	{

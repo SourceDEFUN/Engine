@@ -2235,7 +2235,7 @@ void CEngineVGui::DrawMouseFocus( void )
 	bool include_hidden = vgui_drawfocus.GetInt() == 2;
 
 	int x, y;
-	vgui::input()->GetCursorPos( x, y );
+	SDL_GetMouseState((int)&x, (int)&y);
 
 	vgui::VPANEL embedded = vgui::surface()->GetEmbeddedPanel();
 

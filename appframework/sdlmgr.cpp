@@ -446,8 +446,8 @@ static int GetLargestDisplaySize( int& Width, int& Height )
 {
 	int nDisplay = 0;
 
-	Width = 640;
-	Height = 480;
+	Width = 1280;
+	Height = 720;
         
         int tempValue1 = NULL; SDL_GetDisplays(&tempValue1);
 	for ( int i = 0; i < tempValue1; i++ )
@@ -1156,7 +1156,7 @@ void CSDLMgr::OnFrameRendered()
 		}
 #endif
 		m_bRawInput = !m_bCursorVisible && rawinput.IsValid() && rawinput.GetBool();
-
+                
 		bool bWindowGrab = !m_bCursorVisible ? true : false;
 		bool bRelativeMouseMode = bWindowGrab;
 
@@ -1498,7 +1498,7 @@ void CSDLMgr::SetWindowFullScreen( bool bFullScreen, int nWidth, int nHeight )
 		{
 			int x = 0;
 			int y = 0;
-                        int tempValue1 = NULL; SDL_GetDisplays(&tempValue1);
+			int tempValue1 = NULL; SDL_GetDisplays(&tempValue1);
 			// If we have more than one display, center the window in the one we've been assigned to.
 			if ( tempValue1 > 1 )
 			{
@@ -1756,6 +1756,16 @@ void CSDLMgr::PumpWindowsMessageLoop()
 		{
 			case SDL_EVENT_MOUSE_MOTION:
 			{
+				if (false) { // Enable if VGUI2 can't see mouse.
+					printf("\nMOUSE DEBUG START!\n");
+					printf("MOUSE Visible: %d\n", m_bCursorVisible);
+					printf("MOUSE Has focus: %d\n", m_bHasFocus);
+					printf("MOUSE Raw Input: %d\n", m_bRawInput);
+					printf("MOUSE Motion: %f, %f\n", event.motion.x, event.motion.y);
+					printf("MOUSE Target: %d, %d\n", m_nMouseTargetX, m_nMouseTargetY);
+					printf("MOUSE Delta: %d, %d\n", m_nMouseXDelta, m_nMouseYDelta);
+					printf("MOUSE DEBUG ENDS!\n\n");
+				}
 				if ( !m_bHasFocus )
 					break;
 
@@ -1802,7 +1812,6 @@ void CSDLMgr::PumpWindowsMessageLoop()
 			case SDL_EVENT_MOUSE_BUTTON_UP:
 			case SDL_EVENT_MOUSE_BUTTON_DOWN:
 			{
-				printf("Secton DEBUG: Mouse was pressed!\n");
 				// SDL buttons:
 				//  1 = Left button
 				//  2 = Middle button
@@ -1875,7 +1884,7 @@ void CSDLMgr::PumpWindowsMessageLoop()
 				theEvent.m_nMouseClickCount = bDoublePress ? 2 : 1;
 				theEvent.m_MouseButton = cocoaButton;
 				PostEvent( theEvent );
-				printf("Secton DEBUG: Finished through!");
+
 				break;
 			}
 

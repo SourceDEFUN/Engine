@@ -906,17 +906,21 @@ bool CGame::CreateGameWindow( void )
 
 	if (!windowName[0])
 	{
-		Q_strncpy( windowName, "HALF-LIFE 2", sizeof(windowName) );
+		Q_strncpy( windowName, "SourceDEFUN", sizeof(windowName) );
 	}
 
 	if ( IsOpenGL() )
 	{
 #ifdef TOGLES
-		V_strcat( windowName, " - OpenGLES", sizeof( windowName ) );
+		V_strcat( windowName, " (OpenGL ES", sizeof( windowName ) );
 #else
-		V_strcat( windowName, " - OpenGL", sizeof( windowName ) );
+		V_strcat( windowName, " (OpenGL", sizeof( windowName ) );
 #endif
 	}
+#ifdef USE_SDL
+		V_strcat( windowName, ", experimental SDL3 support", sizeof( windowName ) );
+#endif
+		V_strcat( windowName, ")", sizeof( windowName ) );
 
 #if PIX_ENABLE || defined( PIX_INSTRUMENTATION )
 	// PIX_ENABLE/PIX_INSTRUMENTATION is a big slowdown (that should never be checked in, but sometimes is by accident), so add this to the Window title too.

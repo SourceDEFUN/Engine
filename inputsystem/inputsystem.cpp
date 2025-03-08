@@ -15,6 +15,7 @@
 #if defined( USE_SDL )
 #undef M_PI
 #include <SDL3/SDL.h>
+#include <SDL3/SDL_mouse.h>
 #include "appframework/ilaunchermgr.h"
 static void initKeymap(void);
 #endif
@@ -804,8 +805,14 @@ void CInputSystem::PollInputState_Platform()
 
 				case CocoaEvent_MouseMove:
 				{
+                                      #ifdef USE_SDL
+                                        // Secton: Found it! Cursor position shall be properly updated now. P.S. nevermind...
+					float mouseX, mouseY;
+					SDL_GetMouseState(&mouseX, &mouseY);
+					UpdateMousePositionState( state, (short)mouseX, (short)mouseY );
+                                      #else
 					UpdateMousePositionState( state, (short)pEvent->m_MousePos[0], (short)pEvent->m_MousePos[1] );
-
+                                      #endif
 					InputEvent_t event;
 					memset( &event, 0, sizeof(event) );
 					event.m_nTick = GetPollTick();
@@ -1256,6 +1263,7 @@ void CInputSystem::UpdateMousePositionState( InputState_t &state, short x, short
 	{
 		PostEvent( IE_AnalogValueChanged, m_nLastSampleTick, MOUSE_XY, state.m_pAnalogValue[ MOUSE_X ], state.m_pAnalogValue[ MOUSE_Y ] );
 	}
+	printf("\n\n");
 }
 
 
@@ -1477,9 +1485,10 @@ LRESULT CInputSystem::WindowProc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
 #endif // !USE_SDL
 
 	case WM_MOUSEMOVE:
-		{
+		{ printf("Secton DEBUG: About to update mouse position!\n");
+			printf("Secton DEBUG: %d\n", lParam);
 			UpdateMousePositionState( state, (short)LOWORD(lParam), (short)HIWORD(lParam) );
-
+			
 			int nButtonMask = ButtonMaskFromMouseWParam( wParam );
 			UpdateMouseButtonState( nButtonMask );
 		}
@@ -1553,7 +1562,6 @@ ISteamController* CInputSystem::SteamControllerInterface()
 void CInputSystem::StartTextInput()
 {
 #ifdef USE_SDL
-	ILauncherMgr *test; // Secton: WHY TF DOESN'T THIS WORK?!?!?!?
-	SDL_StartTextInput((SDL_Window*)test->GetWindowRef());
+	SDL_StartTextInput((SDL_Window*)m_pLauncherMgr->GetWindowRef());
 #endif
 }

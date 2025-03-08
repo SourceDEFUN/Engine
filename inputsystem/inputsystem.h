@@ -37,11 +37,6 @@
 #include "tier1/utlvector.h"
 #include "tier1/utlflags.h"
 
-#if defined( _X360 )
-#include "xbox/xbox_win32stubs.h"
-#include "xbox/xbox_console.h"
-#endif
-
 #include "steam/steam_api.h"
 
 #define TOUCH_FINGER_MAX_COUNT 10

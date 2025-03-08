@@ -48,7 +48,10 @@ vgui::IInputInternal *g_InputInternal = NULL;
 
 void GetVGUICursorPos( int& x, int& y )
 {
-	vgui::input()->GetCursorPos(x, y);
+        int tempX, tempY;
+	vgui::input()->GetCursorPos(tempX, tempY);
+	printf("Secton DEBUG: Cursor position is %d, %d", tempX, tempY);
+	x = tempX; y = tempY;
 }
 
 void SetVGUICursorPos( int x, int y )

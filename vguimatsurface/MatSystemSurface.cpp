@@ -2860,7 +2860,7 @@ void CMatSystemSurface::SetCursorPos(int x, int y)
 }
 
 void CMatSystemSurface::GetCursorPos(int &x, int &y)
-{ printf("Secton DEBUG: CMatSystemSurface::GetCursorPos");
+{
 	CursorGetPos( m_HWnd, x, y );
 }
 

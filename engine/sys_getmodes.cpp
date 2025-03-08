@@ -245,8 +245,8 @@ CVideoMode_Common::CVideoMode_Common( void )
     m_nNumModes    = 0;
     m_bInitialized = false;
 
-    DefaultVideoMode().width  = 640;
-    DefaultVideoMode().height = 480;
+    DefaultVideoMode().width  = 1280;
+    DefaultVideoMode().height = 720;
     DefaultVideoMode().bpp    = 32;
     DefaultVideoMode().refreshRate = 0;
 
@@ -259,8 +259,8 @@ CVideoMode_Common::CVideoMode_Common( void )
     m_pBackgroundTexture   = NULL;
     m_pLoadingTexture      = NULL;
     m_bWindowed            = false;
-    m_nModeWidth           = IsPC() ? 1024 : 640;
-    m_nModeHeight          = IsPC() ? 768 : 480;
+    m_nModeWidth           = 1280;
+    m_nModeHeight          = 720;
 	m_bVROverride = false;
 }
 
@@ -2317,7 +2317,7 @@ bool CVideoMode_MaterialSystem::Init( )
         MaterialVideoMode_t info;
         materials->GetModeInfo( nAdapter, i, info );
 
-        if ( info.m_Width < 640 || info.m_Height < 480 )
+        if ( info.m_Width < 800 || info.m_Height < 600 )
         {
             if ( !bAllowSmallModes )
                 continue;
