@@ -1,0 +1,20 @@
+stages:
+  - build
+  - test
+
+Linux:
+  stage: build
+  script:
+    - chmod +x ./scripts/Compile-Linux-64bits.sh
+    - ./scripts/Compile-Linux-64bits.sh
+
+# Windows:
+#  stage: build
+#  script:
+#    - ./scripts/Compile-Linux-64bits.sh
+
+#macOS:
+#  stage: build
+#  script:
+#    - chmod +x ./scripts/Compile-Linux-64bits.sh
+#    - ./scripts/Compile-Linux-64bits.sh
