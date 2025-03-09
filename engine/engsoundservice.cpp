@@ -475,7 +475,6 @@ private:
 
 	virtual void OnSoundStarted( int guid, StartSoundParams_t& params, char const *soundname )
 	{
-		VPROF("OnSoundStarted");
 
 		if ( IsX360() || !toolframework->IsToolRecording() || params.suppressrecording )
 			return;
@@ -516,7 +515,6 @@ private:
 		// be sent for that guid either. This requires more plumbing, though, and
 		// for the moment, it's not necessary to do that plumbing.
 
-		VPROF("OnSoundStopped");
 
 		if ( IsX360() || !toolframework->IsToolRecording() )
 			return;

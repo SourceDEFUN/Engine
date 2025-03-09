@@ -70,14 +70,12 @@
 
 #define VPROF_VTUNE_GROUP
 
-#define	VPROF( name )						VPROF_(name, 1, VPROF_BUDGETGROUP_OTHER_UNACCOUNTED, false, 0)
 #define	VPROF_ASSERT_ACCOUNTED( name )		VPROF_(name, 1, VPROF_BUDGETGROUP_OTHER_UNACCOUNTED, true, 0)
 #define	VPROF_( name, detail, group, bAssertAccounted, budgetFlags )		VPROF_##detail(name,group, bAssertAccounted, budgetFlags)
 
 #define VPROF_BUDGET( name, group )					VPROF_BUDGET_FLAGS(name, group, BUDGETFLAG_OTHER)
 #define VPROF_BUDGET_FLAGS( name, group, flags )	VPROF_(name, 0, group, false, flags)
 
-#define VPROF_SCOPE_BEGIN( tag )	do { VPROF( tag )
 #define VPROF_SCOPE_END()			} while (0)
 
 #define VPROF_ONLY( expression )	( expression )
@@ -209,7 +207,6 @@
 		; \
 	else \
 	{ \
-	VPROF( __FUNCTION__ ": " #code ); \
 		code; \
 	}
 #else
@@ -218,7 +215,6 @@
 		; \
 	else \
 	{ \
-		VPROF( #code ); \
 		code; \
 	} 
 #endif
@@ -234,14 +230,8 @@
 #else
 
 #  if defined( VPROF_SN_LEVEL ) && ( VPROF_SN_LEVEL >= 0 )
-#    define	VPROF( name )									CVProfSnMarkerScope VProfSn_( name )
-#    define	VPROF_ASSERT_ACCOUNTED( name )					VPROF( name )
 #    define	VPROF_( name, detail, group, bAssertAccounted, budgetFlags )	VPROF_##detail( name, group, bAssertAccounted, budgetFlags )
-#	 define	VPROF_0(name,group,assertAccounted,budgetFlags)	VPROF( name )
-#    define VPROF_BUDGET( name, group )						VPROF( name )
-#    define VPROF_BUDGET_FLAGS( name, group, flags )		VPROF( name )
 
-#    define VPROF_SCOPE_BEGIN( tag )	do { VPROF( tag )
 #    define VPROF_SCOPE_END()			} while (0)
 
 #    define VPROF_ONLY( expression )	( expression )
@@ -249,7 +239,6 @@
 #    define VPROF_ENTER_SCOPE( name )   g_pfnPushMarker( name )
 #    define VPROF_EXIT_SCOPE()   g_pfnPopMarker()
 #  else
-#    define	VPROF( name )									((void)0)
 #    define	VPROF_ASSERT_ACCOUNTED( name )					((void)0)
 #    define	VPROF_( name, detail, group, bAssertAccounted, budgetFlags )	((void)0)
 #    define	VPROF_0(name,group,assertAccounted,budgetFlags)	((void)0)
@@ -266,25 +255,21 @@
 #  endif
 
 #  if defined( VPROF_SN_LEVEL ) && ( VPROF_SN_LEVEL >= 1 )
-#	 define	VPROF_1(name,group,assertAccounted,budgetFlags)	VPROF( name )
 #  else
 #    define	VPROF_1(name,group,assertAccounted,budgetFlags)	((void)0)
 #  endif
 
 #  if defined( VPROF_SN_LEVEL ) && ( VPROF_SN_LEVEL >= 2 )
-#	 define	VPROF_2(name,group,assertAccounted,budgetFlags)	VPROF( name )
 #  else
 #    define	VPROF_2(name,group,assertAccounted,budgetFlags)	((void)0)
 #  endif
 
 #  if defined( VPROF_SN_LEVEL ) && ( VPROF_SN_LEVEL >= 3 )
-#	 define	VPROF_3(name,group,assertAccounted,budgetFlags)	VPROF( name )
 #  else
 #    define	VPROF_3(name,group,assertAccounted,budgetFlags)	((void)0)
 #  endif
 
 #  if defined( VPROF_SN_LEVEL ) && ( VPROF_SN_LEVEL >= 4 )
-#	 define	VPROF_4(name,group,assertAccounted,budgetFlags)	VPROF( name )
 #  else
 #    define	VPROF_4(name,group,assertAccounted,budgetFlags)	((void)0)
 #  endif

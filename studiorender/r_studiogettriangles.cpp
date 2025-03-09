@@ -15,7 +15,6 @@
 
 void CStudioRenderContext::GetTriangles( const DrawModelInfo_t& info, matrix3x4_t *pBoneToWorld, GetTriangles_Output_t &out )
 {
-	VPROF( "CStudioRender::GetTriangles");
 
 	out.m_MaterialBatches.RemoveAll(); // clear out data.
 

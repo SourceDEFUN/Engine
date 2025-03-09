@@ -3089,7 +3089,6 @@ void CTextureListPanel::EndPaint()
 
 void CTextureListPanel::Paint() 
 {
-	VPROF( "CTextureListPanel::Paint" );
 
 	if ( !m_hFont )
 		return;

@@ -542,7 +542,6 @@ void CDODGameMovement::CheckForLadders( bool wasOnGround )
 inline void CDODGameMovement::TracePlayerBBoxWithStep( const Vector &vStart, const Vector &vEnd, 
 							unsigned int fMask, int collisionGroup, trace_t &trace )
 {
-	VPROF( "CDODGameMovement::TracePlayerBBoxWithStep" );
 
 	Vector vHullMin = GetPlayerMins( player->m_Local.m_bDucked );
 	vHullMin.z += player->m_Local.m_flStepSize;
@@ -556,7 +555,6 @@ inline void CDODGameMovement::TracePlayerBBoxWithStep( const Vector &vStart, con
 // Taken from TF2 to prevent bouncing down slopes
 bool CDODGameMovement::ResolveStanding( void )
 {
-	VPROF( "CDODGameMovement::ResolveStanding" );
 
 	//
 	// Attempt to move down twice your step height.  Anything between 0.5 and 1.0

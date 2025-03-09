@@ -537,7 +537,6 @@ void CDispInfo::SetTag()
 void DispInfo_BuildPrimLists( int nSortGroup, SurfaceHandle_t *pList, int listCount, bool bDepthOnly,
 	CDispInfo *visibleDisps[MAX_MAP_DISPINFO], int &nVisibleDisps )
 {
-	VPROF("DispInfo_BuildPrimLists");
 
 	nVisibleDisps = 0;
 	bool bDebugConvars = !bDepthOnly ? DispInfoRenderDebugModes() : false;
@@ -567,7 +566,6 @@ ConVar disp_dynamic( "disp_dynamic", "0" );
 void DispInfo_DrawPrimLists( ERenderDepthMode DepthMode )
 {
 #ifndef SWDS
-	VPROF("DispInfo_DrawPrimLists");
 
 	int nDispGroupsSize = g_DispGroups.Size();
 
@@ -697,7 +695,6 @@ void DispInfo_BatchDecals( CDispInfo **pVisibleDisps, int nVisibleDisps )
 #ifndef SWDS
 
 	// Performance analysis.
-	VPROF( "DispInfo_BatchDecals" );
 
 	// Increment the decal sort check count and clear the pool.
 	DecalDispSurfacesInit();
@@ -998,7 +995,6 @@ void DispInfo_DrawDecalsGroup( int iGroup, int iTreeType )
 void DispInfo_DrawDecals( CDispInfo **visibleDisps, int nVisibleDisps )
 {
 #ifndef SWDS
-	VPROF( "DispInfo_DrawDecals" );
 
 	int iGroup = 0;
 
@@ -1016,7 +1012,6 @@ void DispInfo_DrawDecals( CDispInfo **visibleDisps, int nVisibleDisps )
 void DispInfo_DrawDecals_Old( CDispInfo *visibleDisps[MAX_MAP_DISPINFO], int nVisibleDisps )
 {
 #ifndef SWDS
-//	VPROF("DispInfo_DrawDecals");
 	if( !nVisibleDisps )
 		return;
 
@@ -1394,7 +1389,6 @@ static void DispInfo_DrawChainNormals( SurfaceHandle_t *pList, int listCount )
 static void DispInfo_DrawDebugInformation( SurfaceHandle_t *pList, int listCount )
 {
 #ifndef SWDS
-	VPROF("DispInfo_DrawDebugInformation");
 	// Overlay with normals if we're in that mode
 	if( mat_normals.GetInt() )
 	{

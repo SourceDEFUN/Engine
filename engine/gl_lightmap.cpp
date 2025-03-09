@@ -437,7 +437,6 @@ unsigned int R_ComputeDynamicLightMask( dlight_t *pLights, SurfaceHandle_t surfI
 void R_AddDynamicLights( dlight_t *pLights, SurfaceHandle_t surfID, const matrix3x4_t& entityToWorld, bool needsBumpmap, unsigned int lightMask )
 {
 	ASSERT_SURF_VALID( surfID );
-	VPROF( "R_AddDynamicLights" );
 
 	Vector bumpNormals[3];
 	bool computedBumpBasis = false;
@@ -999,7 +998,6 @@ static void AccumulateBumpedLightstyles( ColorRGBExp32* RESTRICT pLightmap, int 
 static void ComputeLightmapFromLightstyle( msurfacelighting_t *pLighting, bool computeLightmap, 
 				bool computeBumpmap, int lightmapSize, bool hasBumpmapLightmapData )
 {
-	VPROF( "ComputeLightmapFromLightstyle" );
 
 	ColorRGBExp32 *pLightmap = pLighting->m_pSamples;
 

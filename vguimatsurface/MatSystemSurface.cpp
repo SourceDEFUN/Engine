@@ -3175,7 +3175,6 @@ void CMatSystemSurface::PaintTraverseEx(VPANEL panel, bool paintPopups /*= false
 	if ( !ipanel()->IsVisible( panel ) )
 		return;
 
-	VPROF( "CMatSystemSurface::PaintTraverse" );
 	CMatRenderContextPtr pRenderContext( g_pMaterialSystem );
 	bool bTopLevelDraw = false;
 
@@ -3216,14 +3215,12 @@ void CMatSystemSurface::PaintTraverseEx(VPANEL panel, bool paintPopups /*= false
 		else
 		{
 			// paint traverse the root panel, painting all children
-			VPROF( "ipanel()->PaintTraverse" );
 			ipanel()->PaintTraverse( panel, true );
 		}
 	}
 	else
 	{
 		// If it's a popup, it should already have been painted above
-		VPROF( "ipanel()->PaintTraverse" );
 		if ( !paintPopups || !ipanel()->IsPopup( panel ) )
 		{
 			ipanel()->PaintTraverse( panel, true );
@@ -3236,7 +3233,6 @@ void CMatSystemSurface::PaintTraverseEx(VPANEL panel, bool paintPopups /*= false
 		// now draw the popups front to back
 		// since depth-test and depth-write are on, the front panels will occlude the underlying ones
 		{
-			VPROF( "CMatSystemSurface::PaintTraverse popups loop" );
 			int popups = GetPopupCount();
 			if ( popups > 254 )
 			{
@@ -3277,7 +3273,6 @@ void CMatSystemSurface::PaintTraverseEx(VPANEL panel, bool paintPopups /*= false
 	if ( bTopLevelDraw )
 	{
 		// only undo the 2d ortho mode once
-		VPROF( "FinishDrawing" );
 
 		// Reset stencil to normal state
 		pRenderContext->SetStencilEnable( false );

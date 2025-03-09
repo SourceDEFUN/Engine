@@ -258,7 +258,6 @@ void TE_PlayerDecal( IRecipientFilter& filter, float delay,
 void C_TEPlayerDecal::PostDataUpdate( DataUpdateType_t updateType )
 {
 #ifndef _XBOX
-	VPROF( "C_TEPlayerDecal::PostDataUpdate" );
 
 	// Decals disabled?
 	if ( !r_decals.GetBool() )

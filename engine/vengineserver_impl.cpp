@@ -1806,7 +1806,6 @@ static CUtlMemoryPool s_PVSInfoAllocator( 128, 128 * 64, CUtlMemoryPool::GROW_SL
 //-----------------------------------------------------------------------------
 void CVEngineServer::PlaybackTempEntity( IRecipientFilter& filter, float delay, const void *pSender, const SendTable *pST, int classID  )
 {
-	VPROF( "PlaybackTempEntity" );
 
 	// don't add more events to a snapshot than a client can receive
 	if ( sv.m_TempEntities.Count() >= ((1<<CEventInfo::EVENT_INDEX_BITS)-1) )

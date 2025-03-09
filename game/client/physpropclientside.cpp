@@ -536,7 +536,6 @@ void C_PhysPropClientside::Clone( Vector &velocity )
 
 void C_PhysPropClientside::ImpactTrace( trace_t *pTrace, int iDamageType, const char *pCustomImpactName )
 {
-	VPROF( "C_PhysPropClientside::ImpactTrace" );
 	IPhysicsObject *pPhysicsObject = VPhysicsGetObject();
 
 	if( !pPhysicsObject )

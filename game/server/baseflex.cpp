@@ -896,7 +896,6 @@ bool CBaseFlex::CheckSceneEventCompletion( CSceneEventInfo *info, float currentt
 //-----------------------------------------------------------------------------
 void CBaseFlex::ProcessSceneEvents( void )
 {
-	VPROF( "CBaseFlex::ProcessSceneEvents" );
 	// slowly decay to netural expression
 	for ( LocalFlexController_t i = LocalFlexController_t(0); i < GetNumFlexControllers(); i++)
 	{
@@ -1173,7 +1172,6 @@ ConVar	ai_expression_frametime( "ai_expression_frametime", "0.05", FCVAR_NONE, "
 //-----------------------------------------------------------------------------
 bool CBaseFlex::ProcessFlexAnimationSceneEvent( CSceneEventInfo *info, CChoreoScene *scene, CChoreoEvent *event )
 {
-	VPROF( "CBaseFlex::ProcessFlexAnimationSceneEvent" );
 
 	if ( event->HasEndTime() )
 	{
@@ -1225,7 +1223,6 @@ bool CBaseFlex::ProcessFlexSettingSceneEvent( CSceneEventInfo *info, CChoreoScen
 	if ( !event->HasEndTime() )
 		return true;
 
-	VPROF( "CBaseFlex::ProcessFlexSettingSceneEvent" );
 
 	// Look up the actual strings
 	const char *scenefile	= event->GetParameters();
@@ -1256,7 +1253,6 @@ bool CBaseFlex::ProcessFacingSceneEvent( CSceneEventInfo *info, CChoreoScene *sc
 	if (info->m_hTarget == NULL)
 		return false;
 
-	VPROF( "CBaseFlex::ProcessFacingSceneEvent" );
 
 	// make sure we're still able to play this command
 	if (!EnterSceneSequence( scene, event, true ))
@@ -1368,7 +1364,6 @@ bool CBaseFlex::ProcessMoveToSceneEvent( CSceneEventInfo *info, CChoreoScene *sc
 	if (!myNpc)
 		return false;
 
-	VPROF( "CBaseFlex::ProcessMoveToSceneEvent" );
 
 	// make sure we're still able to play this command
 	if (!EnterSceneSequence( scene, event, true ))
@@ -1512,7 +1507,6 @@ bool CBaseFlex::ProcessMoveToSceneEvent( CSceneEventInfo *info, CChoreoScene *sc
 
 bool CBaseFlex::ProcessLookAtSceneEvent( CSceneEventInfo *info, CChoreoScene *scene, CChoreoEvent *event )
 {
-	VPROF( "CBaseFlex::ProcessLookAtSceneEvent" );
 	CAI_BaseNPC *myNpc = MyNPCPointer( );
 	if (myNpc && info->m_hTarget != NULL)
 	{
@@ -1541,7 +1535,6 @@ bool CBaseFlex::ProcessLookAtSceneEvent( CSceneEventInfo *info, CChoreoScene *sc
 //-----------------------------------------------------------------------------
 bool CBaseFlex::ProcessSceneEvent( CSceneEventInfo *info, CChoreoScene *scene, CChoreoEvent *event )
 {
-	VPROF( "CBaseFlex::ProcessSceneEvent" );
 	switch ( event->GetType() )
 	{
 	case CChoreoEvent::FLEXANIMATION:
@@ -1692,7 +1685,6 @@ void CBaseFlex::AddFlexAnimation( CSceneEventInfo *info )
 	// decay if this is a background scene and there's other flex animations playing
 	float weight = event->GetIntensity( scenetime ) * info->UpdateWeight( this );
 	{
-	VPROF( "AddFlexAnimation_SetFlexWeight" );
 
 	// Compute intensity for each track in animation and apply
 	// Iterate animation tracks

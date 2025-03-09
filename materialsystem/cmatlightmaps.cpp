@@ -1952,7 +1952,6 @@ void CMatLightmaps::UpdateLightmap( int lightmapPageID, int lightmapSize[2],
 									  float *pFloatImage, float *pFloatImageBump1,
 									  float *pFloatImageBump2, float *pFloatImageBump3 )
 {
-	VPROF( "CMatRenderContext::UpdateLightmap" );
 
 	bool hasBump = false;
 	int uSize = 1;

@@ -4135,7 +4135,6 @@ void Panel::PerformApplySchemeSettings()
 
 	if ( _flags.IsFlagSet( NEEDS_SCHEME_UPDATE ) )
 	{
-		VPROF( "ApplySchemeSettings" );
 		IScheme *pScheme = scheme()->GetIScheme( GetScheme() );
 		AssertOnce( pScheme );
 		if ( pScheme ) // this should NEVER be null, but if it is bad things would happen in ApplySchemeSettings...

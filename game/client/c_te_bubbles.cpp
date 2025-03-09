@@ -69,7 +69,6 @@ void TE_Bubbles( IRecipientFilter& filter, float delay,
 //-----------------------------------------------------------------------------
 void C_TEBubbles::PostDataUpdate( DataUpdateType_t updateType )
 {
-	VPROF( "C_TEBubbles::PostDataUpdate" );
 
 	tempents->Bubbles( m_vecMins, m_vecMaxs, m_fHeight, m_nModelIndex, m_nCount, m_fSpeed );
 }

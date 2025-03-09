@@ -235,7 +235,6 @@ CAM_Think
 */
 void CInput::CAM_Think( void )
 {
-	VPROF("CAM_Think");
 	//
 	if ( m_pCameraThirdData )
 	{

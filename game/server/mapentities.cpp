@@ -249,7 +249,6 @@ void SpawnAllEntities( int nEntities, HierarchicalSpawn_t *pSpawnList, bool bAct
 	int nEntity;
 	for (nEntity = 0; nEntity < nEntities; nEntity++)
 	{
-		VPROF( "MapEntity_ParseAllEntities_Spawn");
 		CBaseEntity *pEntity = pSpawnList[nEntity].m_pEntity;
 
 		if ( pSpawnList[nEntity].m_pDeferredParent )
@@ -287,7 +286,6 @@ void SpawnAllEntities( int nEntities, HierarchicalSpawn_t *pSpawnList, bool bAct
 
 	if ( bActivateEntities )
 	{
-		VPROF( "MapEntity_ParseAllEntities_Activate");
 		bool bAsyncAnims = mdlcache->SetAsyncLoad( MDLCACHE_ANIMBLOCK, false );
 		for (nEntity = 0; nEntity < nEntities; nEntity++)
 		{
@@ -309,7 +307,6 @@ void SpawnAllEntities( int nEntities, HierarchicalSpawn_t *pSpawnList, bool bAct
 //-----------------------------------------------------------------------------
 void MapEntity_ParseAllEntities(const char *pMapData, IMapEntityFilter *pFilter, bool bActivateEntities)
 {
-	VPROF("MapEntity_ParseAllEntities");
 
 	HierarchicalSpawnMapData_t *pSpawnMapData = new HierarchicalSpawnMapData_t[NUM_ENT_ENTRIES];
 	HierarchicalSpawn_t *pSpawnList = new HierarchicalSpawn_t[NUM_ENT_ENTRIES];
@@ -371,7 +368,6 @@ void MapEntity_ParseAllEntities(const char *pMapData, IMapEntityFilter *pFilter,
 		// To 
 		if ( dynamic_cast<CWorld*>( pEntity ) )
 		{
-			VPROF( "MapEntity_ParseAllEntities_SpawnWorld");
 
 			pEntity->m_iParent = NULL_STRING;	// don't allow a parent on the first entity (worldspawn)
 
@@ -382,7 +378,6 @@ void MapEntity_ParseAllEntities(const char *pMapData, IMapEntityFilter *pFilter,
 		CNodeEnt *pNode = dynamic_cast<CNodeEnt*>(pEntity);
 		if ( pNode )
 		{
-			VPROF( "MapEntity_ParseAllEntities_SpawnTransients");
 
 			// We overflow the max edicts on large maps that have lots of entities.
 			// Nodes & Lights remove themselves immediately on Spawn(), so dispatch their
@@ -401,7 +396,6 @@ void MapEntity_ParseAllEntities(const char *pMapData, IMapEntityFilter *pFilter,
 
 		if ( dynamic_cast<CLight*>(pEntity) )
 		{
-			VPROF( "MapEntity_ParseAllEntities_SpawnTransients");
 
 			// We overflow the max edicts on large maps that have lots of entities.
 			// Nodes & Lights remove themselves immediately on Spawn(), so dispatch their
@@ -438,7 +432,6 @@ void MapEntity_ParseAllEntities(const char *pMapData, IMapEntityFilter *pFilter,
 	int iTemplates = pPointTemplates.Count();
 	for ( int i = 0; i < iTemplates; i++ )
 	{
-		VPROF( "MapEntity_ParseAllEntities_SpawnTemplates");
 		CPointTemplate *pPointTemplate = pPointTemplates[i];
 
 		// First, tell the Point template to Spawn

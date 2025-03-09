@@ -381,7 +381,6 @@ private:
 //-----------------------------------------------------------------------------
 int	CEngineTrace::GetPointContents( const Vector &vecAbsPosition, IHandleEntity** ppEntity )
 {
-	VPROF( "CEngineTrace_GetPointContents" );
 //	VPROF_BUDGET( "CEngineTrace_GetPointContents", "CEngineTrace_GetPointContents" );
 	
 	m_traceStatCounters[TRACE_STAT_COUNTER_POINTCONTENTS]++;
@@ -1593,7 +1592,6 @@ CON_COMMAND_EXTERN( ray_bench, RayBench, "Time the rays" )
 			CM_BoxTrace( s_BenchmarkRays[i], 0, MASK_SOLID, true, trace );
 			if ( 0 )
 			{
-				VPROF("QueryStaticProps");
 				// Create a ray that extends only until we hit the world and adjust the trace accordingly
 				Ray_t entityRay = s_BenchmarkRays[i];
 				VectorScale( entityRay.m_Delta, trace.fraction, entityRay.m_Delta );
@@ -1608,7 +1606,6 @@ CON_COMMAND_EXTERN( ray_bench, RayBench, "Time the rays" )
 				if ( 0 )
 				{
 
-					VPROF("IntersectStaticProps");
 				for ( int i = 0; i < nCount; ++i )
 				{
 					// Generate a collideable

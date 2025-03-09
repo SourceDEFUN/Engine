@@ -153,7 +153,6 @@ void TE_Decal( IRecipientFilter& filter, float delay,
 //-----------------------------------------------------------------------------
 void C_TEDecal::PostDataUpdate( DataUpdateType_t updateType )
 {
-	VPROF( "C_TEDecal::PostDataUpdate" );
 
 	CBroadcastRecipientFilter filter;
 	TE_Decal( filter, 0.0f, &m_vecOrigin, &m_vecStart, m_nEntity, m_nHitbox, m_nIndex );

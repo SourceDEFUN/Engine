@@ -315,7 +315,6 @@ extern bool g_bDisableEhandleAccess;
 // call this before and after each frame to delete all of the marked entities.
 void CGlobalEntityList::CleanupDeleteList( void )
 {
-	VPROF( "CGlobalEntityList::CleanupDeleteList" );
 	g_fInCleanupDelete = true;
 	// clean up the vphysics delete list as well
 	PhysOnCleanupDeleteList();
@@ -1345,7 +1344,6 @@ void EntityTouch_Add( CBaseEntity *pEntity )
 
 void CEntityTouchManager::FrameUpdatePostEntityThink()
 {
-	VPROF( "CEntityTouchManager::FrameUpdatePostEntityThink" );
 	// Loop through all entities again, checking their untouch if flagged to do so
 	
 	int count = m_updateList.Count();

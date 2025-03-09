@@ -419,7 +419,6 @@ bool SendTable_Encode(
 		ErrorIfNot(	pRecipients->NumAllocated() >= pPrecalc->GetNumDataTableProxies(), ("SendTable_Encode: pRecipients array too small.") );
 	}
 
-	VPROF( "SendTable_Encode" );
 
 	CServerDTITimer timer( pTable, SERVERDTI_ENCODE );
 
@@ -553,7 +552,6 @@ int SendTable_CalcDelta(
 	int *pDeltaPropsBase = pDeltaProps;
 	int *pDeltaPropsEnd = pDeltaProps + nMaxDeltaProps;
 
-	VPROF( "SendTable_CalcDelta" );
 	
 	// Trivial reject.
 	//if ( CompareBitArrays( pFromState, pToState, nFromBits, nToBits ) )

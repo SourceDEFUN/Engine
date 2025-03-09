@@ -95,7 +95,6 @@ static inline void RecordMetalSparks( const Vector &start, const Vector &directi
 //-----------------------------------------------------------------------------
 void C_TEMetalSparks::PostDataUpdate( DataUpdateType_t updateType )
 {
-	VPROF( "C_TEMetalSparks::PostDataUpdate" );
 
 	g_pEffects->MetalSparks( m_vecPos, m_vecDir );
 	RecordMetalSparks( m_vecPos, m_vecDir );

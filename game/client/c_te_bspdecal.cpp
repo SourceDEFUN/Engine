@@ -86,7 +86,6 @@ void TE_BSPDecal( IRecipientFilter& filter, float delay,
 //-----------------------------------------------------------------------------
 void C_TEBSPDecal::PostDataUpdate( DataUpdateType_t updateType )
 {
-	VPROF( "C_TEBSPDecal::PostDataUpdate" );
 
 	C_BaseEntity *ent;
 	if ( ( ent = cl_entitylist->GetEnt( m_nEntity ) ) == NULL )

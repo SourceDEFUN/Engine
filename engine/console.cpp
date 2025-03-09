@@ -1254,7 +1254,6 @@ int CConPanel::ProcessNotifyLines( int &left, int &top, int &right, int &bottom,
 //-----------------------------------------------------------------------------
 void CConPanel::Paint()
 {
-	VPROF( "CConPanel::Paint" );
 
 #if !defined( SWDS ) && !defined( DEDICATED )
 	if ( IsPC() && !g_ClientDLL->ShouldDrawDropdownConsole() )

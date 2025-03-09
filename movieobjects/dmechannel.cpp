@@ -477,7 +477,6 @@ bool CDmeChannel::IsDirty()
 
 void CDmeChannel::Operate()
 {
-	VPROF( "CDmeChannel::Operate" );
 
 	switch ( GetMode() )
 	{
@@ -875,7 +874,6 @@ static int FindSpanningLayerAndSetIntensity( DmeLog_TimeSelection_t &ts, LayerSe
 
 void CDmeChannel::Record()
 {
-	VPROF( "CDmeChannel::Record" );
 
 	CDmAttribute *pFromAttr = GetFromAttribute();
 	if ( pFromAttr == NULL )

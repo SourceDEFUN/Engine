@@ -569,7 +569,6 @@ static ConVar cl_debug_player_perf( "cl_debug_player_perf", "0", 0 );
 //-----------------------------------------------------------------------------
 bool CL_ProcessPacketEntities ( SVC_PacketEntities *entmsg )
 {
-	VPROF( "_CL_ParsePacketEntities" );
 
 	// Packed entities for that frame
 	// Allocate space for new packet info.

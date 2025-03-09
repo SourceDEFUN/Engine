@@ -499,7 +499,6 @@ void CSoundPatch::Shutdown( void )
 //-----------------------------------------------------------------------------
 bool CSoundPatch::Update( float time, float deltaTime )
 {
-	VPROF( "CSoundPatch::Update" );
 	if ( m_shutdownTime && time > m_shutdownTime )
 	{
 		Shutdown();
@@ -883,7 +882,6 @@ void CSoundControllerImp::SystemReset( void )
 //-----------------------------------------------------------------------------
 void CSoundControllerImp::SystemUpdate( void )
 {
-	VPROF( "CSoundControllerImp::SystemUpdate" );
 	float time = g_pEffects->Time();
 	float deltaTime = time - m_flLastTime;
 	
@@ -894,7 +892,6 @@ void CSoundControllerImp::SystemUpdate( void )
 	m_flLastTime = time;
 
 	{
-		VPROF( "CSoundControllerImp::SystemUpdate:processcommandlist" );
 		while ( m_commandList.Count() )
 		{
 			SoundCommand_t *pCmd = m_commandList.ElementAtHead();
@@ -916,7 +913,6 @@ void CSoundControllerImp::SystemUpdate( void )
 	// NOTE: Because this loop goes from the end to the beginning
 	// we can fast remove inside it without breaking the indexing
 	{
-		VPROF( "CSoundControllerImp::SystemUpdate:removesounds" );
 		for ( int i = m_soundList.Count()-1; i >=0; i-- )
 		{
 			CSoundPatch *pNode = m_soundList[i];

@@ -1148,7 +1148,6 @@ static bool IsTakingAFreezecamScreenshot()
 //-----------------------------------------------------------------------------
 void CNetGraphPanel::Paint() 
 {
-	VPROF( "CNetGraphPanel::Paint" );
 
 	// Don't display net_graph if taking freezecam screenshot and hud_freezecamhide is enabled
 	extern ConVar hud_freezecamhide;
@@ -1225,7 +1224,6 @@ void CNetGraphPanel::Paint()
 //-----------------------------------------------------------------------------
 void CNetGraphPanel::PaintLineArt( int x, int y, int w, int graphtype, int maxmsgbytes ) 
 {
-	VPROF( "CNetGraphPanel::PaintLineArt" );
 
 	ResetLineSegments();
 
@@ -1440,7 +1438,6 @@ void CNetGraphPanel::DrawLine( vrect_t *rect, unsigned char *color, unsigned cha
 //-----------------------------------------------------------------------------
 void CNetGraphPanel::DrawLine2( vrect_t *rect, unsigned char *color, unsigned char *color2, unsigned char alpha, unsigned char alpha2 )
 {
-	VPROF( "CNetGraphPanel::DrawLine2" );
 
 	int idx = m_Rects.AddToTail();
 	CLineSegment *seg = &m_Rects[ idx ];

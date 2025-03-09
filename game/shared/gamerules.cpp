@@ -566,7 +566,6 @@ bool CGameRules::ClientCommand( CBaseEntity *pEdict, const CCommand &args )
 
 void CGameRules::FrameUpdatePostEntityThink()
 {
-	VPROF( "CGameRules::FrameUpdatePostEntityThink" );
 	Think();
 }
 

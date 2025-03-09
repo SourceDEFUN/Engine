@@ -1208,7 +1208,6 @@ void CMatRenderContext::EndRender()
 
 void CMatRenderContext::Flush( bool flushHardware )
 {
-	VPROF( "CMatRenderContextBase::Flush" );
 
 	g_pShaderAPI->FlushBufferedPrimitives();
 	if ( IsPC() && flushHardware )

@@ -29,9 +29,6 @@
 #endif
 #if defined(VPROF_AI)
 #include "tier0/vprof.h"
-#define AI_PROFILE_SCOPE( tag )			VPROF( #tag )
-#define AI_PROFILE_SCOPE_( pszName )	VPROF( pszName )
-#define AI_PROFILE_MEASURE_SCOPE( tag )	VPROF( #tag )
 #elif defined(PROFILE_AI)
 #include "tier0/fasttimer.h"
 #define AI_PROFILE_SCOPE( tag )			PROFILE_SCOPE( tag )

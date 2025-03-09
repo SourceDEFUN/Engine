@@ -432,20 +432,17 @@ void CVGui::RunFrame()
 
 	// this will generate all key and mouse events as well as make a real repaint
 	{
-		VPROF( "surface()->RunFrame()" );
 		g_pSurface->RunFrame();
 	}
 
 	// give the system a chance to process
 	{
-		VPROF( "system()->RunFrame()" );
 		g_pSystem->RunFrame();
 	}
 
 	// update cursor positions
 	if ( IsPC() && !IsReentrant() )
 	{
-		VPROF( "update cursor positions" );
 		int cursorX, cursorY;
 		g_pInput->GetCursorPosition(cursorX, cursorY);
 
@@ -456,14 +453,12 @@ void CVGui::RunFrame()
 
 	if ( !bIsReentrant )
 	{
-		VPROF( "input()->RunFrame()" );
 		g_pInput->RunFrame();
 	}
 
 	// messenging
 	if ( !bIsReentrant )
 	{
-		VPROF( "messaging" );
 
 		// send all the messages waiting in the queue
 		DispatchMessages();
@@ -511,7 +506,6 @@ void CVGui::RunFrame()
 	}
 
 	{
-		VPROF( "SolveTraverse" );
 		// make sure the hierarchy is up to date
 		g_pSurface->SolveTraverse(g_pSurface->GetEmbeddedPanel());
 		g_pSurface->ApplyChanges();

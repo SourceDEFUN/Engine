@@ -3047,7 +3047,6 @@ void _Host_RunFrame (float time)
 	int numticks;
 	{
 		// Profile scope specific to the top of this function, protect from setjmp() problems
-		VPROF( "_Host_RunFrame_Upto_MarkFrame" );
 
 		if ( host_checkheap )
 		{
@@ -4605,7 +4604,6 @@ SERVER TRANSITIONS
 */
 bool Host_NewGame( char *mapName, bool loadGame, bool bBackgroundLevel, const char *pszOldMap, const char *pszLandmark, bool bOldSave )
 {
-	VPROF( "Host_NewGame" );
 	COM_TimestampedLog( "Host_NewGame" );
 
 	char previousMapName[MAX_PATH] = { 0 };
@@ -4658,7 +4656,6 @@ bool Host_NewGame( char *mapName, bool loadGame, bool bBackgroundLevel, const ch
 
 	if ( !loadGame )
 	{
-		VPROF( "Host_NewGame_HostState_RunGameInit" );
 		HostState_RunGameInit();
 	}
 

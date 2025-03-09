@@ -82,7 +82,6 @@ void C_TEFootprintDecal::Precache( void )
 
 void C_TEFootprintDecal::PostDataUpdate( DataUpdateType_t updateType )
 {
-	VPROF( "C_TEFootprintDecal::PostDataUpdate" );
 
 	// FIXME: Make this choose the decal based on material type
 	if ( r_decals.GetInt() )

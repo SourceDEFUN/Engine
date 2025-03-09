@@ -72,7 +72,6 @@ void C_TEImpact::Precache( void )
 //-----------------------------------------------------------------------------
 void C_TEImpact::PostDataUpdate( DataUpdateType_t updateType )
 {
-	VPROF( "C_TEImpact::PostDataUpdate" );
 }
 
 //-----------------------------------------------------------------------------

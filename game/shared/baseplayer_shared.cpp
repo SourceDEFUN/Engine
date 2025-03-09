@@ -227,7 +227,6 @@ bool CBasePlayer::UsingStandardWeaponsInVehicle( void )
 //-----------------------------------------------------------------------------
 void CBasePlayer::ItemPostFrame()
 {
-	VPROF( "CBasePlayer::ItemPostFrame" );
 
 	// Put viewmodels into basically correct place based on new player origin
 	CalcViewModelView( EyePosition(), EyeAngles() );

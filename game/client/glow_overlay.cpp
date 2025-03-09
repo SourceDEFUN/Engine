@@ -496,7 +496,6 @@ void CGlowOverlay::Deactivate()
 
 void CGlowOverlay::DrawOverlays( bool bCacheFullSceneState )
 {
-	VPROF("CGlowOverlay::DrawOverlays()");
 
 	CMatRenderContextPtr pRenderContext( materials );
 

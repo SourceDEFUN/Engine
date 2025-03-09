@@ -381,7 +381,6 @@ struct CAudioSourceCachedInfoHandle_t
 
 	inline CAudioSourceCachedInfo *Get( int audiosourcetype, bool soundisprecached, CSfxTable *sfx, int *pcacheddatasize )
 	{
-		VPROF("CAudioSourceCachedInfoHandle_t::Get");
 
 		if ( m_FlushCount != s_nCurrentFlushCount )
 		{
@@ -406,7 +405,6 @@ struct CAudioSourceCachedInfoHandle_t
 
 	inline CAudioSourceCachedInfo *FastGet()
 	{
-		VPROF("CAudioSourceCachedInfoHandle_t::FastGet");
 
 		if ( m_FlushCount != s_nCurrentFlushCount )
 		{

@@ -532,7 +532,6 @@ void CStudioRender::DrawModel( const DrawModelInfo_t& info, const StudioRenderCo
 void CStudioRender::DrawModelStaticProp( const DrawModelInfo_t& info, 
 	const StudioRenderContext_t &rc, const matrix3x4_t& rootToWorld, int flags )
 {
-	VPROF( "CStudioRender::DrawModelStaticProp");
 
 	m_pRC = const_cast<StudioRenderContext_t*>( &rc );
 

@@ -529,7 +529,6 @@ void CAudioDeviceAudioQueue::TransferSamples( int end )
 
 void CAudioDeviceAudioQueue::SpatializeChannel( int volume[CCHANVOLUMES/2], int master_vol, const Vector& sourceDir, float gain, float mono )
 {
-	VPROF("CAudioDeviceAudioQueue::SpatializeChannel");
 	S_SpatializeChannel( volume, master_vol, &sourceDir, gain, mono );
 }
 

@@ -1135,7 +1135,6 @@ void CCSGameMovement::OnLand( float fVelocity )
 //-----------------------------------------------------------------------------
 void  CCSGameMovement::TryTouchGround( const Vector& start, const Vector& end, const Vector& mins, const Vector& maxs, unsigned int fMask, int collisionGroup, trace_t& pm )
 {
-	VPROF( "CCSGameMovement::TryTouchGround" );
 
 	Ray_t ray;
 	ray.Init( start, end, mins, maxs );

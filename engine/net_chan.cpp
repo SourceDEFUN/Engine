@@ -1868,7 +1868,6 @@ bool CNetChan::ProcessControlMessage( int cmd, bf_read &buf)
 
 bool CNetChan::ProcessMessages( bf_read &buf  )
 {
-	VPROF( "CNetChan::ProcessMessages" );
 
 	const char * showmsgname = net_showmsg.GetString();
 	const char * blockmsgname = net_blockmsg.GetString();
@@ -2420,7 +2419,6 @@ and then the netmessages processed
 */
 void CNetChan::ProcessPacket( netpacket_t * packet, bool bHasHeader )
 {
-	VPROF( "CNetChan::ProcessPacket" );
 
 	Assert( packet );
 

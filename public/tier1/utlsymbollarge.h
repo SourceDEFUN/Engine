@@ -375,7 +375,6 @@ inline CUtlSymbolTableLargeBase<TreeType, CASEINSENSITIVE, POOL_SIZE>::~CUtlSymb
 template < class TreeType, bool CASEINSENSITIVE, size_t POOL_SIZE >
 inline CUtlSymbolLarge CUtlSymbolTableLargeBase<TreeType, CASEINSENSITIVE, POOL_SIZE>::Find( const char* pString ) const
 {	
-	VPROF( "CUtlSymbolLarge::Find" );
 	if (!pString)
 		return CUtlSymbolLarge();
 
@@ -418,7 +417,6 @@ inline int CUtlSymbolTableLargeBase<TreeType, CASEINSENSITIVE, POOL_SIZE>::FindP
 template < class TreeType, bool CASEINSENSITIVE, size_t POOL_SIZE >
 inline CUtlSymbolLarge CUtlSymbolTableLargeBase<TreeType, CASEINSENSITIVE, POOL_SIZE>::AddString( const char* pString )
 {
-	VPROF("CUtlSymbolLarge::AddString");
 	if (!pString) 
 		return UTL_INVAL_SYMBOL_LARGE;
 

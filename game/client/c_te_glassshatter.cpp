@@ -161,7 +161,6 @@ void C_TEShatterSurface::RecordShatterSurface( )
 //-----------------------------------------------------------------------------
 void C_TEShatterSurface::PostDataUpdate( DataUpdateType_t updateType )
 {
-	VPROF( "C_TEShatterSurface::PostDataUpdate" );
 
 	RecordShatterSurface();
 

@@ -88,7 +88,6 @@ static inline void RecordSmoke( const Vector &start, float flScale, int nFrameRa
 //-----------------------------------------------------------------------------
 void C_TESmoke::PostDataUpdate( DataUpdateType_t updateType )
 {
-	VPROF( "C_TESmoke::PostDataUpdate" );
 
 	// The number passed down is 10 times smaller...
 	g_pEffects->Smoke( m_vecOrigin, m_nModelIndex, m_fScale * 10.0f, m_nFrameRate );

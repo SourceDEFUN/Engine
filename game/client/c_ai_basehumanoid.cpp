@@ -76,7 +76,6 @@ END_RECV_TABLE()
 //-----------------------------------------------------------------------------
 void C_AI_BaseHumanoid::StandardBlendingRules( CStudioHdr *pStudioHdr, Vector pos[], Quaternion q[], float currentTime, int boneMask )
 {
-	VPROF( "C_AI_BaseHumanoid::StandardBlendingRules" );
 
 	BaseClass::StandardBlendingRules( pStudioHdr, pos, q, currentTime, boneMask );
 

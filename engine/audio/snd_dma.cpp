@@ -2442,7 +2442,6 @@ void DSP_SetSpatialDelay( int chan, float v )
 
 void SND_SetSpatialDelays()
 {
-	VPROF("SoundSpatialDelays");
 	float dist, v, vp;
 	Vector v_dir, v_dir2;
 	int chan_max = (g_AudioDevice->IsSurround() ? 4 : 2) + (g_AudioDevice->IsSurroundCenter() ? 1 : 0);  // 2, 4, 5 channels
@@ -4076,7 +4075,6 @@ int DAS_GetRoomDSP( das_room_t *proom, int inode )
 
 void DAS_CheckNewRoomDSP( )
 {
-	VPROF("DAS_CheckNewRoomDSP");
 	das_room_t *proom = &g_das_room;
 	int dsp_preset;
 	bool bRoom_ready = false;
@@ -4322,7 +4320,6 @@ SND_Spatialize
 */
 void SND_Spatialize(channel_t *ch)
 {
-	VPROF("SND_Spatialize");
 
     vec_t dist;
     Vector source_vec;
@@ -6110,7 +6107,6 @@ Called once each time through the main loop
 */
 void S_Update( const AudioState_t *pAudioState )
 {
-	VPROF("S_Update");
 	channel_t	*ch;
 	channel_t	*combine;
 	static unsigned int s_roundrobin = 0 ; ///< number of times this function is called.

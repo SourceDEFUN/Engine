@@ -2769,7 +2769,6 @@ extern ConVar ai_LOS_mode;
 //=========================================================
 bool CBaseEntity::FVisible( CBaseEntity *pEntity, int traceMask, CBaseEntity **ppBlocker )
 {
-	VPROF( "CBaseEntity::FVisible" );
 
 	if ( pEntity->GetFlags() & FL_NOTARGET )
 		return false;

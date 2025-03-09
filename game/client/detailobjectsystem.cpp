@@ -2107,7 +2107,6 @@ int CDetailObjectSystem::SortSpritesBackToFront( int nLeaf, const Vector &viewOr
 
 	if ( nCount )
 	{
-		VPROF( "CDetailObjectSystem::SortSpritesBackToFront -- Sort" );
 		std::make_heap( pSortInfo, pSortInfo + nCount, SortLessFunc ); 
 		std::sort_heap( pSortInfo, pSortInfo + nCount, SortLessFunc ); 
 	}
@@ -2224,7 +2223,6 @@ int CDetailObjectSystem::BuildOutSortedSprites( CFastDetailLeafSpriteList *pData
 	// part 2 - sort
 	if ( nCount )
 	{
-		VPROF( "CDetailObjectSystem::SortSpritesBackToFront -- Sort" );
 		std::make_heap( m_pFastSortInfo, m_pFastSortInfo + nCount, SortLessFunc ); 
 		std::sort_heap( m_pFastSortInfo, m_pFastSortInfo + nCount, SortLessFunc ); 
 	}

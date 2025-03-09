@@ -142,7 +142,6 @@ void TE_BreakModel( IRecipientFilter& filter, float delay,
 //-----------------------------------------------------------------------------
 void C_TEBreakModel::PostDataUpdate( DataUpdateType_t updateType )
 {
-	VPROF( "C_TEBreakModel::PostDataUpdate" );
 
 	tempents->BreakModel( m_vecOrigin, m_angRotation, m_vecSize, m_vecVelocity,
 		m_nRandomization, m_fTime, m_nCount, m_nModelIndex, m_nFlags );

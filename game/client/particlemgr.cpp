@@ -1424,7 +1424,6 @@ void CParticleMgr::RemoveAllEffects()
 
 void CParticleMgr::IncrementFrameCode()
 {
-	VPROF( "CParticleMgr::IncrementFrameCode()" );
 
 	++m_FrameCode;
 	if ( m_FrameCode == 0 )
@@ -1474,7 +1473,6 @@ int GetParticlePerformance()
 
 void CParticleMgr::PostRender()
 {
-	VPROF("CParticleMgr::SimulateUndrawnEffects");
 
 	// Simulate all effects that weren't drawn (if they have their 'always simulate' flag set).
 	FOR_EACH_LL( m_Effects, i )

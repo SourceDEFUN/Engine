@@ -100,7 +100,6 @@ bool CHammerVGui::HasFocus( CVGuiWnd *pWnd )
 
 void CHammerVGui::Simulate()
 {
-// VPROF( "CHammerVGui::Simulate" );
 
 	if ( !IsInitialized() )
 		return;

@@ -643,7 +643,6 @@ float CViewRender::GetZFar()
 //-----------------------------------------------------------------------------
 void CViewRender::SetUpViews()
 {
-	VPROF("CViewRender::SetUpViews");
 
 	// Initialize view structure with default values
 	float farZ = GetZFar();

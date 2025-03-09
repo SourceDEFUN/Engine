@@ -240,7 +240,6 @@ void ClientData_Update( CBasePlayer *pl )
 //-----------------------------------------------------------------------------
 void UpdateAllClientData( void )
 {
-	VPROF( "UpdateAllClientData" );
 	int i;
 	CBasePlayer *pl;
 

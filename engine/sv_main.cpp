@@ -2908,7 +2908,6 @@ void SV_SendClientUpdates( bool bIsSimulating, bool bSendDuringPause )
 
 void SV_Frame( bool finalTick )
 {
-	VPROF( "SV_Frame" );
 
 	if ( serverGameDLL && finalTick )
 	{

@@ -145,7 +145,6 @@ void TE_BloodSprite( IRecipientFilter& filter, float delay,
 //-----------------------------------------------------------------------------
 void C_TEBloodSprite::PostDataUpdate( DataUpdateType_t updateType )
 {
-	VPROF( "C_TEBloodSprite::PostDataUpdate" );
 
 	Vector	offset = m_vecOrigin + ( m_vecDirection * 4.0f );
 

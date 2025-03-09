@@ -1749,7 +1749,6 @@ static float GetSkyboxFogMaxDensity()
 
 void CViewRender::DisableFog( void )
 {
-	VPROF("CViewRander::DisableFog()");
 
 	CMatRenderContextPtr pRenderContext( materials );
 	pRenderContext->FogMode( MATERIAL_FOG_NONE );
@@ -1891,7 +1890,6 @@ void CViewRender::RenderView( const CViewSetup &view, int nClearFlags, int whatT
 	m_CurrentView = view;
 
 	C_BaseAnimating::AutoAllowBoneAccess boneaccess( true, true );
-	VPROF( "CViewRender::RenderView" );
 
 	// Don't want TF2 running less than DX 8
 	if ( g_pMaterialSystemHardwareConfig->GetDXSupportLevel() < 80 )
@@ -2653,7 +2651,6 @@ bool DoesViewPlaneIntersectWater( float waterZ, int leafWaterDataID )
 
 void CViewRender::ViewDrawScene_PortalStencil( const CViewSetup &viewIn, ViewCustomVisibility_t *pCustomVisibility )
 {
-	VPROF( "CViewRender::ViewDrawScene_PortalStencil" );
 
 	CViewSetup view( viewIn );
 
@@ -2792,7 +2789,6 @@ void CViewRender::GetWaterLODParams( float &flCheapWaterStartDistance, float &fl
 //-----------------------------------------------------------------------------
 void CViewRender::ViewDrawScene_Intro( const CViewSetup &view, int nClearFlags, const IntroData_t &introData )
 {
-	VPROF( "CViewRender::ViewDrawScene" );
 
 	CMatRenderContextPtr pRenderContext( materials );
 
@@ -3221,7 +3217,6 @@ void CRendering3dView::ReleaseLists()
 //-----------------------------------------------------------------------------
 void CRendering3dView::SetupRenderablesList( int viewID )
 {
-	VPROF( "CViewRender::SetupRenderablesList" );
 
 	// Clear the list.
 	int i;
@@ -4175,7 +4170,6 @@ static inline void DrawTranslucentRenderable( IClientRenderable *pEnt, bool twoP
 //-----------------------------------------------------------------------------
 void CRendering3dView::DrawTranslucentRenderablesNoWorld( bool bInSkybox )
 {
-	VPROF( "CViewRender::DrawTranslucentRenderablesNoWorld" );
 
 	if ( !m_pMainView->ShouldDrawEntities() || !r_drawtranslucentrenderables.GetBool() )
 		return;
@@ -4215,7 +4209,6 @@ void CRendering3dView::DrawTranslucentRenderablesNoWorld( bool bInSkybox )
 //-----------------------------------------------------------------------------
 void CRendering3dView::DrawNoZBufferTranslucentRenderables( void )
 {
-	VPROF( "CViewRender::DrawNoZBufferTranslucentRenderables" );
 
 	if ( !m_pMainView->ShouldDrawEntities() || !r_drawtranslucentrenderables.GetBool() )
 		return;
@@ -4496,7 +4489,6 @@ void CRendering3dView::DrawTranslucentRenderables( bool bInSkybox, bool bShadowD
 //-----------------------------------------------------------------------------
 void CRendering3dView::EnableWorldFog( void )
 {
-	VPROF("CViewRender::EnableWorldFog");
 	CMatRenderContextPtr pRenderContext( materials );
 
 	fogparams_t *pFogParams = NULL;
@@ -5543,7 +5535,6 @@ void CSimpleWorldView::Setup( const CViewSetup &view, int nClearFlags, bool bDra
 //-----------------------------------------------------------------------------
 void CSimpleWorldView::Draw()
 {
-	VPROF( "CViewRender::ViewDrawScene_NoWater" );
 
 	CMatRenderContextPtr pRenderContext( materials );
 	PIXEVENT( pRenderContext, "CSimpleWorldView::Draw" );
@@ -5691,7 +5682,6 @@ void CAboveWaterView::Setup( const CViewSetup &view, bool bDrawSkybox, const Vis
 //-----------------------------------------------------------------------------
 void CAboveWaterView::Draw()
 {
-	VPROF( "CViewRender::ViewDrawScene_EyeAboveWater" );
 
 	// eye is outside of water
 	
@@ -5952,7 +5942,6 @@ void CUnderWaterView::Draw()
 {
 	// FIXME: The 3d skybox shouldn't be drawn when the eye is under water
 
-	VPROF( "CViewRender::ViewDrawScene_EyeUnderWater" );
 
 	CMatRenderContextPtr pRenderContext( materials );
 
@@ -6110,7 +6099,6 @@ void CReflectiveGlassView::PopView( )
 //-----------------------------------------------------------------------------
 void CReflectiveGlassView::Draw()
 {
-	VPROF( "CReflectiveGlassView::Draw" );
 
 	CMatRenderContextPtr pRenderContext( materials );
 	PIXEVENT( pRenderContext, "CReflectiveGlassView::Draw" );
@@ -6179,7 +6167,6 @@ void CRefractiveGlassView::PopView( )
 //-----------------------------------------------------------------------------
 void CRefractiveGlassView::Draw()
 {
-	VPROF( "CRefractiveGlassView::Draw" );
 
 	CMatRenderContextPtr pRenderContext( materials );
 	PIXEVENT( pRenderContext, "CRefractiveGlassView::Draw" );

@@ -1124,7 +1124,6 @@ void CStudioRender::AddDecal( StudioDecalHandle_t hDecal, const StudioRenderCont
 	studiohdr_t *pStudioHdr, const Ray_t& ray, const Vector& decalUp, IMaterial* pDecalMaterial, 
 	float radius, int body, bool noPokethru, int maxLODToDecal )
 {
-	VPROF( "CStudioRender::AddDecal" );
 
 	if ( hDecal == STUDIORENDER_DECAL_INVALID )
 		return;
@@ -1721,7 +1720,6 @@ void CStudioRender::DrawDecalMaterial( IMatRenderContext *pRenderContext, DecalM
 {
 	// Performance analysis.
 //	VPROF_BUDGET( "Decals", "Decals" );
-	VPROF( "DecalsDrawStudio" );
 
 	// It's possible for the index count to become zero due to decal retirement
 	int indexCount = decalMaterial.m_Indices.Count();
@@ -1891,7 +1889,6 @@ void CStudioRender::DrawDecal( const DrawModelInfo_t &drawInfo, int lod, int bod
 	if ( handle == STUDIORENDER_DECAL_INVALID )
 		return;
 
-	VPROF("CStudioRender::DrawDecal");
 
 	CMatRenderContextPtr pRenderContext( g_pMaterialSystem );
 	PreDrawDecal( pRenderContext, drawInfo );
@@ -1963,7 +1960,6 @@ void CStudioRender::DrawStaticPropDecals( const DrawModelInfo_t &drawInfo, const
 
 	m_pRC = const_cast< StudioRenderContext_t* >( &rc );
 
-	VPROF("CStudioRender::DrawStaticPropDecals");
 	CMatRenderContextPtr pRenderContext( g_pMaterialSystem );
 	PreDrawDecal( pRenderContext, drawInfo );
 

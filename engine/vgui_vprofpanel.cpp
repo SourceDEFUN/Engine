@@ -208,7 +208,6 @@ void CProfileHierarchyPanel::ColumnPanels_t::AddColumn( int index, const char *n
 
 void CProfileHierarchyPanel::ColumnPanels_t::Refresh( KeyValues *kv )
 {
-	VPROF( "CProfileHierarchyPanel::ColumnPanels_t" );
 
 	int c = m_Columns.Count();
 	for ( int i = 0; i < c; ++i )
@@ -265,7 +264,6 @@ void CProfileHierarchyPanel::ApplySchemeSettings( vgui::IScheme *pScheme )
 
 void CProfileHierarchyPanel::SetItemColors( int id, const Color& fg, const Color& bg )
 {
-	VPROF( "CProfileHierarchyPanel::SetItemColors" );
 	GetTree()->SetItemFgColor( id, fg );
 	GetTree()->SetItemBgColor( id, bg );
 	ColumnPanels_t search;
@@ -289,7 +287,6 @@ void CProfileHierarchyPanel::SetItemColors( int id, const Color& fg, const Color
 
 void CProfileHierarchyPanel::SetItemColumnColors( int id, int col, const Color& fg, const Color& bg )
 {
-	VPROF( "CProfileHierarchyPanel::SetItemColumnColors" );
 	ColumnPanels_t search;
 	search.treeViewItem = id;
 	int idx = m_Panels.Find( search );
@@ -362,7 +359,6 @@ void CProfileHierarchyPanel::PostChildPaint()
 
 void CProfileHierarchyPanel::PerformLayout()
 {
-	VPROF( "CProfileHierarchyPanel::PerformLayout" );
 	BaseClass::PerformLayout();
 
 	// Assume all invisible at first
@@ -883,7 +879,6 @@ void CVProfPanel::AddColumns( CProfileHierarchyPanel::ColumnPanels_t& cp )
 //-----------------------------------------------------------------------------
 int CVProfPanel::UpdateVProfTreeEntry( KeyValues *pKeyValues, CVProfNode *pNode, int parent )
 {
-	VPROF( "UpdateVProfTreeEntry" );
 
 	CFmtStrN<1024> msg;
 	double curTimeLessChildren = pNode->GetCurTimeLessChildren();
@@ -937,7 +932,6 @@ int CVProfPanel::UpdateVProfTreeEntry( KeyValues *pKeyValues, CVProfNode *pNode,
 	}
 	else
 	{
-		VPROF( "UpdateVProfTreeEntry:Modify" );
 		m_pHierarchy->ModifyItem( pKeyValues, id );
 	}
 

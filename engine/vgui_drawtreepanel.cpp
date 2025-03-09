@@ -535,7 +535,6 @@ void VGui_FillKeyValues( KeyValues *pCurrentParent )
 
 void VGui_DrawHierarchy( void )
 {
-	VPROF( "VGui_DrawHierarchy" );
 
 	if ( IsX360() )
 		return;

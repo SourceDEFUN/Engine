@@ -298,7 +298,6 @@ bool CNavMesh::FindNavAreaOrLadderAlongRay( const Vector &start, const Vector &e
  */
 bool CNavMesh::FindActiveNavArea( void )
 {
-	VPROF( "CNavMesh::FindActiveNavArea" );
 
 	m_splitAlongX = false;
 	m_splitEdge = 0.0f;
@@ -719,7 +718,6 @@ void CNavMesh::UpdateDragSelectionSet( void )
 ConVar nav_show_compass( "nav_show_compass", "0", FCVAR_CHEAT );
 void CNavMesh::DrawEditMode( void )
 {
-	VPROF( "CNavMesh::DrawEditMode" );
 
 	CBasePlayer *player = UTIL_GetListenServerHost();
 	if (player == NULL)

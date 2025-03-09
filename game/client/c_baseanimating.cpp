@@ -378,7 +378,6 @@ void C_ClientRagdoll::OnRestore( void )
 
 void C_ClientRagdoll::ImpactTrace( trace_t *pTrace, int iDamageType, const char *pCustomImpactName )
 {
-	VPROF( "C_ClientRagdoll::ImpactTrace" );
 
 	IPhysicsObject *pPhysicsObject = VPhysicsGetObject();
 
@@ -1761,7 +1760,6 @@ CollideType_t C_BaseAnimating::GetCollideType( void )
 //-----------------------------------------------------------------------------
 void C_BaseAnimating::MaintainSequenceTransitions( IBoneSetup &boneSetup, float flCycle, Vector pos[], Quaternion q[] )
 {
-	VPROF( "C_BaseAnimating::MaintainSequenceTransitions" );
 
 	if ( !boneSetup.GetStudioHdr() )
 		return;
@@ -1899,7 +1897,6 @@ void C_BaseAnimating::ChildLayerBlend( Vector pos[], Quaternion q[], float curre
 //-----------------------------------------------------------------------------
 void C_BaseAnimating::StandardBlendingRules( CStudioHdr *hdr, Vector pos[], Quaternion q[], float currentTime, int boneMask )
 {
-	VPROF( "C_BaseAnimating::StandardBlendingRules" );
 
 	float		poseparam[MAXSTUDIOPOSEPARAM];
 
@@ -2032,7 +2029,6 @@ void C_BaseAnimating::SetupBones_AttachmentHelper( CStudioHdr *hdr )
 
 bool C_BaseAnimating::CalcAttachments()
 {
-	VPROF( "C_BaseAnimating::CalcAttachments" );
 
 
 	// Make sure m_CachedBones is valid.
@@ -3225,7 +3221,6 @@ void C_BaseAnimating::DoInternalDrawModel( ClientModelRenderInfo_t *pInfo, DrawM
 //-----------------------------------------------------------------------------
 int C_BaseAnimating::InternalDrawModel( int flags )
 {
-	VPROF( "C_BaseAnimating::InternalDrawModel" );
 
 	if ( !GetModel() )
 		return 0;
@@ -4223,7 +4218,6 @@ bool C_BaseAnimating::Interpolate( float flCurrentTime )
 	if ( m_pRagdoll )
 		return true;
 
-	VPROF( "C_BaseAnimating::Interpolate" );
 
 	Vector oldOrigin;
 	QAngle oldAngles;
@@ -4406,7 +4400,6 @@ void C_BaseAnimating::VPhysicsUpdate( IPhysicsObject *pPhysics )
 //-----------------------------------------------------------------------------
 void C_BaseAnimating::PreDataUpdate( DataUpdateType_t updateType )
 {
-	VPROF( "C_BaseAnimating::PreDataUpdate" );
 
 	m_flOldCycle = GetCycle();
 	m_nOldSequence = GetSequence();
@@ -4942,7 +4935,6 @@ bool C_BaseAnimating::TestCollision( const Ray_t &ray, unsigned int fContentsMas
 // Add those and the client hitboxes will be robust
 bool C_BaseAnimating::TestHitboxes( const Ray_t &ray, unsigned int fContentsMask, trace_t& tr )
 {
-	VPROF( "C_BaseAnimating::TestHitboxes" );
 
 	MDLCACHE_CRITICAL_SECTION();
 

@@ -941,7 +941,6 @@ bool CServerGameDLL::IsRestoring()
 // Called any time a new level is started (after GameInit() also on level transitions within a game)
 bool CServerGameDLL::LevelInit( const char *pMapName, char const *pMapEntities, char const *pOldLevel, char const *pLandmarkName, bool loadGame, bool background )
 {
-	VPROF("CServerGameDLL::LevelInit");
 
 #ifdef USES_ECON_ITEMS
 	GameItemSchema_t *pItemSchema = ItemSystem()->GetItemSchema();
@@ -1176,7 +1175,6 @@ ConVar  trace_report( "trace_report", "0" );
 
 void CServerGameDLL::GameFrame( bool simulating )
 {
-	VPROF( "CServerGameDLL::GameFrame" );
 
 	// Don't run frames until fully restored
 	if ( g_InRestore )

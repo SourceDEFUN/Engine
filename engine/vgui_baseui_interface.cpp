@@ -2222,7 +2222,6 @@ static void VGui_RecursePanel( CUtlVector< vgui::VPANEL >& panelList, int x, int
 
 void CEngineVGui::DrawMouseFocus( void )
 {
-	VPROF( "CEngineVGui::DrawMouseFocus" );
 
 	g_FocusPanelList.RemoveAll();
 

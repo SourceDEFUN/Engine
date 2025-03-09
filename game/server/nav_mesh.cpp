@@ -248,7 +248,6 @@ void CNavMesh::DestroyNavigationMesh( bool incremental )
  */
 void CNavMesh::Update( void )
 {
-	VPROF( "CNavMesh::Update" );
 
 	if (IsGenerating())
 	{
@@ -738,7 +737,6 @@ CNavArea *CNavMesh::GetNavArea( const Vector &pos, float beneathLimit ) const
 //----------------------------------------------------------------------------
 CNavArea *CNavMesh::GetNavArea( CBaseEntity *pEntity, int nFlags, float flBeneathLimit ) const
 {
-	VPROF( "CNavMesh::GetNavArea [ent]" );
 
 	if ( !m_grid.Count() )
 		return NULL;
@@ -999,7 +997,6 @@ CNavArea *CNavMesh::GetNearestNavArea( const Vector &pos, bool anyZ, float maxDi
 //----------------------------------------------------------------------------
 CNavArea *CNavMesh::GetNearestNavArea( CBaseEntity *pEntity, int nFlags, float maxDist ) const
 {
-	VPROF( "CNavMesh::GetNearestNavArea [ent]" );
 
 	if ( !m_grid.Count() )
 		return NULL;
@@ -1324,7 +1321,6 @@ public:
 
 bool CNavMesh::GetGroundHeight( const Vector &pos, float *height, Vector *normal ) const
 {
-	VPROF( "CNavMesh::GetGroundHeight" );
 
 	const float flMaxOffset = 100.0f;
 
@@ -3129,7 +3125,6 @@ void CNavMesh::OnAreaUnblocked( CNavArea *area )
 //--------------------------------------------------------------------------------------------------------
 void CNavMesh::UpdateBlockedAreas( void )
 {
-	VPROF( "CNavMesh::UpdateBlockedAreas" );
 	for ( int i=0; i<m_blockedAreas.Count(); ++i )
 	{
 		CNavArea *area = m_blockedAreas[i];
@@ -3175,7 +3170,6 @@ void CNavMesh::OnAvoidanceObstacleLeftArea( CNavArea *area )
 //--------------------------------------------------------------------------------------------------------
 void CNavMesh::UpdateAvoidanceObstacleAreas( void )
 {
-	VPROF( "CNavMesh::UpdateAvoidanceObstacleAreas" );
 	for ( int i=0; i<m_avoidanceObstacleAreas.Count(); ++i )
 	{
 		CNavArea *area = m_avoidanceObstacleAreas[i];

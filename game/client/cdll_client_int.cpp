@@ -1493,7 +1493,6 @@ void CHLClient::DecodeUserCmdFromBuffer( bf_read& buf, int slot )
 //-----------------------------------------------------------------------------
 void CHLClient::View_Render( vrect_t *rect )
 {
-	VPROF( "View_Render" );
 
 	// UNDONE: This gets hit at startup sometimes, investigate - will cause NaNs in calcs inside Render()
 	if ( rect->width == 0 || rect->height == 0 )
@@ -1986,7 +1985,6 @@ void SimulateEntities()
 
 bool AddDataChangeEvent( IClientNetworkable *ent, DataUpdateType_t updateType, int *pStoredEvent )
 {
-	VPROF( "AddDataChangeEvent" );
 
 	Assert( ent );
 	// Make sure we don't already have an event queued for this guy.
@@ -2103,7 +2101,6 @@ void UpdatePVSNotifiers()
 
 void OnRenderStart()
 {
-	VPROF( "OnRenderStart" );
 	MDLCACHE_CRITICAL_SECTION();
 	MDLCACHE_COARSE_LOCK();
 
@@ -2124,7 +2121,6 @@ void OnRenderStart()
 
 	{
 		// vprof node for this bloc of math
-		VPROF( "OnRenderStart: dirty bone caches");
 		// Invalidate any bone information.
 		C_BaseAnimating::InvalidateBoneCaches();
 
@@ -2244,7 +2240,6 @@ void CHLClient::FrameStageNotify( ClientFrameStage_t curStage )
 
 	case FRAME_RENDER_START:
 		{
-			VPROF( "CHLClient::FrameStageNotify FRAME_RENDER_START" );
 
 			// Last thing before rendering, run simulation.
 			OnRenderStart();
@@ -2253,7 +2248,6 @@ void CHLClient::FrameStageNotify( ClientFrameStage_t curStage )
 		
 	case FRAME_RENDER_END:
 		{
-			VPROF( "CHLClient::FrameStageNotify FRAME_RENDER_END" );
 			OnRenderEnd();
 
 			PREDICTION_SPEWVALUECHANGES();
@@ -2262,7 +2256,6 @@ void CHLClient::FrameStageNotify( ClientFrameStage_t curStage )
 		
 	case FRAME_NET_UPDATE_START:
 		{
-			VPROF( "CHLClient::FrameStageNotify FRAME_NET_UPDATE_START" );
 			// disabled all recomputations while we update entities
 			C_BaseEntity::EnableAbsRecomputations( false );
 			C_BaseEntity::SetAbsQueriesValid( false );
@@ -2286,13 +2279,11 @@ void CHLClient::FrameStageNotify( ClientFrameStage_t curStage )
 		break;
 	case FRAME_NET_UPDATE_POSTDATAUPDATE_START:
 		{
-			VPROF( "CHLClient::FrameStageNotify FRAME_NET_UPDATE_POSTDATAUPDATE_START" );
 			PREDICTION_STARTTRACKVALUE( "postdataupdate" );
 		}
 		break;
 	case FRAME_NET_UPDATE_POSTDATAUPDATE_END:
 		{
-			VPROF( "CHLClient::FrameStageNotify FRAME_NET_UPDATE_POSTDATAUPDATE_END" );
 			PREDICTION_ENDTRACKVALUE();
 			// Let prediction copy off pristine data
 			prediction->PostEntityPacketReceived();
@@ -2492,7 +2483,6 @@ void CHLClient::WriteSaveGameScreenshotOfSize( const char *pFilename, int width,
 // See RenderViewInfo_t
 void CHLClient::RenderView( const CViewSetup &setup, int nClearFlags, int whatToDraw )
 {
-	VPROF("RenderView");
 	view->RenderView( setup, nClearFlags, whatToDraw );
 }
 

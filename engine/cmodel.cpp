@@ -1467,7 +1467,6 @@ CM_TraceToLeaf
 template <bool IS_POINT>
 void FASTCALL CM_TraceToLeaf( TraceInfo_t * RESTRICT pTraceInfo, int ndxLeaf, float startFrac, float endFrac )
 {
-	VPROF("CM_TraceToLeaf");
 	// get the leaf
 	cleaf_t * RESTRICT pLeaf = &pTraceInfo->m_pBSPData->map_leafs[ndxLeaf];
 
@@ -1559,7 +1558,6 @@ void FASTCALL CM_TraceToLeaf( TraceInfo_t * RESTRICT pTraceInfo, int ndxLeaf, fl
 	// Collide (test) against displacement surfaces in this leaf.
 	if( pLeaf->dispCount )
 	{
-		VPROF("CM_TraceToLeafDisps");
 		//
 		// trace ray/swept box against all displacement surfaces in this leaf
 		//
@@ -2181,7 +2179,6 @@ void CM_BoxTraceAgainstLeafList( const Ray_t &ray, int *pLeafList, int nLeafCoun
 
 void CM_BoxTrace( const Ray_t& ray, int headnode, int brushmask, bool computeEndpt, trace_t& tr )
 {
-	VPROF("BoxTrace");
 	// for multi-check avoidance
 	TraceInfo_t *pTraceInfo = BeginTrace();		
 

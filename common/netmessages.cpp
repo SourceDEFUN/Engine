@@ -50,7 +50,6 @@ bool CLC_VoiceData::WriteToBuffer( bf_write &buffer )
 
 bool CLC_VoiceData::ReadFromBuffer( bf_read &buffer )
 {
-	VPROF( "CLC_VoiceData::ReadFromBuffer" );
 
 	m_nLength = buffer.ReadWord();	// length in bits
 
@@ -85,7 +84,6 @@ bool CLC_Move::WriteToBuffer( bf_write &buffer )
 
 bool CLC_Move::ReadFromBuffer( bf_read &buffer )
 {
-	VPROF( "CLC_Move::ReadFromBuffer" );
 
 	m_nNewCommands = buffer.ReadUBitLong( NUM_NEW_COMMAND_BITS );
 	m_nBackupCommands = buffer.ReadUBitLong( NUM_BACKUP_COMMAND_BITS );
@@ -133,7 +131,6 @@ bool CLC_ClientInfo::WriteToBuffer( bf_write &buffer )
 
 bool CLC_ClientInfo::ReadFromBuffer( bf_read &buffer )
 {
-	VPROF( "CLC_ClientInfo::ReadFromBuffer" );
 
 	m_nServerCount = buffer.ReadLong();
 	m_nSendTableCRC = buffer.ReadLong();
@@ -170,7 +167,6 @@ bool CLC_BaselineAck::WriteToBuffer( bf_write &buffer )
 
 bool CLC_BaselineAck::ReadFromBuffer( bf_read &buffer )
 {
-	VPROF( "CLC_BaselineAck::ReadFromBuffer" );
 
 	m_nBaselineTick = buffer.ReadLong();
 	m_nBaselineNr = buffer.ReadUBitLong( 1 );
@@ -198,7 +194,6 @@ bool CLC_ListenEvents::WriteToBuffer( bf_write &buffer )
 
 bool CLC_ListenEvents::ReadFromBuffer( bf_read &buffer )
 {
-	VPROF( "CLC_ListenEvents::ReadFromBuffer" );
 
 	int count = MAX_EVENT_NUMBER / 32;
 	for ( int i = 0; i < count; ++i )
@@ -239,7 +234,6 @@ bool CLC_RespondCvarValue::WriteToBuffer( bf_write &buffer )
 
 bool CLC_RespondCvarValue::ReadFromBuffer( bf_read &buffer )
 {
-	VPROF( "CLC_RespondCvarValue::ReadFromBuffer" );
 
 	m_iCookie = buffer.ReadSBitLong( 32 );
 	m_eStatusCode = (EQueryCvarValueStatus)buffer.ReadSBitLong( 4 );
@@ -347,7 +341,6 @@ bool CLC_FileCRCCheck::WriteToBuffer( bf_write &buffer )
 
 bool CLC_FileCRCCheck::ReadFromBuffer( bf_read &buffer )
 {
-	VPROF( "CLC_FileCRCCheck::ReadFromBuffer" );
 
 	// Reserved for future use.
 	buffer.ReadOneBit();
@@ -462,7 +455,6 @@ bool CLC_FileMD5Check::WriteToBuffer( bf_write &buffer )
 
 bool CLC_FileMD5Check::ReadFromBuffer( bf_read &buffer )
 {
-	VPROF( "CLC_FileMD5Check::ReadFromBuffer" );
 
 	// Reserved for future use.
 	buffer.ReadOneBit();
@@ -579,7 +571,6 @@ bool Base_CmdKeyValues::WriteToBuffer( bf_write &buffer )
 
 bool Base_CmdKeyValues::ReadFromBuffer( bf_read &buffer )
 {
-	VPROF( "Base_CmdKeyValues::ReadFromBuffer" );
 
 	if ( !m_pKeyValues )
 		m_pKeyValues = new KeyValues( "" );
@@ -670,7 +661,6 @@ bool SVC_Print::WriteToBuffer( bf_write &buffer )
 
 bool SVC_Print::ReadFromBuffer( bf_read &buffer )
 {
-	VPROF( "SVC_Print::ReadFromBuffer" );
 
 	m_szText = m_szTextBuffer;
 	
@@ -691,7 +681,6 @@ bool NET_StringCmd::WriteToBuffer( bf_write &buffer )
 
 bool NET_StringCmd::ReadFromBuffer( bf_read &buffer )
 {
-	VPROF( "NET_StringCmd::ReadFromBuffer" );
 
 	m_szCommand = m_szCommandBuffer;
 	
@@ -732,7 +721,6 @@ bool SVC_ServerInfo::WriteToBuffer( bf_write &buffer )
 
 bool SVC_ServerInfo::ReadFromBuffer( bf_read &buffer )
 {
-	VPROF( "SVC_ServerInfo::ReadFromBuffer" );
 
 	m_szGameDir = m_szGameDirBuffer;
 	m_szMapName = m_szMapNameBuffer;
@@ -797,7 +785,6 @@ bool NET_SignonState::WriteToBuffer( bf_write &buffer )
 
 bool NET_SignonState::ReadFromBuffer( bf_read &buffer )
 {
-	VPROF( "NET_SignonState::ReadFromBuffer" );
 
 	m_nSignonState = buffer.ReadByte();
 	m_nSpawnCount = buffer.ReadLong();
@@ -834,7 +821,6 @@ bool SVC_BSPDecal::WriteToBuffer( bf_write &buffer )
 
 bool SVC_BSPDecal::ReadFromBuffer( bf_read &buffer )
 {
-	VPROF( "SVC_BSPDecal::ReadFromBuffer" );
 
 	buffer.ReadBitVec3Coord( m_Pos );
 	m_nDecalTextureIndex = buffer.ReadUBitLong( MAX_DECAL_INDEX_BITS );
@@ -870,7 +856,6 @@ bool SVC_SetView::WriteToBuffer( bf_write &buffer )
 
 bool SVC_SetView::ReadFromBuffer( bf_read &buffer )
 {
-	VPROF( "SVC_SetView::ReadFromBuffer" );
 
 	m_nEntityIndex = buffer.ReadUBitLong( MAX_EDICT_BITS );
 	return !buffer.IsOverflowed();
@@ -894,7 +879,6 @@ bool SVC_FixAngle::WriteToBuffer( bf_write &buffer )
 
 bool SVC_FixAngle::ReadFromBuffer( bf_read &buffer )
 {
-	VPROF( "SVC_FixAngle::ReadFromBuffer" );
 
 	m_bRelative = buffer.ReadOneBit() != 0;
 	m_Angle.x = buffer.ReadBitAngle( 16 );
@@ -921,7 +905,6 @@ bool SVC_CrosshairAngle::WriteToBuffer( bf_write &buffer )
 
 bool SVC_CrosshairAngle::ReadFromBuffer( bf_read &buffer )
 {
-	VPROF( "SVC_CrosshairAngle::ReadFromBuffer" );
 
 	m_Angle.x = buffer.ReadBitAngle( 16 );
 	m_Angle.y = buffer.ReadBitAngle( 16 );
@@ -946,7 +929,6 @@ bool SVC_VoiceInit::WriteToBuffer( bf_write &buffer )
 
 bool SVC_VoiceInit::ReadFromBuffer( bf_read &buffer )
 {
-	VPROF( "SVC_VoiceInit::ReadFromBuffer" );
 
 	buffer.ReadString( m_szVoiceCodec, sizeof(m_szVoiceCodec) );
 	unsigned char nLegacyQuality = buffer.ReadByte();
@@ -1007,7 +989,6 @@ bool SVC_VoiceData::WriteToBuffer( bf_write &buffer )
 
 bool SVC_VoiceData::ReadFromBuffer( bf_read &buffer )
 {
-	VPROF( "SVC_VoiceData::ReadFromBuffer" );
 
 	m_nFromClient = buffer.ReadByte();
 	m_bProximity = !!buffer.ReadByte();
@@ -1043,7 +1024,6 @@ bool NET_Tick::WriteToBuffer( bf_write &buffer )
 
 bool NET_Tick::ReadFromBuffer( bf_read &buffer )
 {
-	VPROF( "NET_Tick::ReadFromBuffer" );
 
 	m_nTick = buffer.ReadLong();
 #if PROTOCOL_VERSION > 10
@@ -1076,7 +1056,6 @@ bool SVC_UserMessage::WriteToBuffer( bf_write &buffer )
 
 bool SVC_UserMessage::ReadFromBuffer( bf_read &buffer )
 {
-	VPROF( "SVC_UserMessage::ReadFromBuffer" );
 	m_nMsgType = buffer.ReadByte();
 	m_nLength = buffer.ReadUBitLong( NETMSG_LENGTH_BITS ); // max 256 * 8 bits, see MAX_USER_MSG_DATA
 	m_DataIn = buffer;
@@ -1098,7 +1077,6 @@ bool SVC_SetPause::WriteToBuffer( bf_write &buffer )
 
 bool SVC_SetPause::ReadFromBuffer( bf_read &buffer )
 {
-	VPROF( "SVC_SetPause::ReadFromBuffer" );
 
 	m_bPaused = buffer.ReadOneBit() != 0;
 	return !buffer.IsOverflowed();
@@ -1120,7 +1098,6 @@ bool SVC_SetPauseTimed::WriteToBuffer( bf_write &buffer )
 
 bool SVC_SetPauseTimed::ReadFromBuffer( bf_read &buffer )
 {
-	VPROF( "SVC_SetPauseTimed::ReadFromBuffer" );
 
 	m_bPaused = buffer.ReadOneBit() != 0;
 	m_flExpireTime = buffer.ReadFloat();
@@ -1154,7 +1131,6 @@ bool NET_SetConVar::WriteToBuffer( bf_write &buffer )
 
 bool NET_SetConVar::ReadFromBuffer( bf_read &buffer )
 {
-	VPROF( "NET_SetConVar::ReadFromBuffer" );
 
 	int numvars = buffer.ReadByte();
 
@@ -1204,7 +1180,6 @@ bool SVC_UpdateStringTable::WriteToBuffer( bf_write &buffer )
 
 bool SVC_UpdateStringTable::ReadFromBuffer( bf_read &buffer )
 {
-	VPROF( "SVC_UpdateStringTable::ReadFromBuffer" );
 
 	m_nTableID = buffer.ReadUBitLong( Q_log2( MAX_TABLES ) );
 
@@ -1266,7 +1241,6 @@ bool SVC_CreateStringTable::WriteToBuffer( bf_write &buffer )
 
 bool SVC_CreateStringTable::ReadFromBuffer( bf_read &buffer )
 {
-	VPROF( "SVC_CreateStringTable::ReadFromBuffer" );
 
 	char prefix = buffer.PeekUBitLong( 8 );
 	if ( prefix == ':' )
@@ -1349,7 +1323,6 @@ bool SVC_Sounds::WriteToBuffer( bf_write &buffer )
 
 bool SVC_Sounds::ReadFromBuffer( bf_read &buffer )
 {
-	VPROF( "SVC_Sounds::ReadFromBuffer" );
 
 	m_bReliableSound = buffer.ReadOneBit() != 0;
 
@@ -1388,7 +1361,6 @@ bool SVC_Prefetch::WriteToBuffer( bf_write &buffer )
 
 bool SVC_Prefetch::ReadFromBuffer( bf_read &buffer )
 {
-	VPROF( "SVC_Prefetch::ReadFromBuffer" );
 
 	m_fType = SOUND; // buffer.ReadUBitLong( 1 );
 	if( m_pMessageHandler->GetDemoProtocolVersion() > 22 )
@@ -1426,7 +1398,6 @@ bool SVC_TempEntities::WriteToBuffer( bf_write &buffer )
 
 bool SVC_TempEntities::ReadFromBuffer( bf_read &buffer )
 {
-	VPROF( "SVC_TempEntities::ReadFromBuffer" );
 
 	m_nNumEntries = buffer.ReadUBitLong( CEventInfo::EVENT_INDEX_BITS );
 	if ( m_pMessageHandler->GetDemoProtocolVersion() > PROTOCOL_VERSION_23 )
@@ -1476,7 +1447,6 @@ bool SVC_ClassInfo::WriteToBuffer( bf_write &buffer )
 
 bool SVC_ClassInfo::ReadFromBuffer( bf_read &buffer )
 {
-	VPROF( "SVC_ClassInfo::ReadFromBuffer" );
 
 	m_Classes.RemoveAll();
 
@@ -1564,7 +1534,6 @@ bool SVC_GameEvent::WriteToBuffer( bf_write &buffer )
 
 bool SVC_GameEvent::ReadFromBuffer( bf_read &buffer )
 {
-	VPROF( "SVC_GameEvent::ReadFromBuffer" );
 
 	m_nLength = buffer.ReadUBitLong( NETMSG_LENGTH_BITS ); // max 8 * 256 bits
 	m_DataIn = buffer;
@@ -1591,7 +1560,6 @@ bool SVC_SendTable::WriteToBuffer( bf_write &buffer )
 
 bool SVC_SendTable::ReadFromBuffer( bf_read &buffer )
 {
-	VPROF( "SVC_SendTable::ReadFromBuffer" );
 
 	m_bNeedsDecoder = buffer.ReadOneBit() != 0;
 	m_nLength = buffer.ReadShort();		// TODO do we have a maximum length ? check that
@@ -1625,7 +1593,6 @@ bool SVC_EntityMessage::WriteToBuffer( bf_write &buffer )
 
 bool SVC_EntityMessage::ReadFromBuffer( bf_read &buffer )
 {
-	VPROF( "SVC_EntityMessage::ReadFromBuffer" );
 
 	m_nEntityIndex = buffer.ReadUBitLong( MAX_EDICT_BITS );
 	m_nClassID = buffer.ReadUBitLong( MAX_SERVER_CLASS_BITS );
@@ -1669,7 +1636,6 @@ bool SVC_PacketEntities::WriteToBuffer( bf_write &buffer )
 
 bool SVC_PacketEntities::ReadFromBuffer( bf_read &buffer )
 {
-	VPROF( "SVC_PacketEntities::ReadFromBuffer" );
 
 	m_nMaxEntries = buffer.ReadUBitLong( MAX_EDICT_BITS );
 	
@@ -1747,7 +1713,6 @@ bool SVC_Menu::WriteToBuffer( bf_write &buffer )
 
 bool SVC_Menu::ReadFromBuffer( bf_read &buffer )
 {
-	VPROF( "SVC_Menu::ReadFromBuffer" );
 
 	m_Type = (DIALOG_TYPE)buffer.ReadShort();
 	m_iLength = buffer.ReadWord();
@@ -1789,7 +1754,6 @@ bool SVC_GameEventList::WriteToBuffer( bf_write &buffer )
 
 bool SVC_GameEventList::ReadFromBuffer( bf_read &buffer )
 {
-	VPROF( "SVC_GameEventList::ReadFromBuffer" );
 
 	m_nNumEvents = buffer.ReadUBitLong( MAX_EVENT_BITS );
 	m_nLength = buffer.ReadUBitLong( 20 );
@@ -2052,7 +2016,6 @@ bool SVC_GetCvarValue::WriteToBuffer( bf_write &buffer )
 
 bool SVC_GetCvarValue::ReadFromBuffer( bf_read &buffer )
 {
-	VPROF( "SVC_GetCvarValue::ReadFromBuffer" );
 
 	m_iCookie = buffer.ReadSBitLong( 32 );
 	buffer.ReadString( m_szCvarNameBuffer, sizeof( m_szCvarNameBuffer ) );

@@ -228,7 +228,6 @@ bool IsInPrediction()
 
 int SelectWeightedSequence( CStudioHdr *pstudiohdr, int activity, int curSequence )
 {
-	VPROF( "SelectWeightedSequence" );
 
 	if (! pstudiohdr)
 		return 0;
@@ -387,7 +386,6 @@ void GetEyePosition ( CStudioHdr *pstudiohdr, Vector &vecEyePosition )
 //-----------------------------------------------------------------------------
 int LookupActivity( CStudioHdr *pstudiohdr, const char *label )
 {
-	VPROF( "LookupActivity" );
 
 	if ( !pstudiohdr )
 	{
@@ -414,7 +412,6 @@ int LookupActivity( CStudioHdr *pstudiohdr, const char *label )
 //-----------------------------------------------------------------------------
 int LookupSequence( CStudioHdr *pstudiohdr, const char *label )
 {
-	VPROF( "LookupSequence" );
 
 	if (! pstudiohdr)
 		return 0;

@@ -888,7 +888,6 @@ extern ConVar mp_feetyawrate;
 void CDODPlayerAnimState::Update( float eyeYaw, float eyePitch )
 {
 	// Profile the animation update.
-	VPROF( "CDODPlayerAnimState::Update" );
 
 	// Get the studio header for the player.
 	CStudioHdr *pStudioHdr = GetOuterDOD()->GetModelPtr();

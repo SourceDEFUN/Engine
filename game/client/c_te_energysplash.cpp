@@ -68,7 +68,6 @@ void C_TEEnergySplash::Precache( void )
 //-----------------------------------------------------------------------------
 void C_TEEnergySplash::PostDataUpdate( DataUpdateType_t updateType )
 {
-	VPROF( "C_TEEnergySplash::PostDataUpdate" );
 
 	g_pEffects->EnergySplash( m_vecPos, m_vecDir, m_bExplosive );
 }

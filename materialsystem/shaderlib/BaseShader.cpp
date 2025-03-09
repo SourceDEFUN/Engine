@@ -142,7 +142,6 @@ void CBaseShader::InitShaderInstance( IMaterialVar** ppParams, IShaderInit *pSha
 void CBaseShader::DrawElements( IMaterialVar **ppParams, int nModulationFlags,
 	IShaderShadow* pShaderShadow, IShaderDynamicAPI* pShaderAPI, VertexCompressionType_t vertexCompression, CBasePerMaterialContextData **pContextDataPtr )
 {
-	VPROF("CBaseShader::DrawElements");
 	// Re-entrancy check
 	Assert( !s_ppParams );
 

@@ -2237,7 +2237,6 @@ void CAI_NetworkBuilder::Build( CAI_Network *pNetwork )
 
 	CAI_NetworkBuildHelper *pHelper = (CAI_NetworkBuildHelper *)CreateEntityByName( "ai_network_build_helper" );
 
-	VPROF( "AINet" );
 
 	BeginBuild();
 

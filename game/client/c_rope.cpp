@@ -938,7 +938,6 @@ void LockNodeDirection(
 
 void C_RopeKeyframe::CPhysicsDelegate::ApplyConstraints( CSimplePhysics::CNode *pNodes, int nNodes )
 {
-	VPROF( "CPhysicsDelegate::ApplyConstraints" );
 
 	CTraceFilterWorldOnly traceFilter;
 

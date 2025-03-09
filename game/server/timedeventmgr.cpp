@@ -103,7 +103,6 @@ CTimedEventMgr::CTimedEventMgr()
 
 void CTimedEventMgr::FireEvents()
 {
-	VPROF( "CTimedEventMgr::FireEvents" );
 	while ( m_Events.Count() )
 	{
 		// Fire the top element, then break out.

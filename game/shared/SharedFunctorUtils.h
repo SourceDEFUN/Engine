@@ -40,7 +40,6 @@ public:
 
 	virtual bool operator() ( PlayerType *them )
 	{
-		VPROF( "TargetScan()" );
 		if ( them != m_me && 
 			 them->IsAlive() && 
 			 (m_team == TEAM_ANY || them->GetTeamNumber() == m_team) &&

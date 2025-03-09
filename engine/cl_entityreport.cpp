@@ -505,7 +505,6 @@ bool CEntityReportPanel::DrawEntry( int row, int col, int rowheight, int colwidt
 //-----------------------------------------------------------------------------
 void CEntityReportPanel::Paint() 
 {
-	VPROF( "CEntityReportPanel::Paint" );
 
 	if ( !m_hFont )
 		return;

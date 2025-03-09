@@ -555,7 +555,6 @@ public:
 
 	void EmitSound( IRecipientFilter& filter, int entindex, const EmitSound_t & ep )
 	{
-		VPROF( "CSoundEmitterSystem::EmitSound (calls engine)" );
 
 #ifdef STAGING_ONLY
 		if ( sv_snd_filter.GetString()[ 0 ] && !V_stristr( ep.m_pSoundName, sv_snd_filter.GetString() ))
@@ -1153,7 +1152,6 @@ static ConCommand Command_Playgamesound( "playgamesound", Playgamesound_f, "Play
 //-----------------------------------------------------------------------------
 void CBaseEntity::EmitSound( const char *soundname, float soundtime /*= 0.0f*/, float *duration /*=NULL*/ )
 {
-	//VPROF( "CBaseEntity::EmitSound" );
 	VPROF_BUDGET( "CBaseEntity::EmitSound", _T( "CBaseEntity::EmitSound" ) );
 
 	CPASAttenuationFilter filter( this, soundname );
@@ -1175,7 +1173,6 @@ void CBaseEntity::EmitSound( const char *soundname, HSOUNDSCRIPTHANDLE& handle, 
 {
 	VPROF_BUDGET( "CBaseEntity::EmitSound", _T( "CBaseEntity::EmitSound" ) );
 
-	// VPROF( "CBaseEntity::EmitSound" );
 	CPASAttenuationFilter filter( this, soundname, handle );
 
 	EmitSound_t params;
@@ -1201,7 +1198,6 @@ void CBaseEntity::EmitSound( IRecipientFilter& filter, int iEntIndex, const char
 
 	VPROF_BUDGET( "CBaseEntity::EmitSound", _T( "CBaseEntity::EmitSound" ) );
 
-	// VPROF( "CBaseEntity::EmitSound" );
 	EmitSound_t params;
 	params.m_pSoundName = soundname;
 	params.m_flSoundTime = soundtime;
@@ -1223,7 +1219,6 @@ void CBaseEntity::EmitSound( IRecipientFilter& filter, int iEntIndex, const char
 {
 	VPROF_BUDGET( "CBaseEntity::EmitSound", _T( "CBaseEntity::EmitSound" ) );
 
-	//VPROF( "CBaseEntity::EmitSound" );
 	EmitSound_t params;
 	params.m_pSoundName = soundname;
 	params.m_flSoundTime = soundtime;
@@ -1254,7 +1249,6 @@ void CBaseEntity::EmitSound( IRecipientFilter& filter, int iEntIndex, const Emit
 		pEntity->ModifyEmitSoundParams( const_cast< EmitSound_t& >( params ) );
 	}
 
-	// VPROF( "CBaseEntity::EmitSound" );
 	// Call into the sound emitter system...
 	g_SoundEmitterSystem.EmitSound( filter, iEntIndex, params );
 }
@@ -1279,7 +1273,6 @@ void CBaseEntity::EmitSound( IRecipientFilter& filter, int iEntIndex, const Emit
 		pEntity->ModifyEmitSoundParams( const_cast< EmitSound_t& >( params ) );
 	}
 
-	// VPROF( "CBaseEntity::EmitSound" );
 	// Call into the sound emitter system...
 	g_SoundEmitterSystem.EmitSoundByHandle( filter, iEntIndex, params, handle );
 }

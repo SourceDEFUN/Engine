@@ -2969,7 +2969,6 @@ void CC_KDTreeTest( const CCommand &args )
 	{
 	case 0:
 		{
-			VPROF( "TraceTotal" );			
 
 			trace_t trace;
 			for ( int iTest = 0; iTest < NUM_KDTREE_TESTS; ++iTest )
@@ -2980,7 +2979,6 @@ void CC_KDTreeTest( const CCommand &args )
 		}
 	case 1:
 		{
-			VPROF( "TraceTotal" );
 
 			trace_t trace;
 			for ( int iTest = 0; iTest < NUM_KDTREE_TESTS; ++iTest )
@@ -3011,7 +3009,6 @@ void CC_KDTreeTest( const CCommand &args )
 			}
 
 
-			VPROF( "TraceTotal" );
 
 			int nCount = 0;
 
@@ -3037,7 +3034,6 @@ void CC_KDTreeTest( const CCommand &args )
 				flRadius[iTest] = vecDelta.Length() * 0.5f;
 			}
 
-			VPROF( "TraceTotal" );
 
 			int nCount = 0;
 

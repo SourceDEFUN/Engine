@@ -1312,7 +1312,6 @@ void CClientState::DumpPrecacheStats( const char * name )
 
 void CClientState::ReadDeletions( CEntityReadInfo &u )
 {
-	VPROF( "ReadDeletions" );
 	while ( u.m_pBuf->ReadOneBit()!=0 )
 	{
 		int idx = u.m_pBuf->ReadUBitLong( MAX_EDICT_BITS );	
@@ -1325,7 +1324,6 @@ void CClientState::ReadDeletions( CEntityReadInfo &u )
 
 void CClientState::ReadEnterPVS( CEntityReadInfo &u )
 {
-	VPROF( "ReadEnterPVS" );
 
 	TRACE_PACKET(( "  CL Enter PVS (%d)\n", u.m_nNewEntity ));
 
@@ -1341,7 +1339,6 @@ void CClientState::ReadEnterPVS( CEntityReadInfo &u )
 
 void CClientState::ReadLeavePVS( CEntityReadInfo &u )
 {
-	VPROF( "ReadLeavePVS" );
 	// Sanity check.
 	if ( !u.m_bAsDelta )
 	{
@@ -1363,7 +1360,6 @@ void CClientState::ReadLeavePVS( CEntityReadInfo &u )
 
 void CClientState::ReadDeltaEnt( CEntityReadInfo &u )
 {
-	VPROF( "ReadDeltaEnt" );
 	CL_CopyExistingEntity( u );
 	
 	u.NextOldEntity();
@@ -1371,7 +1367,6 @@ void CClientState::ReadDeltaEnt( CEntityReadInfo &u )
 
 void CClientState::ReadPreserveEnt( CEntityReadInfo &u )
 {
-	VPROF( "ReadPreserveEnt" );
 	if ( !u.m_bAsDelta )  // Should never happen on a full update.
 	{
 		Assert(0); // cl.validsequence = 0;

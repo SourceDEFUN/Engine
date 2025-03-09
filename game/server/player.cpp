@@ -3360,7 +3360,6 @@ void CBasePlayer::PhysicsSimulate( void )
 			// Update our vphysics object.
 			if ( m_pPhysicsController )
 			{
-				VPROF( "CBasePlayer::PhysicsSimulate-UpdateVPhysicsPosition" );
 				// If simulating at 2 * TICK_INTERVAL, add an extra TICK_INTERVAL to position arrival computation
 				UpdateVPhysicsPosition( m_vNewVPhysicsPosition, m_vNewVPhysicsVelocity, vphysicsArrivalTime );
 				vphysicsArrivalTime += TICK_INTERVAL;
@@ -4566,7 +4565,6 @@ void CBasePlayer::PostThink()
 			}
 
 			// select the proper animation for the player character	
-			VPROF( "CBasePlayer::PostThink-Animation" );
 			// If he's in a vehicle, sit down
 			if ( IsInAVehicle() )
 				SetAnimation( PLAYER_IN_VEHICLE );

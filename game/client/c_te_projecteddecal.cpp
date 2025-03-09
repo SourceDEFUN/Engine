@@ -154,7 +154,6 @@ void TE_ProjectDecal( IRecipientFilter& filter, float delay,
 //-----------------------------------------------------------------------------
 void C_TEProjectedDecal::PostDataUpdate( DataUpdateType_t updateType )
 {
-	VPROF( "C_TEProjectedDecal::PostDataUpdate" );
 
 	CBroadcastRecipientFilter filter;
 	TE_ProjectDecal( filter, 0.0f, &m_vecOrigin, &m_angRotation, m_flDistance, m_nIndex );

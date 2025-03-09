@@ -74,7 +74,6 @@ void CL_ParseEventDelta( void *RawData, void *pToData, RecvTable *pRecvTable, un
 //-----------------------------------------------------------------------------
 void CL_FireEvents( void )
 {
-	VPROF("CL_FireEvents");
 	if ( !cl.IsActive() )
 	{
 		cl.events.RemoveAll();

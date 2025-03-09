@@ -93,7 +93,6 @@ C_TEDODExplosion::C_TEDODExplosion( void )
 //-----------------------------------------------------------------------------
 void C_TEDODExplosion::PostDataUpdate( DataUpdateType_t updateType )
 {
-	VPROF( "C_TETFExplosion::PostDataUpdate" );
 	DODExplosionCallback( m_vecOrigin, m_vecNormal );
 }
 

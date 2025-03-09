@@ -147,7 +147,6 @@ bool C_NPC_Hydra::SetupBones( matrix3x4_t *pBoneToWorldOut, int nMaxBones, int b
 
 void  C_NPC_Hydra::StandardBlendingRules( Vector pos[], Quaternion q[], float currentTime, int boneMask )
 {
-	VPROF( "C_NPC_Hydra::StandardBlendingRules" );
 
 	studiohdr_t *hdr = GetModelPtr();
 	if ( !hdr )

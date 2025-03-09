@@ -310,7 +310,6 @@ void CCSPlayerAnimState::CheckCachedSequenceValidity( void )
  */
 int CCSPlayerAnimState::SelectWeightedSequence( Activity activity )
 {
-	VPROF( "CCSPlayerAnimState::ComputeMainSequence" );
 
 	if ( activity > ACT_CROUCHIDLE || activity < 1 )
 	{
@@ -342,7 +341,6 @@ int CCSPlayerAnimState::SelectWeightedSequence( Activity activity )
  */
 int CCSPlayerAnimState::CalcSequenceIndex( const char *pBaseName, ... )
 {
-	VPROF( "CCSPlayerAnimState::CalcSequenceIndex" );
 
 	CheckCachedSequenceValidity();
 
@@ -666,7 +664,6 @@ bool CCSPlayerAnimState::IsOuterGrenadePrimed()
 
 void CCSPlayerAnimState::ComputeGrenadeSequence( CStudioHdr *pStudioHdr )
 {
-	VPROF( "CCSPlayerAnimState::ComputeGrenadeSequence" );
 
 	if ( m_bThrowingGrenade )
 	{
@@ -758,7 +755,6 @@ int CCSPlayerAnimState::GetOuterGrenadeThrowCounter()
 
 void CCSPlayerAnimState::ComputeReloadSequence( CStudioHdr *pStudioHdr )
 {
-	VPROF( "CCSPlayerAnimState::ComputeReloadSequence" );
 	bool hold = m_flReloadHoldEndTime > gpGlobals->curtime;
 	UpdateLayerSequenceGeneric( pStudioHdr, RELOADSEQUENCE_LAYER, m_bReloading, m_flReloadCycle, m_iReloadSequence, hold );
 	if ( !m_bReloading )
@@ -770,7 +766,6 @@ void CCSPlayerAnimState::ComputeReloadSequence( CStudioHdr *pStudioHdr )
 
 int CCSPlayerAnimState::CalcAimLayerSequence( float *flCycle, float *flAimSequenceWeight, bool bForceIdle )
 {
-	VPROF( "CCSPlayerAnimState::CalcAimLayerSequence" );
 
 	const char *pSuffix = GetWeaponSuffix();
 	if ( !pSuffix )
@@ -816,7 +811,6 @@ int CCSPlayerAnimState::CalcAimLayerSequence( float *flCycle, float *flAimSequen
 
 const char* CCSPlayerAnimState::GetWeaponSuffix()
 {
-	VPROF( "CCSPlayerAnimState::GetWeaponSuffix" );
 
 	// Figure out the weapon suffix.
 	CWeaponCSBase *pWeapon = m_pHelpers->CSAnim_GetActiveWeapon();
@@ -1018,7 +1012,6 @@ void CCSPlayerAnimState::ComputeSequences( CStudioHdr *pStudioHdr )
 {
 	BaseClass::ComputeSequences( pStudioHdr );
 
-	VPROF( "CCSPlayerAnimState::ComputeSequences" );
 
 	ComputeFireSequence( pStudioHdr );
 	ComputeReloadSequence( pStudioHdr );
@@ -1045,7 +1038,6 @@ void CCSPlayerAnimState::ClearAnimationLayers()
 
 void CCSPlayerAnimState::ComputeFireSequence( CStudioHdr *pStudioHdr )
 {
-	VPROF( "CCSPlayerAnimState::ComputeFireSequence" );
 
 	if ( m_delayedFire != PLAYERANIMEVENT_COUNT )
 	{

@@ -423,7 +423,6 @@ bool CPortalRenderable_FlatBasic::CalcFrustumThroughPortal( const Vector &ptCurr
 
 void CPortalRenderable_FlatBasic::RenderPortalViewToBackBuffer( CViewRender *pViewRender, const CViewSetup &cameraView )
 {
-	VPROF( "CPortalRenderable_FlatBasic::RenderPortalViewToBackBuffer" );
 
 	if( m_fStaticAmount == 1.0f )
 		return; //not going to see anything anyways

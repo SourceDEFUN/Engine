@@ -260,7 +260,6 @@ int CStudioRender::R_StudioRenderModel( IMatRenderContext *pRenderContext, int s
 	int body, int hitboxset, void /*IClientEntity*/ *pEntity,
 	IMaterial **ppMaterials, int *pMaterialFlags, int flags, int boneMask, int lod, ColorMeshInfo_t *pColorMeshes )
 {
-	VPROF("CStudioRender::R_StudioRenderModel");
 
 	int nDrawGroup = flags & STUDIORENDER_DRAW_GROUP_MASK;
 
@@ -418,7 +417,6 @@ int CStudioRender::R_StudioRenderFinal( IMatRenderContext *pRenderContext,
 	int skin, int nBodyPartCount, BodyPartInfo_t *pBodyPartInfo, void /*IClientEntity*/ *pClientEntity,
 	IMaterial **ppMaterials, int *pMaterialFlags, int boneMask, int lod, ColorMeshInfo_t *pColorMeshes )
 {
-	VPROF("CStudioRender::R_StudioRenderFinal");
 
 	int numTrianglesRendered = 0;
 
@@ -473,7 +471,6 @@ void CStudioRender::DrawShadows( const DrawModelInfo_t& info, int flags, int bon
 	if ( !m_ShadowState.Count() )
 		return;
 
-	VPROF("CStudioRender::DrawShadows");
 
 	IMaterial* pForcedMat = m_pRC->m_pForcedMaterial;
 	OverrideType_t nForcedType = m_pRC->m_nForcedMaterialType;
@@ -2271,7 +2268,6 @@ int CStudioRender::R_StudioDrawStaticMesh( IMatRenderContext *pRenderContext, ms
 				float r_blend, IMaterial* pMaterial, int lod, ColorMeshInfo_t *pColorMeshes  )
 {
 	MatSysQueueMark( g_pMaterialSystem, "R_StudioDrawStaticMesh\n" );
-	VPROF( "R_StudioDrawStaticMesh" );
 
 	int numTrianglesRendered = 0;
 
@@ -2391,7 +2387,6 @@ int CStudioRender::R_StudioDrawDynamicMesh( IMatRenderContext *pRenderContext, m
 				studiomeshgroup_t* pGroup, StudioModelLighting_t lighting, 
 				float r_blend, IMaterial* pMaterial, int lod )
 {
-	VPROF( "R_StudioDrawDynamicMesh" );
 
 	bool doFlex = ((pGroup->m_Flags & MESHGROUP_IS_FLEXED) != 0) && m_pRC->m_Config.bFlex;
 
@@ -2770,7 +2765,6 @@ int CStudioRender::R_StudioDrawMesh( IMatRenderContext *pRenderContext, mstudiom
 									 StudioModelLighting_t lighting, IMaterial *pMaterial, 
 									 ColorMeshInfo_t *pColorMeshes, int lod )
 {
-	VPROF( "R_StudioDrawMesh" );
 
 	int numTrianglesRendered = 0;
 
@@ -2904,7 +2898,6 @@ int CStudioRender::SortMeshes( int* pIndices, IMaterial **ppMaterials,
 int CStudioRender::R_StudioDrawPoints( IMatRenderContext *pRenderContext, int skin, void /*IClientEntity*/ *pClientEntity, 
 	IMaterial **ppMaterials, int *pMaterialFlags, int boneMask, int lod, ColorMeshInfo_t *pColorMeshes )
 {
-	VPROF( "R_StudioDrawPoints" );
 	int			i;
 	int numTrianglesRendered = 0;
 

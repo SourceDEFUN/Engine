@@ -69,7 +69,6 @@ void TE_BubbleTrail( IRecipientFilter& filter, float delay,
 //-----------------------------------------------------------------------------
 void C_TEBubbleTrail::PostDataUpdate( DataUpdateType_t updateType )
 {
-	VPROF( "C_TEBubbleTrail::PostDataUpdate" );
 
 	tempents->BubbleTrail( m_vecMins, m_vecMaxs, m_flWaterZ, m_nModelIndex, m_nCount, m_fSpeed );
 }

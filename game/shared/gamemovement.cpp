@@ -773,7 +773,6 @@ Vector CGameMovement::GetPlayerViewOffset( bool ducked ) const
 //-----------------------------------------------------------------------------
 inline void CGameMovement::TracePlayerBBox( const Vector& start, const Vector& end, unsigned int fMask, int collisionGroup, trace_t& pm )
 {
-	VPROF( "CGameMovement::TracePlayerBBox" );
 
 	Ray_t ray;
 	ray.Init( start, end, GetPlayerMins(), GetPlayerMaxs() );
@@ -3643,7 +3642,6 @@ void TracePlayerBBoxForGround( const Vector& start, const Vector& end, const Vec
 							  const Vector& maxsSrc, IHandleEntity *player, unsigned int fMask,
 							  int collisionGroup, trace_t& pm )
 {
-	VPROF( "TracePlayerBBoxForGround" );
 
 	Ray_t ray;
 	Vector mins, maxs;
@@ -3712,7 +3710,6 @@ void TracePlayerBBoxForGround( const Vector& start, const Vector& end, const Vec
 //-----------------------------------------------------------------------------
 void CGameMovement::TryTouchGroundInQuadrants( const Vector& start, const Vector& end, unsigned int fMask, int collisionGroup, trace_t& pm )
 {
-	VPROF( "CGameMovement::TryTouchGroundInQuadrants" );
 
 	Vector mins, maxs;
 	Vector minsSrc = GetPlayerMins();
@@ -4549,7 +4546,6 @@ static ConVar sv_optimizedmovement( "sv_optimizedmovement", "1", FCVAR_REPLICATE
 //-----------------------------------------------------------------------------
 void CGameMovement::PlayerMove( void )
 {
-	VPROF( "CGameMovement::PlayerMove" );
 
 	CheckParameters();
 	
@@ -4906,7 +4902,6 @@ bool CGameMovement::GameHasLadders() const
 //-----------------------------------------------------------------------------
 void CGameMovement::TracePlayerBBox( const Vector& start, const Vector& end, unsigned int fMask, int collisionGroup, trace_t& pm )
 {
-	VPROF( "CGameMovement::TracePlayerBBox" );
 
 	Ray_t ray;
 	ray.Init( start, end, GetPlayerMins(), GetPlayerMaxs() );
@@ -4921,7 +4916,6 @@ void CGameMovement::TracePlayerBBox( const Vector& start, const Vector& end, uns
 //-----------------------------------------------------------------------------
 void  CGameMovement::TryTouchGround( const Vector& start, const Vector& end, const Vector& mins, const Vector& maxs, unsigned int fMask, int collisionGroup, trace_t& pm )
 {
-	VPROF( "CGameMovement::TryTouchGround" );
 
 	Ray_t ray;
 	ray.Init( start, end, mins, maxs );

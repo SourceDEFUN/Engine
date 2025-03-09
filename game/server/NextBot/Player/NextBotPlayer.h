@@ -576,7 +576,6 @@ inline void _NextBot_BuildUserCommand( CUserCmd *cmd, const QAngle &viewangles, 
 template < typename PlayerType >
 inline void NextBotPlayer< PlayerType >::PhysicsSimulate( void )
 {
-	VPROF( "NextBotPlayer::PhysicsSimulate" );
 
 	// Make sure not to simulate this guy twice per frame
 	if ( PlayerType::m_nSimulationTick == gpGlobals->tickcount )

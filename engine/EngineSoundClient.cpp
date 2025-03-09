@@ -326,7 +326,6 @@ void CEngineSoundClient::EmitSound( IRecipientFilter& filter, int iEntIndex, int
 	float flVolume, float flAttenuation, int iFlags, int iPitch, int iSpecialDSP, 
 	const Vector *pOrigin, const Vector *pDirection, CUtlVector< Vector >* pUtlVecOrigins, bool bUpdatePositions, float soundtime /*= 0.0f*/, int speakerentity /*= -1*/ )
 {
-	VPROF( "CEngineSoundClient::EmitSound" );
 	EmitSound( filter, iEntIndex, iChannel, pSample, flVolume, ATTN_TO_SNDLVL( flAttenuation ), iFlags, 
 		iPitch, iSpecialDSP, pOrigin, pDirection, pUtlVecOrigins, bUpdatePositions, soundtime, speakerentity );
 
@@ -337,7 +336,6 @@ void CEngineSoundClient::EmitSound( IRecipientFilter& filter, int iEntIndex, int
 	float flVolume, soundlevel_t iSoundLevel, int iFlags, int iPitch, int iSpecialDSP, 
 	const Vector *pOrigin, const Vector *pDirection, CUtlVector< Vector >* pUtlVecOrigins, bool bUpdatePositions, float soundtime /*= 0.0f*/, int speakerentity /*= -1*/ )
 {
-	VPROF( "CEngineSoundClient::EmitSound" );
 	if ( pSample && TestSoundChar(pSample, CHAR_SENTENCE) )
 	{
 		int iSentenceIndex = -1;

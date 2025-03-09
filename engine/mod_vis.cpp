@@ -236,7 +236,6 @@ bool Map_AreAnyLeavesVisible( const worldbrushdata_t &worldbrush, int *leafList,
 //-----------------------------------------------------------------------------
 void Map_VisMark( bool forcenovis, model_t *worldmodel )
 {
-	VPROF( "Map_VisMark" );
 	int			i, c;
 
 	// development aid to let you run around and see exactly where

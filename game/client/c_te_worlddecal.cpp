@@ -100,7 +100,6 @@ static inline void RecordWorldDecal( const Vector *pos, int index )
 //-----------------------------------------------------------------------------
 void C_TEWorldDecal::PostDataUpdate( DataUpdateType_t updateType )
 {
-	VPROF( "C_TEWorldDecal::PostDataUpdate" );
 
 	if ( r_decals.GetInt() )
 	{

@@ -2457,7 +2457,6 @@ void CSaveRestore::EntityPatchRead( CSaveRestoreData *pSaveData, const char *lev
 //-----------------------------------------------------------------------------
 int CSaveRestore::LoadGameState( char const *level, bool createPlayers )
 {
-	VPROF("CSaveRestore::LoadGameState");
 
 	SAVE_HEADER		header;
 	CSaveRestoreData *pSaveData;

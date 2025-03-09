@@ -635,7 +635,6 @@ void CCSPlayer::Precache()
 ConVar sv_runcmds( "sv_runcmds", "1" );
 void CCSPlayer::PlayerRunCommand( CUserCmd *ucmd, IMoveHelper *moveHelper )
 {
-	VPROF( "CCSPlayer::PlayerRunCommand" );
 
 	if ( !sv_runcmds.GetInt() )
 		return;

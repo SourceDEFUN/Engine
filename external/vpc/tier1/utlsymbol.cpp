@@ -242,7 +242,6 @@ CUtlSymbolTable::~CUtlSymbolTable()
 
 CUtlSymbol CUtlSymbolTable::Find( const char* pString ) const
 {	
-	VPROF( "CUtlSymbol::Find" );
 	if (!pString)
 		return CUtlSymbol();
 	
@@ -285,7 +284,6 @@ int CUtlSymbolTable::FindPoolWithSpace( int len )	const
 
 CUtlSymbol CUtlSymbolTable::AddString( const char* pString )
 {
-	VPROF("CUtlSymbol::AddString");
 	if (!pString) 
 		return CUtlSymbol( UTL_INVAL_SYMBOL );
 

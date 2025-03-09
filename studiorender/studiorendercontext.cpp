@@ -2271,7 +2271,6 @@ void CStudioRenderContext::DrawModel( DrawModelResults_t *pResults, const DrawMo
 	MaterialLock_t hLock = 0;
 	if ( flags & STUDIORENDER_DRAW_ACCURATETIME )
 	{
-		VPROF("STUDIORENDER_DRAW_ACCURATETIME");
 
 		// Flush the material system before timing this model:
 		hLock = g_pMaterialSystem->Lock();
@@ -2319,7 +2318,6 @@ void CStudioRenderContext::DrawModel( DrawModelResults_t *pResults, const DrawMo
 
 	if( flags & STUDIORENDER_DRAW_ACCURATETIME )
 	{
-		VPROF( "STUDIORENDER_DRAW_ACCURATETIME" );
 
 		// Make sure this model is completely drawn before ending the timer:
 		g_pMaterialSystem->Flush(true);

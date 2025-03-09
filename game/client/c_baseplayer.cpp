@@ -2273,7 +2273,6 @@ bool C_BasePlayer::ShouldPredict( void )
 void C_BasePlayer::PhysicsSimulate( void )
 {
 #if !defined( NO_ENTITY_PREDICTION )
-	VPROF( "C_BasePlayer::PhysicsSimulate" );
 	// If we've got a moveparent, we must simulate that first.
 	CBaseEntity *pMoveParent = GetMoveParent();
 	if (pMoveParent)

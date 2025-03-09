@@ -444,7 +444,6 @@ void CDODPlayer::Precache()
 ConVar sv_runcmds( "sv_runcmds", "1" );
 void CDODPlayer::PlayerRunCommand( CUserCmd *ucmd, IMoveHelper *moveHelper )
 {
-	VPROF( "CDODPlayer::PlayerRunCommand" );
 
 	if ( !sv_runcmds.GetInt() )
 		return;

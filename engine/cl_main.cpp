@@ -2149,7 +2149,6 @@ void CL_Move(float accumulated_extra_samples, bool bFinalTick )
 
 	if ( cl.IsActive() )
 	{
-		VPROF( "CL_Move" );
 
 		int nextcommandnr = cl.lastoutgoingcommand + cl.chokedcommands + 1;
 

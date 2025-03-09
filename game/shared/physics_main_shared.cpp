@@ -1721,7 +1721,6 @@ void CBaseEntity::PhysicsToss( void )
 //-----------------------------------------------------------------------------
 void CBaseEntity::PhysicsRigidChild( void )
 {
-	VPROF("CBaseEntity::PhysicsRigidChild");
 	// NOTE: rigidly attached children do simulation in local space
 	// Collision impulses will be handled either not at all, or by
 	// forwarding the information to the highest move parent
@@ -1786,7 +1785,6 @@ void CBaseEntity::UpdateBaseVelocity( void )
 //-----------------------------------------------------------------------------
 void CBaseEntity::PhysicsSimulate( void )
 {
-	VPROF( "CBaseEntity::PhysicsSimulate" );
 	// NOTE:  Players override PhysicsSimulate and drive through their CUserCmds at that point instead of
 	//  processng through this function call!!!  They shouldn't chain to here ever.
 	// Make sure not to simulate this guy twice per frame
@@ -1814,12 +1812,10 @@ void CBaseEntity::PhysicsSimulate( void )
 
 	if (pMoveParent)
 	{
-		VPROF( "CBaseEntity::PhysicsSimulate-MoveParent" );
 		pMoveParent->PhysicsSimulate();
 	}
 	else
 	{
-		VPROF( "CBaseEntity::PhysicsSimulate-BaseVelocity" );
 
 		UpdateBaseVelocity();
 
@@ -1839,7 +1835,6 @@ void CBaseEntity::PhysicsSimulate( void )
 	{
 	case MOVETYPE_PUSH:
 		{
-			VPROF( "CBaseEntity::PhysicsSimulate-MOVETYPE_PUSH" );
 			PhysicsPusher();
 		}
 		break;
@@ -1852,7 +1847,6 @@ void CBaseEntity::PhysicsSimulate( void )
 
 	case MOVETYPE_NONE:
 		{
-			VPROF( "CBaseEntity::PhysicsSimulate-MOVETYPE_NONE" );
 			Assert(pMoveParent);
 			PhysicsRigidChild();
 		}
@@ -1860,14 +1854,12 @@ void CBaseEntity::PhysicsSimulate( void )
 
 	case MOVETYPE_NOCLIP:
 		{
-			VPROF( "CBaseEntity::PhysicsSimulate-MOVETYPE_NOCLIP" );
 			PhysicsNoclip();
 		}
 		break;
 
 	case MOVETYPE_STEP:
 		{
-			VPROF( "CBaseEntity::PhysicsSimulate-MOVETYPE_STEP" );
 			PhysicsStep();
 		}
 		break;
@@ -1875,14 +1867,12 @@ void CBaseEntity::PhysicsSimulate( void )
 	case MOVETYPE_FLY:
 	case MOVETYPE_FLYGRAVITY:
 		{
-			VPROF( "CBaseEntity::PhysicsSimulate-MOVETYPE_FLY" );
 			PhysicsToss();
 		}
 		break;
 
 	case MOVETYPE_CUSTOM:
 		{
-			VPROF( "CBaseEntity::PhysicsSimulate-MOVETYPE_CUSTOM" );
 			PhysicsCustom();
 		}
 		break;

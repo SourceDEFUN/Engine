@@ -1560,7 +1560,6 @@ void CShaderSystem::DrawElements( IShader *pShader, IMaterialVar **params,
 								  VertexCompressionType_t vertexCompression, 
 								  uint32 nMaterialVarChangeTimeStamp )
 {
-	VPROF("CShaderSystem::DrawElements");
 
 	g_pShaderAPI->InvalidateDelayedShaderConstants();
 	// Compute modulation...

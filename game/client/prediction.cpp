@@ -292,7 +292,6 @@ void CPrediction::PreEntityPacketReceived ( int commands_acknowledged, int curre
 	Q_snprintf( sz, sizeof( sz ), "preentitypacket%d", commands_acknowledged );
 	PREDICTION_TRACKVALUECHANGESCOPE( sz );
 #endif
-	VPROF( "CPrediction::PreEntityPacketReceived" );
 
 	// Cache off incoming packet #
 	m_nIncomingPacketNumber = current_world_update_packet;
@@ -334,7 +333,6 @@ void CPrediction::PostEntityPacketReceived( void )
 {
 #if !defined( NO_ENTITY_PREDICTION )
 	PREDICTION_TRACKVALUECHANGESCOPE( "postentitypacket" );
-	VPROF( "CPrediction::PostEntityPacketReceived" );
 
 	// Don't screw up memory of current player from history buffers if not filling in history buffers
 	//  during prediction!!!
@@ -411,7 +409,6 @@ bool CPrediction::ShouldDumpEntity( C_BaseEntity *ent )
 void CPrediction::PostNetworkDataReceived( int commands_acknowledged )
 {
 #if !defined( NO_ENTITY_PREDICTION )
-	VPROF( "CPrediction::PostNetworkDataReceived" );
 
 	bool error_check = ( commands_acknowledged > 0 ) ? true : false;
 #if defined( _DEBUG )
@@ -602,7 +599,6 @@ void CPrediction::PostNetworkDataReceived( int commands_acknowledged )
 void CPrediction::SetupMove( C_BasePlayer *player, CUserCmd *ucmd, IMoveHelper *pHelper, CMoveData *move ) 
 {
 #if !defined( NO_ENTITY_PREDICTION )
-	VPROF( "CPrediction::SetupMove" );
 
 	move->m_bFirstRunOfFunctions = IsFirstTimePredicted();
 	
@@ -683,7 +679,6 @@ void CPrediction::SetupMove( C_BasePlayer *player, CUserCmd *ucmd, IMoveHelper *
 void CPrediction::FinishMove( C_BasePlayer *player, CUserCmd *ucmd, CMoveData *move )
 {
 #if !defined( NO_ENTITY_PREDICTION )
-	VPROF( "CPrediction::FinishMove" );
 
 	player->m_RefEHandle = move->m_nPlayerHandle;
 
@@ -726,7 +721,6 @@ void CPrediction::FinishMove( C_BasePlayer *player, CUserCmd *ucmd, CMoveData *m
 void CPrediction::StartCommand( C_BasePlayer *player, CUserCmd *cmd )
 {
 #if !defined( NO_ENTITY_PREDICTION )
-	VPROF( "CPrediction::StartCommand" );
 
 	CPredictableId::ResetInstanceCounters();
 
@@ -743,7 +737,6 @@ void CPrediction::StartCommand( C_BasePlayer *player, CUserCmd *cmd )
 void CPrediction::FinishCommand( C_BasePlayer *player )
 {
 #if !defined( NO_ENTITY_PREDICTION )
-	VPROF( "CPrediction::FinishCommand" );
 
 	player->m_pCurrentCommand = NULL;
 	C_BaseEntity::SetPredictionRandomSeed( NULL );
@@ -759,7 +752,6 @@ void CPrediction::FinishCommand( C_BasePlayer *player )
 void CPrediction::RunPreThink( C_BasePlayer *player )
 {
 #if !defined( NO_ENTITY_PREDICTION )
-	VPROF( "CPrediction::RunPreThink" );
 
 	// Run think functions on the player
 	if ( !player->PhysicsRunThink() )
@@ -786,7 +778,6 @@ void CPrediction::RunPreThink( C_BasePlayer *player )
 void CPrediction::RunThink (C_BasePlayer *player, double frametime )
 {
 #if !defined( NO_ENTITY_PREDICTION )
-	VPROF( "CPrediction::RunThink" );
 
 	int thinktick = player->GetNextThinkTick();
 
@@ -809,7 +800,6 @@ void CPrediction::RunThink (C_BasePlayer *player, double frametime )
 void CPrediction::RunPostThink( C_BasePlayer *player )
 {
 #if !defined( NO_ENTITY_PREDICTION )
-	VPROF( "CPrediction::RunPostThink" );
 
 	// Run post-think
 	player->PostThink();
@@ -825,7 +815,6 @@ void CPrediction::RunPostThink( C_BasePlayer *player )
 void CPrediction::RunCommand( C_BasePlayer *player, CUserCmd *ucmd, IMoveHelper *moveHelper )
 {
 #if !defined( NO_ENTITY_PREDICTION )
-	VPROF( "CPrediction::RunCommand" );
 #if defined( _DEBUG )
 	char sz[ 32 ];
 	Q_snprintf( sz, sizeof( sz ), "runcommand%04d", ucmd->command_number );
@@ -1007,7 +996,6 @@ void CPrediction::SetIdealPitch ( C_BasePlayer *player, const Vector& origin, co
 void CPrediction::RemoveStalePredictedEntities( int sequence_number )
 {
 #if !defined( NO_ENTITY_PREDICTION )
-	VPROF( "CPrediction::RemoveStalePredictedEntities" );
 
 	int oldest_allowable_command = sequence_number;
 
@@ -1101,7 +1089,6 @@ void CPrediction::RemoveStalePredictedEntities( int sequence_number )
 void CPrediction::RestoreOriginalEntityState( void )
 {
 #if !defined( NO_ENTITY_PREDICTION )
-	VPROF( "CPrediction::RestoreOriginalEntityState" );
 	PREDICTION_TRACKVALUECHANGESCOPE( "restore" );
 
 	Assert( C_BaseEntity::IsAbsRecomputationsEnabled() );
@@ -1134,7 +1121,6 @@ void CPrediction::RestoreOriginalEntityState( void )
 void CPrediction::RunSimulation( int current_command, float curtime, CUserCmd *cmd, C_BasePlayer *localPlayer )
 {
 #if !defined( NO_ENTITY_PREDICTION )
-	VPROF( "CPrediction::RunSimulation" );
 
 	Assert( localPlayer );
 	C_CommandContext *ctx = localPlayer->GetCommandContext();
@@ -1262,7 +1248,6 @@ void InvalidateEFlagsRecursive( C_BaseEntity *pEnt, int nDirtyFlags, int nChildF
 void CPrediction::StorePredictionResults( int predicted_frame )
 {
 #if !defined( NO_ENTITY_PREDICTION )
-	VPROF( "CPrediction::StorePredictionResults" );
 	PREDICTION_TRACKVALUECHANGESCOPE( "save" );
 
 	int i;
@@ -1298,7 +1283,6 @@ void CPrediction::StorePredictionResults( int predicted_frame )
 void CPrediction::ShiftIntermediateDataForward( int slots_to_remove, int number_of_commands_run )
 {
 #if !defined( NO_ENTITY_PREDICTION )
-	VPROF( "CPrediction::ShiftIntermediateDataForward" );
 	PREDICTION_TRACKVALUECHANGESCOPE( "shift" );
 
 	C_BasePlayer *current = C_BasePlayer::GetLocalPlayer();
@@ -1334,7 +1318,6 @@ void CPrediction::ShiftIntermediateDataForward( int slots_to_remove, int number_
 void CPrediction::RestoreEntityToPredictedFrame( int predicted_frame )
 {
 #if !defined( NO_ENTITY_PREDICTION )
-	VPROF( "CPrediction::RestoreEntityToPredictedFrame" );
 	PREDICTION_TRACKVALUECHANGESCOPE( "restoretopred" );
 
 	C_BasePlayer *current = C_BasePlayer::GetLocalPlayer();
@@ -1474,7 +1457,6 @@ bool CPrediction::PerformPrediction( bool received_new_world_update, C_BasePlaye
 {
 	MDLCACHE_CRITICAL_SECTION();
 #if !defined( NO_ENTITY_PREDICTION )
-	VPROF( "CPrediction::PerformPrediction" );
 
 	// This makes sure , tahe we are allwoed to sample the world when it may not be ready to be sampled
 	Assert( C_BaseEntity::IsAbsQueriesValid() );

@@ -1811,7 +1811,6 @@ void CShadowMgr::ApplyShadowToLeaf( const Shadow_t &shadow, mleaf_t* RESTRICT pL
 //-----------------------------------------------------------------------------
 bool CShadowMgr::EnumerateLeaf( int leaf, intp context )
 {
-	VPROF( "CShadowMgr::EnumerateLeaf" );
 	ShadowBuildInfo_t* pBuild = (ShadowBuildInfo_t*)context;
 
 	// Skip this leaf if it's not visible from the shadow caster
@@ -2227,7 +2226,6 @@ bool CShadowMgr::ProjectVerticesIntoShadowSpace( const VMatrix& modelToShadow,
 int CShadowMgr::ProjectAndClipVertices( const Shadow_t& shadow, const VMatrix& worldToShadow,
 	const VMatrix *pWorldToModel, int count, Vector** ppPosition, ShadowVertex_t*** ppOutVertex )
 {
-	VPROF( "ProjectAndClipVertices" );
 	static ShadowClipState_t clip;
 	if ( !ProjectVerticesIntoShadowSpace( worldToShadow, shadow.m_MaxDist, count, ppPosition, clip ) )
 		return 0;
@@ -2312,7 +2310,6 @@ inline void CShadowMgr::CopyClippedVertices( int count, ShadowVertex_t** ppSrcVe
 bool CShadowMgr::ComputeShadowVertices( ShadowDecal_t& decal, 
 	const VMatrix* pModelToWorld, const VMatrix *pWorldToModel, ShadowVertexCache_t* pVertexCache )
 {
-	VPROF( "CShadowMgr::ComputeShadowVertices" );
 	// Prepare for the clipping
 	Vector **ppVec = (Vector**)stackalloc( MSurf_VertCount( decal.m_SurfID ) * sizeof(Vector*) );
 	for (int i = 0; i < MSurf_VertCount( decal.m_SurfID ); ++i )

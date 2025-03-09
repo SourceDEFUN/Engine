@@ -90,7 +90,6 @@ static inline void RecordMuzzleFlash( const Vector &start, const QAngle &angles,
 //-----------------------------------------------------------------------------
 void C_TEMuzzleFlash::PostDataUpdate( DataUpdateType_t updateType )
 {
-	VPROF( "C_TEMuzzleFlash::PostDataUpdate" );
 
 	//FIXME: Index is incorrect
 	g_pEffects->MuzzleFlash( m_vecOrigin, m_vecAngles, m_flScale, m_nType );	

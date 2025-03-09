@@ -858,7 +858,6 @@ void CAsyncWavDataCache::Shutdown()
 //-----------------------------------------------------------------------------
 memhandle_t CAsyncWavDataCache::AsyncLoadCache( char const *filename, int datasize, int startpos, bool bIsPrefetch )
 {
-	VPROF( "CAsyncWavDataCache::AsyncLoadCache" );
 
 	FileNameHandle_t fnh = g_pFileSystem->FindOrAddFileName( filename );
 
@@ -959,7 +958,6 @@ memhandle_t CAsyncWavDataCache::FindOrCreateBuffer( asyncwaveparams_t &params, b
 //-----------------------------------------------------------------------------
 StreamHandle_t CAsyncWavDataCache::OpenStreamedLoad( char const *pFileName, int dataSize, int dataStart, int startPos, int loopPos, int bufferSize, int numBuffers, streamFlags_t flags )
 {
-	VPROF( "CAsyncWavDataCache::OpenStreamedLoad" );
 
 	StreamedEntry_t			streamedEntry;
 	StreamHandle_t			hStream;
@@ -1014,7 +1012,6 @@ StreamHandle_t CAsyncWavDataCache::OpenStreamedLoad( char const *pFileName, int 
 //-----------------------------------------------------------------------------
 void CAsyncWavDataCache::CloseStreamedLoad( StreamHandle_t hStream )
 {
-	VPROF( "CAsyncWavDataCache::CloseStreamedLoad" );
 
 	if ( hStream == INVALID_STREAM_HANDLE )
 	{
@@ -1071,7 +1068,6 @@ void CAsyncWavDataCache::PrefetchCache( char const *filename, int datasize, int 
 //-----------------------------------------------------------------------------
 bool CAsyncWavDataCache::CopyDataIntoMemory( char const *filename, int datasize, int startpos, void *buffer, int bufsize, int copystartpos, int bytestocopy, bool *pbPostProcessed )
 {
-	VPROF( "CAsyncWavDataCache::CopyDataIntoMemory" );
 
 	bool bret = false;
 
@@ -1111,7 +1107,6 @@ bool CAsyncWavDataCache::CopyDataIntoMemory( char const *filename, int datasize,
 //-----------------------------------------------------------------------------
 bool CAsyncWavDataCache::CopyDataIntoMemory( memhandle_t& handle, char const *filename, int datasize, int startpos, void *buffer, int bufsize, int copystartpos, int bytestocopy, bool *pbPostProcessed )
 {
-	VPROF( "CAsyncWavDataCache::CopyDataIntoMemory" );
 
 	*pbPostProcessed = false;
 
@@ -1167,7 +1162,6 @@ bool CAsyncWavDataCache::CopyDataIntoMemory( memhandle_t& handle, char const *fi
 //-----------------------------------------------------------------------------
 int CAsyncWavDataCache::CopyStreamedDataIntoMemory( int hStream, void *pBuffer, int bufferSize, int copyStartPos, int bytesToCopy )
 {
-	VPROF( "CAsyncWavDataCache::CopyStreamedDataIntoMemory" );
 
 	int					actualCopied;
 	int					count;
@@ -1421,7 +1415,6 @@ void *CAsyncWavDataCache::GetStreamedDataPointer( StreamHandle_t hStream, bool b
 //-----------------------------------------------------------------------------
 bool CAsyncWavDataCache::IsStreamedDataReady( int hStream )
 {
-	VPROF( "CAsyncWavDataCache::IsStreamedDataReady" );
 
 	if ( hStream == INVALID_STREAM_HANDLE )
 	{
@@ -1502,7 +1495,6 @@ void CAsyncWavDataCache::Unload( memhandle_t handle )
 //-----------------------------------------------------------------------------
 bool CAsyncWavDataCache::GetDataPointer( memhandle_t& handle, char const *filename, int datasize, int startpos, void **pData, int copystartpos, bool *pbPostProcessed )
 {
-	VPROF( "CAsyncWavDataCache::GetDataPointer" );
 
 	Assert( pbPostProcessed );
 	Assert( pData );
@@ -1585,7 +1577,6 @@ bool CAsyncWavDataCache::GetDataPointer( memhandle_t& handle, char const *filena
 //-----------------------------------------------------------------------------
 bool CAsyncWavDataCache::IsDataLoadCompleted( memhandle_t handle, bool *pIsValid )
 {
-	VPROF( "CAsyncWavDataCache::IsDataLoadCompleted" );
 
 	CAsyncWaveData *data = CacheGet( handle );
 	if ( !data )
@@ -1841,7 +1832,6 @@ private:
 	//-----------------------------------------------------------------------------
 	inline byte *GetCachedDataPointer()
 	{
-		VPROF( "CWaveDataStreamAsync::GetCachedDataPointer" );
 
 		CAudioSourceCachedInfo *info = m_AudioCacheHandle.Get( CAudioSource::AUDIO_SOURCE_WAV, m_pSfx->IsPrecachedSound(), m_pSfx, &m_nCachedDataSize );
 		if ( !info )

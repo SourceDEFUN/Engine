@@ -628,7 +628,6 @@ static void ComputeAmbientFromSurface( SurfaceHandle_t surfID, dworldlight_t* pS
 static void ComputeAmbientFromSphericalSamples( const Vector& start, 
 						Vector* lightBoxColor )
 {
-	VPROF( "ComputeAmbientFromSphericalSamples" );
 	// find any ambient lights
 	dworldlight_t *pSkylight = FindAmbientLight();
 
@@ -734,7 +733,6 @@ static void R_StudioGetAmbientLightForPoint(
 {
 	*bAddedLeafAmbientCube = false;
 
-	VPROF( "R_StudioGetAmbientLightForPoint" );
 	int i;
 	if ( g_pMaterialSystemConfig->nFullbright == 1 )
 	{
@@ -1826,7 +1824,6 @@ static void AddStaticLighting(
 	bool bStaticProp,
 	bool bAddedLeafAmbientCube )
 {
-	VPROF( "AddStaticLighting" );
 	// First, blat out the lighting state
 	int i;
 	pCache->m_StaticLightingState.numlights = 0;
@@ -2071,7 +2068,6 @@ static const byte* ComputeStaticLightingForCacheEntry( CBaseLightCache *pcache, 
 {
 	VPROF_INCREMENT_COUNTER( "ComputeStaticLightingForCacheEntry", 1 );
 	
-	VPROF( "ComputeStaticLightingForCacheEntry" );
 	// Figure out the PVS info for this location
  	const byte* pVis = CM_ClusterPVS( CM_LeafCluster( leaf ) );
 

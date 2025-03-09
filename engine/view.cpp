@@ -219,7 +219,6 @@ void FullViewColorAdjustment( )
 //-----------------------------------------------------------------------------
 void V_RenderView( void )
 {
-	VPROF( "V_RenderView" );
 	MDLCACHE_COARSE_LOCK_(g_pMDLCache);
 
 	bool bCanRenderWorld = ( host_state.worldmodel != NULL ) && cl.IsActive();

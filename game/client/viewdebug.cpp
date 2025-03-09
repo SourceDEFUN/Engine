@@ -516,7 +516,6 @@ static void OverlayColorRamp( bool bHalfSpace )
 //-----------------------------------------------------------------------------
 void CDebugViewRender::Draw3DDebuggingInfo( const CViewSetup &view )
 {
-	VPROF("CViewRender::Draw3DDebuggingInfo");
 
 	// Draw 3d overlays
 	render->Draw3DDebugOverlays();

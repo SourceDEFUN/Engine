@@ -631,7 +631,6 @@ void Shader_DrawSurfaceDynamic( IMatRenderContext *pRenderContext, SurfaceHandle
 // since it causes a lock and drawindexedprimitive per surface! (gary)
 void Shader_DrawSurfaceStatic( SurfaceHandle_t surfID )
 {
-	VPROF( "Shader_DrawSurfaceStatic" );
 	if ( 
 #ifdef USE_CONVARS
 		mat_forcedynamic.GetInt() || 
@@ -1505,7 +1504,6 @@ void Shader_DrawChains( const CWorldRenderList *pRenderList, int nSortGroup, boo
 {
 	CMatRenderContextPtr pRenderContext(materials);
 	Assert( !g_EngineRenderer->InLightmapUpdate() );
-	VPROF("Shader_DrawChains");
 	// Draw chains...
 #ifdef USE_CONVARS
 	if ( !mat_forcedynamic.GetInt() && !g_pMaterialSystemConfig->bDrawFlat )
@@ -1596,7 +1594,6 @@ void Shader_DrawDispChain( int nSortGroup, const CMSurfaceSortList &list, unsign
 
 static void Shader_BuildDynamicLightmaps( CWorldRenderList *pRenderList )
 {
-	VPROF( "Shader_BuildDynamicLightmaps" );
 
 	R_DLightStartView();
 
@@ -2101,7 +2098,6 @@ static void Shader_WorldZFill( CWorldRenderList *pRenderList, unsigned long flag
 //-----------------------------------------------------------------------------
 static void Shader_WorldEnd( CWorldRenderList *pRenderList, unsigned long flags, float waterZAdjust )
 {
-	VPROF("Shader_WorldEnd");
 
 	CMatRenderContextPtr pRenderContext( materials );
 
@@ -2982,7 +2978,6 @@ void R_BuildWorldLists( IWorldRenderList *pRenderListIn, WorldListInfo_t* pInfo,
 		return;
 	}
 
-	VPROF( "R_BuildWorldLists" );
 	VectorCopy( g_EngineRenderer->ViewOrigin(), modelorg );
 
 #ifdef USE_CONVARS
@@ -3246,7 +3241,6 @@ void R_DrawWorldLists( IWorldRenderList *pRenderListIn, unsigned long flags, flo
 
 #ifdef DEBUG_SURF
 	{
-		VPROF("R_DrawWorldLists (DEBUG_SURF)");
 		if (g_pDebugSurf)
 		{
 			CMatRenderContextPtr pRenderContext( materials );
@@ -4154,7 +4148,6 @@ CBrushBatchRender::brushrender_t *CBrushBatchRender::FindOrCreateRenderBatch( mo
 //-----------------------------------------------------------------------------
 void CBrushBatchRender::DrawOpaqueBrushModel( IClientEntity *baseentity, model_t *model, const Vector& origin, ERenderDepthMode DepthMode )
 {
-	VPROF( "R_DrawOpaqueBrushModel" );
 	SurfaceHandle_t firstSurfID = SurfaceHandleFromIndex( model->brush.firstmodelsurface, model->brush.pShared );
 
 	brushrender_t *pRender = FindOrCreateRenderBatch( model );
@@ -4449,7 +4442,6 @@ void R_Surface_LevelShutdown()
 //-----------------------------------------------------------------------------
 static void R_DrawBrushModel_Override( IClientEntity *baseentity, model_t *model, const Vector& origin )
 {
-	VPROF( "R_DrawOpaqueBrushModel_Override" );
 	SurfaceHandle_t surfID = SurfaceHandleFromIndex( model->brush.firstmodelsurface, model->brush.pShared );
 	for (int i=0 ; i<model->brush.nummodelsurfaces ; i++, surfID++)
 	{
@@ -4582,7 +4574,6 @@ public:
 void R_DrawBrushModel( IClientEntity *baseentity, model_t *model, 
 	const Vector& origin, const QAngle& angles, ERenderDepthMode DepthMode, bool bDrawOpaque, bool bDrawTranslucent )
 {
-	VPROF( "R_DrawBrushModel" );
 
 #ifdef USE_CONVARS
 	if ( !r_drawbrushmodels.GetInt() )

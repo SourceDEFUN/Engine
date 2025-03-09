@@ -310,12 +310,10 @@ CAttributeNode *CDependencyGraph::FindAttrNode( CDmAttribute *pAttr )
 
 	CAttributeNode *pAttrNode = 0;
 	{
-		VPROF( "CDependencyGraph::FindAttrNode_Alloc" );
 		pAttrNode = g_AttrNodePool.Alloc();
 		pAttrNode->m_attribute = pAttr;
 	}
 	{
-		VPROF( "CDependencyGraph::FindAttrNode_Alloc2" );
 		m_attrNodes.Insert( pAttrNode );
 	}
 	return pAttrNode;

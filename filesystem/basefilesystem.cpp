@@ -2317,7 +2317,6 @@ void CBaseFileSystem::HandleOpenRegularFile( CFileOpenInfo &openInfo, bool bIsAb
 //-----------------------------------------------------------------------------
 FileHandle_t CBaseFileSystem::FindFileInSearchPath( CFileOpenInfo &openInfo )
 {
-	VPROF( "CBaseFileSystem::FindFile" );
 	
 	Assert( openInfo.m_pSearchPath );
 	openInfo.m_pFileHandle = NULL;
@@ -2379,7 +2378,6 @@ FileHandle_t CBaseFileSystem::FindFileInSearchPath( CFileOpenInfo &openInfo )
 //-----------------------------------------------------------------------------
 FileHandle_t CBaseFileSystem::OpenForRead( const char *pFileNameT, const char *pOptions, unsigned flags, const char *pathID, char **ppszResolvedFilename )
 {
-	VPROF( "CBaseFileSystem::OpenForRead" );
 
 	char pFileNameBuff[MAX_PATH];
 	const char *pFileName = pFileNameBuff;

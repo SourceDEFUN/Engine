@@ -144,7 +144,6 @@ void respawn( CBaseEntity *pEdict, bool fCopyCorpse )
 
 void GameStartFrame( void )
 {
-	VPROF( "GameStartFrame" );
 
 	if ( g_pGameRules )
 		g_pGameRules->Think();

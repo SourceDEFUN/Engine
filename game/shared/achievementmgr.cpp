@@ -606,7 +606,6 @@ CBaseAchievement *CAchievementMgr::GetAchievementByID( int iAchievementID )
 //-----------------------------------------------------------------------------
 CBaseAchievement *CAchievementMgr::GetAchievementByName( const char *pchName )
 {
-	VPROF("GetAchievementByName");
 	FOR_EACH_MAP_FAST( m_mapAchievement, i )
 	{
 		CBaseAchievement *pAchievement = m_mapAchievement[i];

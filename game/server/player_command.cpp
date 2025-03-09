@@ -39,7 +39,6 @@ CPlayerMove::CPlayerMove( void )
 //-----------------------------------------------------------------------------
 void CPlayerMove::StartCommand( CBasePlayer *player, CUserCmd *cmd )
 {
-	VPROF( "CPlayerMove::StartCommand" );
 
 #if !defined( NO_ENTITY_PREDICTION )
 	CPredictableId::ResetInstanceCounters();
@@ -76,7 +75,6 @@ void CPlayerMove::StartCommand( CBasePlayer *player, CUserCmd *cmd )
 //-----------------------------------------------------------------------------
 void CPlayerMove::FinishCommand( CBasePlayer *player )
 {
-	VPROF( "CPlayerMove::FinishCommand" );
 
 	player->m_pCurrentCommand = NULL;
 	CBaseEntity::SetPredictionRandomSeed( NULL );
@@ -91,7 +89,6 @@ void CPlayerMove::FinishCommand( CBasePlayer *player )
 //-----------------------------------------------------------------------------
 void CPlayerMove::CheckMovingGround( CBasePlayer *player, double frametime )
 {
-	VPROF( "CPlayerMove::CheckMovingGround()" );
 
 	CBaseEntity	    *groundentity;
 
@@ -131,7 +128,6 @@ void CPlayerMove::CheckMovingGround( CBasePlayer *player, double frametime )
 //-----------------------------------------------------------------------------
 void CPlayerMove::SetupMove( CBasePlayer *player, CUserCmd *ucmd, IMoveHelper *pHelper, CMoveData *move )
 {
-	VPROF( "CPlayerMove::SetupMove" );
 
 	// Allow sound, etc. to be created by movement code
 	move->m_bFirstRunOfFunctions = true;
@@ -204,7 +200,6 @@ void CPlayerMove::SetupMove( CBasePlayer *player, CUserCmd *ucmd, IMoveHelper *p
 //-----------------------------------------------------------------------------
 void CPlayerMove::FinishMove( CBasePlayer *player, CUserCmd *ucmd, CMoveData *move )
 {
-	VPROF( "CPlayerMove::FinishMove" );
 
 	// NOTE: Don't copy this.  the movement code modifies its local copy but is not expecting to be authoritative
 	//player->m_flMaxspeed			= move->m_flClientMaxSpeed;
@@ -245,7 +240,6 @@ void CPlayerMove::FinishMove( CBasePlayer *player, CUserCmd *ucmd, CMoveData *mo
 //-----------------------------------------------------------------------------
 void CPlayerMove::RunPreThink( CBasePlayer *player )
 {
-	VPROF( "CPlayerMove::RunPreThink" );
 
 	// Run think functions on the player
 	VPROF_SCOPE_BEGIN( "player->PhysicsRunThink()" );
@@ -275,7 +269,6 @@ void CPlayerMove::RunPreThink( CBasePlayer *player )
 //-----------------------------------------------------------------------------
 void CPlayerMove::RunThink (CBasePlayer *player, double frametime )
 {
-	VPROF( "CPlayerMove::RunThink" );
 	int thinktick = player->GetNextThinkTick();
 
 	if ( thinktick <= 0 || thinktick > player->m_nTickBase )
@@ -296,7 +289,6 @@ void CPlayerMove::RunThink (CBasePlayer *player, double frametime )
 //-----------------------------------------------------------------------------
 void CPlayerMove::RunPostThink( CBasePlayer *player )
 {
-	VPROF( "CPlayerMove::RunPostThink" );
 
 	// Run post-think
 	player->PostThink();
@@ -380,7 +372,6 @@ void CPlayerMove::RunCommand ( CBasePlayer *player, CUserCmd *ucmd, IMoveHelper 
 		CBaseCombatWeapon *weapon = dynamic_cast< CBaseCombatWeapon * >( CBaseEntity::Instance( ucmd->weaponselect ) );
 		if ( weapon )
 		{
-			VPROF( "player->SelectItem()" );
 			player->SelectItem( weapon->GetName(), ucmd->weaponsubtype );
 		}
 	}
@@ -429,13 +420,11 @@ void CPlayerMove::RunCommand ( CBasePlayer *player, CUserCmd *ucmd, IMoveHelper 
 	// Let the game do the movement.
 	if ( !pVehicle )
 	{
-		VPROF( "g_pGameMovement->ProcessMovement()" );
 		Assert( g_pGameMovement );
 		g_pGameMovement->ProcessMovement( player, g_pMoveData );
 	}
 	else
 	{
-		VPROF( "pVehicle->ProcessMovement()" );
 		pVehicle->ProcessMovement( player, g_pMoveData );
 	}
 			

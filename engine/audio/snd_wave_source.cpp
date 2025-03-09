@@ -239,7 +239,6 @@ char const *CAudioSourceWave::GetFileName()
 //-----------------------------------------------------------------------------
 bool CAudioSourceWave::IsAsyncLoad()
 {
-	VPROF("CAudioSourceWave::IsAsyncLoad");
 
 	if ( ( IsPC() || !IsX360() ) && !m_AudioCacheHandle.IsValid() )
 	{
@@ -1354,7 +1353,6 @@ void CAudioSourceMemWave::ParseDataChunk( IterateRIFF &walk )
 //-----------------------------------------------------------------------------
 int CAudioSourceMemWave::GetCacheStatus( void )
 {
-	VPROF("CAudioSourceMemWave::GetCacheStatus");
 
 	if ( IsPC() || !IsX360() )
 	{
@@ -2594,7 +2592,6 @@ CAudioSourceCache::SearchPathCache *CAudioSourceCache::LookUpCacheEntry( const c
 //-----------------------------------------------------------------------------
 CAudioSourceCachedInfo *CAudioSourceCache::GetInfo( int audiosourcetype, bool soundisprecached, CSfxTable *sfx )
 {
-	VPROF("CAudioSourceCache::GetInfo");
 
 	if ( IsX360() )
 	{
@@ -2631,7 +2628,6 @@ CAudioSourceCachedInfo *CAudioSourceCache::GetInfo( int audiosourcetype, bool so
 
 void CAudioSourceCache::RebuildCacheEntry( int audiosourcetype, bool soundisprecached, CSfxTable *sfx )
 {
-	VPROF("CAudioSourceCache::RebuildCacheEntry");
 
 	if ( IsX360() )
 	{

@@ -98,7 +98,6 @@ protected:
 	//-----------------------------------------------------------------------------
 	inline byte *GetCachedDataPointer()
 	{
-		VPROF("CAudioSourceWave::GetCachedDataPointer");
 
 		CAudioSourceCachedInfo *info = m_AudioCacheHandle.Get( CAudioSource::AUDIO_SOURCE_WAV, m_pSfx->IsPrecachedSound(), m_pSfx, &m_nCachedDataSize );
 		if ( !info )

@@ -73,7 +73,6 @@ ConVar fire_dmgbase( "fire_dmgbase", "1" );
 ConVar fire_growthrate( "fire_growthrate", "1.0" );
 ConVar fire_dmginterval( "fire_dmginterval", "1.0" );
 
-#define VPROF_FIRE(s) VPROF( s )
 
 class CFire : public CBaseEntity
 {
@@ -389,8 +388,6 @@ bool FireSystem_CanAddFire( Vector *position, float separationRadius, fireType_e
 //-----------------------------------------------------------------------------
 bool FireSystem_StartFire( const Vector &position, float fireHeight, float attack, float fuel, int flags, CBaseEntity *owner, fireType_e type )
 {
-	VPROF_FIRE( "FireSystem_StartFire1" );
-
 	Vector testPos = position;
 	//Must be okay to add fire here
 	if ( FireSystem_CanAddFire( &testPos, 16.0f, type, flags ) == false )
@@ -437,8 +434,6 @@ bool FireSystem_StartFire( const Vector &position, float fireHeight, float attac
 //-----------------------------------------------------------------------------
 bool FireSystem_StartFire( CBaseAnimating *pEntity, float fireHeight, float attack, float fuel, int flags, CBaseEntity *owner, fireType_e type )
 {
-	VPROF_FIRE( "FireSystem_StartFire2" );
-
 	Vector position = pEntity->GetAbsOrigin();
 	Vector testPos = position;
 
@@ -496,8 +491,6 @@ void FireSystem_ExtinguishInRadius( const Vector &origin, float radius, float ra
 //-----------------------------------------------------------------------------
 void FireSystem_AddHeatInRadius( const Vector &origin, float radius, float heat )
 {
-	VPROF_FIRE( "FireSystem_AddHeatInRadius" );
-
 	CFire *pFires[32];
 
 	int fireCount = FireSystem_GetFiresInSphere( pFires, ARRAYSIZE(pFires), false, origin, radius );
@@ -918,8 +911,6 @@ bool CFire::GetFireDimensions( Vector *pFireMins, Vector *pFireMaxs )
 //-----------------------------------------------------------------------------
 void CFire::Update( float simTime )
 {
-	VPROF_FIRE( "CFire::Update" );
-
 	if ( m_flFuel != 0 )
 	{
 		m_flFuel -= simTime;

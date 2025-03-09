@@ -807,7 +807,6 @@ void C_BaseEntity::Interp_SetupMappings( VarMapping_t *map )
 
 void C_BaseEntity::Interp_RestoreToLastNetworked( VarMapping_t *map )
 {
-	VPROF( "C_BaseEntity::Interp_RestoreToLastNetworked" );
 
 	PREDICTION_TRACKVALUECHANGESCOPE_ENTITY( this, "restoretolastnetworked" );
 
@@ -2125,7 +2124,6 @@ void C_BaseEntity::MarkMessageReceived()
 //-----------------------------------------------------------------------------
 void C_BaseEntity::PreDataUpdate( DataUpdateType_t updateType )
 {
-	VPROF( "C_BaseEntity::PreDataUpdate" );
 
 	// Register for an OnDataChanged call and call OnPreDataChanged().
 	if ( AddDataChangeEvent( this, updateType, &m_DataChangeEventRef ) )
@@ -2284,7 +2282,6 @@ void C_BaseEntity::MarkAimEntsDirty()
 
 void C_BaseEntity::CalcAimEntPositions()
 {
-	VPROF("CalcAimEntPositions");
 	int i;
 	int c = g_AimEntsList.Count();
 	for ( i = 0; i < c; ++i )
@@ -2873,7 +2870,6 @@ void C_BaseEntity::BaseInterpolatePart2( Vector &oldOrigin, QAngle &oldAngles, V
 //-----------------------------------------------------------------------------
 bool C_BaseEntity::Interpolate( float currentTime )
 {
-	VPROF( "C_BaseEntity::Interpolate" );
 
 	Vector oldOrigin;
 	QAngle oldAngles;
@@ -5679,7 +5675,6 @@ RenderGroup_t C_BaseEntity::GetRenderGroup()
 int C_BaseEntity::SaveData( const char *context, int slot, int type )
 {
 #if !defined( NO_ENTITY_PREDICTION )
-	VPROF( "C_BaseEntity::SaveData" );
 
 	void *dest = ( slot == SLOT_ORIGINALDATA ) ? GetOriginalNetworkDataObject() : GetPredictedFrame( slot );
 	Assert( dest );
@@ -5728,7 +5723,6 @@ int C_BaseEntity::SaveData( const char *context, int slot, int type )
 int C_BaseEntity::RestoreData( const char *context, int slot, int type )
 {
 #if !defined( NO_ENTITY_PREDICTION )
-	VPROF( "C_BaseEntity::RestoreData" );
 
 	const void *src = ( slot == SLOT_ORIGINALDATA ) ? GetOriginalNetworkDataObject() : GetPredictedFrame( slot );
 	Assert( src );

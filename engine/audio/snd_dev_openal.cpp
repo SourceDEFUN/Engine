@@ -541,7 +541,6 @@ void CAudioDeviceOpenAL::TransferSamples( int end )
 
 void CAudioDeviceOpenAL::SpatializeChannel( int volume[CCHANVOLUMES/2], int master_vol, const Vector& sourceDir, float gain, float mono )
 {
-	VPROF("CAudioDeviceOpenAL::SpatializeChannel");
 	S_SpatializeChannel( volume, master_vol, &sourceDir, gain, mono );
 }
 

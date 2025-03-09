@@ -53,7 +53,6 @@ C_TEKillPlayerAttachments::~C_TEKillPlayerAttachments( void )
 //-----------------------------------------------------------------------------
 void C_TEKillPlayerAttachments::PostDataUpdate( DataUpdateType_t updateType )
 {
-	VPROF( "C_TEKillPlayerAttachments::PostDataUpdate" );
 
 	tempents->KillAttachedTents( m_nPlayer );
 }

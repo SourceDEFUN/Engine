@@ -1746,7 +1746,6 @@ bool C_BaseFlex::ProcessFlexSettingSceneEvent( CSceneEventInfo *info, CChoreoSce
 	if ( !event->HasEndTime() )
 		return true;
 
-	VPROF( "C_BaseFlex::ProcessFlexSettingSceneEvent" );
 
 	// Look up the actual strings
 	const char *scenefile	= event->GetParameters();

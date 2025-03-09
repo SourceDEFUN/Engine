@@ -2908,7 +2908,6 @@ void DecalSurfaceDraw_QueueHelper( bool bBatched, int renderGroup, Vector vModel
 void DecalSurfaceDraw( IMatRenderContext *pRenderContext, int renderGroup, float flFade )
 {
 	//	VPROF_BUDGET( "Decals", "Decals" );
-	VPROF( "DecalsDraw" );
 
 	if( !r_drawdecals.GetBool() )
 	{
@@ -2973,7 +2972,6 @@ void DecalSurfaceAdd( SurfaceHandle_t surfID, int iGroup )
 {
 	// Performance analysis.
 //	VPROF_BUDGET( "Decals", "Decals" );
-	VPROF( "DecalsBatch" );
 	
 	// Go through surfaces decal list and add them to the correct lists.
 	decal_t *pDecalList = MSurf_DecalPointer( surfID );

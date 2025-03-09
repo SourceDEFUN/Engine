@@ -1395,7 +1395,6 @@ bool CIndexBufferDx8::Lock( int nMaxIndexCount, bool bAppend, IndexDesc_t &desc 
 	ShaderUtil()->SyncMatrices();
 	g_ShaderMutex.Lock();
 
-	VPROF( "CIndexBufferX8::Lock" );		
 
 	void *pLockedData = NULL;
 	HRESULT hr;
@@ -1793,7 +1792,6 @@ bool CVertexBufferDx8::Lock( int nMaxVertexCount, bool bAppend, VertexDesc_t &de
 	ShaderUtil()->SyncMatrices();
 	g_ShaderMutex.Lock();
 
-	VPROF( "CVertexBufferDx8::Lock" );		
 
 	void *pLockedData = NULL;
 	HRESULT hr;
@@ -2752,7 +2750,6 @@ void CMeshDX8::LockMesh( int nVertexCount, int nIndexCount, MeshDesc_t& desc )
 	ShaderUtil()->SyncMatrices();
 
 	g_ShaderMutex.Lock();
-	VPROF( "CMeshDX8::LockMesh" );		
 	Lock( nVertexCount, false, *static_cast<VertexDesc_t*>( &desc ) );
 	if ( m_Type != MATERIAL_POINTS )
 	{
@@ -2770,7 +2767,6 @@ void CMeshDX8::LockMesh( int nVertexCount, int nIndexCount, MeshDesc_t& desc )
 
 void CMeshDX8::UnlockMesh( int nVertexCount, int nIndexCount, MeshDesc_t& desc )
 {
-	VPROF( "CMeshDX8::UnlockMesh" );
 
 	Assert( CBaseMeshDX8::m_bMeshLocked );
 
@@ -2794,7 +2790,6 @@ void CMeshDX8::UnlockMesh( int nVertexCount, int nIndexCount, MeshDesc_t& desc )
 //-----------------------------------------------------------------------------
 void CMeshDX8::ModifyBeginEx( bool bReadOnly, int nFirstVertex, int nVertexCount, int nFirstIndex, int nIndexCount, MeshDesc_t& desc )
 {
-	VPROF( "CMeshDX8::ModifyBegin" );
 
 	// Just give the app crap buffers to fill up while we're suppressed...
 	if ( g_pShaderDeviceDx8->IsDeactivated())
@@ -2833,7 +2828,6 @@ void CMeshDX8::ModifyBegin( int nFirstVertex, int nVertexCount, int nFirstIndex,
 
 void CMeshDX8::ModifyEnd( MeshDesc_t& desc )
 {
-	VPROF( "CMeshDX8::ModifyEnd" );
 	Unlock( 0, *static_cast<IndexDesc_t*>( &desc ) );
 	Unlock( 0, *static_cast<VertexDesc_t*>( &desc ) );
 }
@@ -3424,7 +3418,6 @@ void CMeshDX8::CheckIndices( CPrimList *pPrim, int numPrimitives )
 void CMeshDX8::RenderPass()
 {
 	LOCK_SHADERAPI();
-	VPROF( "CMeshDX8::RenderPass" );
 
 	HandleLateCreation();
 
@@ -3460,7 +3453,6 @@ void CMeshDX8::RenderPass()
 			CheckIndices( pPrim, numPrimitives );
 #endif // CHECK_INDICES
 			{
-				VPROF( "Dx9Device()->DrawIndexedPrimitive" );
 				VPROF_INCREMENT_COUNTER( "DrawIndexedPrimitive", 1 );
 				VPROF_INCREMENT_COUNTER( "numPrimitives", numPrimitives );
 				VPROF_INCREMENT_GROUP_COUNTER( "render/DrawIndexedPrimitive", COUNTER_GROUP_TELEMETRY, 1 );
@@ -3734,7 +3726,6 @@ void CDynamicMeshDX8::Draw( int nFirstIndex, int nIndexCount )
 		return;
 	}
 
-	VPROF( "CDynamicMeshDX8::Draw" );
 
 	m_HasDrawn = true;
 
@@ -4806,7 +4797,6 @@ void CBufferedMeshDX8::Flush( )
 
 	if ( m_pMesh && !m_IsFlushing && m_FlushNeeded )
 	{
-		VPROF( "CBufferedMeshDX8::Flush" );
 
 #ifdef DEBUG_BUFFERED_MESHES
 		if( m_BufferedStateSet )
@@ -5868,7 +5858,6 @@ void CMeshMgr::Draw( MaterialPrimitiveType_t primitiveType, int nFirstIndex, int
 void CMeshMgr::RenderPassWithVertexAndIndexBuffers( void )
 {
 //	LOCK_SHADERAPI(); MESHFIXME
-	VPROF( "CShaderAPIDX8::RenderPassWithVertexAndIndexBuffers" );
 
 	Assert( m_PrimitiveType != MATERIAL_HETEROGENOUS );
 
@@ -5892,7 +5881,6 @@ void CMeshMgr::RenderPassWithVertexAndIndexBuffers( void )
 
 //			Warning( "CMeshMgr::RenderPassWithVertexAndIndexBuffers: DrawIndexedPrimitive: m_nFirstIndex = %d numPrimitives = %d\n", ( int )( ( CDynamiCIndexBufferDx8 * )m_pCurrentIndexBuffer )->m_FirstIndex, ( int )( m_nNumIndices / 3 ) );
 			{
-				VPROF( "Dx9Device()->DrawIndexedPrimitive" );
 //				VPROF_INCREMENT_COUNTER( "DrawIndexedPrimitive", 1 );
 //				VPROF_INCREMENT_COUNTER( "numPrimitives", numPrimitives );
 

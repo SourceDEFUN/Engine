@@ -1167,7 +1167,6 @@ inline void MIX_CenterFromLeftRight( int *pl, int *pr, int *pc )
 
 void MIX_MixPaintbuffers(int ibuf1, int ibuf2, int ibuf3, int count, float fgain_out)
 {
-	VPROF("Mixpaintbuffers");
 	int i;
 	portable_samplepair_t *pbuf1, *pbuf2, *pbuf3, *pbuft;
 	portable_samplepair_t *pbufrear1, *pbufrear2, *pbufrear3, *pbufreart;
@@ -1715,7 +1714,6 @@ void SDEBUG_ShowAvgValue()
 
 void MIX_CompressPaintbuffer(int ipaint, int count)
 {
-	VPROF("CompressPaintbuffer");
 	int i;
 	paintbuffer_t *ppaint = MIX_GetPPaintFromIPaint(ipaint);
 	portable_samplepair_t *pbf;
@@ -1770,7 +1768,6 @@ void MIX_CompressPaintbuffer(int ipaint, int count)
 
 void MIX_MixUpsampleBuffer( CChannelList &list, int ipaintbuffer, int end, int count, int flags )
 {
-	VPROF("MixUpsampleBuffer");
 	int ipaintcur = MIX_GetCurrentPaintbufferIndex(); // save current paintbuffer
 
 	// reset paintbuffer upsampling filter index
@@ -1818,7 +1815,6 @@ void MIX_MixUpsampleBuffer( CChannelList &list, int ipaintbuffer, int end, int c
 
 void MIX_UpsampleAllPaintbuffers( CChannelList &list, int end, int count )
 {
-	VPROF( "MixUpsampleAll" );
 
 	// 'dry' and 'speaker' channel sounds mix 100% into their corresponding buffers
 
@@ -1978,7 +1974,6 @@ static int __cdecl ChannelVolComparator ( const void * a, const void * b )
 
 void CChannelCullList::Initialize( CChannelList &list )
 {
-	VPROF("CChannelCullList::Initialize");
 	// First, build a sorted list of channels by decreasing volume, and by a hash of their wavname.
 	m_numChans = list.Count();
 
@@ -2050,7 +2045,6 @@ ConVar snd_mute_losefocus("snd_mute_losefocus", "1", FCVAR_ARCHIVE);
 // remove all active channels that won't mix for some reason
 void MIX_BuildChannelList( CChannelList &list )
 {
-	VPROF("MIX_BuildChannelList");
 	g_ActiveChannels.GetActiveChannels( list );
 	list.m_nSpecialDSPs.RemoveAll();
 	list.m_hasDryChannels = false;
@@ -2313,7 +2307,6 @@ void MIX_PaintChannels( int endtime, bool bIsUnderwater )
 
 	while ( g_paintedtime < endtime )
 	{
-		VPROF("MIX_PaintChannels inner loop");
 		// mix a full 'paintbuffer' of sound
 		
 		// clamp at paintbuffer size

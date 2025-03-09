@@ -108,7 +108,6 @@ bool CFacePoserVGui::HasFocus( CVGuiWnd *pWnd )
 
 void CFacePoserVGui::Simulate()
 {
-	// VPROF( "CFacePoserVGui::Simulate" );
 
 	if ( !IsInitialized() )
 		return;

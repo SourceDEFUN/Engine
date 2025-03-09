@@ -145,7 +145,6 @@ static void RecordEffect( const char *pEffectName, const CEffectData &data )
 //-----------------------------------------------------------------------------
 void C_TEEffectDispatch::PostDataUpdate( DataUpdateType_t updateType )
 {
-	VPROF( "C_TEEffectDispatch::PostDataUpdate" );
 
 	// Find the effect name.
 	const char *pEffectName = g_StringTableEffectDispatch->GetString( m_EffectData.GetEffectNameIndex() );

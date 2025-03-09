@@ -69,7 +69,6 @@ void R_LightAmbient_4D( const Vector& normal, Vector4D* pLightBoxColor, Vector &
 #if defined( _WIN32 ) && !defined( _X360 )
 void R_LightAmbient_4D( const FourVectors& normal, Vector4D* pLightBoxColor, FourVectors &lv )
 {
-//	VPROF( "R_LightAmbient" );
 
 	// !!speed!! compute ambient color cube in sse format
 	static fltx4 FourZeros={0.,0.,0.,.0};
@@ -140,7 +139,6 @@ void R_LightAmbient_3D( const Vector& normal, const Vector* pLightBoxColor, Vect
 //-----------------------------------------------------------------------------
 void R_LightStrengthWorld( const Vector& vert, int lightcount, LightDesc_t* pDesc, lightpos_t *light )
 {
-//	VPROF( "R_LightStrengthWorld" );
 
 	// NJS: note to self, maybe switch here based on lightcount, so multiple squareroots can be done simeltaneously?
 	for ( int i = 0; i < lightcount; i++)
@@ -191,7 +189,6 @@ TEMPLATE_FUNCTION_TABLE( void, R_LightEffectsWorldFunctionTable, ( const LightDe
 		LightType4 = ( nArgument & 0x03 )
 	};
  
-	//	VPROF( "R_LightEffectsWorld" );
 
 	#ifdef NO_AMBIENT_CUBE
 		dest[0] = dest[1] = dest[2] = 0.0f;
@@ -258,7 +255,6 @@ TEMPLATE_FUNCTION_TABLE( void, R_LightEffectsWorldFunctionTableConstDirectional,
 		LightType4 = ( nArgument & 0x03 )
 	};
 
-	//	VPROF( "R_LightEffectsWorld" );
 
 #ifdef NO_AMBIENT_CUBE
 	dest[0] = dest[1] = dest[2] = 0.0f;

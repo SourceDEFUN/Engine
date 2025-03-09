@@ -1569,7 +1569,6 @@ void CClientLeafSystem::CollateRenderablesInLeaf( int leaf, int worldListLeafInd
 		// If the renderable is inside an area, cull it using the frustum for that area.
 		if ( portalTestEnts && renderable.m_Area != -1 )
 		{
-			VPROF( "r_PortalTestEnts" );
 			if ( !engine->DoesBoxTouchAreaFrustum( absMins, absMaxs, renderable.m_Area ) )
 				continue;
 		}

@@ -999,7 +999,6 @@ int CMDLCache::GetRef( MDLHandle_t handle )
 //-----------------------------------------------------------------------------
 void CMDLCache::UnserializeVCollide( MDLHandle_t handle, bool synchronousLoad )
 {
-	VPROF( "CMDLCache::UnserializeVCollide" );
 
 	// FIXME: Should the vcollde be played into cacheable memory?
 	studiodata_t *pStudioData = m_MDLDict[handle];
@@ -1206,7 +1205,6 @@ void CMDLCache::FreeAnimBlocks( MDLHandle_t handle )
 //-----------------------------------------------------------------------------
 unsigned char *CMDLCache::UnserializeAnimBlock( MDLHandle_t handle, int nBlock )
 {
-	VPROF( "CMDLCache::UnserializeAnimBlock" );
 
 	if ( IsX360() && g_pQueuedLoader->IsMapLoading() )
 	{
@@ -2073,7 +2071,6 @@ studiohdr_t *CMDLCache::UnserializeMDL( MDLHandle_t handle, void *pData, int nDa
 //-----------------------------------------------------------------------------
 bool CMDLCache::ReadMDLFile( MDLHandle_t handle, const char *pMDLFileName, CUtlBuffer &buf )
 {
-	VPROF( "CMDLCache::ReadMDLFile" );
 
 	char pFileName[ MAX_PATH ];
 	Q_strncpy( pFileName, pMDLFileName, sizeof( pFileName ) );
@@ -2633,7 +2630,6 @@ const char *CMDLCache::GetVTXExtension()
 //-----------------------------------------------------------------------------
 bool CMDLCache::VerifyHeaders( studiohdr_t *pStudioHdr )
 {
-	VPROF( "CMDLCache::VerifyHeaders" );
 
 	if ( developer.GetInt() < 2 )
 	{
@@ -2702,7 +2698,6 @@ bool CMDLCache::VerifyHeaders( studiohdr_t *pStudioHdr )
 //-----------------------------------------------------------------------------
 vertexFileHeader_t *CMDLCache::CacheVertexData( studiohdr_t *pStudioHdr )
 {
-	VPROF( "CMDLCache::CacheVertexData" );
 
 	vertexFileHeader_t	*pVvdHdr;
 	MDLHandle_t			handle;

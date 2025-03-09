@@ -555,7 +555,6 @@ void CAudioDeviceSDLAudio::TransferSamples( int end )
 
 void CAudioDeviceSDLAudio::SpatializeChannel( int nSlot, int volume[CCHANVOLUMES/2], int master_vol, const Vector& sourceDir, float gain, float mono )
 {
-	VPROF("CAudioDeviceSDLAudio::SpatializeChannel");
 	S_SpatializeChannel( /*nSlot,*/ volume, master_vol, &sourceDir, gain, mono );
 }
 

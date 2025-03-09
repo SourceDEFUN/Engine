@@ -106,7 +106,6 @@ static inline void RecordSprite( const Vector& start, int nModelIndex,
 //-----------------------------------------------------------------------------
 void C_TESprite::PostDataUpdate( DataUpdateType_t updateType )
 {
-	VPROF( "C_TESprite::PostDataUpdate" );
 
 	float a = ( 1.0 / 255.0 ) * m_nBrightness;
 	tempents->TempSprite( m_vecOrigin, vec3_origin, m_fScale, m_nModelIndex, kRenderTransAdd, 0, a, 0, FTENT_SPRANIMATE );

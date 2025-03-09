@@ -352,7 +352,6 @@ float CPlayerAnimState::CalcMovementPlaybackRate( bool *bIsMoving )
 //-----------------------------------------------------------------------------
 void CPlayerAnimState::ComputePoseParam_BodyPitch( CStudioHdr *pStudioHdr )
 {
-	VPROF( "CBasePlayerAnimState::ComputePoseParam_BodyPitch" );
 
 	// Get pitch from v_angle
 	float flPitch = -m_flEyePitch;

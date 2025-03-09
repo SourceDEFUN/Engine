@@ -71,7 +71,6 @@ FORCEINLINE StudioModelLighting_t CStudioRender::R_StudioComputeLighting( IMater
 IMaterial* CStudioRender::R_StudioSetupSkinAndLighting( IMatRenderContext *pRenderContext, int index, IMaterial **ppMaterials, int materialFlags,  
 	void /*IClientRenderable*/ *pClientRenderable, ColorMeshInfo_t *pColorMeshes, StudioModelLighting_t &lighting )
 {
-	VPROF( "R_StudioSetupSkin" );
 	IMaterial *pMaterial = NULL;
 	bool bCheckForConVarDrawTranslucentSubModels = false;
 	if( m_pRC->m_Config.bWireframe && !m_pRC->m_pForcedMaterial )

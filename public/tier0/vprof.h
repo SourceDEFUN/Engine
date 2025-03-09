@@ -60,14 +60,12 @@
 
 #define VPROF_VTUNE_GROUP
 
-#define	VPROF( name )						VPROF_(name, 1, VPROF_BUDGETGROUP_OTHER_UNACCOUNTED, false, 0)
 #define	VPROF_ASSERT_ACCOUNTED( name )		VPROF_(name, 1, VPROF_BUDGETGROUP_OTHER_UNACCOUNTED, true, 0)
 #define	VPROF_( name, detail, group, bAssertAccounted, budgetFlags )		VPROF_##detail(name,group, bAssertAccounted, budgetFlags)
 
 #define VPROF_BUDGET( name, group )					VPROF_BUDGET_FLAGS(name, group, BUDGETFLAG_OTHER)
 #define VPROF_BUDGET_FLAGS( name, group, flags )	VPROF_(name, 0, group, false, flags)
 
-#define VPROF_SCOPE_BEGIN( tag )	do { VPROF( tag )
 #define VPROF_SCOPE_END()			} while (0)
 
 #define VPROF_ONLY( expression )	expression
@@ -175,7 +173,6 @@
 		; \
 	else \
 	{ \
-	VPROF( __FUNCTION__ ": " #code ); \
 		code; \
 	}
 #else
@@ -184,7 +181,6 @@
 		; \
 	else \
 	{ \
-		VPROF( #code ); \
 		code; \
 	} 
 #endif
@@ -197,7 +193,6 @@
 
 #else
 
-#define	VPROF( name )									((void)0)
 #define	VPROF_ASSERT_ACCOUNTED( name )					((void)0)
 #define	VPROF_( name, detail, group, bAssertAccounted, budgetFlags )	((void)0)
 #define VPROF_BUDGET( name, group )						((void)0)

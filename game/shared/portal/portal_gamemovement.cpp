@@ -399,7 +399,6 @@ void TracePlayerBBoxForGround2( const Vector& start, const Vector& end, const Ve
 							   int collisionGroup, trace_t& pm )
 {
 
-	VPROF( "TracePlayerBBoxForGround" );
 
 	CPortal_Player *pPortalPlayer = dynamic_cast<CPortal_Player *>(player->GetRefEHandle().Get());
 	CProp_Portal *pPlayerPortal = pPortalPlayer->m_hPortalEnvironment;
@@ -681,7 +680,6 @@ void CPortalGameMovement::SetGroundEntity( trace_t *pm )
 
 void CPortalGameMovement::TracePlayerBBox( const Vector& start, const Vector& end, unsigned int fMask, int collisionGroup, trace_t& pm )
 {
-	VPROF( "CGameMovement::TracePlayerBBox" );
 	
 	CPortal_Player *pPortalPlayer = (CPortal_Player *)((CBaseEntity *)mv->m_nPlayerHandle.Get());
 

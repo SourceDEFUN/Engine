@@ -4717,7 +4717,6 @@ void CNavArea::MarkAsBlocked( int teamID, CBaseEntity *blocker, bool bGenerateEv
 // checks if any func_nav_blockers are still blocking the area
 void CNavArea::UpdateBlockedFromNavBlockers( void )
 {
-	VPROF( "CNavArea::UpdateBlockedFromNavBlockers" );
 	Extent bounds;
 	GetExtent( &bounds );
 
@@ -4814,7 +4813,6 @@ void CNavArea::UnblockArea( int teamID )
  */
 void CNavArea::UpdateBlocked( bool force, int teamID )
 {
-	VPROF( "CNavArea::UpdateBlocked" );
 	if ( !force && !m_blockedTimer.IsElapsed() )
 	{
 		return;
@@ -4857,7 +4855,6 @@ void CNavArea::UpdateBlocked( bool force, int teamID )
 #endif
 	trace_t tr;
 	{
-	VPROF( "CNavArea::UpdateBlocked-Trace" );
 	UTIL_TraceHull(
 		origin,
 		origin,
@@ -4910,7 +4907,6 @@ void CNavArea::UpdateBlocked( bool force, int teamID )
 
 	if ( wasBlocked != isBlocked )
 	{
-		VPROF( "CNavArea::UpdateBlocked-Event" );
 		IGameEvent * event = gameeventmanager->CreateEvent( "nav_blocked" );
 		if ( event )
 		{

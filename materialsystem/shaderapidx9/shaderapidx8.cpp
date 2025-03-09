@@ -3817,7 +3817,6 @@ void CShaderAPIDx8::SetDefaultState()
 //-----------------------------------------------------------------------------
 inline void CShaderAPIDx8::SetVertexDecl( VertexFormat_t vertexFormat, bool bHasColorMesh, bool bUsingFlex, bool bUsingMorph )
 {
-	VPROF("CShaderAPIDx8::SetVertexDecl");
 	IDirect3DVertexDeclaration9 *pDecl = FindOrCreateVertexDecl( vertexFormat, bHasColorMesh, bUsingFlex, bUsingMorph );
 	Assert( pDecl );
 
@@ -3897,7 +3896,6 @@ void CShaderAPIDx8::MarkUnusedVertexFields( unsigned int nFlags, int nTexCoordCo
 //-----------------------------------------------------------------------------
 void CShaderAPIDx8::DrawMesh( CMeshBase *pMesh )
 {
-	VPROF("CShaderAPIDx8::DrawMesh");
 	if ( ShaderUtil()->GetConfig().m_bSuppressRendering )
 		return;
 
@@ -3921,7 +3919,6 @@ void CShaderAPIDx8::DrawMesh( CMeshBase *pMesh )
 
 void CShaderAPIDx8::DrawWithVertexAndIndexBuffers( void )
 {
-	VPROF("CShaderAPIDx8::DrawWithVertexAndIndexBuffers");
 	if ( ShaderUtil()->GetConfig().m_bSuppressRendering )
 		return;
 
@@ -4064,7 +4061,6 @@ void CShaderAPIDx8::UpdateFrameSyncQuery( int queryIndex, bool bIssue )
 void CShaderAPIDx8::ForceHardwareSync( void )
 {
 	LOCK_SHADERAPI();
-	VPROF( "CShaderAPIDx8::ForceHardwareSync" );
 
 #ifdef DX_TO_GL_ABSTRACTION
 	if ( true )
@@ -9321,7 +9317,6 @@ void CShaderAPIDx8::CopyRenderTargetToTexture( ShaderAPITextureHandle_t textureH
 void CShaderAPIDx8::CopyTextureToRenderTargetEx( int nRenderTargetID, ShaderAPITextureHandle_t textureHandle, Rect_t *pSrcRect, Rect_t *pDstRect )
 {
 	LOCK_SHADERAPI();
-	VPROF( "CShaderAPIDx8::CopyRenderTargetToTexture" );
 
 	if ( !TextureIsAllocated( textureHandle ) )
 		return;
@@ -9823,7 +9818,6 @@ void CShaderAPIDx8::SpewBoardState()
 void CShaderAPIDx8::BeginPass( StateSnapshot_t snapshot )
 {
 	LOCK_SHADERAPI();
-	VPROF("CShaderAPIDx8::BeginPass");
 	if (IsDeactivated())
 		return;
 
@@ -11390,7 +11384,6 @@ void CShaderAPIDx8::CommitPerPassStateChanges( StateSnapshot_t id )
 //-----------------------------------------------------------------------------
 void CShaderAPIDx8::CommitStateChanges()
 {
-	VPROF("CShaderAPIDx8::CommitStateChanges");
 	CommitFastClipPlane();
 
 	bool bUsingFixedFunction = !IsX360() && m_pMaterial && !UsesVertexShader( m_pMaterial->GetVertexFormat() );

@@ -300,7 +300,6 @@ void IGameSystem::SafeRemoveIfDesiredAllSystems()
 
 void IGameSystem::PreRenderAllSystems()
 {
-	VPROF("IGameSystem::PreRenderAllSystems");
 	InvokePerFrameMethod( &IGameSystemPerFrame::PreRender );
 }
 

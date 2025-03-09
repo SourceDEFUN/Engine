@@ -452,7 +452,6 @@ void CPortalRender::EnteredPortal( CPortalRenderable *pEnteredPortal )
    
 bool CPortalRender::DrawPortalsUsingStencils( CViewRender *pViewRender )
 {	  
-	VPROF( "CPortalRender::DrawPortalsUsingStencils" );
 
 	if( !ShouldUseStencilsToRenderPortals() )
 		return false;

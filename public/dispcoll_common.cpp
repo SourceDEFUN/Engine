@@ -530,7 +530,6 @@ void CDispCollTree::Cache( void )
 		return;
 	}
 
-	VPROF( "CDispCollTree::Cache" );
 
 	// Alloc.
 //	int nSize = sizeof( CDispCollTriCache ) * GetTriSize();
@@ -562,7 +561,6 @@ bool CDispCollTree::AABBTree_Ray( const Ray_t &ray, RayDispOutput_t &output )
 
 bool CDispCollTree::AABBTree_Ray( const Ray_t &ray, const Vector &vecInvDelta, RayDispOutput_t &output )
 {
-	VPROF( "DispRayTest" );
 
 	// Check for ray test.
 	if ( CheckFlags( CCoreDispInfo::SURF_NORAY_COLL ) )
@@ -647,7 +645,6 @@ void CDispCollTree::AABBTree_TreeTrisRayBarycentricTest( const Ray_t &ray, const
 //-----------------------------------------------------------------------------
 bool CDispCollTree::AABBTree_Ray( const Ray_t &ray, const Vector &vecInvDelta, CBaseTrace *pTrace, bool bSide )
 {
-	VPROF("AABBTree_Ray");
 
 //	VPROF_BUDGET( "DispRayTraces", VPROF_BUDGETGROUP_DISP_RAYTRACES );
 
@@ -738,7 +735,6 @@ int CDispCollTree::AABBTree_BuildTreeTrisInSphere_r( const Vector &center, float
 		// the rest are all leaves
 		if ( IsLeafNode(iNode) )
 		{
-			VPROF("Tris");
 			for ( --listIndex; listIndex <= maxIndex; listIndex++ )
 			{
 				if ( (nTriCount+2) <= indexMax )
@@ -816,7 +812,6 @@ bool CDispCollTree::AABBTree_IntersectAABB( const Vector &absMins, const Vector 
 		// the rest are all leaves
 		if ( IsLeafNode(iNode) )
 		{
-			VPROF("Tris");
 			for ( --listIndex; listIndex <= maxIndex; listIndex++ )
 			{
 				int leafIndex = nodeList[listIndex] - m_nodes.Count();
@@ -890,7 +885,6 @@ static const Vector g_Vec3DispCollEpsilons(DISPCOLL_DIST_EPSILON,DISPCOLL_DIST_E
 //-----------------------------------------------------------------------------
 bool CDispCollTree::AABBTree_SweepAABB( const Ray_t &ray, const Vector &vecInvDelta, CBaseTrace *pTrace )
 {
-	VPROF( "DispHullTest" );
 	//	VPROF_BUDGET( "DispHullTraces", VPROF_BUDGETGROUP_DISP_HULLTRACES );
 	// Check for hull test.
 	if ( CheckFlags( CCoreDispInfo::SURF_NOHULL_COLL ) )

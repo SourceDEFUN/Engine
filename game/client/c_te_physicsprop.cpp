@@ -134,7 +134,6 @@ void TE_PhysicsProp( IRecipientFilter& filter, float delay,
 //-----------------------------------------------------------------------------
 void C_TEPhysicsProp::PostDataUpdate( DataUpdateType_t updateType )
 {
-	VPROF( "C_TEPhysicsProp::PostDataUpdate" );
 
 	tempents->PhysicsProp( m_nModelIndex, m_nSkin, m_vecOrigin, m_angRotation, m_vecVelocity, m_nFlags, m_nEffects );
 	RecordPhysicsProp( m_vecOrigin, m_angRotation, m_vecVelocity, m_nModelIndex, m_nFlags, m_nSkin, m_nEffects );

@@ -1116,7 +1116,6 @@ bool CEventQueue::HasEventPending( CBaseEntity *pTarget, const char *sInputName 
 
 void ServiceEventQueue( void )
 {
-	VPROF("ServiceEventQueue()");
 
 	g_EventQueue.ServiceEvents();
 }

@@ -4484,7 +4484,6 @@ float InstancedScriptedScene( CBaseFlex *pActor, const char *pszScene, EHANDLE *
 							 float flPostDelay, bool bIsBackground, AI_Response *response,
 							 bool bMultiplayer, IRecipientFilter *filter /* = NULL */ )
 {
-	VPROF( "InstancedScriptedScene" );
 
 	CInstancedSceneEntity *pScene = (CInstancedSceneEntity *)CBaseEntity::CreateNoSpawn( "instanced_scripted_scene", vec3_origin, vec3_angle );
 

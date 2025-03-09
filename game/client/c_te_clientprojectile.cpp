@@ -64,7 +64,6 @@ void TE_ClientProjectile( IRecipientFilter& filter, float delay,
 //-----------------------------------------------------------------------------
 void C_TEClientProjectile::PostDataUpdate( DataUpdateType_t updateType )
 {
-	VPROF( "C_TEClientProjectile::PostDataUpdate" );
 
 	tempents->ClientProjectile( m_vecOrigin, m_vecVelocity, vec3_origin, m_nModelIndex, m_nLifeTime, m_hOwner );
 }

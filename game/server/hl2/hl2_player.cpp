@@ -586,7 +586,6 @@ void CHL2_Player::PreThink(void)
 	// Riding a vehicle?
 	if ( IsInAVehicle() )	
 	{
-		VPROF( "CHL2_Player::PreThink-Vehicle" );
 		// make sure we update the client, check for timed damage and update suit even if we are in a vehicle
 		UpdateClientData();		
 		CheckTimeBasedDamage();
@@ -604,7 +603,6 @@ void CHL2_Player::PreThink(void)
 	// only affects you if sv_autojump is nonzero.
 	if( (GetFlags() & FL_ONGROUND) && sv_autojump.GetFloat() != 0 )
 	{
-		VPROF( "CHL2_Player::PreThink-Autojump" );
 		// check autojump
 		Vector vecCheckDir;
 
@@ -2926,7 +2924,6 @@ void CHL2_Player::UpdateWeaponPosture( void )
 	if ( pWeapon && m_LowerWeaponTimer.Expired() && pWeapon->CanLower() )
 	{
 		m_LowerWeaponTimer.Set( .3 );
-		VPROF( "CHL2_Player::UpdateWeaponPosture-CheckLower" );
 		Vector vecAim = BaseClass::GetAutoaimVector( AUTOAIM_SCALE_DIRECT_ONLY );
 
 		const float CHECK_FRIENDLY_RANGE = 50 * 12;
@@ -3016,7 +3013,6 @@ void CHL2_Player::UpdateWeaponPosture( void )
 
 		m_AutoaimTimer.Set( .1 );
 
-		VPROF( "hl2_x360_aiming" );
 
 		// Call the autoaim code to update the local player data, which allows the client to update.
 		autoaim_params_t params;
@@ -3043,7 +3039,6 @@ void CHL2_Player::UpdateWeaponPosture( void )
 //-----------------------------------------------------------------------------
 bool CHL2_Player::Weapon_Lower( void )
 {
-	VPROF( "CHL2_Player::Weapon_Lower" );
 	// Already lowered?
 	if ( m_HL2Local.m_bWeaponLowered )
 		return true;
@@ -3064,7 +3059,6 @@ bool CHL2_Player::Weapon_Lower( void )
 //-----------------------------------------------------------------------------
 bool CHL2_Player::Weapon_Ready( void )
 {
-	VPROF( "CHL2_Player::Weapon_Ready" );
 
 	// Already ready?
 	if ( m_HL2Local.m_bWeaponLowered == false )
