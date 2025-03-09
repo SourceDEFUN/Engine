@@ -8,7 +8,6 @@
 #include "bone_setup.h"
 #include "c_ai_basenpc.h"
 #include "engine/ivdebugoverlay.h"
-#include "tier0/vprof.h"
 #include "soundinfo.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

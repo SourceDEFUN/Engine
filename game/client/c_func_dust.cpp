@@ -11,7 +11,6 @@
 #include "c_te_particlesystem.h"
 #include "env_wind_shared.h"
 #include "engine/IEngineTrace.h"
-#include "tier0/vprof.h"
 #include "clienteffectprecachesystem.h"
 #include "particles_ez.h"
 
@@ -252,7 +251,6 @@ void C_Func_Dust::AttemptSpawnNewParticle()
 //-----------------------------------------------------------------------------
 void FX_Dust( const Vector &vecOrigin, const Vector &vecDirection, float flSize, float flSpeed )
 {
-	VPROF_BUDGET( "FX_Dust", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
 	
 	int	numPuffs = (flSize*0.5f);
 

@@ -806,9 +806,7 @@ bool CGCInterface::BProcessSystemMessage( uint32 unGCSysMsgType, const void *pub
 	//track this message that we are sending (always just strip off the protobuff flag so it works with all message types)
 	g_theMessageList.TallySendMessage( unGCSysMsgType & ~k_EMsgProtoBufFlag, cubData, eMsgSource_System );
 
-	VPROF_BUDGET( "GCHost", VPROF_BUDGETGROUP_STEAM );
 	{
-		VPROF_BUDGET( "GCHost - ProcessSystemMessage", VPROF_BUDGETGROUP_STEAM );
 		return m_pGCHost->BProcessSystemMessage( unGCSysMsgType, pubData, cubData );
 	}
 }
@@ -829,9 +827,7 @@ bool CGCInterface::BSendMessageToClient( uint64 ullSteamID, uint32 unMsgType, co
 	//track this message that we are sending (always just strip off the protobuff flag so it works with all message types)
 	g_theMessageList.TallySendMessage( unMsgType & ~k_EMsgProtoBufFlag, cubData, eMsgSource_Client );
 
-	VPROF_BUDGET( "GCHost", VPROF_BUDGETGROUP_STEAM );
 	{
-		VPROF_BUDGET( "GCHost - SendMessageToClient", VPROF_BUDGETGROUP_STEAM );
 		return m_pGCHost->BSendMessageToClient( ullSteamID, unMsgType, pubData, cubData );
 	}
 }
@@ -845,9 +841,7 @@ bool CGCInterface::BSendMessageToGC( int iGCServerIDTarget, uint32 unMsgType, co
 	//track this message that we are sending (always just strip off the protobuff flag so it works with all message types)
 	g_theMessageList.TallySendMessage( unMsgType & ~k_EMsgProtoBufFlag, cubData, eMsgSource_GC );
 
-	VPROF_BUDGET( "GCHost", VPROF_BUDGETGROUP_STEAM );
 	{
-		VPROF_BUDGET( "GCHost - SendMessageToGC", VPROF_BUDGETGROUP_STEAM );
 		return m_pGCHost->BSendMessageToGC( iGCServerIDTarget, unMsgType, pubData, cubData );
 	}
 }
@@ -908,9 +902,7 @@ void CGCInterface::EmitSpew( const char *pchGroupName, SpewType_t spewType, int 
 		m_vecLogCapture[m_vecLogCapture.AddToTail()].Set( pchMsg );
 	}
 
-	VPROF_BUDGET( "GCHost", VPROF_BUDGETGROUP_STEAM );
 	{
-		VPROF_BUDGET( "GCHost - EmitMessage", VPROF_BUDGETGROUP_STEAM );
 		m_pGCHost->EmitSpew( pchGroupName, spewType, iSpewLevel, iLevelLog, pchMsg );
 	}
 }
@@ -919,9 +911,7 @@ void CGCInterface::EmitSpew( const char *pchGroupName, SpewType_t spewType, int 
 //-----------------------------------------------------------------------------
 void CGCInterface::AsyncSQLQuery( IGCSQLQuery *pQuery, int eSchemaCatalog )
 {
-	VPROF_BUDGET( "GCHost", VPROF_BUDGETGROUP_STEAM );
 	{
-		VPROF_BUDGET( "GCHost - SQLQuery", VPROF_BUDGETGROUP_STEAM );
 		m_pGCHost->AsyncSQLQuery( pQuery, eSchemaCatalog );
 	}
 }

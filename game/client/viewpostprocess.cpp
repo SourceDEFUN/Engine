@@ -17,7 +17,6 @@
 #include "c_world.h"
 #include "bitmap/tgawriter.h"
 #include "filesystem.h"
-#include "tier0/vprof.h"
 
 #include "proxyentity.h"
 

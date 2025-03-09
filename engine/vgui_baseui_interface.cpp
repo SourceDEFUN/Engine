@@ -31,7 +31,6 @@
 #include "igame.h"
 #include "con_nprint.h"
 #include "vgui_DebugSystemPanel.h"
-#include "tier0/vprof.h"
 #include "cl_demoactionmanager.h"
 #include "enginebugreporter.h"
 #include "engineperftools.h"
@@ -41,14 +40,10 @@
 #include "server.h"
 #include "sys.h" // Sys_GetRegKeyValue()
 #include "vgui_drawtreepanel.h"
-#include "vgui_vprofpanel.h"
 #include "vgui/VGUI.h"
 #include "vgui/IInput.h"
 #include <vgui/IInputInternal.h>
 #include "vgui_controls/AnimationController.h"
-#include "vgui_vprofgraphpanel.h"
-#include "vgui_texturebudgetpanel.h"
-#include "vgui_budgetpanel.h"
 #include "ivideomode.h"
 #include "sourcevr/isourcevirtualreality.h"
 #include "cl_pluginhelpers.h"
@@ -410,12 +405,6 @@ private:
 	CDebugSystemPanel *staticDebugSystemPanel;
 	CFocusOverlayPanel *staticFocusOverlayPanel;
 
-#ifdef VPROF_ENABLED
-	CVProfPanel *m_pVProfPanel;
-	CBudgetPanelEngine *m_pBudgetPanel;
-	CTextureBudgetPanel *m_pTextureBudgetPanel;
-#endif
-
 	// progress bar
 	bool m_bShowProgressDialog;
 	LevelLoadingProgress_e m_eLastProgressPoint;
@@ -525,10 +514,6 @@ CEngineVGui::CEngineVGui()
 
 	m_hStaticGameUIModule = NULL;
 	m_GameUIFactory = NULL;
-
-#ifdef VPROF_ENABLED
-	m_pVProfPanel = NULL;
-#endif
 
 	m_bShowProgressDialog = false;
 	m_bSaveProgress = false;
@@ -853,41 +838,10 @@ void CEngineVGui::Connect()
 //-----------------------------------------------------------------------------
 void CEngineVGui::CreateVProfPanels( vgui::Panel *pParent )
 {
-	if ( IsX360() )
-		return;
-
-#ifdef VPROF_ENABLED
-	m_pVProfPanel = new CVProfPanel( pParent, "VProfPanel" );
-	m_pBudgetPanel = new CBudgetPanelEngine( pParent, "BudgetPanel" );
-	CreateVProfGraphPanel( pParent );
-	m_pTextureBudgetPanel = new CTextureBudgetPanel( pParent, "TextureBudgetPanel" );
-#endif
 }
 
 void CEngineVGui::DestroyVProfPanels( )
 {
-	if ( IsX360() )
-		return;
-
-#ifdef VPROF_ENABLED
-	if ( m_pVProfPanel )
-	{
-		delete m_pVProfPanel;
-		m_pVProfPanel = NULL;
-	}
-	if ( m_pBudgetPanel )
-	{
-		delete m_pBudgetPanel;
-		m_pBudgetPanel = NULL;
-	}
-	DestroyVProfGraphPanel();
-
-	if ( m_pTextureBudgetPanel )
-	{
-		delete m_pTextureBudgetPanel;
-		m_pTextureBudgetPanel = NULL;
-	}
-#endif
 }
 
 
@@ -1621,7 +1575,6 @@ void CEngineVGui::Simulate()
 
 	if ( staticPanel )
 	{
-		VPROF_BUDGET( "CEngineVGui::Simulate", VPROF_BUDGETGROUP_OTHER_VGUI );
 
 		// update vgui animations
 		//!! currently this has to be done once per dll, because the anim controller object is in a lib;
@@ -1684,7 +1637,6 @@ void CEngineVGui::BackwardCompatibility_Paint()
 //-----------------------------------------------------------------------------
 void CEngineVGui::Paint( PaintMode_t mode )
 {
-	VPROF_BUDGET( "CEngineVGui::Paint", VPROF_BUDGETGROUP_OTHER_VGUI );
 
 	if ( !staticPanel )
 		return;

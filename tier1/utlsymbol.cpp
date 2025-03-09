@@ -12,7 +12,6 @@
 #include "tier0/threadtools.h"
 #include "stringpool.h"
 #include "generichash.h"
-#include "tier0/vprof.h"
 #include <stddef.h>
 
 // memdbgon must be the last include file in a .cpp file!!!

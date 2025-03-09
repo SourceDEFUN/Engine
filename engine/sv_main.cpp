@@ -36,7 +36,6 @@
 #include "testscriptmgr.h"
 #include "PlayerState.h"
 #include "saverestoretypes.h"
-#include "tier0/vprof.h"
 #include "proto_oob.h"
 #include "staticpropmgr.h"
 #include "checksum_crc.h"
@@ -1852,7 +1851,6 @@ static void SV_ParallelSendSnapshot( CGameClient *& pClient )
 
 void CGameServer::SendClientMessages ( bool bSendSnapshots )
 {
-	VPROF_BUDGET( "SendClientMessages", VPROF_BUDGETGROUP_OTHER_NETWORKING );
 	
 	// build individual updates
 	int receivingClientCount = 0;

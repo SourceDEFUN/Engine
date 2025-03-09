@@ -44,7 +44,6 @@
 #include "SkyCamera.h"
 #include "sceneentity.h"
 #include "game.h"
-#include "tier0/vprof.h"
 #include "ai_basenpc.h"
 #include "iservervehicle.h"
 #include "eventlist.h"

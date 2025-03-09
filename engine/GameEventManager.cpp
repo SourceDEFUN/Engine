@@ -13,7 +13,6 @@
 #include "filesystem_engine.h"
 #include "server.h"
 #include "client.h"
-#include "tier0/vprof.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -394,9 +393,6 @@ bool CGameEventManager::FireEventIntern( IGameEvent *event, bool bServerOnly, bo
 		return false;
 
 	Assert( !(bServerOnly && bClientOnly) ); // it can't be both
-
-	VPROF_("CGameEventManager::FireEvent", 1, VPROF_BUDGETGROUP_OTHER_UNACCOUNTED, false, 
-		bClientOnly ? BUDGETFLAG_CLIENT : ( bServerOnly ? BUDGETFLAG_SERVER : BUDGETFLAG_OTHER ) );
 
 	CGameEventDescriptor *descriptor = GetEventDescriptor( event );
 

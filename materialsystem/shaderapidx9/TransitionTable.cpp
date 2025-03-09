@@ -15,7 +15,6 @@
 #include "tier1/convar.h"
 #include "materialsystem/imaterialsystemhardwareconfig.h"
 #include "vertexshaderdx8.h"
-#include "tier0/vprof.h"
 #include "shaderdevicedx8.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

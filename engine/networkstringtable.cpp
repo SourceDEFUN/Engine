@@ -13,7 +13,6 @@
 #include "net.h"
 #include "filesystem_engine.h"
 #include "baseclient.h"
-#include "vprof.h"
 #include <tier1/utlstring.h>
 #include <tier1/utlhashtable.h>
 #include <tier0/etwprof.h>
@@ -1230,7 +1229,6 @@ void CNetworkStringTable::Dump( void )
 
 bool CNetworkStringTable::WriteBaselines( SVC_CreateStringTable &msg, char *msg_buffer, int msg_buffer_size )
 {
-	VPROF_BUDGET( "CNetworkStringTable::WriteBaselines", VPROF_BUDGETGROUP_OTHER_NETWORKING );
 	msg.m_DataOut.StartWriting( msg_buffer, msg_buffer_size );
 
 	msg.m_bIsFilenames          = m_bIsFilenames;
@@ -1395,7 +1393,6 @@ int CNetworkStringTableContainer::GetNumTables( void ) const
 //-----------------------------------------------------------------------------
 void CNetworkStringTableContainer::WriteBaselines( bf_write &buf )
 {
-	VPROF_BUDGET( "CNetworkStringTableContainer::WriteBaselines", VPROF_BUDGETGROUP_OTHER_NETWORKING );
 
 	SVC_CreateStringTable msg;
 
@@ -1513,7 +1510,6 @@ bool CNetworkStringTableContainer::ReadStringTables( bf_read& buf )
 //-----------------------------------------------------------------------------
 void CNetworkStringTableContainer::WriteUpdateMessage( CBaseClient *client, int tick_ack, bf_write &buf )
 {
-	VPROF_BUDGET( "CNetworkStringTableContainer::WriteUpdateMessage", VPROF_BUDGETGROUP_OTHER_NETWORKING );
 
 	char buffer[NET_MAX_PAYLOAD];
 
@@ -1553,7 +1549,6 @@ void CNetworkStringTableContainer::WriteUpdateMessage( CBaseClient *client, int 
 //-----------------------------------------------------------------------------
 void CNetworkStringTableContainer::DirectUpdate( int tick_ack )
 {
-	VPROF_BUDGET( "CNetworkStringTableContainer::DirectUpdate", VPROF_BUDGETGROUP_OTHER_NETWORKING );
 
 	// Determine if an update is needed
 	for ( int i = 0; i < m_Tables.Count(); i++ )

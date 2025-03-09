@@ -29,7 +29,6 @@
 #include "movevars_shared.h"
 #include "physics_saverestore.h"
 #include "solidsetdefaults.h"
-#include "tier0/vprof.h"
 #include "engine/IStaticPropMgr.h"
 #include "physics_prop_ragdoll.h"
 #if HL2_EPISODIC
@@ -373,7 +372,6 @@ bool CPhysicsHook::FindOrAddVehicleScript( const char *pScriptName, vehicleparam
 // called after entities think
 void CPhysicsHook::FrameUpdatePostEntityThink( ) 
 {
-	VPROF_BUDGET( "CPhysicsHook::FrameUpdatePostEntityThink", VPROF_BUDGETGROUP_PHYSICS );
 
 	// Tracker 24846:  If game is paused, don't simulate vphysics
 	float interval = ( gpGlobals->frametime > 0.0f ) ? TICK_INTERVAL : 0.0f;

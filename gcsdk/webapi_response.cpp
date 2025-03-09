@@ -382,7 +382,6 @@ CWebAPIResponse::~CWebAPIResponse()
 //-----------------------------------------------------------------------------
 bool CWebAPIResponse::BEmitFormattedOutput( EWebAPIOutputFormat eFormat, CUtlBuffer &outputBuffer, size_t unMaxResultSize )
 {
-	VPROF_BUDGET( "CWebAPIResponse::BEmitFormattedOutput", VPROF_BUDGETGROUP_STEAM );
 	outputBuffer.Clear();
 
 	switch( eFormat )

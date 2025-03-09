@@ -29,7 +29,6 @@
 #include "materialsystem/ivballoctracker.h"
 #include "materialsystem/imesh.h"
 #include "lightcache.h"
-#include "tier0/vprof.h"
 #include "render.h"
 #include "cmodel_engine.h"
 #include "datacache/imdlcache.h"
@@ -970,7 +969,6 @@ void CStaticProp::DisplayStaticPropInfo( int nInfoType )
 int	CStaticProp::DrawModelSlow( int flags )
 {
 #ifndef SWDS
-	VPROF_BUDGET( "CStaticProp::DrawModel", VPROF_BUDGETGROUP_STATICPROP_RENDERING );
 
 	if ( !r_drawstaticprops.GetBool() )
 		return 0;
@@ -1066,7 +1064,6 @@ int	CStaticProp::DrawModelSlow( int flags )
 int CStaticProp::DrawModel( int flags )
 {
 #ifndef SWDS
-	VPROF_BUDGET( "CStaticProp::DrawModel", VPROF_BUDGETGROUP_STATICPROP_RENDERING );
 
 	if ( (m_Alpha == 0) || !m_pModel )
 		return 0;
@@ -1993,7 +1990,6 @@ void CStaticPropMgr::DrawStaticProps_FastPipeline( IClientRenderable **pProps, i
 ConVar pipeline_static_props("pipeline_static_props", "1");
 void CStaticPropMgr::DrawStaticProps( IClientRenderable **pProps, int count, bool bShadowDepth, bool drawVCollideWireframe )
 {
-	VPROF_BUDGET( "CStaticPropMgr::DrawStaticProps", VPROF_BUDGETGROUP_STATICPROP_RENDERING );
 
 	if ( !r_drawstaticprops.GetBool() )
 		return;

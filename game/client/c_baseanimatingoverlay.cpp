@@ -8,7 +8,6 @@
 #include "cbase.h"
 #include "c_baseanimatingoverlay.h"
 #include "bone_setup.h"
-#include "tier0/vprof.h"
 #include "engine/ivdebugoverlay.h"
 #include "datacache/imdlcache.h"
 #include "eventlist.h"

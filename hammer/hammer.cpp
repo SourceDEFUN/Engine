@@ -1210,11 +1210,6 @@ InitReturnVal_t CHammer::HammerInternalInit()
 			}
 		}
 	}
-
-#ifdef VPROF_HAMMER
-	g_VProfCurrentProfile.Start();
-#endif
-	
 	CSplashWnd::HideSplashScreen();
 
 	// create the lighting preview thread
@@ -1296,11 +1291,6 @@ void CHammer::Shutdown()
 		ThreadJoin( g_LPreviewThread );
 		g_LPreviewThread = 0;
 	}
-
-#ifdef VPROF_HAMMER
-	g_VProfCurrentProfile.Stop();
-#endif
-
 	// PrintBudgetGroupTimes_Recursive( g_VProfCurrentProfile.GetRoot() );
 
 	HammerVGui()->Shutdown();
@@ -1598,13 +1588,6 @@ void CHammer::OnAppAbout(void)
 {
 	CAboutDlg aboutDlg;
 	aboutDlg.DoModal();
-
-#ifdef VPROF_HAMMER
-	g_VProfCurrentProfile.OutputReport();
-	g_VProfCurrentProfile.Reset();
-	g_pMemAlloc->DumpStats();
-#endif
-
 }
 
 
@@ -1989,10 +1972,6 @@ void CHammer::RunFrame(void)
 	{
 		Sleep(50);
 	}
-
-#ifdef VPROF_HAMMER
-	g_VProfCurrentProfile.MarkFrame();
-#endif
 
 	HammerVGui()->Simulate();
 

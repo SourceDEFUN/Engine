@@ -9,7 +9,6 @@
 #include "c_prop_portal.h"
 #include "portal_shareddefs.h"
 #include "clientsideeffects.h"
-#include "tier0/vprof.h"
 #include "materialsystem/itexture.h"
 #include "hud_macros.h"
 #include "igamesystem.h"
@@ -883,7 +882,6 @@ void C_Prop_Portal::GetToolRecordingState( KeyValues *msg )
 	if ( !ToolsEnabled() )
 		return;
 
-	VPROF_BUDGET( "C_Prop_Portal::GetToolRecordingState", VPROF_BUDGETGROUP_TOOLS );
 	BaseClass::GetToolRecordingState( m_bActivated, msg );
 
 	if ( !m_bActivated )

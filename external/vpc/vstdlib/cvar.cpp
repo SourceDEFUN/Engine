@@ -13,7 +13,6 @@
 #include "tier1/strtools.h"
 #include "tier1/keyvalues.h"
 #include "tier1/convar.h"
-#include "tier0/vprof.h"
 #include "tier1/tier1.h"
 #include "tier1/utlbuffer.h"
 #include "tier1/utlmap.h"
@@ -611,17 +610,11 @@ void CCvar::UnregisterConCommands( CVarDLLIdentifier_t id )
 //-----------------------------------------------------------------------------
 const ConCommandBase *CCvar::FindCommandBase( const char *name ) const
 {
-	VPROF_INCREMENT_COUNTER( "CCvar::FindCommandBase", 1 );
-	VPROF_BUDGET( "CCvar::FindCommandBase", VPROF_BUDGETGROUP_CVAR_FIND );
-
 	return m_CommandHash.FindPtr( name );
 }
 
 ConCommandBase *CCvar::FindCommandBase( const char *name )
 {
-	VPROF_INCREMENT_COUNTER( "CCvar::FindCommandBase", 1 );
-	VPROF_BUDGET( "CCvar::FindCommandBase", VPROF_BUDGETGROUP_CVAR_FIND );
-
 	return m_CommandHash.FindPtr( name );
 }
 

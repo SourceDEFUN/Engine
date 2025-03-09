@@ -69,7 +69,6 @@
 #include "collisionutils.h"
 #include "iviewrender.h"
 #include "ivrenderview.h"
-#include "tier0/vprof.h"
 #include "engine/ivmodelinfo.h"
 #include "view_shared.h"
 #include "engine/ivdebugoverlay.h"
@@ -1148,7 +1147,6 @@ void CVisibleShadowList::PrioritySort()
 //-----------------------------------------------------------------------------
 int CVisibleShadowList::FindShadows( const CViewSetup *pView, int nLeafCount, LeafIndex_t *pLeafList )
 {
-	VPROF_BUDGET( "CVisibleShadowList::FindShadows", VPROF_BUDGETGROUP_SHADOW_RENDERING );
 
 	m_ShadowsInView.RemoveAll();
 	ClientLeafSystem()->EnumerateShadowsInLeaves( nLeafCount, pLeafList, this );
@@ -1334,7 +1332,6 @@ void CClientShadowMgr::Shutdown()
 //-----------------------------------------------------------------------------
 void CClientShadowMgr::InitDepthTextureShadows()
 {
-	VPROF_BUDGET( "CClientShadowMgr::InitDepthTextureShadows", VPROF_BUDGETGROUP_SHADOW_DEPTH_TEXTURING );
 
 	if( !m_bDepthTextureActive )
 	{
@@ -1900,7 +1897,6 @@ ClientShadowHandle_t CClientShadowMgr::CreateShadow( ClientEntityHandle_t entity
 //-----------------------------------------------------------------------------
 void CClientShadowMgr::UpdateFlashlightState( ClientShadowHandle_t shadowHandle, const FlashlightState_t &flashlightState )
 {
-	VPROF_BUDGET( "CClientShadowMgr::UpdateFlashlightState", VPROF_BUDGETGROUP_SHADOW_DEPTH_TEXTURING );
 
 	BuildPerspectiveWorldToFlashlightMatrix( m_Shadows[shadowHandle].m_WorldToShadow, flashlightState );
 											
@@ -1999,7 +1995,6 @@ void CClientShadowMgr::BuildWorldToShadowMatrix( VMatrix& matWorldToShadow,	cons
 
 void CClientShadowMgr::BuildPerspectiveWorldToFlashlightMatrix( VMatrix& matWorldToShadow, const FlashlightState_t &flashlightState )
 {
-	VPROF_BUDGET( "CClientShadowMgr::BuildPerspectiveWorldToFlashlightMatrix", VPROF_BUDGETGROUP_SHADOW_DEPTH_TEXTURING );
 
 	// Buildworld to shadow matrix, then perspective projection and concatenate
 	VMatrix matWorldToShadowView, matPerspective;
@@ -2621,7 +2616,6 @@ void CClientShadowMgr::BuildFlashlight( ClientShadowHandle_t handle )
 		return;
 	}
 
-	VPROF_BUDGET( "CClientShadowMgr::BuildFlashlight", VPROF_BUDGETGROUP_SHADOW_DEPTH_TEXTURING );
 
 	bool bLightModels = r_flashlightmodels.GetBool();
 	bool bLightSpecificEntity = shadow.m_hTargetEntity.Get() != NULL;
@@ -2791,7 +2785,6 @@ void CClientShadowMgr::UpdateBrushShadow( IClientRenderable *pRenderable, Client
 	}
 	else
 	{
-		VPROF_BUDGET( "CClientShadowMgr::UpdateBrushShadow", VPROF_BUDGETGROUP_SHADOW_DEPTH_TEXTURING );
 
 		BuildFlashlight( handle );
 	}
@@ -2861,7 +2854,6 @@ bool CClientShadowMgr::ShouldUseParentShadow( IClientRenderable *pRenderable )
 //-----------------------------------------------------------------------------
 void CClientShadowMgr::PreRender()
 {
-	VPROF_BUDGET( "CClientShadowMgr::PreRender", VPROF_BUDGETGROUP_SHADOW_RENDERING );
 	MDLCACHE_CRITICAL_SECTION();
 
 	//
@@ -2870,7 +2862,6 @@ void CClientShadowMgr::PreRender()
 
 	{
 		// VPROF scope
-		VPROF_BUDGET( "CClientShadowMgr::PreRender", VPROF_BUDGETGROUP_SHADOW_DEPTH_TEXTURING );
 
 		// If someone turned shadow depth mapping on but we can't do it, force it off
 		if ( r_flashlightdepthtexture.GetBool() && !materials->SupportsShadowDepthTextures() )
@@ -3168,7 +3159,6 @@ void CClientShadowMgr::UpdateProjectedTextureInternal( ClientShadowHandle_t hand
 
 	if( shadow.m_Flags & SHADOW_FLAGS_FLASHLIGHT )
 	{
-		VPROF_BUDGET( "CClientShadowMgr::UpdateProjectedTextureInternal", VPROF_BUDGETGROUP_SHADOW_DEPTH_TEXTURING );
 
 		Assert( ( shadow.m_Flags & SHADOW_FLAGS_SHADOW ) == 0 );
 		ClientShadow_t& shadow = m_Shadows[handle];
@@ -3192,7 +3182,6 @@ void CClientShadowMgr::UpdateProjectedTextureInternal( ClientShadowHandle_t hand
 //-----------------------------------------------------------------------------
 void CClientShadowMgr::UpdateProjectedTexture( ClientShadowHandle_t handle, bool force )
 {
-	VPROF_BUDGET( "CClientShadowMgr::UpdateProjectedTexture", VPROF_BUDGETGROUP_SHADOW_DEPTH_TEXTURING );
 
 	if ( handle == CLIENTSHADOW_INVALID_HANDLE )
 		return;
@@ -3292,7 +3281,6 @@ bool CClientShadowMgr::CullReceiver( ClientShadowHandle_t handle, IClientRendera
 	// check flags here instead and assert !pSourceRenderable
 	if( m_Shadows[handle].m_Flags & SHADOW_FLAGS_FLASHLIGHT )
 	{
-		VPROF_BUDGET( "CClientShadowMgr::CullReceiver", VPROF_BUDGETGROUP_SHADOW_DEPTH_TEXTURING );
 
 		Assert( !pSourceRenderable );	
 		const Frustum_t &frustum = shadowmgr->GetFlashlightFrustum( m_Shadows[handle].m_ShadowHandle );
@@ -3455,7 +3443,6 @@ void CClientShadowMgr::AddShadowToReceiver( ClientShadowHandle_t handle,
 
 		if( shadow.m_Flags & SHADOW_FLAGS_FLASHLIGHT )
 		{
-			VPROF_BUDGET( "CClientShadowMgr::AddShadowToReceiver", VPROF_BUDGETGROUP_SHADOW_DEPTH_TEXTURING );
 
 			if( (!shadow.m_hTargetEntity) || IsFlashlightTarget( handle, pRenderable ) )
 			{
@@ -3488,7 +3475,6 @@ void CClientShadowMgr::AddShadowToReceiver( ClientShadowHandle_t handle,
 		}
 		else if( shadow.m_Flags & SHADOW_FLAGS_FLASHLIGHT )
 		{
-			VPROF_BUDGET( "CClientShadowMgr::AddShadowToReceiver", VPROF_BUDGETGROUP_SHADOW_DEPTH_TEXTURING );
 
 			if( (!shadow.m_hTargetEntity) || IsFlashlightTarget( handle, pRenderable ) )
 			{
@@ -3502,7 +3488,6 @@ void CClientShadowMgr::AddShadowToReceiver( ClientShadowHandle_t handle,
 	case SHADOW_RECEIVER_STUDIO_MODEL:
 		if( shadow.m_Flags & SHADOW_FLAGS_FLASHLIGHT )
 		{
-			VPROF_BUDGET( "CClientShadowMgr::AddShadowToReceiver", VPROF_BUDGETGROUP_SHADOW_DEPTH_TEXTURING );
 
 			if( (!shadow.m_hTargetEntity) || IsFlashlightTarget( handle, pRenderable ) )
 			{
@@ -3911,7 +3896,6 @@ void CClientShadowMgr::SetViewFlashlightState( int nActiveFlashlightCount, Clien
 //-----------------------------------------------------------------------------
 void CClientShadowMgr::ComputeShadowDepthTextures( const CViewSetup &viewSetup )
 {
-	VPROF_BUDGET( "CClientShadowMgr::ComputeShadowDepthTextures", VPROF_BUDGETGROUP_SHADOW_DEPTH_TEXTURING );
 
 	CMatRenderContextPtr pRenderContext( materials );
 	PIXEVENT( pRenderContext, "Shadow Depth Textures" );
@@ -3992,7 +3976,6 @@ static void SetupBonesOnBaseAnimating( C_BaseAnimating *&pBaseAnimating )
 
 void CClientShadowMgr::ComputeShadowTextures( const CViewSetup &view, int leafCount, LeafIndex_t* pLeafList )
 {
-	VPROF_BUDGET( "CClientShadowMgr::ComputeShadowTextures", VPROF_BUDGETGROUP_SHADOW_RENDERING );
 
 	if ( !m_RenderToTextureActive || (r_shadows.GetInt() == 0) || r_shadows_gamecontrol.GetInt() == 0 )
 		return;

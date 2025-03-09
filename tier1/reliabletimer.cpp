@@ -68,7 +68,6 @@ CReliableTimer::CReliableTimer()
 //-----------------------------------------------------------------------------
 int64 CReliableTimer::GetPerformanceCountNow()
 {
-	//VPROF_BUDGET( "CReliableTimer::GetPerformanceCountNow", VPROF_BUDGETGROUP_OTHER_UNACCOUNTED );
 #ifdef _WIN32
 	if ( sm_bUseQPC )
 	{

@@ -24,7 +24,6 @@
 #include "iengine.h"
 #include "keys.h"
 #include "con_nprint.h"
-#include "tier0/vprof.h"
 #include "sound.h"
 #include "gl_rmain.h"
 #include "proto_version.h"
@@ -954,7 +953,6 @@ void CEngineClient::Sound_ExtraUpdate( void )
 	if ( IsX360() )
 		return;
 
-	VPROF_BUDGET( "CEngineClient::Sound_ExtraUpdate()", VPROF_BUDGETGROUP_OTHER_SOUND );
 
 	S_ExtraUpdate();
 }

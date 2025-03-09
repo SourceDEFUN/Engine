@@ -11,7 +11,6 @@
 #include "weapon_selection.h"
 #include "hud_crosshair.h"
 #include "engine/ivmodelinfo.h"
-#include "tier0/vprof.h"
 #include "hltvcamera.h"
 #include "tier1/KeyValues.h"
 #include "toolframework/itoolframework.h"
@@ -468,7 +467,6 @@ bool C_BaseCombatWeapon::ShouldDrawPickup( void )
 //-----------------------------------------------------------------------------
 int C_BaseCombatWeapon::DrawModel( int flags )
 {
-	VPROF_BUDGET( "C_BaseCombatWeapon::DrawModel", VPROF_BUDGETGROUP_MODEL_RENDERING );
 	if ( !m_bReadyToDraw )
 		return 0;
 

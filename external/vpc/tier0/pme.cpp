@@ -13,7 +13,6 @@
 #pragma warning( disable : 4530 )   // warning: exception handler -GX option
 
 #include "tier0/platform.h"
-#include "tier0/vprof.h"
 #include "tier0/pmelib.h"
 #include "tier0/l2cache.h"
 #include "tier0/dbg.h"
@@ -48,10 +47,6 @@ void InitPME( void )
 	{
 		DevMsg( 1, _T("PME Uninitialized.\n") );
 	}
-
-#ifdef VPROF_ENABLED
-	g_VProfCurrentProfile.PMEInitialized( bInit );
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -64,10 +59,6 @@ void ShutdownPME( void )
 	{
 	   pPME->SetProcessPriority( ProcessPriorityNormal );
 	}
-
-#ifdef VPROF_ENABLED
-	g_VProfCurrentProfile.PMEInitialized( false );
-#endif
 }
 
 //=============================================================================

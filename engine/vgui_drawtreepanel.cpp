@@ -15,7 +15,6 @@
 #include <vgui/IInput.h>
 #include "../vgui2/src/VPanel.h"
 #include "convar.h"
-#include "tier0/vprof.h"
 #include "vgui_baseui_interface.h"
 #include "vgui_helpers.h"
 

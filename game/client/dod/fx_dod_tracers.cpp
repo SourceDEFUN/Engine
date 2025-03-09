@@ -6,7 +6,6 @@
 #include "cbase.h"
 #include "fx.h"
 #include "c_te_effect_dispatch.h"
-#include "tier0/vprof.h"
 #include "clientsideeffects.h"
 #include "clienteffectprecachesystem.h"
 #include "view.h"

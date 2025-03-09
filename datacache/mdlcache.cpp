@@ -10,7 +10,6 @@
 //===========================================================================//
 
 #include <memory.h>
-#include "tier0/vprof.h"
 #include "tier0/icommandline.h"
 #include "tier1/utllinkedlist.h"
 #include "tier1/utlmap.h"
@@ -2201,10 +2200,7 @@ studiohdr_t *CMDLCache::GetStudioHdr( MDLHandle_t handle )
 
 	if( !pStudioData )
 		return NULL;
-
-#if _DEBUG
-	VPROF_INCREMENT_COUNTER( "GetStudioHdr", 1 );
-#endif
+	
 	studiohdr_t *pHdr = (studiohdr_t*)CheckData( m_MDLDict[handle]->m_MDLCache, MDLCACHE_STUDIOHDR );
 	if ( !pHdr )
 	{

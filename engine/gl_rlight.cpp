@@ -14,7 +14,6 @@
 #include <float.h>
 #include "collisionutils.h"
 #include "cl_main.h"
-#include "tier0/vprof.h"
 #include "debugoverlay.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -745,8 +744,6 @@ void R_LightVecUseModel( model_t* pModel )
 SurfaceHandle_t R_LightVec (const Vector& start, const Vector& end, bool bUseLightStyles, Vector& c, 
 		float *textureS, float *textureT, float *lightmapS, float *lightmapT )
 {
-	VPROF_INCREMENT_COUNTER( "R_LightVec", 1 );
-
 	SurfaceHandle_t retSurfID;
 	SurfaceHandle_t dispSurfID;
 	

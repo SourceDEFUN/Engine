@@ -10,7 +10,6 @@
 #include "NextBotEventResponderInterface.h"
 #include "NextBotContextualQueryInterface.h"
 #include "NextBotDebug.h"
-#include "tier0/vprof.h"
 
 
 //#define DEBUG_BEHAVIOR_MEMORY
@@ -1365,7 +1364,6 @@ ActionResult< Actor > Action< Actor >::InvokeUpdate( Actor *me, Behavior< Actor 
 	// update ourselves
 	ActionResult< Actor > result;
 	{
-		VPROF_BUDGET( GetName(), "NextBot" );
 
 		result = Update( me, interval );
 	}

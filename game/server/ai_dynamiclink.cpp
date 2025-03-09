@@ -18,7 +18,6 @@
 #include "saverestore_utlvector.h"
 #include "editor_sendcommand.h"
 #include "bitstring.h"
-#include "tier0/vprof.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -681,7 +680,6 @@ void CAI_RadialLinkController::ModifyNodeLinks( bool bMakeStale )
 	int nNodes = g_pBigAINet->NumNodes();
 	CAI_Node **ppNodes = g_pBigAINet->AccessNodes();
 
-	VPROF_BUDGET("ModifyLinks", "ModifyLinks");
 
 	const float MinDistCareSq = Square( ai_radial_max_link_dist.GetFloat() + 0.1 );
 

@@ -19,7 +19,6 @@
 #include "tier1/tsmempool.h"
 #include "misc.h"
 #endif
-#include "tier0/vprof.h"
 
 #include "protobuf-2.3.0/src/google/protobuf/message_lite.h"
 
@@ -533,7 +532,6 @@ public:
 	
 	void SerializeCrossProc( CUtlBuffer *pBuffer ) const
 	{
-		VPROF_BUDGET( "CUIProtoBufMsg::SerializeCrossProc", VPROF_BUDGETGROUP_TENFOOT );
 		uint32 unSize = m_pMsgRefCount->AccessMsg()->ByteSize();
 
 		// Ensure enough for type, size, and serialized data
@@ -552,7 +550,6 @@ public:
 	
 	bool BDeserializeCrossProc( CUtlBuffer *pBuffer )
 	{
-		VPROF_BUDGET( "CUIProtoBufMsg::BDeserialize", VPROF_BUDGETGROUP_TENFOOT );
 		if ( pBuffer->GetBytesRemaining() < (int)sizeof(uint32) )
 			return false;
 		uint32 unSize = pBuffer->GetUnsignedInt();

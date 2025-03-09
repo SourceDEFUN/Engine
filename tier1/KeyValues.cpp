@@ -19,7 +19,6 @@
 #include "filesystem.h"
 #include <vstdlib/IKeyValuesSystem.h>
 #include "tier0/icommandline.h"
-#include "tier0/vprof_telemetry.h"
 #include <Color.h>
 #include <stdlib.h>
 #include "tier0/dbg.h"

@@ -25,7 +25,6 @@
 #include "engine/ivmodelinfo.h"
 #include "SoundEmitterSystem/isoundemittersystembase.h"
 #include "view.h"
-#include "tier0/vprof.h"
 #include "particles_localspace.h"
 #include "physpropclientside.h"
 #include "tier0/icommandline.h"
@@ -155,7 +154,6 @@ void C_LocalTempEntity::SetAcceleration( const Vector &vecVelocity )
 //-----------------------------------------------------------------------------
 int C_LocalTempEntity::DrawStudioModel( int flags )
 {
-	VPROF_BUDGET( "C_LocalTempEntity::DrawStudioModel", VPROF_BUDGETGROUP_MODEL_RENDERING );
 	int drawn = 0;
 
 	if ( !GetModel() || modelinfo->GetModelType( GetModel() ) != mod_studio )
@@ -2322,7 +2320,6 @@ int CTempEnts::AddVisibleTempEntity( C_LocalTempEntity *pEntity )
 //-----------------------------------------------------------------------------
 void CTempEnts::Update(void)
 {
-	VPROF_("CTempEnts::Update", 1, VPROF_BUDGETGROUP_CLIENT_SIM, false, BUDGETFLAG_CLIENT);
 	static int gTempEntFrame = 0;
 	float		frametime;
 
@@ -2524,7 +2521,6 @@ inline void CTempEnts::CacheMuzzleFlashes( void )
 //-----------------------------------------------------------------------------
 void CTempEnts::MuzzleFlash_Combine_Player( ClientEntityHandle_t hEntity, int attachmentIndex )
 {
-	VPROF_BUDGET( "MuzzleFlash_Combine_Player", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
 	CSmartPtr<CLocalSpaceEmitter> pSimple = CLocalSpaceEmitter::Create( "MuzzleFlash", hEntity, attachmentIndex, FLE_VIEWMODEL );
 
 	CacheMuzzleFlashes();
@@ -2597,7 +2593,6 @@ void CTempEnts::MuzzleFlash_Combine_Player( ClientEntityHandle_t hEntity, int at
 //-----------------------------------------------------------------------------
 void CTempEnts::MuzzleFlash_Combine_NPC( ClientEntityHandle_t hEntity, int attachmentIndex )
 {
-	VPROF_BUDGET( "MuzzleFlash_Combine_NPC", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
 
 	// If the material isn't available, let's not do anything.
 	if ( g_Mat_Combine_Muzzleflash[0] == NULL )
@@ -2822,7 +2817,6 @@ void CTempEnts::MuzzleFlash_SMG1_NPC( ClientEntityHandle_t hEntity, int attachme
 //-----------------------------------------------------------------------------
 void CTempEnts::MuzzleFlash_SMG1_Player( ClientEntityHandle_t hEntity, int attachmentIndex )
 {
-	VPROF_BUDGET( "MuzzleFlash_SMG1_Player", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
 	CSmartPtr<CLocalSpaceEmitter> pSimple = CLocalSpaceEmitter::Create( "MuzzleFlash_SMG1_Player", hEntity, attachmentIndex, FLE_VIEWMODEL );
 
 	CacheMuzzleFlashes();
@@ -2870,7 +2864,6 @@ void CTempEnts::MuzzleFlash_SMG1_Player( ClientEntityHandle_t hEntity, int attac
 
 void CTempEnts::MuzzleFlash_Shotgun_Player( ClientEntityHandle_t hEntity, int attachmentIndex )
 {
-	VPROF_BUDGET( "MuzzleFlash_Shotgun_Player", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
 	CSmartPtr<CSimpleEmitter> pSimple = CSimpleEmitter::Create( "MuzzleFlash_Shotgun_Player" );
 
 	pSimple->SetDrawBeforeViewModel( true );
@@ -3043,7 +3036,6 @@ void CTempEnts::MuzzleFlash_Shotgun_NPC( ClientEntityHandle_t hEntity, int attac
 //==================================================
 void CTempEnts::MuzzleFlash_357_Player( ClientEntityHandle_t hEntity, int attachmentIndex )
 {
-	VPROF_BUDGET( "MuzzleFlash_357_Player", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
 	CSmartPtr<CSimpleEmitter> pSimple = CSimpleEmitter::Create( "MuzzleFlash_357_Player" );
 
 	pSimple->SetDrawBeforeViewModel( true );
@@ -3130,7 +3122,6 @@ void CTempEnts::MuzzleFlash_357_Player( ClientEntityHandle_t hEntity, int attach
 
 void CTempEnts::MuzzleFlash_Pistol_Player( ClientEntityHandle_t hEntity, int attachmentIndex )
 {
-	VPROF_BUDGET( "MuzzleFlash_Pistol_Player", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
 	CSmartPtr<CSimpleEmitter> pSimple = CSimpleEmitter::Create( "MuzzleFlash_Pistol_Player" );
 	pSimple->SetDrawBeforeViewModel( true );
 

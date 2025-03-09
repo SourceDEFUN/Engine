@@ -19,7 +19,6 @@
 #include <vgui/ISurface.h>
 #include <vgui/IScheme.h>
 #include <vgui/ILocalize.h>
-#include "tier0/vprof.h"
 #include "cdll_bounded_cvars.h"
 
 #include "materialsystem/imaterialsystem.h"

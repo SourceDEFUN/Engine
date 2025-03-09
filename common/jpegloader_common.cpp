@@ -7,7 +7,6 @@
 #include "jpegloader.h"
 #include "tier0/dbg.h"
 #include "tier1/utlvector.h"
-#include "tier0/vprof.h"
 #include "jpeglib/jpeglib.h"
 
 //-----------------------------------------------------------------------------
@@ -25,7 +24,6 @@
 //-----------------------------------------------------------------------------
 bool BResizeImageInternal( CUtlBuffer &bufImage, int nWidth, int nHeight, int &nNewWidth, int &nNewHeight, bool bIsRGBA = true )
 {
-	VPROF_BUDGET( "BResizeImageRGBA", VPROF_BUDGETGROUP_OTHER_VGUI );
 	CUtlBuffer bufImageOut;
 
 	if ( nWidth == 0 || nHeight == 0 )

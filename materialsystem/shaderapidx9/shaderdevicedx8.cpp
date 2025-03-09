@@ -24,7 +24,6 @@
 #include "vertexshaderdx8.h"
 #include "recording.h"
 #include "winutils.h"
-#include "tier0/vprof_telemetry.h"
 
 #if defined ( DX_TO_GL_ABSTRACTION )
 // Placed here so inlines placed in dxabstract.h can access gGL

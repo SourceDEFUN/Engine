@@ -210,7 +210,6 @@ CSharedObject *CGCSharedObjectTypeCache::RemoveObject( const CSharedObject & soI
 void CGCSharedObjectTypeCache::BuildCacheSubscribedMsg( CMsgSOCacheSubscribed_SubscribedType *pMsgType, uint32 unFlags, const CISubscriberMessageFilter &filter )
 {
 	//MEM_ALLOC_CREDIT_( CFmtStr( "StartPlaying - Type BuildMsg - %s", CSharedObject::PchClassName( GetTypeID() ) ) );
-	VPROF_BUDGET( CSharedObject::PchClassBuildCacheNodeName( GetTypeID() ), VPROF_BUDGETGROUP_STEAM );
 	
 	uint32 nNumSubscribed = 0;
 	for( uint32 i=0; i<GetCount(); i++ )
@@ -326,14 +325,12 @@ CSharedObject *CGCSharedObjectCache::RemoveObject( const CSharedObject & soIndex
 				uint32 unFlags = CalcSendFlags( steamID );
 				if( filter.BShouldSendObject( pObject, unFlags ) )
 				{
-					VPROF_BUDGET( CSharedObject::PchClassCreateNodeName( pObject->GetTypeID() ), VPROF_BUDGETGROUP_STEAM );				
 					vecRecipients.AddToTail( vecSubscribers[nSub].m_steamID );
 				}
 			}
 
 			if ( vecRecipients.Count() > 0 )
 			{
-				VPROF_BUDGET( CSharedObject::PchClassCreateNodeName( pObject->GetTypeID() ), VPROF_BUDGETGROUP_STEAM );
 #if 0
 				// Kyle says: KFIXME: this is the more current way of doing things but we're missing some multi-broadcast
 				//					  code that hasn't been integrated from Dota yet.
@@ -411,7 +408,6 @@ void CGCSharedObjectCache::SetTradingPartner( const CSteamID &steamID )
 void CGCSharedObjectCache::AddSubscriber( const CSteamID & steamID, bool bForceSendSubscriptionMsg )
 {
 	MEM_ALLOC_CREDIT_("StartPlaying - AddSubscriber" );
-	VPROF_BUDGET( "CGCSharedObjectCache::AddSubscriber()", VPROF_BUDGETGROUP_STEAM );
 
 	Assert( steamID.IsValid() );
 	bool bAdded = m_context.BAddSubscriber( steamID );
@@ -662,7 +658,6 @@ void CGCSharedObjectCache::SendNetworkUpdates( CSharedObject *pObj )
 //----------------------------------------------------------------------------
 void CGCSharedObjectCache::SendAllNetworkUpdates()
 {
-	VPROF_BUDGET( "CGCSharedObjectCache::SendAllNetworkUpdates", VPROF_BUDGETGROUP_STEAM );
 
 	// Create messages first
 	if ( m_networkDirtyObjsCreate.Count() )
@@ -685,7 +680,6 @@ void CGCSharedObjectCache::SendAllNetworkUpdates()
 	CUtlVector< CSharedObject* > vecObjects( 0, m_networkDirtyObjs.Count() );
 
 	{
-		VPROF_BUDGET( "CGCSharedObjectCache::SendAllNetworkUpdates - build messages", VPROF_BUDGETGROUP_STEAM );
 		FOR_EACH_HASHTABLE( m_networkDirtyObjs, i )
 		{
 			CSharedObject *pObj = m_networkDirtyObjs.Key( i );
@@ -709,7 +703,6 @@ void CGCSharedObjectCache::SendAllNetworkUpdates()
 
 	// now build uber msg for each subscriber
 	{
-		VPROF_BUDGET( "CGCSharedObjectCache::SendAllNetworkUpdates - send all messages", VPROF_BUDGETGROUP_STEAM );
 
 		CUtlVector<int> vecObjsToSendToThisUser( 0, vecObjects.Count() );
 
@@ -734,7 +727,6 @@ void CGCSharedObjectCache::SendAllNetworkUpdates()
 			// If we have any objects to send then build the message and send it
 			if ( vecObjsToSendToThisUser.Count() > 0 )
 			{
-				VPROF_BUDGET( "CGCSharedObjectCache::SendAllNetworkUpdates - Sending Msg", VPROF_BUDGETGROUP_STEAM );
 				CProtoBufMsg< CMsgSOMultipleObjects > msg( k_ESOMsg_UpdateMultiple );
 				msg.Body().set_owner( GetOwner().ConvertToUint64() );
 				msg.Body().set_version( GetVersion() );
@@ -809,7 +801,6 @@ void CGCSharedObjectCache::SendNetworkCreateInternal( CSharedObject * pObj )
 	if( !BShouldSendToAnyClients( unFlags ) )
 		return;
 
-	VPROF_BUDGET( CSharedObject::PchClassUpdateNodeName( pObj->GetTypeID() ), VPROF_BUDGETGROUP_STEAM );
 
 	const CISubscriberMessageFilter &filter = GetSubscriberMessageFilter();
 	const CUtlVector< CSharedObjectContext::Subscriber_t > &vecSubscribers = m_context.GetSubscribers();
@@ -822,7 +813,6 @@ void CGCSharedObjectCache::SendNetworkCreateInternal( CSharedObject * pObj )
 		uint32 unFlags = CalcSendFlags( steamID );
 		if( filter.BShouldSendObject( pObj, unFlags ) )
 		{
-			VPROF_BUDGET( CSharedObject::PchClassCreateNodeName( pObj->GetTypeID() ), VPROF_BUDGETGROUP_STEAM );
 			pObj->BSendCreateToSteamID( steamID, m_context.GetOwner(), GetVersion() );
 			vecRecipients.AddToTail( steamID );
 		}
@@ -843,7 +833,6 @@ void CGCSharedObjectCache::SendNetworkUpdateInternal( CSharedObject * pObj )
 	if( !BShouldSendToAnyClients( unFlags ) )
 		return;
 
-	VPROF_BUDGET( CSharedObject::PchClassUpdateNodeName( pObj->GetTypeID() ), VPROF_BUDGETGROUP_STEAM );
 
 	CProtoBufMsg< CMsgSOSingleObject > msg( k_ESOMsg_Update );
 	msg.Body().set_owner( GetOwner().ConvertToUint64() );

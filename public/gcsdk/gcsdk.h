@@ -27,7 +27,6 @@
 #ifdef DBGFLAG_VALIDATE
 #include "tier0/validator.h"
 #endif
-#include "tier0/vprof.h"
 #include "tier0/fasttimer.h"
 
 // include this before checksum_crc specifically to avoid the 

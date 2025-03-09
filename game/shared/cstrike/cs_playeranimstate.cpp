@@ -7,7 +7,6 @@
 #include "cbase.h"
 #include "cs_playeranimstate.h"
 #include "base_playeranimstate.h"
-#include "tier0/vprof.h"
 #include "animation.h"
 #include "weapon_csbase.h"
 #include "studio.h"

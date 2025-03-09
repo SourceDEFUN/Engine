@@ -9,7 +9,6 @@
 #include "dispcoll_common.h"
 #include "collisionutils.h"
 #include "tier1/strtools.h"
-#include "tier0/vprof.h"
 #include "tier1/fmtstr.h"
 #include "tier1/utlhash.h"
 #include "tier1/generichash.h"
@@ -646,7 +645,6 @@ void CDispCollTree::AABBTree_TreeTrisRayBarycentricTest( const Ray_t &ray, const
 bool CDispCollTree::AABBTree_Ray( const Ray_t &ray, const Vector &vecInvDelta, CBaseTrace *pTrace, bool bSide )
 {
 
-//	VPROF_BUDGET( "DispRayTraces", VPROF_BUDGETGROUP_DISP_RAYTRACES );
 
 	// Check for ray test.
 	if ( CheckFlags( CCoreDispInfo::SURF_NORAY_COLL ) )
@@ -885,7 +883,6 @@ static const Vector g_Vec3DispCollEpsilons(DISPCOLL_DIST_EPSILON,DISPCOLL_DIST_E
 //-----------------------------------------------------------------------------
 bool CDispCollTree::AABBTree_SweepAABB( const Ray_t &ray, const Vector &vecInvDelta, CBaseTrace *pTrace )
 {
-	//	VPROF_BUDGET( "DispHullTraces", VPROF_BUDGETGROUP_DISP_HULLTRACES );
 	// Check for hull test.
 	if ( CheckFlags( CCoreDispInfo::SURF_NOHULL_COLL ) )
 		return false;

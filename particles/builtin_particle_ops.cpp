@@ -14,37 +14,12 @@
 #include "tier1/strtools.h"
 #include "studio.h"
 #include "bspflags.h"
-#include "tier0/vprof.h"
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
 
-#if MEASURE_PARTICLE_PERF
-
-#if VPROF_LEVEL > 0
-#define START_OP float flOpStartTime = Plat_FloatTime(); VPROF_ENTER_SCOPE(pOp->GetDefinition()->GetName())
-#else
-#define START_OP float flOpStartTime = Plat_FloatTime();
-#endif
-
-#if VPROF_LEVEL > 0
-#define END_OP  if ( 1 ) {																						\
-	float flETime = Plat_FloatTime() - flOpStartTime;									\
-	IParticleOperatorDefinition *pDef = (IParticleOperatorDefinition *) pOp->GetDefinition();	\
-	pDef->RecordExecutionTime( flETime );												\
-} \
-	VPROF_EXIT_SCOPE()
-#else
-#define END_OP  if ( 1 ) {																						\
-	float flETime = Plat_FloatTime() - flOpStartTime;									\
-	IParticleOperatorDefinition *pDef = (IParticleOperatorDefinition *) pOp->GetDefinition();	\
-	pDef->RecordExecutionTime( flETime );												\
-}
-#endif
-#else
-#define START_OP
+#define START_OP float flOpStartTime = Plat_FloatTime()
 #define END_OP
-#endif
 
 //-----------------------------------------------------------------------------
 // Standard movement operator

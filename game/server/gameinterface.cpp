@@ -40,7 +40,6 @@
 #include "saverestoretypes.h"
 #include "physics_saverestore.h"
 #include "achievement_saverestore.h"
-#include "tier0/vprof.h"
 #include "effect_dispatch_data.h"
 #include "engine/IStaticPropMgr.h"
 #include "TemplateEntities.h"

@@ -17,7 +17,6 @@
 #include "mathlib/vmatrix.h"
 #include "tier1/strtools.h"
 #include "convar.h"
-#include "tier0/vprof.h"
 
 // NOTE: This must be the last include file in a .cpp file!
 #include "tier0/memdbgon.h"

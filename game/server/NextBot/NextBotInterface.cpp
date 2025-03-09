@@ -13,7 +13,6 @@
 #include "NextBotBodyInterface.h"
 #include "NextBotManager.h"
 
-#include "tier0/vprof.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -113,7 +112,6 @@ void INextBot::EndUpdate( void )
 //----------------------------------------------------------------------------------------------------------------
 void INextBot::Update( void )
 {
-	VPROF_BUDGET( "INextBot::Update", "NextBot" );
 
 	m_debugDisplayLine = 0;
 
@@ -139,7 +137,6 @@ void INextBot::Update( void )
 //----------------------------------------------------------------------------------------------------------------
 void INextBot::Upkeep( void )
 {
-	VPROF_BUDGET( "INextBot::Upkeep", "NextBot" );
 
 	// do upkeep for all components
 	for( INextBotComponent *comp = m_componentList; comp; comp = comp->m_nextComponent )

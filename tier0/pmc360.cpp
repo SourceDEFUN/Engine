@@ -12,7 +12,6 @@
 #else
 
 #include "tier0/platform.h"
-#include "tier0/vprof.h"
 #include <pmcpbsetup.h>
 #include "tier0/dbg.h"
 #include "pmc360.h"

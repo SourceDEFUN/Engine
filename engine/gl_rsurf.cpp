@@ -34,7 +34,6 @@
 #include "icliententitylist.h"
 #include "icliententity.h"
 #include "gl_rmain.h"
-#include "tier0/vprof.h"
 #include "bitvec.h"
 #include "debugoverlay.h"
 #include "host.h"
@@ -922,7 +921,6 @@ void Shader_DrawChainsStatic( const CMSurfaceSortList &sortList, int nSortGroup,
 #endif
 
 		int meshTotal = meshList.Count();
-		VPROF_INCREMENT_COUNTER( "vertex format changes", meshTotal );
 
 		// HACKHACK: Crappy little bubble sort
 		// UNDONE: Make the traversal happen so that they are already sorted when you get here.
@@ -3165,7 +3163,6 @@ ConVar fast_fogvolume("fast_fogvolume", "0");
 //-----------------------------------------------------------------------------
 void R_GetVisibleFogVolume( const Vector& vEyePoint, VisibleFogVolumeInfo_t *pInfo )
 {
-	VPROF_BUDGET( "R_GetVisibleFogVolume", VPROF_BUDGETGROUP_WORLD_RENDERING );
 
 	if ( host_state.worldmodel->brush.pShared->numleafwaterdata == 0 )
 	{

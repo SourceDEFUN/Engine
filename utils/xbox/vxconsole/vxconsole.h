@@ -139,14 +139,6 @@ typedef enum
 	FL_MAXFUNCTIONCOUNTS,
 } fileLogFunctions_e;
 
-typedef enum
-{
-	VPROF_OFF = 0,
-	VPROF_CPU,
-	VPROF_TEXTURE,
-	VPROF_TEXTUREFRAME,
-} vprofState_e;
-
 // funtion command types
 #define FN_CONSOLE	0x00	// command runs at console
 #define FN_XBOX		0x01	// command requires xbox
@@ -438,12 +430,6 @@ extern void			TimeStampLog_Open();
 extern bool			TimeStampLog_Init();
 extern void			TimeStampLog_Clear();
 extern int			rc_TimeStampLog( char* commandPtr );
-
-//-----------------------------------------------------------------------------
-// COMMON.CPP
-//-----------------------------------------------------------------------------
-extern vprofState_e	VProf_GetState();
-extern void			VProf_Enable( vprofState_e state );
 
 //-----------------------------------------------------------------------------
 // SHOW_MATERIALS.CPP

@@ -44,7 +44,6 @@
 #include "engine/ivdebugoverlay.h"
 #include "vguicenterprint.h"
 #include "iviewrender_beams.h"
-#include "tier0/vprof.h"
 #include "engine/IEngineTrace.h"
 #include "engine/ivmodelinfo.h"
 #include "physics.h"
@@ -1965,14 +1964,12 @@ bool CHLClient::DispatchUserMessage( int msg_type, bf_read &msg_data )
 
 void SimulateEntities()
 {
-	VPROF_BUDGET("Client SimulateEntities", VPROF_BUDGETGROUP_CLIENT_SIM);
 
 	// Service timer events (think functions).
   	ClientThinkList()->PerformThinkFunctions();
 
 	// TODO: make an ISimulateable interface so C_BaseNetworkables can simulate?
 	{
-		VPROF_("C_BaseEntity::Simulate", 1, VPROF_BUDGETGROUP_CLIENT_SIM, false, BUDGETFLAG_CLIENT);
 		C_BaseEntityIterator iterator;
 		C_BaseEntity *pEnt;
 		while ( (pEnt = iterator.Next()) != NULL )
@@ -2015,7 +2012,6 @@ void ClearDataChangedEvent( int iStoredEvent )
 
 void ProcessOnDataChangedEvents()
 {
-	VPROF_("ProcessOnDataChangedEvents", 1, VPROF_BUDGETGROUP_CLIENT_SIM, false, BUDGETFLAG_CLIENT);
 	FOR_EACH_LL( g_DataChangedEvents, i )
 	{
 		CDataChangedEvent *pEvent = &g_DataChangedEvents[i];
@@ -2172,7 +2168,6 @@ void OnRenderStart()
 	C_BaseAnimating::ThreadedBoneSetup();
 
 	{
-		VPROF_("Client TempEnts", 0, VPROF_BUDGETGROUP_CLIENT_SIM, false, BUDGETFLAG_CLIENT);
 		// This creates things like temp entities.
 		engine->FireEvents();
 
@@ -2192,7 +2187,6 @@ void OnRenderStart()
 		// Enable FP exceptions here when FP_EXCEPTIONS_ENABLED is defined,
 		// to help track down bad math.
 		FPExceptionEnabler enableExceptions;
-		VPROF_BUDGET( "ParticleMgr()->Simulate", VPROF_BUDGETGROUP_PARTICLE_SIMULATION );
 		ParticleMgr()->Simulate( gpGlobals->frametime );
 	}
 

@@ -16,7 +16,6 @@
 #include "NextBotBodyInterface.h"
 #include "NextBotVisionInterface.h"
 
-#include "tier0/vprof.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -137,7 +136,6 @@ void PathFollower::AdjustSpeed( INextBot *bot )
  */
 bool PathFollower::IsAtGoal( INextBot *bot ) const
 {
-	VPROF_BUDGET( "PathFollower::IsAtGoal", "NextBot" );
 
 	ILocomotion *mover = bot->GetLocomotionInterface();
 	IBody *body = bot->GetBodyInterface();
@@ -266,7 +264,6 @@ bool PathFollower::IsAtGoal( INextBot *bot ) const
  */
 bool PathFollower::LadderUpdate( INextBot *bot )
 {
-	VPROF_BUDGET( "PathFollower::LadderUpdate", "NextBot" );
 
 	ILocomotion *mover = bot->GetLocomotionInterface();
 	IBody *body = bot->GetBodyInterface();
@@ -571,7 +568,6 @@ bool PathFollower::CheckProgress( INextBot *bot )
  */
 void PathFollower::Update( INextBot *bot )
 {
-	VPROF_BUDGET( "PathFollower::Update", "NextBotSpiky" );
 
 	// track most recent path followed
 	bot->SetCurrentPath( this );
@@ -872,7 +868,6 @@ CBaseEntity *PathFollower::FindBlocker( INextBot *bot )
  */
 Vector PathFollower::Avoid( INextBot *bot, const Vector &goalPos, const Vector &forward, const Vector &left )
 {
-	VPROF_BUDGET( "PathFollower::Avoid", "NextBotExpensive" );
 
 	if ( !NextBotAllowAvoiding.GetBool() )
 	{
@@ -1138,7 +1133,6 @@ bool PathFollower::FindClimbLedge( INextBot *bot, Vector startTracePos, Vector l
  */
 bool PathFollower::Climbing( INextBot *bot, const Path::Segment *goal, const Vector &forward, const Vector &right, float goalRange )
 {
-	VPROF_BUDGET( "PathFollower::Climbing", "NextBot" );
 
 	ILocomotion *mover = bot->GetLocomotionInterface();
 	IBody *body = bot->GetBodyInterface();
@@ -1386,7 +1380,6 @@ bool PathFollower::Climbing( INextBot *bot, const Path::Segment *goal, const Vec
 	// wasPotentialLedgeFound = wasPotentialLedgeFound && (result.fraction == 0 || isBackupTraceUsed);
 	if ( wasPotentialLedgeFound )
 	{
-		VPROF_BUDGET( "PathFollower::Climbing( Search for ledge to climb )", "NextBot" );
 
 		if ( bot->IsDebugging( NEXTBOT_PATH ) && NextBotDebugClimbing.GetBool() )
 		{
@@ -1729,7 +1722,6 @@ bool PathFollower::Climbing( INextBot *bot, const Path::Segment *goal, const Vec
  */
 bool PathFollower::JumpOverGaps( INextBot *bot, const Path::Segment *goal, const Vector &forward, const Vector &right, float goalRange )
 {
-	VPROF_BUDGET( "PathFollower::JumpOverGaps", "NextBot" );
 
 	ILocomotion *mover = bot->GetLocomotionInterface();
 	IBody *body = bot->GetBodyInterface();
@@ -1797,7 +1789,6 @@ bool PathFollower::JumpOverGaps( INextBot *bot, const Path::Segment *goal, const
 
 	if ( gap )
 	{
-		VPROF_BUDGET( "PathFollower::GapJumping", "NextBot" );
 
 		float halfWidth = hullWidth/2.0f;
 

@@ -22,7 +22,6 @@
 #include "engine/ivmodelrender.h"
 #include "collisionutils.h"
 #include "debugoverlay.h"
-#include "tier0/vprof.h"
 #include "disp.h"
 #include "gl_rmain.h"
 #include "MaterialBuckets.h"
@@ -1470,7 +1469,6 @@ void CShadowMgr::ProjectShadow( ShadowHandle_t handle, const Vector &origin,
 	int nLeafCount, const int *pLeafList,
 	float maxHeight, float falloffOffset, float falloffAmount, const Vector &vecCasterOrigin )
 {
-	VPROF_BUDGET( "CShadowMgr::ProjectShadow", VPROF_BUDGETGROUP_SHADOW_RENDERING );
 
 	// First, we need to remove the shadow from all surfaces it may
 	// currently be in; in other words we're invalidating the shadow surface cache
@@ -1588,7 +1586,6 @@ void DrawFrustum( Frustum_t &frustum )
 
 void CShadowMgr::ProjectFlashlight( ShadowHandle_t handle, const VMatrix& worldToShadow, int nLeafCount, const int *pLeafList )
 {
-	VPROF_BUDGET( "CShadowMgr::ProjectFlashlight", VPROF_BUDGETGROUP_SHADOW_DEPTH_TEXTURING );
 
 	Shadow_t& shadow = m_Shadows[handle];
 
@@ -1971,7 +1968,6 @@ void CShadowMgr::ClearShadowRenderList()
 
 void CShadowMgr::RenderShadows( const VMatrix* pModelToWorld )
 {
-	VPROF_BUDGET( "CShadowMgr::RenderShadows", VPROF_BUDGETGROUP_SHADOW_RENDERING );
 	// Iterate through all sort ids and render for regular shadows, which get their materials from the shadow material.
 	CMatRenderContextPtr pRenderContext( materials );
 	int i;
@@ -1986,7 +1982,6 @@ void CShadowMgr::RenderShadows( const VMatrix* pModelToWorld )
 
 void CShadowMgr::RenderProjectedTextures( const VMatrix* pModelToWorld )
 {
-	VPROF_BUDGET( "CShadowMgr::RenderProjectedTextures", VPROF_BUDGETGROUP_SHADOW_RENDERING );
 
 	RenderFlashlights( true, pModelToWorld );
 	RenderShadows( pModelToWorld );
@@ -3282,7 +3277,6 @@ TODO: do we even need to do the far plane?
 //---------------------------------------------------------------------------------------
 void CShadowMgr::SetFlashlightStencilMasks( bool bDoMasking )
 {
-	VPROF_BUDGET( "CShadowMgr::RenderFlashlights", VPROF_BUDGETGROUP_SHADOW_RENDERING );
 
 	if ( IsX360() || r_flashlight_version2.GetInt() )
 		return;
@@ -3390,7 +3384,6 @@ void CShadowMgr::SetFlashlightRenderState( ShadowHandle_t handle )
 void CShadowMgr::RenderFlashlights( bool bDoMasking, const VMatrix* pModelToWorld )
 {
 #ifndef SWDS
-	VPROF_BUDGET( "CShadowMgr::RenderFlashlights", VPROF_BUDGETGROUP_SHADOW_RENDERING );
 
 	if ( IsX360() || r_flashlight_version2.GetInt() )
 		return;
@@ -3544,7 +3537,6 @@ const FlashlightState_t &CShadowMgr::GetFlashlightState( ShadowHandle_t handle )
 
 void CShadowMgr::DrawFlashlightDecals( int sortGroup, bool bDoMasking )
 {
-	VPROF_BUDGET( "CShadowMgr::DrawFlashlightDecals", VPROF_BUDGETGROUP_SHADOW_RENDERING );
 
 	if ( IsX360() || r_flashlight_version2.GetInt() )
 		return;
@@ -3578,7 +3570,6 @@ void CShadowMgr::DrawFlashlightDecals( int sortGroup, bool bDoMasking )
 
 void CShadowMgr::DrawFlashlightDecalsOnDisplacements( int sortGroup, CDispInfo *visibleDisps[MAX_MAP_DISPINFO], int nVisibleDisps, bool bDoMasking )
 {
-	VPROF_BUDGET( "CShadowMgr::DrawFlashlightDecalsOnDisplacements", VPROF_BUDGETGROUP_SHADOW_RENDERING );
 
 	if ( IsX360() || r_flashlight_version2.GetInt() )
 		return;
@@ -3614,7 +3605,6 @@ void CShadowMgr::DrawFlashlightDecalsOnDisplacements( int sortGroup, CDispInfo *
 
 void CShadowMgr::DrawFlashlightDecalsOnSingleSurface( SurfaceHandle_t surfID, bool bDoMasking )
 {
-	VPROF_BUDGET( "CShadowMgr::DrawFlashlightDecalsOnSingleSurface", VPROF_BUDGETGROUP_SHADOW_RENDERING );
 
 	if ( IsX360() || r_flashlight_version2.GetInt() )
 		return;
@@ -3648,7 +3638,6 @@ void CShadowMgr::DrawFlashlightDecalsOnSingleSurface( SurfaceHandle_t surfID, bo
 
 void CShadowMgr::DrawFlashlightOverlays( int nSortGroup, bool bDoMasking )
 {
-	VPROF_BUDGET( "CShadowMgr::DrawFlashlightOverlays", VPROF_BUDGETGROUP_SHADOW_RENDERING );
 
 	if ( IsX360() || r_flashlight_version2.GetInt() )
 		return;

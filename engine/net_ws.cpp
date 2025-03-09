@@ -9,7 +9,6 @@
 // Windows IP Support layer.
 
 #include "tier0/etwprof.h"
-#include "tier0/vprof.h"
 #include "net_ws_headers.h"
 #include "net_ws_queued_packet_sender.h"
 #include "fmtstr.h"
@@ -1402,7 +1401,6 @@ bool NET_GetLoopPacket ( netpacket_t * packet )
 
 bool NET_ReceiveDatagram ( const int sock, netpacket_t * packet )
 {
-	VPROF_BUDGET( "NET_ReceiveDatagram", VPROF_BUDGETGROUP_OTHER_NETWORKING );
 
 	Assert ( packet );
 	Assert ( net_multiplayer );
@@ -1413,7 +1411,6 @@ bool NET_ReceiveDatagram ( const int sock, netpacket_t * packet )
 
 	int ret = 0;
 	{
-		VPROF_BUDGET( "recvfrom", VPROF_BUDGETGROUP_OTHER_NETWORKING );
 		ret = VCRHook_recvfrom(net_socket, (char *)packet->data, NET_MAX_MESSAGE, 0, (struct sockaddr *)&from, (int *)&fromlen );
 	}
 	if ( ret >= NET_MIN_MESSAGE )
@@ -1623,7 +1620,6 @@ bool NET_ReceiveValidDatagram ( const int sock, netpacket_t * packet )
 
 netpacket_t *NET_GetPacket (int sock, byte *scratch )
 {
-	VPROF_BUDGET( "NET_GetPacket", VPROF_BUDGETGROUP_OTHER_NETWORKING );
 
 	// Each socket has its own netpacket to allow multithreading
 	netpacket_t &inpacket = net_packets[sock];
@@ -1816,7 +1812,6 @@ CTSSimpleList<NetScratchBuffer_t> g_NetScratchBuffers;
 
 void NET_ProcessSocket( int sock, IConnectionlessPacketHandler *handler )
 {
-	VPROF_BUDGET( "NET_ProcessSocket", VPROF_BUDGETGROUP_OTHER_NETWORKING );
 
 	netpacket_t * packet;
 	
@@ -1974,7 +1969,6 @@ int NET_SendTo( bool verbose, SOCKET s, const char FAR * buf, int len, const str
 {	
 	int nSend = 0;
 
-	VPROF_BUDGET( "NET_SendTo", VPROF_BUDGETGROUP_OTHER_NETWORKING );
 	
 	// If it's 0.0.0.0:0, then it's a fake player + sv_stressbots and we've plumbed everything all 
 	// the way through here, where we finally bail out.
@@ -2201,7 +2195,6 @@ static ConVar net_splitpacket_maxrate( "net_splitpacket_maxrate", SPLITPACKET_MA
 
 int NET_SendLong( INetChannel *chan, int sock, SOCKET s, const char FAR * buf, int len, const struct sockaddr FAR * to, int tolen, int nMaxRoutableSize )
 {
-	VPROF_BUDGET( "NET_SendLong", VPROF_BUDGETGROUP_OTHER_NETWORKING );
 
 	CNetChan *netchan = dynamic_cast< CNetChan * >( chan );
 
@@ -2339,7 +2332,6 @@ int NET_SendLong( INetChannel *chan, int sock, SOCKET s, const char FAR * buf, i
 
 int NET_SendPacket ( INetChannel *chan, int sock,  const netadr_t &to, const unsigned char *data, int length, bf_write *pVoicePayload /* = NULL */, bool bUseCompression /*=false*/ )
 {
-	VPROF_BUDGET( "NET_SendPacket", VPROF_BUDGETGROUP_OTHER_NETWORKING );
 	ETWSendPacket( to.ToString() , length , 0 , 0 );
 
 	int		ret;
@@ -2404,7 +2396,6 @@ int NET_SendPacket ( INetChannel *chan, int sock,  const netadr_t &to, const uns
 
 	if ( pVoicePayload )
 	{
-		VPROF_BUDGET( "NET_SendPacket_CompressVoice", VPROF_BUDGETGROUP_OTHER_NETWORKING );
 		unsigned int nCompressedLength = COM_GetIdealDestinationCompressionBufferSize_Snappy( pVoicePayload->GetNumBytesWritten() );
 		memCompressedVoice.EnsureCapacity( nCompressedLength + sizeof( unsigned short ) );
 
@@ -2433,7 +2424,6 @@ int NET_SendPacket ( INetChannel *chan, int sock,  const netadr_t &to, const uns
 
 	if ( bUseCompression )
 	{
-		VPROF_BUDGET( "NET_SendPacket_Compress", VPROF_BUDGETGROUP_OTHER_NETWORKING );
 		unsigned int nCompressedLength = COM_GetIdealDestinationCompressionBufferSize_Snappy( length );
 	
 		memCompressed.EnsureCapacity( nCompressedLength + nVoiceBytes + sizeof( unsigned int ) );

@@ -41,7 +41,6 @@
 #include "ixboxsystem.h"
 #endif  // _X360
 #include "engine/imatchmaking.h"
-#include "tier0/vprof.h"
 
 #if defined(TF_DLL) || defined(TF_CLIENT_DLL)
 #include "tf_gamerules.h"
@@ -838,7 +837,6 @@ void CAchievementMgr::LoadGlobalState()
 
 void CAchievementMgr::SaveGlobalState( bool bAsync )
 {
-	VPROF_BUDGET( "CAchievementMgr::SaveGlobalState", "Achievements" );
 
 	KeyValues *pKV = new KeyValues("GameState" );
 	FOR_EACH_MAP( m_mapAchievement, i )
@@ -953,7 +951,6 @@ void CAchievementMgr::AwardAchievement( int iAchievementID )
 #ifndef DISABLE_STEAM
 		if ( steamapicontext->SteamUserStats() )
 		{
-			VPROF_BUDGET( "AwardAchievement", VPROF_BUDGETGROUP_STEAM );
 			// set this achieved in the Steam client
 			bool bRet = steamapicontext->SteamUserStats()->SetAchievement( pAchievement->GetName() );
 			//		Assert( bRet );
@@ -1436,7 +1433,6 @@ void CAchievementMgr::PrintAchievementStatus()
 //-----------------------------------------------------------------------------
 void CAchievementMgr::FireGameEvent( IGameEvent *event )
 {
-	VPROF_( "CAchievementMgr::FireGameEvent", 1, VPROF_BUDGETGROUP_STEAM, false, 0 );
 	const char *name = event->GetName();
 	if ( name == NULL ) { return; }
 	if ( 0 == Q_strcmp( name, "entity_killed" ) )

@@ -14,7 +14,6 @@
 #include "view.h"
 #include "clienteffectprecachesystem.h"
 #include "c_physicsprop.h"
-#include "tier0/vprof.h"
 #include "ivrenderview.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

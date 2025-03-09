@@ -10,7 +10,6 @@
 #include <vgui/ISurface.h>
 #include <vgui/IVGui.h>
 #include <vgui/IInput.h>
-#include "tier0/vprof.h"
 #include <vgui_controls/Panel.h>
 #include <KeyValues.h>
 #include <dme_controls/dmeControls.h>

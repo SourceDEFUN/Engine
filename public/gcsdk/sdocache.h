@@ -711,7 +711,6 @@ bool CSDOCache::BGetLoadedSDO( CSDORef<T> *pPSDORef, const typename T::KeyType_t
 template<class T>
 bool CSDOCache::BYldLoadSDO( CSDORef<T> *pPSDORef, const typename T::KeyType_t &key, bool *pbTimeoutLoading /* = NULL */ )
 {
-	VPROF_BUDGET( "CSDOCache::BYldLoadSDO", VPROF_BUDGETGROUP_STEAM );
 	if ( pbTimeoutLoading )
 		*pbTimeoutLoading = false;
 

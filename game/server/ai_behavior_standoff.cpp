@@ -337,7 +337,6 @@ void CAI_StandoffBehavior::EndScheduleSelection()
 
 void CAI_StandoffBehavior::PrescheduleThink()
 {
-	VPROF_BUDGET( "CAI_StandoffBehavior::PrescheduleThink", VPROF_BUDGETGROUP_NPCS );
 
 	BaseClass::PrescheduleThink();
 	

@@ -26,10 +26,8 @@
 //
 //==================================================================================================
 #include "togles/rendermechanism.h"
-#include "tier0/vprof_telemetry.h"
 #include "tier0/dbg.h"
 #include "tier0/threadtools.h"
-#include "tier0/vprof.h"
 #include "tier1/strtools.h"
 #include "tier1/utlbuffer.h"
 #include "dx9asmtogl2.h"

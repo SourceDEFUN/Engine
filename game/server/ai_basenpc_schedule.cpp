@@ -571,16 +571,7 @@ void CAI_BaseNPC::MaintainSchedule ( void )
 	int			i;
 	bool		runTask = true;
 
-#if defined( VPROF_ENABLED )
-#if defined(DISABLE_DEBUG_HISTORY)
-	bool bDebugTaskNames = ( developer.GetBool() || ( VProfAI() && g_VProfCurrentProfile.IsEnabled() ) );
-#else
-	bool bDebugTaskNames = true;
-#endif
-#else
 	bool bDebugTaskNames = false;
-#endif
-
 	memset( g_AITaskTimings, 0, sizeof(g_AITaskTimings) );
 	
 	g_nAITasksRun = 0;
@@ -3190,7 +3181,6 @@ void CAI_BaseNPC::RunAttackTask( int task )
 //=========================================================
 void CAI_BaseNPC::RunTask( const Task_t *pTask )
 {
-	VPROF_BUDGET( "CAI_BaseNPC::RunTask", VPROF_BUDGETGROUP_NPCS );
 	switch ( pTask->iTask )
 	{
 	case TASK_GET_PATH_TO_RANDOM_NODE:

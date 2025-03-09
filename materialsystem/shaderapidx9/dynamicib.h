@@ -129,14 +129,6 @@ public:
 
 	void HandlePerFrameTextureStats( int frame )
 	{
-#ifdef VPROF_ENABLED
-		if ( m_Frame != frame && !m_bDynamic )
-		{
-			m_Frame = frame;
-			VPROF_INCREMENT_GROUP_COUNTER( "TexGroup_frame_" TEXTURE_GROUP_STATIC_INDEX_BUFFER, 
-				COUNTER_GROUP_TEXTURE_PER_FRAME, IndexCount() * IndexSize() );
-		}
-#endif
 	}
 	
 	static int BufferCount()
@@ -220,10 +212,6 @@ private :
 	unsigned char	m_bSoftwareVertexProcessing : 1;
 	unsigned char	m_bLateCreateShouldDiscard : 1;
 
-#ifdef VPROF_ENABLED
-	int				m_Frame;
-#endif
-
 	CInterlockedInt	m_nReferenceCount;
 
 #ifdef _DEBUG
@@ -252,11 +240,6 @@ private:
 	~CIndexBuffer();
 };
 
-#if defined( _X360 )
-#include "utlmap.h"
-MEMALLOC_DECLARE_EXTERNAL_TRACKING( XMem_CIndexBuffer );
-#endif
-
 
 //-----------------------------------------------------------------------------
 // constructor, destructor
@@ -272,14 +255,6 @@ inline CIndexBuffer::CIndexBuffer( IDirect3DDevice9 *pD3D, int count,
 		m_bDynamic(dynamic),
 		m_bSoftwareVertexProcessing( bSoftwareVertexProcessing ),
 		m_bLateCreateShouldDiscard( false )
-#ifdef _X360
-		,m_pAllocatedMemory(NULL)
-		,m_iNextBlockingPosition(0)
-		,m_iAllocationCount(0)
-#endif
-#ifdef VPROF_ENABLED
-		,m_Frame( -1 )
-#endif
 		, m_nReferenceCount( 0 ) 
 {
 	// For write-combining, ensure we always have locked memory aligned to 4-byte boundaries
@@ -355,20 +330,6 @@ inline CIndexBuffer::CIndexBuffer( IDirect3DDevice9 *pD3D, int count,
 
 	m_iNextBlockingPosition = m_iAllocationCount;
 #endif // _X360
-
-
-#ifdef VPROF_ENABLED
-	if ( !m_bDynamic )
-	{
-		VPROF_INCREMENT_GROUP_COUNTER( "TexGroup_global_" TEXTURE_GROUP_STATIC_INDEX_BUFFER, 
-			COUNTER_GROUP_TEXTURE_GLOBAL, IndexCount() * IndexSize() );
-	}
-	else if ( IsX360() )
-	{
-		VPROF_INCREMENT_GROUP_COUNTER( "TexGroup_global_" TEXTURE_GROUP_DYNAMIC_INDEX_BUFFER, 
-			COUNTER_GROUP_TEXTURE_GLOBAL, IndexCount() * IndexSize() );
-	}
-#endif
 }
 
 
@@ -426,9 +387,6 @@ void CIndexBuffer::Create( IDirect3DDevice9 *pD3D )
 
 #ifdef MEASURE_DRIVER_ALLOCATIONS
 	int nMemUsed = 1024;
-	VPROF_INCREMENT_GROUP_COUNTER( "ib count", COUNTER_GROUP_NO_RESET, 1 );
-	VPROF_INCREMENT_GROUP_COUNTER( "ib driver mem", COUNTER_GROUP_NO_RESET, nMemUsed );
-	VPROF_INCREMENT_GROUP_COUNTER( "total driver mem", COUNTER_GROUP_NO_RESET, nMemUsed );
 #endif
 
 #if defined( _DEBUG )
@@ -452,9 +410,6 @@ inline CIndexBuffer::CIndexBuffer() :
 	m_bLocked(false),
 	m_bExternalMemory( true ),
 	m_bDynamic( false )
-#ifdef VPROF_ENABLED
-	,m_Frame( -1 )
-#endif
 {
 	m_IndexCount = 0; 
 
@@ -517,9 +472,6 @@ inline CIndexBuffer::~CIndexBuffer()
 	if ( !m_bExternalMemory )
 	{
 		int nMemUsed = 1024;
-		VPROF_INCREMENT_GROUP_COUNTER( "ib count", COUNTER_GROUP_NO_RESET, -1 );
-		VPROF_INCREMENT_GROUP_COUNTER( "ib driver mem", COUNTER_GROUP_NO_RESET, -nMemUsed );
-		VPROF_INCREMENT_GROUP_COUNTER( "total driver mem", COUNTER_GROUP_NO_RESET, -nMemUsed );
 	}
 #endif
 
@@ -559,65 +511,7 @@ inline CIndexBuffer::~CIndexBuffer()
 	m_pAllocatedMemory = NULL;
 	m_pIB = NULL;
 #endif
-
-#ifdef VPROF_ENABLED
-	if ( !m_bExternalMemory )
-	{
-		if ( !m_bDynamic )
-		{
-			VPROF_INCREMENT_GROUP_COUNTER( "TexGroup_global_" TEXTURE_GROUP_STATIC_INDEX_BUFFER,
-				COUNTER_GROUP_TEXTURE_GLOBAL, - IndexCount() * IndexSize() );
-		}
-		else if ( IsX360() )
-		{
-			VPROF_INCREMENT_GROUP_COUNTER( "TexGroup_global_" TEXTURE_GROUP_DYNAMIC_INDEX_BUFFER,
-				COUNTER_GROUP_TEXTURE_GLOBAL, - IndexCount() * IndexSize() );
-		}
-	}
-#endif
 }
-
-#ifdef _X360
-//-----------------------------------------------------------------------------
-// Get memory allocation data
-//-----------------------------------------------------------------------------
-inline const GPUBufferHandle_t *CIndexBuffer::GetBufferAllocationHandle( void )
-{
-	Assert( IsPooled() );
-	return ( IsPooled() ? &m_GPUBufferHandle : NULL );
-}
-
-//-----------------------------------------------------------------------------
-// Update memory allocation data
-//-----------------------------------------------------------------------------
-inline void CIndexBuffer::SetBufferAllocationHandle( const GPUBufferHandle_t &bufferAllocationHandle )
-{
-	// This IB's memory has been reallocated or freed, update our cached pointer and the D3D header
-	// NOTE: this should never be called while any rendering is in flight!
-	Assert( ( m_pAllocatedMemory == NULL ) || IsPooled() );
-	if ( ( m_pAllocatedMemory == NULL ) || IsPooled() )
-	{
-		m_GPUBufferHandle  = bufferAllocationHandle;
-		m_pAllocatedMemory = m_GPUBufferHandle.pMemory;
-		if ( m_pIB )
-		{
-			int nBufferSize = m_IndexCount * IndexSize();
-			XGSetIndexBufferHeader( nBufferSize, 0, D3DFMT_INDEX16, 0, 0, m_pIB );
-			XGOffsetResourceAddress( m_pIB, m_pAllocatedMemory );
-		}
-	}
-}
-
-//-----------------------------------------------------------------------------
-// Expose the data pointer for read-only CPU access to the data
-//-----------------------------------------------------------------------------
-inline const byte **CIndexBuffer::GetBufferDataPointerAddress( void )
-{
-	if ( m_bDynamic /* FIXME: || m_bExternalMemory */ )
-		return NULL;
-	return (const byte **)&m_pAllocatedMemory;
-}
-#endif // _X360
 
 //-----------------------------------------------------------------------------
 // Do we have enough room without discarding?

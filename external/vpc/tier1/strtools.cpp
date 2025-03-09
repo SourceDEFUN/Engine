@@ -87,7 +87,6 @@
 #include "ps3_pathinfo.h"
 #include <cell/l10n.h> // for UCS-2 to UTF-8 conversion
 #endif
-#include "tier0/vprof.h"
 #include "tier0/memdbgon.h"
 
 #ifndef NDEBUG
@@ -172,7 +171,6 @@ int _V_strcmp (const char *s1, const char *s2)
 {
 	AssertValidStringPtr( s1 );
 	AssertValidStringPtr( s2 );
-	VPROF_2( "V_strcmp", VPROF_BUDGETGROUP_OTHER_UNACCOUNTED, false, BUDGETFLAG_ALL );
 
 	return strcmp( s1, s2 );
 }
@@ -197,7 +195,6 @@ int _V_wcscmp (const wchar_t *s1, const wchar_t *s2)
 #define TOLOWERC( x )  (( ( x >= 'A' ) && ( x <= 'Z' ) )?( x + 32 ) : x )
 int	_V_stricmp( const char *s1, const char *s2 )
 {
-	VPROF_2( "V_stricmp", VPROF_BUDGETGROUP_OTHER_UNACCOUNTED, false, BUDGETFLAG_ALL );
 #ifdef POSIX
 	if ( s1 == NULL && s2 == NULL )
 		return 0;
@@ -260,7 +257,6 @@ int	_V_stricmp( const char *s1, const char *s2 )
 // returns <0 if strings do not match even in a case-insensitive way
 int	_V_stricmp_NegativeForUnequal( const char *s1, const char *s2 )
 {
-	VPROF_2( "V_stricmp", VPROF_BUDGETGROUP_OTHER_UNACCOUNTED, false, BUDGETFLAG_ALL );
 	uint8 const *pS1 = ( uint8 const * ) s1;
 	uint8 const *pS2 = ( uint8 const * ) s2;
 	int iExactMatchResult = 1;
@@ -360,7 +356,6 @@ int V_strncmp (const char *s1, const char *s2, int count)
 	Assert( count >= 0 );
 	AssertValidStringPtr( s1, count );
 	AssertValidStringPtr( s2, count );
-	VPROF_2( "V_strcmp", VPROF_BUDGETGROUP_OTHER_UNACCOUNTED, false, BUDGETFLAG_ALL );
 
 	while ( count-- > 0 )
 	{
@@ -404,7 +399,6 @@ int V_strncasecmp (const char *s1, const char *s2, int n)
 	Assert( n >= 0 );
 	AssertValidStringPtr( s1 );
 	AssertValidStringPtr( s2 );
-	VPROF_2( "V_strcmp", VPROF_BUDGETGROUP_OTHER_UNACCOUNTED, false, BUDGETFLAG_ALL );
 	
 	while ( n-- > 0 )
 	{
@@ -431,7 +425,6 @@ int V_strcasecmp( const char *s1, const char *s2 )
 {
 	AssertValidStringPtr( s1 );
 	AssertValidStringPtr( s2 );
-	VPROF_2( "V_strcmp", VPROF_BUDGETGROUP_OTHER_UNACCOUNTED, false, BUDGETFLAG_ALL );
 
 	return V_stricmp( s1, s2 );
 }

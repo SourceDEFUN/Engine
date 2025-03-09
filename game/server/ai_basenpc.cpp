@@ -2967,7 +2967,6 @@ bool CAI_BaseNPC::PreThink( void )
 
 void CAI_BaseNPC::RunAnimation( void )
 {
-	VPROF_BUDGET( "CAI_BaseNPC_RunAnimation", VPROF_BUDGETGROUP_SERVER_ANIM );
 
 	if ( !GetModelPtr() )
 		return;
@@ -3932,7 +3931,6 @@ void CAI_BaseNPC::NPCThink( void )
 
 		if ( g_pAINetworkManager && g_pAINetworkManager->IsInitialized() )
 		{
-			VPROF_BUDGET( "NPCs", VPROF_BUDGETGROUP_NPCS );
 
 			AI_PROFILE_SCOPE_BEGIN_( GetClassScheduleIdSpace()->GetClassName() ); // need to use a string stable from map load to map load
 

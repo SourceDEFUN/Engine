@@ -41,11 +41,6 @@
 #include "filesystem.h"
 #include "tier0/icommandline.h"
 #include "const.h"
-#include "vprof.h"
-
-#if defined( _X360 )
-#include "xbox/xbox_win32stubs.h"
-#endif
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>

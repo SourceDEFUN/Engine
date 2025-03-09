@@ -43,7 +43,6 @@
 
 #include "in_buttons.h"
 #include "engine/IEngineSound.h"
-#include "tier0/vprof.h"
 #include "SoundEmitterSystem/isoundemittersystembase.h"
 #include "decals.h"
 #include "obstacle_pushaway.h"

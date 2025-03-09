@@ -23,7 +23,6 @@
 #include "commonmacros.h"
 #include "mathlib/mathlib.h"
 #include "tier0/dbg.h"
-#include "tier0/vprof.h"
 #include "tier0/icommandline.h"
 #include "tier1/strtools.h"
 

@@ -14,7 +14,6 @@
 
 #include "tier1/mempool.h"
 
-#include "tier0/vprof.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -81,7 +80,6 @@ CDependencyGraph::CDependencyGraph() :
 
 void CDependencyGraph::Reset( const CUtlVector< IDmeOperator * > &operators )
 {
-	VPROF_BUDGET( "CDependencyGraph::Reset", VPROF_BUDGETGROUP_TOOLS );
 
 	Cleanup();
 
@@ -154,7 +152,6 @@ CDependencyGraph::~CDependencyGraph()
 
 void CDependencyGraph::Cleanup()
 {
-	VPROF_BUDGET( "CDependencyGraph::Cleanup", VPROF_BUDGETGROUP_TOOLS );
 
 	int on = m_opNodes.Count();
 	for ( int oi = 0; oi < on; ++oi )
@@ -297,7 +294,6 @@ bool CDependencyGraph::GetOperatorOrdering( CUtlVector< COperatorNode * > &pOpNo
 //-----------------------------------------------------------------------------
 CAttributeNode *CDependencyGraph::FindAttrNode( CDmAttribute *pAttr )
 {
-	VPROF_BUDGET( "CDependencyGraph::FindAttrNode", VPROF_BUDGETGROUP_TOOLS );
 
 	Assert( pAttr );
 

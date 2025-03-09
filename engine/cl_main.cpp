@@ -24,7 +24,6 @@
 #include "dt_recv_eng.h"
 #include "vgui_baseui_interface.h"
 #include "testscriptmgr.h"
-#include <tier0/vprof.h>
 #include <proto_oob.h>
 #include "materialsystem/imaterialsystemhardwareconfig.h"
 #include "gl_matsysiface.h"

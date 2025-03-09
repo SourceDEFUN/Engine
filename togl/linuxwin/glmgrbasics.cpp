@@ -31,7 +31,6 @@
 #include "tier0/icommandline.h"
 #include "tier1/utlhash.h"
 #include "tier1/utlmap.h"
-#include "tier0/vprof.h"
 
 #ifdef OSX
 #include <OpenGL/OpenGL.h>

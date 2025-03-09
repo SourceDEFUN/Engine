@@ -15,7 +15,6 @@
 #include "mempool.h"
 #include "iclientmode.h"
 #include "view_scene.h"
-#include "tier0/vprof.h"
 #include "engine/ivdebugoverlay.h"
 #include "view.h"
 #include "KeyValues.h"
@@ -294,7 +293,6 @@ void CParticleEffectBinding::BBoxCalcEnd( bool bboxSet, Vector &bbMin, Vector &b
 
 int CParticleEffectBinding::DrawModel( int flags )
 {
-	VPROF_BUDGET( "CParticleEffectBinding::DrawModel", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
 #ifndef PARTICLEPROTOTYPE_APP
 	if ( !r_DrawParticles.GetInt() )
 		return 0;
@@ -1801,7 +1799,6 @@ void CParticleMgr::UpdateNewEffects( float flTimeDelta )
 // 	g_bDontMakeSkipToTimeTakeForever = true;
 // #endif
 	flTimeDelta *= r_particle_timescale.GetFloat();
-	VPROF_BUDGET( "CParticleMSG::UpdateNewEffects", "Particle Simulation" );
 
 	g_pParticleSystemMgr->SetLastSimulationTime( gpGlobals->curtime );
 

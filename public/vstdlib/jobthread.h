@@ -33,7 +33,6 @@
 #include "tier1/utllinkedlist.h"
 #include "tier1/utlvector.h"
 #include "tier1/functors.h"
-#include "tier0/vprof_telemetry.h"
 
 #include "vstdlib/vstdlib.h"
 

@@ -16,7 +16,6 @@
 #include "particles_ez.h"
 #include "c_impact_effects.h"
 #include "engine/IStaticPropMgr.h"
-#include "tier0/vprof.h"
 #include "c_te_effect_dispatch.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -235,7 +234,6 @@ static void CreateFleckParticles( const Vector& origin, const Vector &color, tra
 //-----------------------------------------------------------------------------
 void FX_DebrisFlecks( const Vector& origin, trace_t *tr, char materialType, int iScale, bool bNoFlecks )
 {
-	VPROF_BUDGET( "FX_DebrisFlecks", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
 
 	if ( !fx_drawimpactdebris.GetBool() )
 		return;
@@ -478,7 +476,6 @@ void FX_DebrisFlecks( const Vector& origin, trace_t *tr, char materialType, int 
 //-----------------------------------------------------------------------------
 void FX_GlassImpact( const Vector &pos, const Vector &normal )
 {
-	VPROF_BUDGET( "FX_GlassImpact", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
 	CSmartPtr<CSimple3DEmitter> pGlassEmitter = CSimple3DEmitter::Create( "FX_GlassImpact" );
 	pGlassEmitter->SetSortOrigin( pos );
 
@@ -624,7 +621,6 @@ void FX_AntlionImpact( const Vector &pos, trace_t *trace )
 	return;
 #endif // _X360
 
-	VPROF_BUDGET( "FX_AntlionImpact", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
 
 	CSmartPtr<CSimple3DEmitter> fleckEmitter = CSimple3DEmitter::Create( "FX_DebrisFlecks" );
 	if ( fleckEmitter == NULL )
@@ -766,7 +762,6 @@ void FX_AntlionImpact( const Vector &pos, trace_t *trace )
 #endif
 void FX_BugBlood( Vector &pos, Vector &dir, Vector &vWorldMins, Vector &vWorldMaxs )
 {
-	VPROF_BUDGET( "FX_BugBlood", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
 
 	CSmartPtr<CSimpleEmitter> pSimple = CSimpleEmitter::Create( "FX_BugBlood" );
 	if ( !pSimple )
@@ -879,7 +874,6 @@ void FX_BugBlood( Vector &pos, Vector &dir, Vector &vWorldMins, Vector &vWorldMa
 //-----------------------------------------------------------------------------
 void FX_Blood( Vector &pos, Vector &dir, float r, float g, float b, float a )
 {
-	VPROF_BUDGET( "FX_Blood", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
 
 	// Cloud
 	CSmartPtr<CSimpleEmitter> pSimple = CSimpleEmitter::Create( "FX_Blood" );
@@ -968,7 +962,6 @@ void FX_DustImpact( const Vector &origin, trace_t *tr, int iScale )
 	// XBox version
 	//
 
-	VPROF_BUDGET( "FX_DustImpact", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
 	Vector	offset;
 	float	spread = 0.2f;
 
@@ -1078,7 +1071,6 @@ void FX_DustImpact( const Vector &origin, trace_t *tr, float flScale )
 	// PC version
 	//
 
-	VPROF_BUDGET( "FX_DustImpact", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
 	Vector	offset;
 	float	spread = 0.2f;
 	

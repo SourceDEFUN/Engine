@@ -8,7 +8,6 @@
 #include "Sprite.h"
 #include "model_types.h"
 #include "engine/ivmodelinfo.h"
-#include "tier0/vprof.h"
 #include "engine/ivdebugoverlay.h"
 
 #if defined( CLIENT_DLL )
@@ -749,7 +748,6 @@ extern ConVar r_drawviewmodel;
 //-----------------------------------------------------------------------------
 int CSprite::DrawModel( int flags )
 {
-	VPROF_BUDGET( "CSprite::DrawModel", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
 	//See if we should draw
 	if ( !IsVisible() || ( m_bReadyToDraw == false ) )
 		return 0;

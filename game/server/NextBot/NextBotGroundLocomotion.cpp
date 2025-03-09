@@ -18,7 +18,6 @@
 #include "functorutils.h"
 #include "SharedFunctorUtils.h"
 
-#include "tier0/vprof.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -104,7 +103,6 @@ bool NextBotGroundLocomotion::TraverseLadder( void )
  */
 void NextBotGroundLocomotion::Update( void )
 {
-	VPROF_BUDGET( "NextBotGroundLocomotion::Update", "NextBot" );
 
 	BaseClass::Update();
 
@@ -330,7 +328,6 @@ void NextBotGroundLocomotion::Approach( const Vector &rawPos, float goalWeight )
 //----------------------------------------------------------------------------------------------------------
 void NextBotGroundLocomotion::ApplyAccumulatedApproach( void )
 {
-	VPROF_BUDGET( "NextBotGroundLocomotion::ApplyAccumulatedApproach", "NextBot" );
 
 	Vector rawPos = GetFeet();
 
@@ -549,7 +546,6 @@ bool NextBotGroundLocomotion::DetectCollision( trace_t *pTrace, int &recursionLi
 //----------------------------------------------------------------------------------------------------------
 Vector NextBotGroundLocomotion::ResolveCollision( const Vector &from, const Vector &to, int recursionLimit )
 {
-	VPROF_BUDGET( "NextBotGroundLocomotion::ResolveCollision", "NextBotExpensive" );
 
 	IBody *body = GetBot()->GetBodyInterface();
 	if ( body == NULL || recursionLimit < 0 )
@@ -846,7 +842,6 @@ Vector NextBotGroundLocomotion::ResolveZombieCollisions( const Vector &pos )
 	// only avoid if we're actually trying to move somewhere, and are enraged
 	if ( me != NULL && !IsUsingLadder() && !IsClimbingOrJumping() && IsOnGround() && m_nextBot->IsAlive() && IsAttemptingToMove() /*&& GetBot()->GetBodyInterface()->IsArousal( IBody::INTENSE )*/ )
 	{
-		VPROF_BUDGET( "NextBotGroundLocomotion::ResolveZombieCollisions", "NextBot" );
 
 		const CUtlVector< CHandle< Infected > > &neighbors = me->GetNeighbors();
 		Vector avoid = vec3_origin;
@@ -895,7 +890,6 @@ Vector NextBotGroundLocomotion::ResolveZombieCollisions( const Vector &pos )
  */
 void NextBotGroundLocomotion::UpdatePosition( const Vector &newPos )
 {
-	VPROF_BUDGET( "NextBotGroundLocomotion::UpdatePosition", "NextBot" );
 
 	if ( NextBotStop.GetBool() || (m_nextBot->GetFlags() & FL_FROZEN) != 0 || newPos == m_nextBot->GetPosition() )
 	{
@@ -924,7 +918,6 @@ void NextBotGroundLocomotion::UpdatePosition( const Vector &newPos )
  */
 void NextBotGroundLocomotion::UpdateGroundConstraint( void )
 {
-	VPROF_BUDGET( "NextBotGroundLocomotion::UpdateGroundConstraint", "NextBotExpensive" );
 
 	// if we're up on the upward arc of our jump, don't interfere by snapping to ground
 	// don't do ground constraint if we're climbing a ladder

@@ -18,7 +18,6 @@
 #include "tier1/KeyValues.h"
 #include "view_scene.h"
 #include "viewrender.h"
-#include "vprof.h"
 
 CLIENTEFFECT_REGISTER_BEGIN( PrecachePortalDrawingMaterials )
 CLIENTEFFECT_MATERIAL( "shadertest/wireframe" )

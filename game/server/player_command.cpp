@@ -13,7 +13,6 @@
 #include "player_command.h"
 #include "movehelper_server.h"
 #include "iservervehicle.h"
-#include "tier0/vprof.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -242,19 +241,12 @@ void CPlayerMove::RunPreThink( CBasePlayer *player )
 {
 
 	// Run think functions on the player
-	VPROF_SCOPE_BEGIN( "player->PhysicsRunThink()" );
 	if ( !player->PhysicsRunThink() )
 		return;
-	VPROF_SCOPE_END();
 
-	VPROF_SCOPE_BEGIN( "g_pGameRules->PlayerThink( player )" );
 	// Called every frame to let game rules do any specific think logic for the player
 	g_pGameRules->PlayerThink( player );
-	VPROF_SCOPE_END();
-
-	VPROF_SCOPE_BEGIN( "player->PreThink()" );
 	player->PreThink();
-	VPROF_SCOPE_END();
 }
 
 //-----------------------------------------------------------------------------
@@ -390,9 +382,7 @@ void CPlayerMove::RunCommand ( CBasePlayer *player, CUserCmd *ucmd, IMoveHelper 
 	}
 
 	// Update player input button states
-	VPROF_SCOPE_BEGIN( "player->UpdateButtonState" );
 	player->UpdateButtonState( ucmd->buttons );
-	VPROF_SCOPE_END();
 
 	CheckMovingGround( player, TICK_INTERVAL );
 
@@ -432,9 +422,7 @@ void CPlayerMove::RunCommand ( CBasePlayer *player, CUserCmd *ucmd, IMoveHelper 
 	FinishMove( player, ucmd, g_pMoveData );
 
 	// Let server invoke any needed impact functions
-	VPROF_SCOPE_BEGIN( "moveHelper->ProcessImpacts" );
 	moveHelper->ProcessImpacts();
-	VPROF_SCOPE_END();
 
 	RunPostThink( player );
 

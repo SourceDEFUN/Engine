@@ -23,7 +23,6 @@
 #endif
 #include "tier1/convar.h"
 #include "tier0/vcrmode.h"
-#include "tier0/vprof.h"
 #include "tier1/fmtstr.h"
 #include "tier1/utlrbtree.h"
 #include "vstdlib/osversion.h"

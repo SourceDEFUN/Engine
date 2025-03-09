@@ -14,7 +14,6 @@
 #include "NextBotBodyInterface.h"
 #include "NextBotUtil.h"
 
-#include "tier0/vprof.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -42,7 +41,6 @@ Path::Path( void )
  */
 bool Path::ComputePathDetails( INextBot *bot, const Vector &start )
 {
-	VPROF_BUDGET( "Path::ComputePathDetails", "NextBot" );
 
 	if (m_segmentCount == 0)
 		return false;
@@ -620,7 +618,6 @@ void Path::Optimize( INextBot *bot )
 	// this is SUPER expensive - especially the IsGap() check
 	return;
 
-	VPROF_BUDGET( "Path::Optimize", "NextBot" );
 
 	if (m_segmentCount < 3)
 		return;
@@ -657,7 +654,6 @@ void Path::Optimize( INextBot *bot )
  */
 void Path::PostProcess( void )
 {
-	VPROF_BUDGET( "Path::PostProcess", "NextBot" );
 
 	m_ageTimer.Start();
 
@@ -843,7 +839,6 @@ const Vector &Path::GetClosestPosition( const Vector &pos, const Segment *start,
  */
 void Path::Copy( INextBot *bot, const Path &path )
 {
-	VPROF_BUDGET( "Path::Copy", "NextBot" );
 
 	Invalidate();
 	

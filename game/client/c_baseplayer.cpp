@@ -24,7 +24,6 @@
 #include "view_shared.h"
 #include "movevars_shared.h"
 #include "prediction.h"
-#include "tier0/vprof.h"
 #include "filesystem.h"
 #include "bitbuf.h"
 #include "KeyValues.h"
@@ -2057,7 +2056,6 @@ void C_BasePlayer::GetToolRecordingState( KeyValues *msg )
 	if ( !ToolsEnabled() )
 		return;
 
-	VPROF_BUDGET( "C_BasePlayer::GetToolRecordingState", VPROF_BUDGETGROUP_TOOLS );
 
 	BaseClass::GetToolRecordingState( msg );
 

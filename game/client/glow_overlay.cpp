@@ -14,7 +14,6 @@
 #include "glow_overlay.h"
 #include "utllinkedlist.h"
 #include "view_shared.h"
-#include "tier0/vprof.h"
 #include "materialsystem/imaterialvar.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

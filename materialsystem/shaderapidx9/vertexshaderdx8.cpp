@@ -33,7 +33,6 @@ typedef int SOCKET;
 #include "locald3dtypes.h"
 #include "shaderapidx8_global.h"
 #include "recording.h"
-#include "tier0/vprof.h"
 #include "materialsystem/imaterialsystem.h"
 #include "materialsystem/imaterialsystemhardwareconfig.h"
 #include "KeyValues.h"
@@ -205,9 +204,6 @@ static void RegisterVS( const void* pShaderBits, int nShaderSize, IDirect3DVerte
 	{
 		int nMemUsed = 23 * 1024;
 		s_UniqueVS.Insert( crc, 1 );
-		VPROF_INCREMENT_GROUP_COUNTER( "unique vs count", COUNTER_GROUP_NO_RESET, 1 );
-		VPROF_INCREMENT_GROUP_COUNTER( "vs driver mem", COUNTER_GROUP_NO_RESET, nMemUsed );
-		VPROF_INCREMENT_GROUP_COUNTER( "total driver mem", COUNTER_GROUP_NO_RESET, nMemUsed );
 	}
 #endif
 }
@@ -231,9 +227,6 @@ static void RegisterPS( const void* pShaderBits, int nShaderSize, IDirect3DPixel
 	{
 		int nMemUsed = 400;
 		s_UniquePS.Insert( crc, 1 );
-		VPROF_INCREMENT_GROUP_COUNTER( "unique ps count", COUNTER_GROUP_NO_RESET, 1 );
-		VPROF_INCREMENT_GROUP_COUNTER( "ps driver mem", COUNTER_GROUP_NO_RESET, nMemUsed );
-		VPROF_INCREMENT_GROUP_COUNTER( "total driver mem", COUNTER_GROUP_NO_RESET, nMemUsed );
 	}
 #endif
 }
@@ -254,9 +247,6 @@ static void UnregisterVS( IDirect3DVertexShader9* pShader )
 		if ( --s_UniqueVS[nIndex] <= 0 )
 		{
 			int nMemUsed = 23 * 1024;
-			VPROF_INCREMENT_GROUP_COUNTER( "unique vs count", COUNTER_GROUP_NO_RESET, -1 );
-			VPROF_INCREMENT_GROUP_COUNTER( "vs driver mem", COUNTER_GROUP_NO_RESET, -nMemUsed );
-			VPROF_INCREMENT_GROUP_COUNTER( "total driver mem", COUNTER_GROUP_NO_RESET, -nMemUsed );
 			s_UniqueVS.Remove( nIndex );
 		}
 	}
@@ -279,9 +269,6 @@ static void UnregisterPS( IDirect3DPixelShader9* pShader )
 		if ( --s_UniquePS[nIndex] <= 0 )
 		{
 			int nMemUsed = 400;
-			VPROF_INCREMENT_GROUP_COUNTER( "unique ps count", COUNTER_GROUP_NO_RESET, -1 );
-			VPROF_INCREMENT_GROUP_COUNTER( "ps driver mem", COUNTER_GROUP_NO_RESET, -nMemUsed );
-			VPROF_INCREMENT_GROUP_COUNTER( "total driver mem", COUNTER_GROUP_NO_RESET, -nMemUsed );
 			s_UniquePS.Remove( nIndex );
 		}
 	}
@@ -1588,7 +1575,6 @@ static ConVar mat_flushshaders_generate_updbs( "mat_flushshaders_generate_updbs"
 HardwareShader_t CShaderManager::CompileShader( const char *pShaderName, 
 												int nStaticIndex, int nDynamicIndex, bool bVertexShader )
 {
-	VPROF_BUDGET( "CompileShader", "CompileShader" );
 	Assert( m_ShaderNameToCombos.Defined( pShaderName ) );
 	if( !m_ShaderNameToCombos.Defined( pShaderName ) )
 	{

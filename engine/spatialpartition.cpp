@@ -21,7 +21,6 @@
 #include "sys_dll.h"
 #include "collisionutils.h"
 #include "debugoverlay.h"
-#include "tier0/vprof.h"
 #include "tier1/utlbuffer.h"
 #include "filesystem_engine.h"
 #include "filesystem.h"

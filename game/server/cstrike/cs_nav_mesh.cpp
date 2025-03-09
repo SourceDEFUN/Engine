@@ -16,7 +16,6 @@
 #include "cs_nav_area.h"
 #include "fmtstr.h"
 #include "utlbuffer.h"
-#include "tier0/vprof.h"
 
 //--------------------------------------------------------------------------------------------------------------
 CSNavMesh::CSNavMesh( void )

@@ -10,7 +10,6 @@
 #include "mempool.h"
 #include "movevars_shared.h"
 #include "utlrbtree.h"
-#include "tier0/vprof.h"
 #include "entitydatainstantiator.h"
 #include "positionwatcher.h"
 #include "movetype_push.h"
@@ -1731,8 +1730,6 @@ void CBaseEntity::PhysicsRigidChild( void )
 	if ( !PhysicsRunThink() )
 		return;
 
-	VPROF_SCOPE_BEGIN("CBaseEntity::PhysicsRigidChild-2");
-
 #if !defined( CLIENT_DLL )
 	// Cause touch functions to be called
 	PhysicsTouchTriggers( &vecPrevOrigin );
@@ -1745,8 +1742,6 @@ void CBaseEntity::PhysicsRigidChild( void )
 		VPhysicsGetObject()->UpdateShadow( GetAbsOrigin(), bAxisAligned ? vec3_angle : GetAbsAngles(), true, gpGlobals->frametime );
 	}
 #endif
-
-	VPROF_SCOPE_END();
 }
 
 

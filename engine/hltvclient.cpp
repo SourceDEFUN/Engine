@@ -6,7 +6,6 @@
 //
 //===========================================================================//
 
-#include <tier0/vprof.h>
 #include "hltvclient.h"
 #include "netmessages.h"
 #include "hltvserver.h"
@@ -423,7 +422,6 @@ void CHLTVClient::UpdateUserSettings()
 
 void CHLTVClient::SendSnapshot( CClientFrame * pFrame )
 {
-	VPROF_BUDGET( "CHLTVClient::SendSnapshot", "HLTV" );
 
 	ALIGN4 byte		buf[NET_MAX_PAYLOAD] ALIGN4_POST;
 	bf_write	msg( "CHLTVClient::SendSnapshot", buf, sizeof(buf) );

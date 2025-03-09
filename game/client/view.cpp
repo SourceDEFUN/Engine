@@ -16,7 +16,6 @@
 #include "viewrender.h"
 #include "c_te_legacytempents.h"
 #include "cl_mat_stub.h"
-#include "tier0/vprof.h"
 #include "iclientvehicle.h"
 #include "engine/IEngineTrace.h"
 #include "mathlib/vmatrix.h"
@@ -514,7 +513,6 @@ StereoEye_t		CViewRender::GetLastEye() const
 // simulation so entities can access attachment points on view models during simulation.
 void CViewRender::OnRenderStart()
 {
-	VPROF_("CViewRender::OnRenderStart", 2, VPROF_BUDGETGROUP_OTHER_UNACCOUNTED, false, 0);
 
     SetUpViews();
 

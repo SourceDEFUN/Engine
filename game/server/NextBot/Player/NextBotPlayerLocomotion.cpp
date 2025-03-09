@@ -443,7 +443,6 @@ void PlayerLocomotion::AdjustPosture( const Vector &moveGoal )
  */
 void PlayerLocomotion::Approach( const Vector &pos, float goalWeight )
 {
-	VPROF_BUDGET( "PlayerLocomotion::Approach", "NextBot" );
 
 	BaseClass::Approach( pos );
 

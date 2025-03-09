@@ -6,7 +6,6 @@
 //=============================================================================//
 #include "cbase.h"
 
-#include "tier0/vprof.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -265,7 +264,6 @@ void CClientThinkList::AddEntityToFrameThinkList( ThinkEntry_t *pEntry, bool bAl
 //-----------------------------------------------------------------------------
 void CClientThinkList::PerformThinkFunctions()
 {
-	VPROF_("Client Thinks", 1, VPROF_BUDGETGROUP_CLIENT_SIM, false, BUDGETFLAG_CLIENT);
 
 	int nMaxList = m_ThinkEntries.Count();
 	if ( nMaxList == 0 )

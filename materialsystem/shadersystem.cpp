@@ -23,7 +23,6 @@
 #include "tier1/convar.h"
 #include "tier1/KeyValues.h"
 #include "shader_dll_verify.h"
-#include "tier0/vprof.h"
 
 // NOTE: This must be the last file included!
 #include "tier0/memdbgon.h"

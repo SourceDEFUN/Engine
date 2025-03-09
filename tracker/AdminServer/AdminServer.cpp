@@ -9,7 +9,6 @@
 #include "IRunGameEngine.h"
 #include "IGameServerData.h"
 #include "GamePanelInfo.h"
-#include "ivprofexport.h"
 
 #include <vgui/ISystem.h>
 #include <vgui/IPanel.h>
@@ -24,7 +23,6 @@ EXPOSE_SINGLE_INTERFACE_GLOBALVAR(CAdminServer, IAdminServer, ADMINSERVER_INTERF
 EXPOSE_SINGLE_INTERFACE_GLOBALVAR(CAdminServer, IVGuiModule, "VGuiModuleAdminServer001", g_AdminServerSingleton);
 
 IGameServerData *g_pGameServerData = NULL;
-IVProfExport *g_pVProfExport = NULL;
 
 //-----------------------------------------------------------------------------
 // Purpose: Constructor
@@ -61,10 +59,6 @@ bool CAdminServer::Initialize(CreateInterfaceFn *factorylist, int factoryCount)
 		if (!g_pGameServerData)
 		{
 			g_pGameServerData = (IGameServerData *)(factorylist[i])(GAMESERVERDATA_INTERFACE_VERSION, NULL);
-		}
-		if ( !g_pVProfExport )
-		{
-			g_pVProfExport = (IVProfExport*)(factorylist[i])( VPROF_EXPORT_INTERFACE_VERSION, NULL );
 		}
 	}
 

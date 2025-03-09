@@ -19,7 +19,6 @@
 #include <vgui_controls/ListViewPanel.h>
 #include <vgui_controls/TreeViewListControl.h>
 #include <vgui/ISystem.h>
-#include "tier0/vprof.h"
 #include "KeyValues.h"
 #include "vgui_helpers.h"
 #include "utlsymbol.h"

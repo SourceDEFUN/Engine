@@ -33,7 +33,6 @@ int g_nMaxLogLevel = 4;
 //-----------------------------------------------------------------------------
 void EmitBaseMessageV( const char *pchGroupName, SpewType_t spewType, int iSpewLevel, int iLevelLog, const char *pchMsg, va_list vaArgs )
 {
-	VPROF_BUDGET( "GCHost", VPROF_BUDGETGROUP_STEAM );
 
 	char pchBuf[ MAX_LOGGING_MESSAGE_LENGTH ];
 	Q_vsnprintf( pchBuf, MAX_LOGGING_MESSAGE_LENGTH, pchMsg, vaArgs );
@@ -56,7 +55,6 @@ void EmitBaseMessageV( const char *pchGroupName, SpewType_t spewType, int iSpewL
 //	}
 
 	{
-		VPROF_BUDGET( "GCHost - EmitMessage", VPROF_BUDGETGROUP_STEAM );
 		// !FIXME! DOTAMERGE
 		//GGCInterface()->EmitSpew( pchGroupName, spewType, iSpewLevel, iLevelLog, pchBuf );
 		GGCHost()->EmitMessage( pchGroupName, spewType, iSpewLevel, iLevelLog, pchBuf );

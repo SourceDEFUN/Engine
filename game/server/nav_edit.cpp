@@ -15,7 +15,6 @@
 #include "nav_node.h"
 #include "nav_colors.h"
 #include "Color.h"
-#include "tier0/vprof.h"
 #include "collisionutils.h"
 #include "world.h"
 #include "functorutils.h"

@@ -11,7 +11,6 @@
 
 #include "platform.h"
 #include "basetypes.h"
-#include "tier0/vprof.h"
 #include "tier0/icommandline.h"
 #include "tier1/tier1.h"
 #include "tier1/utlbuffer.h"

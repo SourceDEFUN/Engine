@@ -23,7 +23,6 @@
 #include "materialsystem/imaterialsystemhardwareconfig.h"
 #include "istudiorender.h"
 #include "staticpropmgr.h"
-#include "tier0/vprof.h"
 #include "IOcclusionSystem.h"
 #include "con_nprint.h"
 #include "debugoverlay.h"
@@ -819,7 +818,6 @@ void CRender::EndUpdateLightmaps( void )
 	Assert( m_iLightmapUpdateDepth > 0 );
 	if ( --m_iLightmapUpdateDepth == 0 )
 	{
-		VPROF_BUDGET( "EndUpdateLightmaps", VPROF_BUDGETGROUP_DLIGHT_RENDERING );
 		if ( g_LightmapUpdateList.Count() && r_dynamiclighting.GetBool() && !r_unloadlightmaps.GetBool() )
 		{
 			CMatRenderContextPtr pRenderContext( materials );

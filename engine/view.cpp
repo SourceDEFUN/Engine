@@ -20,7 +20,6 @@
 #include "demo.h"
 #include "istudiorender.h"
 #include "materialsystem/imesh.h"
-#include "tier0/vprof.h"
 #include "host.h"
 #include "view.h"
 #include "client.h"
@@ -461,7 +460,6 @@ public:
 
 	void ViewDrawFade( byte *color, IMaterial* pFadeMaterial )
 	{
-		VPROF_BUDGET( "ViewDrawFade", VPROF_BUDGETGROUP_WORLD_RENDERING );
 		g_EngineRenderer->ViewDrawFade( color, pFadeMaterial );
 	}
 

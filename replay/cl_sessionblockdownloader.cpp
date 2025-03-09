@@ -10,7 +10,6 @@
 #include "cl_recordingsessionblock.h"
 #include "errorsystem.h"
 #include "convar.h"
-#include "vprof.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -72,7 +71,6 @@ float CSessionBlockDownloader::GetNextThinkTime() const
 
 void CSessionBlockDownloader::Think()
 {
-	VPROF_BUDGET( "CSessionBlockDownloader::Think", VPROF_BUDGETGROUP_REPLAY );
 
 	CBaseThinker::Think();
 

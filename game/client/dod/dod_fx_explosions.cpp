@@ -10,7 +10,6 @@
 #include "dod_shareddefs.h"
 #include "engine/IEngineSound.h"
 #include "c_basetempentity.h"
-#include "tier0/vprof.h"
 #include "fx_explosion.h"
 
 //-----------------------------------------------------------------------------

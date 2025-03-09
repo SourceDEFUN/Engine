@@ -13,7 +13,6 @@
 #include "studiorendercontext.h"
 #include "materialsystem/imaterial.h"
 #include "materialsystem/imaterialvar.h"
-#include "tier0/vprof.h"
 #include "tier3/tier3.h"
 #include "datacache/imdlcache.h"
 

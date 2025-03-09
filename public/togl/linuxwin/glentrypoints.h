@@ -34,7 +34,6 @@
 #ifdef DX_TO_GL_ABSTRACTION
 
 #include "tier0/platform.h"
-#include "tier0/vprof_telemetry.h"
 #include "interface.h"
 #include "togl/rendermechanism.h"
 

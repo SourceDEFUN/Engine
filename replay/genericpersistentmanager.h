@@ -23,7 +23,6 @@
 #include "replay/ireplaycontext.h"
 #include "replay/shared_defs.h"
 #include "replay_dbg.h"
-#include "vprof.h"
 #include "fmtstr.h"
 #include "UtlSortVector.h"
 
@@ -521,7 +520,6 @@ float CGenericPersistentManager< T >::GetNextThinkTime() const
 template< class T >
 void CGenericPersistentManager< T >::Think()
 {
-	VPROF_BUDGET( "CGenericPersistentManager::Think", VPROF_BUDGETGROUP_REPLAY );
 
 	CBaseThinker::Think();
 

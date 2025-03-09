@@ -641,7 +641,6 @@ void CHL2_Player::PreThink(void)
 		}
 	}
 
-	VPROF_SCOPE_BEGIN( "CHL2_Player::PreThink-Speed" );
 	HandleSpeedChanges();
 #ifdef HL2_EPISODIC
 	HandleArmorReduction();
@@ -677,18 +676,12 @@ void CHL2_Player::PreThink(void)
 		}
 	}
 
-	VPROF_SCOPE_END();
 
 	if ( g_fGameOver || IsPlayerLockedInPlace() )
 		return;         // finale
 
-	VPROF_SCOPE_BEGIN( "CHL2_Player::PreThink-ItemPreFrame" );
-	ItemPreFrame( );
-	VPROF_SCOPE_END();
-
-	VPROF_SCOPE_BEGIN( "CHL2_Player::PreThink-WaterMove" );
+	ItemPreFrame();
 	WaterMove();
-	VPROF_SCOPE_END();
 
 	if ( g_pGameRules && g_pGameRules->FAllowFlashlight() )
 		m_Local.m_iHideHUD &= ~HIDEHUD_FLASHLIGHT;
@@ -696,31 +689,14 @@ void CHL2_Player::PreThink(void)
 		m_Local.m_iHideHUD |= HIDEHUD_FLASHLIGHT;
 
 	
-	VPROF_SCOPE_BEGIN( "CHL2_Player::PreThink-CommanderUpdate" );
 	CommanderUpdate();
-	VPROF_SCOPE_END();
-
 	// Operate suit accessories and manage power consumption/charge
-	VPROF_SCOPE_BEGIN( "CHL2_Player::PreThink-SuitPower_Update" );
 	SuitPower_Update();
-	VPROF_SCOPE_END();
-
 	// checks if new client data (for HUD and view control) needs to be sent to the client
-	VPROF_SCOPE_BEGIN( "CHL2_Player::PreThink-UpdateClientData" );
 	UpdateClientData();
-	VPROF_SCOPE_END();
-	
-	VPROF_SCOPE_BEGIN( "CHL2_Player::PreThink-CheckTimeBasedDamage" );
 	CheckTimeBasedDamage();
-	VPROF_SCOPE_END();
-
-	VPROF_SCOPE_BEGIN( "CHL2_Player::PreThink-CheckSuitUpdate" );
 	CheckSuitUpdate();
-	VPROF_SCOPE_END();
-
-	VPROF_SCOPE_BEGIN( "CHL2_Player::PreThink-CheckSuitZoom" );
 	CheckSuitZoom();
-	VPROF_SCOPE_END();
 
 	if (m_lifeState >= LIFE_DYING)
 	{

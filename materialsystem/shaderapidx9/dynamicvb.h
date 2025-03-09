@@ -105,13 +105,6 @@ public:
 
 	void HandlePerFrameTextureStats( int frame )
 	{
-#ifdef VPROF_ENABLED
-		if ( m_Frame != frame && !m_bDynamic )
-		{
-			m_Frame = frame;
-			m_pFrameCounter += m_nBufferSize;
-		}
-#endif
 	}
 	
 	// Do we have enough room without discarding?
@@ -254,12 +247,6 @@ private:
 	unsigned char	m_bSoftwareVertexProcessing : 1;
 	unsigned char	m_bLateCreateShouldDiscard : 1;
 
-#ifdef VPROF_ENABLED
-	int				m_Frame;
-	int				*m_pFrameCounter;
-	int				*m_pGlobalCounter;
-#endif
-
 #ifdef _DEBUG
 	static int		s_BufferCount;
 #endif
@@ -268,12 +255,6 @@ private:
 	unsigned int	m_UID;
 #endif
 };
-
-#if defined( _X360 )
-#include "utlmap.h"
-MEMALLOC_DECLARE_EXTERNAL_TRACKING( XMem_CVertexBuffer );
-#endif
-
 //-----------------------------------------------------------------------------
 // constructor, destructor
 //-----------------------------------------------------------------------------
@@ -293,14 +274,6 @@ inline CVertexBuffer::CVertexBuffer(IDirect3DDevice9 * pD3D, VertexFormat_t fmt,
 		m_bDynamic(dynamic),
 		m_VertexBufferFormat( fmt ),
 		m_bLateCreateShouldDiscard( false )
-#ifdef _X360
-		,m_pAllocatedMemory(NULL)
-		,m_iNextBlockingPosition(0)
-		,m_iAllocationSize(0)
-#endif
-#ifdef VPROF_ENABLED
-		,m_Frame( -1 )
-#endif
 {
 	MEM_ALLOC_CREDIT_( pTextureBudgetName );
 
@@ -314,24 +287,6 @@ inline CVertexBuffer::CVertexBuffer(IDirect3DDevice9 * pD3D, VertexFormat_t fmt,
 	++s_BufferCount;
 #endif
 
-#ifdef VPROF_ENABLED
-	if ( !m_bDynamic )
-	{
-		char name[256];
-		V_strcpy_safe( name, "TexGroup_global_" );
-		V_strcat_safe( name, pTextureBudgetName, sizeof(name) );
-		m_pGlobalCounter = g_VProfCurrentProfile.FindOrCreateCounter( name, COUNTER_GROUP_TEXTURE_GLOBAL );
-
-		V_strcpy_safe( name, "TexGroup_frame_" );
-		V_strcat_safe( name, pTextureBudgetName, sizeof(name) );
-		m_pFrameCounter = g_VProfCurrentProfile.FindOrCreateCounter( name, COUNTER_GROUP_TEXTURE_PER_FRAME );
-	}
-	else
-	{
-		m_pGlobalCounter = g_VProfCurrentProfile.FindOrCreateCounter( "TexGroup_global_" TEXTURE_GROUP_DYNAMIC_VERTEX_BUFFER, COUNTER_GROUP_TEXTURE_GLOBAL );
-	}
-#endif
-
 	if ( !g_pShaderUtil->IsRenderThreadSafe() )
 	{
 		m_pSysmemBuffer = ( byte * )MemAlloc_AllocAligned( m_nBufferSize, 16 );
@@ -342,14 +297,6 @@ inline CVertexBuffer::CVertexBuffer(IDirect3DDevice9 * pD3D, VertexFormat_t fmt,
 		m_pSysmemBuffer = NULL;
 		Create( pD3D );
 	}
-
-#ifdef VPROF_ENABLED
-	if ( IsX360() || !m_bDynamic )
-	{
-		Assert( m_pGlobalCounter );
-		*m_pGlobalCounter += m_nBufferSize;
-	}
-#endif
 }
 
 
@@ -463,101 +410,25 @@ void CVertexBuffer::Create( IDirect3DDevice9 *pD3D )
 
 #ifdef MEASURE_DRIVER_ALLOCATIONS
 	int nMemUsed = 1024;
-	VPROF_INCREMENT_GROUP_COUNTER( "vb count", COUNTER_GROUP_NO_RESET, 1 );
-	VPROF_INCREMENT_GROUP_COUNTER( "vb driver mem", COUNTER_GROUP_NO_RESET, nMemUsed );
-	VPROF_INCREMENT_GROUP_COUNTER( "total driver mem", COUNTER_GROUP_NO_RESET, nMemUsed );
 #endif
 
 	// Track VB allocations
-#if !defined( _X360 )
+
 	g_VBAllocTracker->CountVB( m_pVB, m_bDynamic, m_nBufferSize, m_VertexSize, m_VertexBufferFormat );
-#else
-	g_VBAllocTracker->CountVB( this, m_bDynamic, m_iAllocationSize, m_VertexSize, m_VertexBufferFormat );
-#endif
 }
-
-
-#ifdef _X360
-void *AllocateTempBuffer( size_t nSizeInBytes );
-
-//-----------------------------------------------------------------------------
-// This variant is for when we already have the data in physical memory
-//-----------------------------------------------------------------------------
-inline CVertexBuffer::CVertexBuffer( ) :
-	m_pVB( 0 ), 
-	m_Position( 0 ),
-	m_VertexSize( 0 ), 
-	m_VertexCount( 0 ),
-	m_bFlush( false ),
-	m_bLocked( false ), 
-	m_bExternalMemory( true ),
-	m_nBufferSize( 0 ), 
-	m_bDynamic( false )
-#ifdef VPROF_ENABLED
-	,m_Frame( -1 )
-#endif
-{
-	m_iAllocationSize = 0;
-	m_pAllocatedMemory = 0;
-	m_iNextBlockingPosition = 0;
-}
-
-#include "tier0/memdbgoff.h"
-
-inline void CVertexBuffer::Init( IDirect3DDevice9 *pD3D, VertexFormat_t fmt, DWORD theFVF, uint8 *pVertexData, int vertexSize, int vertexCount )
-{
-	m_nBufferSize = vertexSize * vertexCount;
-	m_Position = m_Position;
-	m_VertexSize = vertexSize;
-	m_VertexCount = vertexCount;
-	m_iAllocationSize = m_nBufferSize;
-	m_pAllocatedMemory = pVertexData;
-	m_iNextBlockingPosition = m_iAllocationSize;
-
-	m_pVB = new( AllocateTempBuffer( sizeof( IDirect3DVertexBuffer9 ) ) ) IDirect3DVertexBuffer9;
-	XGSetVertexBufferHeader( m_nBufferSize, 0, 0, 0, m_pVB );
-	XGOffsetResourceAddress( m_pVB, pVertexData );
-}
-
-#include "tier0/memdbgon.h"
-
-#endif // _X360
 
 inline CVertexBuffer::~CVertexBuffer()
 {
 	// Track VB allocations (even if pooled)
-#if !defined( _X360 )
 	if ( m_pVB != NULL )
 	{
 		g_VBAllocTracker->UnCountVB( m_pVB );
 	}
-#else
-	if ( m_pVB && m_pVB->IsSet( Dx9Device() ) )
-	{
-		Unbind( m_pVB );
-	}
-
-	if ( !m_bExternalMemory )
-	{
-		g_VBAllocTracker->UnCountVB( this );
-	}
-#endif
 
 	if ( !m_bExternalMemory )
 	{
 #ifdef MEASURE_DRIVER_ALLOCATIONS
 		int nMemUsed = 1024;
-		VPROF_INCREMENT_GROUP_COUNTER( "vb count", COUNTER_GROUP_NO_RESET, -1 );
-		VPROF_INCREMENT_GROUP_COUNTER( "vb driver mem", COUNTER_GROUP_NO_RESET, -nMemUsed );
-		VPROF_INCREMENT_GROUP_COUNTER( "total driver mem", COUNTER_GROUP_NO_RESET, -nMemUsed );
-#endif
-
-#ifdef VPROF_ENABLED
-		if ( IsX360() || !m_bDynamic )
-		{
-			Assert( m_pGlobalCounter );
-			*m_pGlobalCounter -= m_nBufferSize;
-		}
 #endif
 
 #ifdef _DEBUG

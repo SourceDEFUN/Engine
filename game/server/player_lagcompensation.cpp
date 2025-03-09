@@ -12,7 +12,6 @@
 #include "inetchannelinfo.h"
 #include "utllinkedlist.h"
 #include "BaseAnimatingOverlay.h"
-#include "tier0/vprof.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -127,7 +126,6 @@ static void RestorePlayerTo( CBasePlayer *pPlayer, const Vector &vWantedPos )
 {
 	// Try to move to the wanted position from our current position.
 	trace_t tr;
-	VPROF_BUDGET( "RestorePlayerTo", "CLagCompensationManager" );
 	UTIL_TraceEntity( pPlayer, vWantedPos, vWantedPos, MASK_PLAYERSOLID, pPlayer, COLLISION_GROUP_PLAYER_MOVEMENT, &tr );
 	if ( tr.startsolid || tr.allsolid )
 	{
@@ -235,7 +233,6 @@ void CLagCompensationManager::FrameUpdatePostEntityThink()
 	
 	m_flTeleportDistanceSqr = sv_lagcompensation_teleport_dist.GetFloat() * sv_lagcompensation_teleport_dist.GetFloat();
 
-	VPROF_BUDGET( "FrameUpdatePostEntityThink", "CLagCompensationManager" );
 
 	// remove all records before that time:
 	int flDeadtime = gpGlobals->curtime - sv_maxunlag.GetFloat();
@@ -346,7 +343,6 @@ void CLagCompensationManager::StartLagCompensation( CBasePlayer *player, CUserCm
 		return;
 
 	// NOTE: Put this here so that it won't show up in single player mode.
-	VPROF_BUDGET( "StartLagCompensation", VPROF_BUDGETGROUP_OTHER_NETWORKING );
 	Q_memset( m_RestoreData, 0, sizeof( m_RestoreData ) );
 	Q_memset( m_ChangeData, 0, sizeof( m_ChangeData ) );
 
@@ -418,7 +414,6 @@ void CLagCompensationManager::BacktrackPlayer( CBasePlayer *pPlayer, float flTar
 	Vector maxsPreScaled;
 	QAngle ang;
 
-	VPROF_BUDGET( "BacktrackPlayer", "CLagCompensationManager" );
 	int pl_index = pPlayer->entindex() - 1;
 
 	// get track history of this player
@@ -729,7 +724,6 @@ void CLagCompensationManager::BacktrackPlayer( CBasePlayer *pPlayer, float flTar
 
 void CLagCompensationManager::FinishLagCompensation( CBasePlayer *player )
 {
-	VPROF_BUDGET_FLAGS( "FinishLagCompensation", VPROF_BUDGETGROUP_OTHER_NETWORKING, BUDGETFLAG_CLIENT|BUDGETFLAG_SERVER );
 
 	m_pCurrentPlayer = NULL;
 

@@ -308,7 +308,6 @@ void CSessionBlockPublisher::Think()
 {
 	// NOTE: This member function gets called even if replay is disabled.  This is intentional.
 
-	VPROF_BUDGET( "CSessionBlockPublisher::Think", VPROF_BUDGETGROUP_REPLAY );
 
 	PublishThink();
 }

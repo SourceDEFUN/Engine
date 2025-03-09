@@ -23,7 +23,6 @@
 #include "phyfile.h"
 #include "vphysics_interface.h"
 #include "tier0/icommandline.h"
-#include "tier0/vprof.h"
 
 HDC		camdc;
 HGLRC	baseRC;
@@ -539,11 +538,6 @@ void Benchmark_PHY( const CPhysCollide *pCollide )
 	size[1].Init(16,16,16);
 	unsigned int dots = 0;
 
-#if VPROF_LEVEL > 0 
-	g_VProfCurrentProfile.Reset();
-	g_VProfCurrentProfile.ResetPeaks();
-	g_VProfCurrentProfile.Start();
-#endif
 	unsigned int hitCount = 0;
 	double startTime = Plat_FloatTime();
 	trace_t tr;
@@ -575,13 +569,6 @@ void Benchmark_PHY( const CPhysCollide *pCollide )
 	OutputDebugStr( str.Access() );
 	}
 
-#if VPROF_LEVEL > 0 
-	g_VProfCurrentProfile.MarkFrame();
-	g_VProfCurrentProfile.Stop();
-	g_VProfCurrentProfile.Reset();
-	g_VProfCurrentProfile.ResetPeaks();
-	g_VProfCurrentProfile.Start();
-#endif
 	hitCount = 0;
 	startTime = Plat_FloatTime();
 	for ( i = 0; i < NUM_COLLISION_TESTS; i++ )
@@ -598,17 +585,11 @@ void Benchmark_PHY( const CPhysCollide *pCollide )
 		{
 			g_Traces[i].hit = false;
 		}
-#if VPROF_LEVEL > 0 
-		g_VProfCurrentProfile.MarkFrame();
-#endif
 	}
 	double midTime = Plat_FloatTime();
 	for ( i = 0; i < NUM_COLLISION_TESTS; i++ )
 	{
 		physcollision->TraceBox( g_Traces[i].start, start, -size[1], size[1], pCollide, vec3_origin, vec3_angle, &tr );
-#if VPROF_LEVEL > 0 
-		g_VProfCurrentProfile.MarkFrame();
-#endif
 	}
 	double endTime = Plat_FloatTime();
 	duration = endTime - startTime;
@@ -630,10 +611,6 @@ void Benchmark_PHY( const CPhysCollide *pCollide )
 	CFmtStr str("%d ms total %d ms gjk %d mesh solve\n", msSupp, msGJK, msMesh );
 	OutputDebugStr( str.Access() );
 	}
-#if VPROF_LEVEL > 0 
-	g_VProfCurrentProfile.Stop();
-	g_VProfCurrentProfile.OutputReport( VPRT_FULL & ~VPRT_HIERARCHY, NULL );
-#endif
 
 	// draw the traces in yellow
 	glColor3f( 1.0f, 1.0f, 0.0f );

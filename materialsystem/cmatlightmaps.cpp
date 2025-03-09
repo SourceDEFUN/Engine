@@ -601,7 +601,6 @@ void CMatLightmaps::RestoreLightmapPages()
 //-----------------------------------------------------------------------------
 void CMatLightmaps::InitLightmapBits( int lightmap )
 {
-	VPROF_( "CMatLightmaps::InitLightmapBits", 1, VPROF_BUDGETGROUP_DLIGHT_RENDERING, false, 0 );
 	int width = GetLightmapWidth(lightmap);
 	int height = GetLightmapHeight(lightmap);
 
@@ -665,7 +664,6 @@ void CMatLightmaps::InitLightmapBits( int lightmap )
 bool CMatLightmaps::LockLightmap( int lightmap )
 {
 //	Warning( "locking lightmap page: %d\n", lightmap );
-	VPROF_INCREMENT_COUNTER( "lightmap fullpage texlock", 1 );
 	if( m_nLockedLightmap != -1 )
 	{
 		g_pShaderAPI->TexUnlock();
@@ -1992,12 +1990,10 @@ void CMatLightmaps::UpdateLightmap( int lightmapPageID, int lightmapSize[2],
 	// added to the right of the original lightmap.
 	bool bLockSubRect;
 	{
-		VPROF_( "Locking lightmaps", 2, VPROF_BUDGETGROUP_DLIGHT_RENDERING, false, 0 ); // vprof scope
 
 		bLockSubRect = m_nUpdatingLightmapsStackDepth <= 0 && !bDynamic;
 		if( bLockSubRect )
 		{
-			VPROF_INCREMENT_COUNTER( "lightmap subrect texlock", 1 );
 			g_pShaderAPI->ModifyTexture( m_LightmapPageTextureHandles[lightmapPageID] );
 			if (!g_pShaderAPI->TexLock( 0, 0, offsetIntoLightmapPage[0], offsetIntoLightmapPage[1],
 				lightmapSize[0] * uSize, lightmapSize[1], m_LightmapPixelWriter ))
@@ -2019,7 +2015,6 @@ void CMatLightmaps::UpdateLightmap( int lightmapPageID, int lightmapSize[2],
 
 	{
 		// account for the part spent in math:
-		VPROF_( "LightmapBitsToPixelWriter", 2, VPROF_BUDGETGROUP_DLIGHT_RENDERING, false, 0 );
 		if ( hasBump )
 		{
 			switch( HardwareConfig()->GetHDRType() )
@@ -2063,7 +2058,6 @@ void CMatLightmaps::UpdateLightmap( int lightmapPageID, int lightmapSize[2],
 
 	if( bLockSubRect )
 	{
-		VPROF_( "Unlocking Lightmaps", 2, VPROF_BUDGETGROUP_DLIGHT_RENDERING, false, 0 );
 		g_pShaderAPI->TexUnlock();
 	}
 }

@@ -649,7 +649,6 @@ int CAudioMixerWave::MixDataToDevice_( IAudioDevice *pDevice, channel_t *pChanne
 		bool bInterpolated_pitch = FUseHighQualityPitch( pChannel );
 		double rate;
 
-		VPROF_( bInterpolated_pitch ? "CAudioMixerWave::MixData innerloop interpolated" : "CAudioMixerWave::MixData innerloop not interpolated", 2, VPROF_BUDGETGROUP_OTHER_SOUND, false, BUDGETFLAG_OTHER );
 
 		// process samples in paintbuffer-sized batches
 		int sampleCountOut = min( sampleCount, PAINTBUFFER_SIZE );

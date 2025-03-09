@@ -10,7 +10,6 @@
 #include "materialsystem/imaterialsystem.h"
 #include "materialsystem/imesh.h"
 #include "materialsystem/imaterial.h"
-#include "tier0/vprof.h"
 #include "tier0/basetypes.h"
 #ifdef DX_TO_GL_ABSTRACTION
 #include "togl/rendermechanism.h"

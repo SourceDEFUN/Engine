@@ -26,7 +26,6 @@
 #endif
 
 #include "vstdlib/coroutine.h"
-#include "tier0/vprof.h"
 #include "tier0/minidump.h"
 #include "tier1/utllinkedlist.h"
 #include "tier1/utlvector.h"
@@ -270,9 +269,6 @@ public:
 #endif
 #ifdef _M_X64
 		m_nAlignmentBytes = CalcAlignOffset( m_rgubRegisters );
-#endif	
-#if defined( VPROF_ENABLED )
-		m_pVProfNodeScope = NULL;
 #endif
 	}
 
@@ -367,25 +363,6 @@ public:
 
 			// resume accounting against the vprof node we were in when we yielded
 			// Make sure we are added after the coroutine we just copied onto the stack
-#if defined( VPROF_ENABLED )
-			pThis->m_pVProfNodeScope = g_VProfCurrentProfile.GetCurrentNode();
-
-			if ( g_VProfCurrentProfile.IsEnabled() )
-			{
-				FOR_EACH_VEC_BACK( pThis->m_vecProfNodeStack, i )
-				{
-					g_VProfCurrentProfile.EnterScope( 
-						pThis->m_vecProfNodeStack[i]->GetName(), 
-						0,  
-						g_VProfCurrentProfile.GetBudgetGroupName( pThis->m_vecProfNodeStack[i]->GetBudgetGroupID() ), 
-						false, 
-						g_VProfCurrentProfile.GetBudgetGroupFlags( pThis->m_vecProfNodeStack[i]->GetBudgetGroupID() ) 
-					);
-				}
-			}
-
-			pThis->m_vecProfNodeStack.Purge();
-#endif
 		}
 	}
 
@@ -407,21 +384,6 @@ public:
 		// if you hit this assert, it's because you're allocating way too much stuff on the stack in your job
 		// check you haven't got any overly large string buffers allocated on the stack
 		Assert( m_cubSavedStack < k_cubMaxCoroutineStackSize );
-
-#if defined( VPROF_ENABLED )
-		// Exit any current vprof scope when we yield, and remember the vprof stack so we can restore it when we run again
-		m_vecProfNodeStack.RemoveAll();
-
-		CVProfNode *pCurNode = g_VProfCurrentProfile.GetCurrentNode();
-		while ( pCurNode && m_pVProfNodeScope && pCurNode != m_pVProfNodeScope && pCurNode != g_VProfCurrentProfile.GetRoot() )
-		{
-			m_vecProfNodeStack.AddToTail( pCurNode );
-			g_VProfCurrentProfile.ExitScope();
-			pCurNode = g_VProfCurrentProfile.GetCurrentNode();
-		}
-
-		m_pVProfNodeScope = NULL;
-#endif
 
 		RW_MEMORY_BARRIER;
 		// save the stack in the newly allocated slot
@@ -464,10 +426,6 @@ public:
 
 	CoroutineFunc_t m_pFunc;
 	void *m_pvParam;
-#if defined( VPROF_ENABLED )
-	CUtlVector<CVProfNode *> m_vecProfNodeStack;
-	CVProfNode *m_pVProfNodeScope;
-#endif
 
 #ifdef CHECK_STACK_CORRUPTION
 	MD5Context_t m_md5;
@@ -793,9 +751,6 @@ bool Coroutine_Continue( HCoroutine hCoroutine, const char *pchName )
 //-----------------------------------------------------------------------------
 void NOINLINE Coroutine_Launch( CCoroutine &coroutine ) 
 {
-#if defined( VPROF_ENABLED )
-	coroutine.m_pVProfNodeScope = g_VProfCurrentProfile.GetCurrentNode();
-#endif
 
 	// set our marker
 #ifndef _PS3

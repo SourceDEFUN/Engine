@@ -28,7 +28,6 @@
 #include "dlight.h"
 #include "iefx.h"
 #include "c_te_effect_dispatch.h"
-#include "tier0/vprof.h"
 #include "clienteffectprecachesystem.h"
 #include <bitbuf.h>
 #include "fx_water.h"
@@ -756,7 +755,6 @@ void C_Strider::GetRenderBounds( Vector& theMins, Vector& theMaxs )
 //-----------------------------------------------------------------------------
 void MuzzleFlash_Strider( ClientEntityHandle_t hEntity, int attachmentIndex )
 {
-	VPROF_BUDGET( "MuzzleFlash_Strider", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
 
 	// If the client hasn't seen this entity yet, bail.
 	matrix3x4_t	matAttachment;
@@ -964,7 +962,6 @@ DECLARE_CLIENT_EFFECT( "StriderMuzzleFlash", StriderMuzzleFlashCallback );
 //-----------------------------------------------------------------------------
 void StriderBlood( const Vector &origin, const Vector &normal, float scale )
 {
-	VPROF_BUDGET( "StriderBlood", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
 	
 	//Find area ambient light color and use it to tint smoke
 	Vector worldLight = WorldGetLightForPoint( origin, true );

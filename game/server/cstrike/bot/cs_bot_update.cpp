@@ -27,7 +27,6 @@ float CCSBot::GetMoveSpeed( void )
  */
 void CCSBot::Upkeep( void )
 {
-	VPROF_BUDGET( "CCSBot::Upkeep", VPROF_BUDGETGROUP_NPCS );
 
 	if (TheNavMesh->IsGenerating() || !IsAlive())
 		return;
@@ -239,7 +238,6 @@ void CCSBot::Upkeep( void )
  */
 void CCSBot::Update( void )
 {
-	VPROF_BUDGET( "CCSBot::Update", VPROF_BUDGETGROUP_NPCS );
 
 	// If bot_flipout is on, then we only do stuff in Upkeep().
 	if ( cv_bot_flipout.GetBool() )

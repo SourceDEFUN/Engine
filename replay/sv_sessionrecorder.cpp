@@ -14,7 +14,6 @@
 #include "sv_recordingsession.h"
 #include "sv_recordingsessionblock.h"
 #include "fmtstr.h"
-#include "vprof.h"
 #include "iserver.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -131,7 +130,6 @@ void CSessionRecorder::Think()
 {
 	CBaseThinker::Think();
 
-	VPROF_BUDGET( "CSessionRecorder::Think", VPROF_BUDGETGROUP_REPLAY );
 
 	// This gets called even if replay is disabled.  This is intentional.
 	PublishThink();

@@ -1434,7 +1434,6 @@ void CClientState::CheckUpdatingSteamResources()
 		return;
 	}
 
-	VPROF_BUDGET( "CheckUpdatingSteamResources", VPROF_BUDGETGROUP_STEAM );
 
 	if ( m_bPrepareClientDLL )
 	{
@@ -1599,7 +1598,6 @@ void CClientState::CheckFileCRCsWithServer()
 //! cannot easily bypass.  Currently that is the case.  But I need to ship the SteamPipe conversion now.
 //! We can revisit pure server security after that has shipped.
 //
-//	VPROF_( "CheckFileCRCsWithServer", 1, VPROF_BUDGETGROUP_OTHER_NETWORKING, false, BUDGETFLAG_CLIENT );
 //	const float flBatchInterval = 1.0f / 5.0f;
 //	const int nBatchSize = 5;
 //

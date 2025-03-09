@@ -18,7 +18,6 @@
 #include "tier1/refcount.h"
 #include "tier1/callqueue.h"
 #include "cmodel.h"
-#include "tier0/vprof.h"
 #include "tier1/memhelpers.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

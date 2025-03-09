@@ -7,7 +7,6 @@
 #include "vgui_BudgetFPSPanel.H"
 #include "vgui_BudgetPanel.h"
 #include <vgui/ISurface.h>
-#include "tier0/vprof.h"
 #include "materialsystem/imaterialsystem.h"
 
 static ConVar budget_peaks_window( "budget_peaks_window", "30", FCVAR_ARCHIVE, "number of frames to look at when figuring out peak frametimes" );
@@ -153,7 +152,7 @@ void CBudgetFPSPanel::DrawPeaks()
 		for( j = 0; j < numSamples; j++ )
 		{
 			double tmp;
-			int offset = ( nSampleOffset - j + VPROF_HISTORY_COUNT ) % VPROF_HISTORY_COUNT;
+			int offset = ( nSampleOffset - j );
 			tmp = pBudgetGroupTimes[i * nSamplesPerGroup + offset];
 			if( tmp > max )
 			{
@@ -183,7 +182,7 @@ void CBudgetFPSPanel::DrawAverages()
 		int j;
 		for( j = 0; j < numSamples; j++ )
 		{
-			int offset = ( nSampleOffset - j + VPROF_HISTORY_COUNT ) % VPROF_HISTORY_COUNT;
+			int offset = ( nSampleOffset - j );
 			sum += pBudgetGroupTimes[i * nSamplesPerGroup + offset];
 		}
 		sum *= ( 1.0f / numSamples );

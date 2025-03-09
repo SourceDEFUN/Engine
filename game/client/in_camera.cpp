@@ -13,7 +13,6 @@
 
 #include <vgui/IInput.h>
 #include "vgui_controls/Controls.h"
-#include "tier0/vprof.h"
 #include "debugoverlay_shared.h"
 #include "cam_thirdperson.h"
 

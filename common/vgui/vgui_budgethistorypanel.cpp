@@ -7,7 +7,6 @@
 #include "vgui_basebudgetpanel.h"
 #include "vgui_budgethistorypanel.h"
 #include <vgui/ISurface.h>
-#include "tier0/vprof.h"
 #include "convar.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

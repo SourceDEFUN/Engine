@@ -16,7 +16,6 @@
 #include "TerrorGamerules.h"
 #endif
 
-#include "vprof.h"
 #include "datacache/imdlcache.h"
 #include "EntityFlame.h"
 
@@ -261,7 +260,6 @@ bool NextBotCombatCharacter::IsAreaTraversable( const CNavArea *area ) const
 //----------------------------------------------------------------------------------------------------------
 void NextBotCombatCharacter::DoThink( void )
 {
-	VPROF_BUDGET( "NextBotCombatCharacter::DoThink", "NextBot" );
 
 	SetNextThink( gpGlobals->curtime );
 

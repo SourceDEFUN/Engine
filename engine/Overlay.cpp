@@ -12,7 +12,6 @@
 #include "materialsystem/imesh.h"
 #include "disp.h"
 #include "collisionutils.h"
-#include "tier0/vprof.h"
 #include "render.h"
 #include "r_decal.h"
 #include "fmtstr.h"
@@ -576,7 +575,6 @@ void COverlayMgr::ClearRenderLists( int nSortGroup )
 void COverlayMgr::RenderOverlays( int nSortGroup )
 {
 #ifndef SWDS
-	VPROF_BUDGET( "COverlayMgr::RenderOverlays", VPROF_BUDGETGROUP_OVERLAYS );
 
 	if (r_renderoverlayfragment.GetInt() == 0)
 	{

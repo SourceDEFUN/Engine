@@ -19,7 +19,6 @@
 #include "mathlib/vmatrix.h"
 #include "studiorendercontext.h"
 #include "tier2/tier2.h"
-#include "tier0/vprof.h"
 //#include "tier0/miniprofiler.h"
 #include <algorithm>
 #include "filesystem.h"

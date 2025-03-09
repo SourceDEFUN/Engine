@@ -5,7 +5,6 @@
 //=============================================================================
 
 #include "basefilesystem.h"
-#include "tier0/vprof.h"
 
 // NOTE: This has to be the last file included!
 #include "tier0/memdbgon.h"

@@ -19,7 +19,6 @@
 #include "npcevent.h"
 #include "isaverestore.h"
 #include "KeyValues.h"
-#include "tier0/vprof.h"
 #include "EntityFlame.h"
 #include "EntityDissolve.h"
 #include "ai_basenpc.h"
@@ -1775,7 +1774,6 @@ void CBaseAnimating::SetupBones( matrix3x4_t *pBoneToWorld, int boneMask )
 {
 	AUTO_LOCK( m_BoneSetupMutex );
 	
-	VPROF_BUDGET( "CBaseAnimating::SetupBones", VPROF_BUDGETGROUP_SERVER_ANIM );
 	
 	MDLCACHE_CRITICAL_SECTION();
 

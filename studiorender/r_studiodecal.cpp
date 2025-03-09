@@ -16,7 +16,6 @@
 #include "materialsystem/imaterialvar.h"
 #include "convar.h"
 
-#include "tier0/vprof.h"
 #include "tier0/minidump.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -1719,7 +1718,6 @@ bool CStudioRender::DrawMultiBoneFlexedDecals( IMatRenderContext *pRenderContext
 void CStudioRender::DrawDecalMaterial( IMatRenderContext *pRenderContext, DecalMaterial_t& decalMaterial, studiohdr_t *pStudioHdr, studioloddata_t *pStudioLOD )
 {
 	// Performance analysis.
-//	VPROF_BUDGET( "Decals", "Decals" );
 
 	// It's possible for the index count to become zero due to decal retirement
 	int indexCount = decalMaterial.m_Indices.Count();

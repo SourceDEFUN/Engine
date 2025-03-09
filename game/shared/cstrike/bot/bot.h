@@ -30,7 +30,6 @@
 #include "util.h"
 #include "shareddefs.h"
 
-#include "tier0/vprof.h"
 
 class BotProfile;
 

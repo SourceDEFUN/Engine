@@ -18,7 +18,6 @@
 #include "client.h"
 #include "gl_shader.h"
 #include "materialsystem/imesh.h"
-#include "tier0/vprof.h"
 #include "tier0/icommandline.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -2702,7 +2701,6 @@ bool COcclusionSystem::IsOccluded( const Vector &vecAbsMins, const Vector &vecAb
 	if ( r_occlusion.GetInt() == 0 )
 		return false;
 
-	VPROF_BUDGET( "COcclusionSystem::IsOccluded", VPROF_BUDGETGROUP_OCCLUSION );
 
 	// @MULTICORE (toml 9/11/2006): need to eliminate this mutex
 	static CThreadFastMutex mutex;

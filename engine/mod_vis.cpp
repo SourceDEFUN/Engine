@@ -11,7 +11,6 @@
 #include "gl_model_private.h"
 #include "view_shared.h"
 #include "cmodel_engine.h"
-#include "tier0/vprof.h"
 #include "utllinkedlist.h"
 #include "ivrenderview.h"
 
@@ -174,7 +173,6 @@ static void VisMark_Cached( const VisCacheEntry &cache, const worldbrushdata_t &
 
 static void VisCache_Build( VisCacheEntry &cache, const worldbrushdata_t &worldbrush )
 {
-	VPROF_INCREMENT_COUNTER( "VisCache misses", 1 );
 	int			i;
 	mleaf_t		*leaf;
 	int			cluster;

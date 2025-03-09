@@ -344,7 +344,6 @@ CProtoBufMsgBase::~CProtoBufMsgBase()
 //-----------------------------------------------------------------------------
 bool CProtoBufMsgBase::InitFromPacket( IMsgNetPacket * pNetPacket )
 {
-	VPROF_BUDGET( "CProtoBufMsg::InitFromPacket( IMsgNetPacket )", VPROF_BUDGETGROUP_OTHER_NETWORKING );
 
 	AssertMsg( NULL == m_pProtoBufHdr, "Encountered a packet being initialized that has outstanding memory. This will leak memory, and is often caused by receiving messages using the wrong constructor which preallocates or not clearing the message between uses" );
 	Assert( k_EMsgFormatTypeProtocolBuffer == pNetPacket->GetEMsgFormatType() );
@@ -380,7 +379,6 @@ bool CProtoBufMsgBase::BAsyncSend( IProtoBufSendHandler & sender ) const
 //-----------------------------------------------------------------------------
 bool CProtoBufMsgBase::BAsyncSendProto( IProtoBufSendHandler& sender, MsgType_t eMsgType, const CMsgProtoBufHeader& hdr, const ::google::protobuf::Message& proto )
 {
-	VPROF_BUDGET( "CProtoBufMsg::BAsyncSendProto", VPROF_BUDGETGROUP_OTHER_NETWORKING );
 	// Compute message sizes and serialize out to buffer.  Need to work on a more efficient 
 	// way to write these to the net without so much copying.
 	uint32 cubBodySize = proto.ByteSize();
@@ -409,7 +407,6 @@ bool CProtoBufMsgBase::BAsyncSendWithPreSerializedBody( IProtoBufSendHandler & p
 //-----------------------------------------------------------------------------
 bool CProtoBufMsgBase::BAsyncSendWithPreSerializedBody( IProtoBufSendHandler& sender, MsgType_t eMsgType, const CMsgProtoBufHeader& hdr, const byte* pubBody, uint32 cubBody )
 {
-	VPROF_BUDGET( "CProtoBufMsg::BAsyncSendWithPreSerializedBody", VPROF_BUDGETGROUP_OTHER_NETWORKING );
 	// Compute message sizes and serialize out to buffer.  Need to work on a more efficient 
 	// way to write these to the net without so much copying.
 	uint32 cubTotalSize = 0;

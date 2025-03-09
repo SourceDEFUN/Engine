@@ -6,7 +6,6 @@
 
 #include "cbase.h"
 
-#include "tier0/vprof.h"
 
 #include "view_scene.h"
 #include "viewrender.h"

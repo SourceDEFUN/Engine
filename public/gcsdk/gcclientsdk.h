@@ -16,7 +16,6 @@
 #include "steam/steamtypes.h"
 
 #include "tier0/dbg.h"
-#include "tier0/vprof.h"
 #include "tier0/fasttimer.h"
 #include "tier0/t0constants.h"
 

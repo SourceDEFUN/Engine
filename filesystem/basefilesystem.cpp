@@ -10,7 +10,6 @@
 #endif
 
 #include "basefilesystem.h"
-#include "tier0/vprof.h"
 #include "tier1/characterset.h"
 #include "tier1/utlbuffer.h"
 #include "tier1/convar.h"
@@ -2692,7 +2691,6 @@ FileHandle_t CBaseFileSystem::OpenEx( const char *pFileName, const char *pOption
 //-----------------------------------------------------------------------------
 void CBaseFileSystem::Close( FileHandle_t file )
 {
-	VPROF_BUDGET( "CBaseFileSystem::Close", VPROF_BUDGETGROUP_OTHER_FILESYSTEM );
 	if ( !file )
 	{
 		Warning( FILESYSTEM_WARNING, "FS:  Tried to Close NULL file handle!\n" );
@@ -2707,7 +2705,6 @@ void CBaseFileSystem::Close( FileHandle_t file )
 //-----------------------------------------------------------------------------
 void CBaseFileSystem::Seek( FileHandle_t file, int pos, FileSystemSeek_t whence )
 {
-	VPROF_BUDGET( "CBaseFileSystem::Seek", VPROF_BUDGETGROUP_OTHER_FILESYSTEM );
 	CFileHandle *fh = ( CFileHandle *)file;
 	if ( !fh )
 	{
@@ -2725,7 +2722,6 @@ void CBaseFileSystem::Seek( FileHandle_t file, int pos, FileSystemSeek_t whence 
 //-----------------------------------------------------------------------------
 unsigned int CBaseFileSystem::Tell( FileHandle_t file )
 {
-	VPROF_BUDGET( "CBaseFileSystem::Tell", VPROF_BUDGETGROUP_OTHER_FILESYSTEM );
 
 	if ( !file )
 	{
@@ -2745,7 +2741,6 @@ unsigned int CBaseFileSystem::Tell( FileHandle_t file )
 //-----------------------------------------------------------------------------
 unsigned int CBaseFileSystem::Size( FileHandle_t file )
 {
-	VPROF_BUDGET( "CBaseFileSystem::Size", VPROF_BUDGETGROUP_OTHER_FILESYSTEM );
 	if ( !file )
 	{
 		Warning( FILESYSTEM_WARNING, "FS:  Tried to Size NULL file handle!\n" );
@@ -2764,7 +2759,6 @@ unsigned int CBaseFileSystem::Size( FileHandle_t file )
 //-----------------------------------------------------------------------------
 unsigned int CBaseFileSystem::Size( const char* pFileName, const char *pPathID )
 {
-	VPROF_BUDGET( "CBaseFileSystem::Size", VPROF_BUDGETGROUP_OTHER_FILESYSTEM );
 	CHECK_DOUBLE_SLASHES( pFileName );
 	
 	// handle the case where no name passed...
@@ -3131,7 +3125,6 @@ void CBaseFileSystem::DiscardPreloadData()
 //-----------------------------------------------------------------------------
 int CBaseFileSystem::Write( void const* pInput, int size, FileHandle_t file )
 {
-	VPROF_BUDGET( "CBaseFileSystem::Write", VPROF_BUDGETGROUP_OTHER_FILESYSTEM );
 
 	AUTOBLOCKREPORTER_FH( Write, this, true, file, FILESYSTEM_BLOCKING_SYNCHRONOUS, FileBlockingItem::FB_ACCESS_WRITE );
 
@@ -3152,7 +3145,6 @@ int CBaseFileSystem::FPrintf( FileHandle_t file, const char *pFormat, ... )
 {
 	va_list args;
 	va_start( args, pFormat );
-	VPROF_BUDGET( "CBaseFileSystem::FPrintf", VPROF_BUDGETGROUP_OTHER_FILESYSTEM );
 	CFileHandle *fh = ( CFileHandle *)file;
 	if ( !fh )
 	{
@@ -3212,7 +3204,6 @@ bool CBaseFileSystem::IsOk( FileHandle_t file )
 //-----------------------------------------------------------------------------
 void CBaseFileSystem::Flush( FileHandle_t file )
 {
-	VPROF_BUDGET( "CBaseFileSystem::Flush", VPROF_BUDGETGROUP_OTHER_FILESYSTEM );
 	CFileHandle *fh = ( CFileHandle *)file;
 	if ( !fh )
 	{
@@ -3256,7 +3247,6 @@ bool CBaseFileSystem::Precache( const char *pFileName, const char *pPathID)
 //-----------------------------------------------------------------------------
 char *CBaseFileSystem::ReadLine( char *pOutput, int maxChars, FileHandle_t file )
 {
-	VPROF_BUDGET( "CBaseFileSystem::ReadLine", VPROF_BUDGETGROUP_OTHER_FILESYSTEM );
 	CFileHandle *fh = ( CFileHandle *)file;
 	if ( !fh )
 	{
@@ -3314,7 +3304,6 @@ char *CBaseFileSystem::ReadLine( char *pOutput, int maxChars, FileHandle_t file 
 //-----------------------------------------------------------------------------
 time_t CBaseFileSystem::GetFileTime( const char *pFileName, const char *pPathID )
 {
-	VPROF_BUDGET( "CBaseFileSystem::GetFileTime", VPROF_BUDGETGROUP_OTHER_FILESYSTEM );
 
 	CHECK_DOUBLE_SLASHES( pFileName );
 
@@ -3357,7 +3346,6 @@ time_t CBaseFileSystem::GetFileTime( const char *pFileName, const char *pPathID 
 
 time_t CBaseFileSystem::GetPathTime( const char *pFileName, const char *pPathID )
 {
-	VPROF_BUDGET( "CBaseFileSystem::GetPathTime", VPROF_BUDGETGROUP_OTHER_FILESYSTEM );
 
 	CSearchPathsIterator iter( this, &pFileName, pPathID );
 
@@ -3734,7 +3722,6 @@ void CBaseFileSystem::FileTimeToString( char *pString, int maxCharsIncludingTerm
 //-----------------------------------------------------------------------------
 bool CBaseFileSystem::FileExists( const char *pFileName, const char *pPathID )
 {
-	VPROF_BUDGET( "CBaseFileSystem::FileExists", VPROF_BUDGETGROUP_OTHER_FILESYSTEM );
 
 	CHECK_DOUBLE_SLASHES( pFileName );
 
@@ -3974,7 +3961,6 @@ const char *CBaseFileSystem::FindFirstEx( const char *pWildCard, const char *pPa
 
 const char *CBaseFileSystem::FindFirstHelper( const char *pWildCardT, const char *pPathID, FileFindHandle_t *pHandle, int *pFoundStoreID )
 {
-	VPROF_BUDGET( "CBaseFileSystem::FindFirst", VPROF_BUDGETGROUP_OTHER_FILESYSTEM );
  	Assert(pWildCardT);
  	Assert(pHandle);
 
@@ -4217,7 +4203,6 @@ bool CBaseFileSystem::FindNextFileInVPKOrPakHelper( FindData_t *pFindData )
 //-----------------------------------------------------------------------------
 const char *CBaseFileSystem::FindNext( FileFindHandle_t handle )
 {
-	VPROF_BUDGET( "CBaseFileSystem::FindNext", VPROF_BUDGETGROUP_OTHER_FILESYSTEM );
 	FindData_t *pFindData = &m_FindData[handle];
 
 	while( 1 )

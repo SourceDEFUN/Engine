@@ -869,7 +869,6 @@ Returns the size IN BITS of the message buffer created.
 
 void CBaseServer::WriteDeltaEntities( CBaseClient *client, CClientFrame *to, CClientFrame *from, bf_write &pBuf )
 {
-	VPROF_BUDGET( "CBaseServer::WriteDeltaEntities", VPROF_BUDGETGROUP_OTHER_NETWORKING );
 	// Setup the CEntityWriteInfo structure.
 	CEntityWriteInfo u;
 	u.m_pBuf = &pBuf;

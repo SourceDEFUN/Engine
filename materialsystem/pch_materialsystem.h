@@ -27,7 +27,6 @@
 #include "tier0/platform.h"
 #include "tier0/dbg.h"
 #include "tier0/fasttimer.h"
-#include "tier0/vprof.h"
 
 #include "tier1/tier1.h"
 #include "tier1/utlstack.h"

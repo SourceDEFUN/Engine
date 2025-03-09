@@ -2012,7 +2012,6 @@ float SND_GetGainFromMult( float gain, float dist_mult, vec_t dist );
 
 float SND_GetGain( channel_t *ch, bool fplayersound, bool fmusicsound, bool flooping, vec_t dist, bool bAttenuated )
 {
-	VPROF_("SND_GetGain",2,VPROF_BUDGETGROUP_OTHER_SOUND,false,BUDGETFLAG_OTHER);
 	if ( ch->flags.m_bCompatibilityAttenuation )
 	{
 		// Convert to the original attenuation value.
@@ -4217,7 +4216,6 @@ check_new_room_exit:
 
 void RemapPlayerOrMusicVols(  channel_t *ch, int volumes[CCHANVOLUMES/2], bool fplayersound, bool fmusicsound, float mono )
 {
-	VPROF_("RemapPlayerOrMusicVols", 2, VPROF_BUDGETGROUP_OTHER_SOUND, false, BUDGETFLAG_OTHER );
 
 	if ( !fplayersound && !fmusicsound )
 		return;	// no remapping
@@ -4403,7 +4401,6 @@ void SND_Spatialize(channel_t *ch)
 	}
 
 	{
-		VPROF_("SoundServices->GetSoundSpatializtion", 2, VPROF_BUDGETGROUP_OTHER_SOUND, false, BUDGETFLAG_OTHER );
 		fvalidentity = g_pSoundServices->GetSoundSpatialization( ch->soundsource, si );	
 	}
 
@@ -4441,7 +4438,6 @@ void SND_Spatialize(channel_t *ch)
 	fdopplerwav = ((ch->wavtype == CHAR_DOPPLER) && !fplayersound);
 	if ( fdopplerwav )
 	{
-		VPROF_("SND_Spatialize doppler", 2, VPROF_BUDGETGROUP_OTHER_SOUND, false, BUDGETFLAG_OTHER );
 		Vector vnearpoint;				// point of closest approach to listener, 
 										// along sound source forward direction (doppler wavs)
 
@@ -4573,7 +4569,6 @@ void SND_Spatialize(channel_t *ch)
 
 	if ( fdopplerwav )
 	{
-		VPROF_("SND_Spatialize doppler", 2, VPROF_BUDGETGROUP_OTHER_SOUND, false, BUDGETFLAG_OTHER );
 		// fill out channel volumes for both doppler sound source locations
 		int volumes[CCHANVOLUMES/2];
 
@@ -5681,12 +5676,10 @@ int S_StartSound( StartSoundParams_t& params )
 
 	if ( params.staticsound )
 	{
-		VPROF_( "StartStaticSound", 0, VPROF_BUDGETGROUP_OTHER_SOUND, false, BUDGETFLAG_OTHER );	
 		return S_StartStaticSound( params );
 	}
 	else
 	{
-		VPROF_( "StartDynamicSound", 0, VPROF_BUDGETGROUP_OTHER_SOUND, false, BUDGETFLAG_OTHER );
 		return S_StartDynamicSound( params );
 	}
 }

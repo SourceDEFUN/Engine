@@ -15,7 +15,6 @@
 #include "nav_node.h"
 #include "fmtstr.h"
 #include "utlbuffer.h"
-#include "tier0/vprof.h"
 #ifdef TERROR
 #include "func_simpleladder.h"
 #endif
@@ -411,7 +410,6 @@ public:
  */
 void CNavMesh::FireGameEvent( IGameEvent *gameEvent )
 {
-	VPROF_BUDGET( "CNavMesh::FireGameEvent", VPROF_BUDGETGROUP_NPCS );
 
 	if ( FStrEq( gameEvent->GetName(), "break_prop" ) || FStrEq( gameEvent->GetName(), "break_breakable" ) )
 	{
@@ -686,7 +684,6 @@ inline void CNavMesh::GridToWorld( int gridX, int gridY, Vector *pos ) const
  */
 CNavArea *CNavMesh::GetNavArea( const Vector &pos, float beneathLimit ) const
 {
-	VPROF_BUDGET( "CNavMesh::GetNavArea", "NextBot"  );
 
 	if ( !m_grid.Count() )
 		return NULL;
@@ -821,7 +818,6 @@ CNavArea *CNavMesh::GetNavArea( CBaseEntity *pEntity, int nFlags, float flBeneat
  */
 CNavArea *CNavMesh::GetNearestNavArea( const Vector &pos, bool anyZ, float maxDist, bool checkLOS, bool checkGround, int team ) const
 {
-	VPROF_BUDGET( "CNavMesh::GetNearestNavArea", "NextBot" );
 
 	if ( !m_grid.Count() )
 		return NULL;	

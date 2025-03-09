@@ -933,7 +933,6 @@ void CPortal_Player::DoAnimationEvent( PlayerAnimEvent_t event, int nData )
 //-----------------------------------------------------------------------------
 void CPortal_Player::SetupBones( matrix3x4_t *pBoneToWorld, int boneMask )
 {
-	VPROF_BUDGET( "CBaseAnimating::SetupBones", VPROF_BUDGETGROUP_SERVER_ANIM );
 
 	// Set the mdl cache semaphore.
 	MDLCACHE_CRITICAL_SECTION();

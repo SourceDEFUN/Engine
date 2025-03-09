@@ -6,7 +6,6 @@
 //=============================================================================//
 
 #include <tier0/dbg.h>
-#include <tier0/vprof.h>
 #include <tier0/icommandline.h>
 #include <commonmacros.h>
 #include <checksum_crc.h>

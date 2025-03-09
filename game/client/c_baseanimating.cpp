@@ -18,7 +18,6 @@
 #include "c_te_legacytempents.h"
 #include "activitylist.h"
 #include "animation.h"
-#include "tier0/vprof.h"
 #include "clienteffectprecachesystem.h"
 #include "IEffects.h"
 #include "engine/ivmodelinfo.h"
@@ -1415,7 +1414,6 @@ void C_BaseAnimating::GetCachedBoneMatrix( int boneIndex, matrix3x4_t &out )
 //-----------------------------------------------------------------------------
 void C_BaseAnimating::BuildTransformations( CStudioHdr *hdr, Vector *pos, Quaternion *q, const matrix3x4_t &cameraTransform, int boneMask, CBoneBitList &boneComputed )
 {
-	VPROF_BUDGET( "C_BaseAnimating::BuildTransformations", VPROF_BUDGETGROUP_CLIENT_ANIMATION );
 
 	if ( !hdr )
 		return;
@@ -2697,7 +2695,6 @@ void C_BaseAnimating::ThreadedBoneSetup()
 
 bool C_BaseAnimating::SetupBones( matrix3x4_t *pBoneToWorldOut, int nMaxBones, int boneMask, float currentTime )
 {
-	VPROF_BUDGET( "C_BaseAnimating::SetupBones", VPROF_BUDGETGROUP_CLIENT_ANIMATION );
 
 	//=============================================================================
 	// HPE_BEGIN:
@@ -3055,7 +3052,6 @@ ConVar r_drawothermodels( "r_drawothermodels", "1", FCVAR_CHEAT, "0=Off, 1=Norma
 //-----------------------------------------------------------------------------
 int C_BaseAnimating::DrawModel( int flags )
 {
-	VPROF_BUDGET( "C_BaseAnimating::DrawModel", VPROF_BUDGETGROUP_MODEL_RENDERING );
 	if ( !m_bReadyToDraw )
 		return 0;
 
@@ -6071,7 +6067,6 @@ void C_BaseAnimating::RemoveFromClientSideAnimationList()
 // static method
 void C_BaseAnimating::UpdateClientSideAnimations()
 {
-	VPROF_BUDGET( "UpdateClientSideAnimations", VPROF_BUDGETGROUP_CLIENT_ANIMATION );
 
 	int c = g_ClientSideAnimationList.Count();
 	for ( int i = 0; i < c ; ++i )
@@ -6089,7 +6084,6 @@ CBoneList *C_BaseAnimating::RecordBones( CStudioHdr *hdr, matrix3x4_t *pBoneStat
 	if ( !ToolsEnabled() )
 		return NULL;
 		
-	VPROF_BUDGET( "C_BaseAnimating::RecordBones", VPROF_BUDGETGROUP_TOOLS );
 
 	// Possible optimization: Instead of inverting everything while recording, record the pos/q stuff into a structure instead?
 	Assert( hdr );
@@ -6143,7 +6137,6 @@ void C_BaseAnimating::GetToolRecordingState( KeyValues *msg )
 	if ( !ToolsEnabled() )
 		return;
 
-	VPROF_BUDGET( "C_BaseAnimating::GetToolRecordingState", VPROF_BUDGETGROUP_TOOLS );
 
 	// Force the animation to drive bones
 	CStudioHdr *hdr = GetModelPtr();

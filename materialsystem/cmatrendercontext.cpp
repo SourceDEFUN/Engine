@@ -1190,7 +1190,6 @@ void CMatRenderContext::BeginRender()
 #if 1 // Rick's optimization: not sure this is needed anymore
 	if ( GetMaterialSystem()->GetThreadMode() != MATERIAL_SINGLE_THREADED )
 	{
-		VPROF_INCREMENT_GROUP_COUNTER( "render/CMatBeginRender", COUNTER_GROUP_TELEMETRY, 1 );
 		g_MatSysMutex.Lock();
 	}
 #endif
@@ -1700,7 +1699,6 @@ void CMatRenderContext::BindMorph( IMorph *pMorph )
 
 IMesh* CMatRenderContext::GetDynamicMesh( bool buffered, IMesh* pVertexOverride, IMesh* pIndexOverride, IMaterial *pAutoBind )
 {
-	VPROF_ASSERT_ACCOUNTED( "CMatRenderContext::GetDynamicMesh" );
 	if( pAutoBind )
 	{
 		Bind( pAutoBind, NULL );
@@ -1730,7 +1728,6 @@ IMesh* CMatRenderContext::GetDynamicMesh( bool buffered, IMesh* pVertexOverride,
 
 IMesh* CMatRenderContext::GetDynamicMeshEx( VertexFormat_t vertexFormat, bool bBuffered, IMesh* pVertexOverride, IMesh* pIndexOverride, IMaterial *pAutoBind )
 {
-	VPROF_ASSERT_ACCOUNTED( "CMatRenderContext::GetDynamicMesh" );
 	if( pAutoBind )
 	{
 		Bind( pAutoBind, NULL );

@@ -4,7 +4,6 @@
 
 #include "cbase.h"
 #include "fmtstr.h"
-#include "tier0/vprof.h"
 #include "utldict.h"
 
 #include "nav_mesh.h"

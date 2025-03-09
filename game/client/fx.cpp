@@ -16,7 +16,6 @@
 #include "glow_overlay.h"
 #include "effect_dispatch_data.h"
 #include "c_te_effect_dispatch.h"
-#include "tier0/vprof.h"
 #include "tier1/KeyValues.h"
 #include "effect_color_tables.h"
 #include "iviewrender_beams.h"
@@ -190,7 +189,6 @@ void FX_MuzzleEffect(
 	unsigned char *pFlashColor,
 	bool bOneFrame )
 {
-	VPROF_BUDGET( "FX_MuzzleEffect", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
 	
 	CSmartPtr<CSimpleEmitter> pSimple = CSimpleEmitter::Create( "MuzzleFlash" );
 	pSimple->SetSortOrigin( origin );
@@ -302,7 +300,6 @@ void FX_MuzzleEffectAttached(
 	unsigned char *pFlashColor,
 	bool bOneFrame )
 {
-	VPROF_BUDGET( "FX_MuzzleEffect", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
 
 	// If the material isn't available, let's not do anything.
 	if ( g_Mat_SMG_Muzzleflash[0] == NULL )
@@ -503,7 +500,6 @@ DECLARE_CLIENT_EFFECT( "MuzzleFlash", MuzzleFlashCallback );
 //-----------------------------------------------------------------------------
 CSmartPtr<CSimpleEmitter> FX_Smoke( const Vector &origin, const Vector &velocity, float scale, int numParticles, float flDietime, unsigned char *pColor, int iAlpha, const char *pMaterial, float flRoll, float flRollDelta )
 {
-	VPROF_BUDGET( "FX_Smoke", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
 	CSmartPtr<CSimpleEmitter> pSimple = CSimpleEmitter::Create( "FX_Smoke" );
 	pSimple->SetSortOrigin( origin );
 
@@ -540,7 +536,6 @@ CSmartPtr<CSimpleEmitter> FX_Smoke( const Vector &origin, const Vector &velocity
 //-----------------------------------------------------------------------------
 void FX_Smoke( const Vector &origin, const QAngle &angles, float scale, int numParticles, unsigned char *pColor, int iAlpha )
 {
-	VPROF_BUDGET( "FX_Smoke", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
 	Vector vecVelocity;
 	Vector vecForward;
 
@@ -763,7 +758,6 @@ DECLARE_CLIENT_EFFECT( "Smoke", SmokeCallback );
 //-----------------------------------------------------------------------------
 void FX_GunshipImpact( const Vector &pos, const Vector &normal, float r, float g, float b )
 {
-	VPROF_BUDGET( "FX_GunshipImpact", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
 	if ( CImpactOverlay *pOverlay = new CImpactOverlay )
 	{
 		pOverlay->m_flLifetime	= 0;
@@ -817,7 +811,6 @@ DECLARE_CLIENT_EFFECT( "CommandPointer", CommandPointerCallback );
 //-----------------------------------------------------------------------------
 void FX_GunshipMuzzleEffect( const Vector &origin, const QAngle &angles, float scale, ClientEntityHandle_t hEntity, unsigned char *pFlashColor )
 {
-	VPROF_BUDGET( "FX_GunshipMuzzleEffect", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
 	CSmartPtr<CSimpleEmitter> pSimple = CSimpleEmitter::Create( "MuzzleFlash" );
 	pSimple->SetSortOrigin( origin );
 	
@@ -864,7 +857,6 @@ void FX_GunshipMuzzleEffect( const Vector &origin, const QAngle &angles, float s
 //-----------------------------------------------------------------------------
 void FX_GunshipTracer( Vector& start, Vector& end, int velocity, bool makeWhiz )
 {
-	VPROF_BUDGET( "FX_GunshipTracer", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
 	Vector	vNear, dStart, dEnd, shotDir;
 	float	totalDist;
 
@@ -914,7 +906,6 @@ void FX_StriderMuzzleEffect( const Vector &origin, const QAngle &angles, float s
 //-----------------------------------------------------------------------------
 void FX_StriderTracer( Vector& start, Vector& end, int velocity, bool makeWhiz )
 {
-	VPROF_BUDGET( "FX_StriderTracer", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
 	Vector	vNear, dStart, dEnd, shotDir;
 	float	totalDist;
 
@@ -948,7 +939,6 @@ void FX_StriderTracer( Vector& start, Vector& end, int velocity, bool makeWhiz )
 //-----------------------------------------------------------------------------
 void FX_HunterTracer( Vector& start, Vector& end, int velocity, bool makeWhiz )
 {
-	VPROF_BUDGET( "FX_HunterTracer", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
 	Vector	vNear, dStart, dEnd, shotDir;
 	float	totalDist;
 
@@ -982,7 +972,6 @@ void FX_HunterTracer( Vector& start, Vector& end, int velocity, bool makeWhiz )
 //-----------------------------------------------------------------------------
 void FX_GaussTracer( Vector& start, Vector& end, int velocity, bool makeWhiz )
 {
-	VPROF_BUDGET( "FX_GaussTracer", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
 	Vector	vNear, dStart, dEnd, shotDir;
 	float	totalDist;
 

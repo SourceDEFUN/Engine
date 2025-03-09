@@ -43,7 +43,6 @@ void CObjectPage::UpdateData( int Mode, PVOID pData, bool bCanEdit )
 //-----------------------------------------------------------------------------
 BOOL CObjectPage::OnSetActive(void)
 {
-	//VPROF_BUDGET( "CObjectPage::OnSetActive", "Object Properties" );
 
 	if (CObjectPage::s_bRESTRUCTURING || !GetActiveWorld())
 	{
@@ -69,7 +68,6 @@ BOOL CObjectPage::OnSetActive(void)
 //-----------------------------------------------------------------------------
 PVOID CObjectPage::GetEditObject()
 { 
-	//VPROF_BUDGET( "CObjectPage::GetEditObject", "Object Properties" );
 	return ((CObjectProperties*) GetParent())->GetEditObject(GetEditObjectRuntimeClass());
 }
 

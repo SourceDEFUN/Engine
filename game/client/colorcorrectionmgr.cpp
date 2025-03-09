@@ -6,7 +6,6 @@
 //===========================================================================//
 
 #include "cbase.h"
-#include "tier0/vprof.h"
 #include "colorcorrectionmgr.h"
 
 
@@ -86,7 +85,6 @@ void CColorCorrectionMgr::SetColorCorrectionWeight( ClientCCHandle_t h, float fl
 
 void CColorCorrectionMgr::ResetColorCorrectionWeights()
 {
-	VPROF_("ResetColorCorrectionWeights", 2, VPROF_BUDGETGROUP_OTHER_UNACCOUNTED, false, 0);
 	// FIXME: Where should I put this? It needs to happen prior to SimulateEntities()
 	// which is where the client thinks for c_colorcorrection + c_colorcorrectionvolumes
 	// update the color correction weights.

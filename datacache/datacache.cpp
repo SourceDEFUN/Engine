@@ -10,7 +10,6 @@
 #include <malloc.h>
 #endif
 
-#include "tier0/vprof.h"
 #include "basetypes.h"
 #include "convar.h"
 #include "interface.h"

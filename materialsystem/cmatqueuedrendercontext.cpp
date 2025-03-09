@@ -866,8 +866,6 @@ void CMatQueuedRenderContext::BeginRender()
 {
 	if ( ++m_iRenderDepth == 1 )
 	{
-		VPROF_INCREMENT_GROUP_COUNTER( "render/CMatQBeginRender", COUNTER_GROUP_TELEMETRY, 1 );
-
 		m_queue.QueueCall( m_pHardwareContext, &IMatRenderContext::BeginRender );
 	}
 }

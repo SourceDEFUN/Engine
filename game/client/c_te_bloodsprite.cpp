@@ -11,7 +11,6 @@
 #include "c_te_legacytempents.h"
 #include "fx.h"
 #include "tier1/KeyValues.h"
-#include "tier0/vprof.h"
 #include "toolframework_client.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

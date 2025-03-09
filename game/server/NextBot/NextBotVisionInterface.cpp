@@ -17,7 +17,6 @@
 #include "querycache.h"
 #endif
 
-#include "tier0/vprof.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -366,7 +365,6 @@ public:
 //------------------------------------------------------------------------------------------
 void IVision::UpdateKnownEntities( void )
 {
-	VPROF_BUDGET( "IVision::UpdateKnownEntities", "NextBot" );
 
 	// construct set of potentially visible objects
 	CUtlVector< CBaseEntity * > potentiallyVisible;
@@ -376,14 +374,12 @@ void IVision::UpdateKnownEntities( void )
 	CollectVisible visibleNow( this );
 	FOR_EACH_VEC( potentiallyVisible, pit )
 	{
-		VPROF_BUDGET( "IVision::UpdateKnownEntities( collect visible )", "NextBot" );
 
 		if ( visibleNow( potentiallyVisible[ pit ] ) == false )
 			break;
 	}
 	
 	// update known set with new data
-	{	VPROF_BUDGET( "IVision::UpdateKnownEntities( update status )", "NextBot" );
 
 		int i;
 		for( i=0; i < m_knownEntityVector.Count(); ++i )
@@ -458,7 +454,6 @@ void IVision::UpdateKnownEntities( void )
 	}
 		
 	// check for new recognizes that were not in the known set
-	{	VPROF_BUDGET( "IVision::UpdateKnownEntities( new recognizes )", "NextBot" );
 
 		int i, j;
 		for( i=0; i < visibleNow.m_recognized.Count(); ++i )
@@ -540,7 +535,6 @@ void IVision::UpdateKnownEntities( void )
  */
 void IVision::Update( void )
 {
-	VPROF_BUDGET( "IVision::Update", "NextBotExpensive" );
 
 /* This adds significantly to bot's reaction times
 	// throttle update rate
@@ -567,7 +561,6 @@ void IVision::Update( void )
 //------------------------------------------------------------------------------------------
 bool IVision::IsAbleToSee( CBaseEntity *subject, FieldOfViewCheckType checkFOV, Vector *visibleSpot ) const
 {
-	VPROF_BUDGET( "IVision::IsAbleToSee", "NextBotExpensive" );
 
 	if ( GetBot()->IsRangeGreaterThan( subject, GetMaxVisionRange() ) )
 	{
@@ -614,7 +607,6 @@ bool IVision::IsAbleToSee( CBaseEntity *subject, FieldOfViewCheckType checkFOV, 
 //------------------------------------------------------------------------------------------
 bool IVision::IsAbleToSee( const Vector &pos, FieldOfViewCheckType checkFOV ) const
 {
-	VPROF_BUDGET( "IVision::IsAbleToSee", "NextBotExpensive" );
 
 	
 	if ( GetBot()->IsRangeGreaterThan( pos, GetMaxVisionRange() ) )
@@ -695,9 +687,6 @@ bool IVision::IsInFieldOfView( CBaseEntity *subject ) const
  */
 bool IVision::IsLineOfSightClear( const Vector &pos ) const
 {
-	VPROF_BUDGET( "IVision::IsLineOfSightClear", "NextBot" );
-	VPROF_INCREMENT_COUNTER( "IVision::IsLineOfSightClear", 1 );
-
 	trace_t result;
 	NextBotVisionTraceFilter filter( GetBot()->GetEntity(), COLLISION_GROUP_NONE );
 	
@@ -712,14 +701,7 @@ bool IVision::IsLineOfSightClearToEntity( const CBaseEntity *subject, Vector *vi
 {
 #ifdef TERROR
 	// TODO: Integration querycache & its dependencies
-
-	VPROF_INCREMENT_COUNTER( "IVision::IsLineOfSightClearToEntity", 1 );
-	VPROF_BUDGET( "IVision::IsLineOfSightClearToEntity", "NextBotSpiky" );
-
 	bool bClear = IsLineOfSightBetweenTwoEntitiesClear( GetBot()->GetBodyInterface()->GetEntity(), EOFFSET_MODE_EYEPOSITION,
-														subject, EOFFSET_MODE_WORLDSPACE_CENTER,
-														subject, COLLISION_GROUP_NONE,
-														MASK_BLOCKLOS_AND_NPCS|CONTENTS_IGNORE_NODRAW_OPAQUE, VisionTraceFilterFunction, 1.0 );
 
 #ifdef USE_NON_CACHE_QUERY
 	trace_t result;
@@ -747,7 +729,6 @@ bool IVision::IsLineOfSightClearToEntity( const CBaseEntity *subject, Vector *vi
 #else
 
 	// TODO: Use plain-old traces until querycache/etc gets integrated
-	VPROF_BUDGET( "IVision::IsLineOfSightClearToEntity", "NextBot" );
 
 	trace_t result;
 	NextBotTraceFilterIgnoreActors filter( subject, COLLISION_GROUP_NONE );

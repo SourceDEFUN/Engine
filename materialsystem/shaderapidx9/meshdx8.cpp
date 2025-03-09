@@ -9,7 +9,6 @@
 #include "imeshdx8.h"
 #include "shaderapidx8_global.h"
 #include "materialsystem/IShader.h"
-#include "tier0/vprof.h"
 #include "studio.h"
 #include "tier1/fmtstr.h"
 
@@ -126,12 +125,6 @@ protected:
 	bool m_bIsDynamic : 1;
 	bool m_bFlush : 1;				// Used only for dynamic buffers, indicates to discard the next time
 
-#ifdef VPROF_ENABLED
-	int m_nVProfFrame;
-	int	*m_pFrameCounter;
-	int	*m_pGlobalCounter;
-#endif
-
 #ifdef _DEBUG
 	static int s_nBufferCount;
 #endif
@@ -202,10 +195,6 @@ private:
 	void *m_pLockIndexBuffer;
 	int m_nLockIndexBufferSize;
 	int m_nLockIndexOffset;
-#endif
-
-#ifdef VPROF_ENABLED
-	int m_nVProfFrame;
 #endif
 
 #ifdef _DEBUG
@@ -1166,10 +1155,6 @@ CIndexBufferDx8::CIndexBufferDx8( ShaderBufferType_t bufferType, MaterialIndexFo
 #ifdef CHECK_INDICES
 	m_pShadowIndices = NULL;
 #endif
-
-#ifdef VPROF_ENABLED
-	m_nVProfFrame = -1;
-#endif
 }
 
 CIndexBufferDx8::~CIndexBufferDx8()
@@ -1231,17 +1216,6 @@ bool CIndexBufferDx8::Allocate()
 		return false;
 	}
 
-	if ( !m_bIsDynamic )
-	{
-		VPROF_INCREMENT_GROUP_COUNTER( "TexGroup_global_" TEXTURE_GROUP_STATIC_INDEX_BUFFER, 
-			COUNTER_GROUP_TEXTURE_GLOBAL, m_nBufferSize );
-	}
-	else
-	{
-		VPROF_INCREMENT_GROUP_COUNTER( "TexGroup_global_" TEXTURE_GROUP_DYNAMIC_INDEX_BUFFER, 
-			COUNTER_GROUP_TEXTURE_GLOBAL, m_nBufferSize );
-	}
-
 #ifdef CHECK_INDICES
 	Assert ( !m_pShadowIndices );
 	m_pShadowIndices = new unsigned char[ m_nBufferSize ];
@@ -1266,17 +1240,6 @@ void CIndexBufferDx8::Free()
 
 		m_pIndexBuffer->Release();
 		m_pIndexBuffer = NULL;
-
-		if ( !m_bIsDynamic )
-		{
-			VPROF_INCREMENT_GROUP_COUNTER( "TexGroup_global_" TEXTURE_GROUP_STATIC_INDEX_BUFFER, 
-				COUNTER_GROUP_TEXTURE_GLOBAL, - m_nBufferSize );
-		}
-		else
-		{
-			VPROF_INCREMENT_GROUP_COUNTER( "TexGroup_global_" TEXTURE_GROUP_DYNAMIC_INDEX_BUFFER, 
-				COUNTER_GROUP_TEXTURE_GLOBAL, - m_nBufferSize );
-		}
 	}
 
 #ifdef CHECK_INDICES
@@ -1350,16 +1313,7 @@ unsigned short CIndexBufferDx8::GetShadowIndex( int i ) const
 // Used to measure how much static buffer memory is touched each frame 
 //-----------------------------------------------------------------------------
 void CIndexBufferDx8::HandlePerFrameTextureStats( int nFrame )
-{
-#ifdef VPROF_ENABLED
-	if ( m_nVProfFrame != nFrame && !m_bIsDynamic )
-	{
-		m_nVProfFrame = nFrame;
-		VPROF_INCREMENT_GROUP_COUNTER( "TexGroup_frame_" TEXTURE_GROUP_STATIC_INDEX_BUFFER, 
-			COUNTER_GROUP_TEXTURE_PER_FRAME, m_nBufferSize );
-	}
-#endif
-}
+{ /* That's right. What you see before thyself, is nothing but nothing. */ }
 
 
 //-----------------------------------------------------------------------------
@@ -1561,26 +1515,6 @@ CVertexBufferDx8::CVertexBufferDx8( ShaderBufferType_t type, VertexFormat_t fmt,
 	m_bIsLocked = false;
 	m_bIsDynamic = ( type == SHADER_BUFFER_TYPE_DYNAMIC ) || ( type == SHADER_BUFFER_TYPE_DYNAMIC_TEMP );
 	m_bFlush = false;
-
-#ifdef VPROF_ENABLED
-	if ( !m_bIsDynamic )
-	{
-		char name[256];
-		V_strcpy_safe( name, "TexGroup_global_" );
-		V_strcat_safe( name, pBudgetGroupName, sizeof(name) );
-		m_pGlobalCounter = g_VProfCurrentProfile.FindOrCreateCounter( name, COUNTER_GROUP_TEXTURE_GLOBAL );
-
-		V_strcpy_safe( name, "TexGroup_frame_" );
-		V_strcat_safe( name, pBudgetGroupName, sizeof(name) );
-		m_pFrameCounter = g_VProfCurrentProfile.FindOrCreateCounter( name, COUNTER_GROUP_TEXTURE_PER_FRAME );
-	}
-	else
-	{
-		m_pGlobalCounter = g_VProfCurrentProfile.FindOrCreateCounter( "TexGroup_global_" TEXTURE_GROUP_DYNAMIC_VERTEX_BUFFER, COUNTER_GROUP_TEXTURE_GLOBAL );
-		m_pFrameCounter = NULL;
-	}
-	m_nVProfFrame = -1;
-#endif
 }
 
 CVertexBufferDx8::~CVertexBufferDx8()
@@ -1649,14 +1583,6 @@ bool CVertexBufferDx8::Allocate()
 	// Track VB allocations
 	g_VBAllocTracker->CountVB( m_pVertexBuffer, m_bIsDynamic, m_nBufferSize, VertexSize(), GetVertexFormat() );
 
-#ifdef VPROF_ENABLED
-	if ( IsX360() || !m_bIsDynamic )
-	{
-		Assert( m_pGlobalCounter );
-		*m_pGlobalCounter += m_nBufferSize;
-	}
-#endif
-
 #ifdef _DEBUG
 		++s_nBufferCount;
 #endif
@@ -1675,14 +1601,6 @@ void CVertexBufferDx8::Free()
 
 	// Track VB allocations
 	g_VBAllocTracker->UnCountVB( m_pVertexBuffer );
-
-#ifdef VPROF_ENABLED
-		if ( IsX360() || !m_bIsDynamic )
-		{
-			Assert( m_pGlobalCounter );
-			*m_pGlobalCounter -= m_nBufferSize;
-		}
-#endif
 
 		m_pVertexBuffer->Release();
 		m_pVertexBuffer = NULL;
@@ -1926,13 +1844,6 @@ void CVertexBufferDx8::Unlock( int nWrittenVertexCount, VertexDesc_t &desc )
 //-----------------------------------------------------------------------------
 void CVertexBufferDx8::HandlePerFrameTextureStats( int nFrame )
 {
-#ifdef VPROF_ENABLED
-	if ( m_nVProfFrame != nFrame && !m_bIsDynamic )
-	{
-		m_nVProfFrame = nFrame;
-		m_pFrameCounter += m_nBufferSize;
-	}
-#endif
 }
 
 
@@ -3453,11 +3364,6 @@ void CMeshDX8::RenderPass()
 			CheckIndices( pPrim, numPrimitives );
 #endif // CHECK_INDICES
 			{
-				VPROF_INCREMENT_COUNTER( "DrawIndexedPrimitive", 1 );
-				VPROF_INCREMENT_COUNTER( "numPrimitives", numPrimitives );
-				VPROF_INCREMENT_GROUP_COUNTER( "render/DrawIndexedPrimitive", COUNTER_GROUP_TELEMETRY, 1 );
-				VPROF_INCREMENT_GROUP_COUNTER( "render/numPrimitives", COUNTER_GROUP_TELEMETRY, 1 );
-
 				Dx9Device()->DrawIndexedPrimitive( 
 					m_Mode,			// Member of the D3DPRIMITIVETYPE enumerated type, describing the type of primitive to render. D3DPT_POINTLIST is not supported with this method.
 
@@ -5061,7 +4967,6 @@ bool CMeshMgr::IsDynamicIndexBuffer( IIndexBuffer *pIndexBuffer ) const
 //-----------------------------------------------------------------------------
 void CMeshMgr::DiscardVertexBuffers()
 {
-	VPROF_BUDGET( "CMeshMgr::DiscardVertexBuffers", VPROF_BUDGETGROUP_SWAP_BUFFERS );
 	// This shouldn't be necessary, but it seems to be on GeForce 2
 	// It helps when running WC and the engine simultaneously.
 	ResetMeshRenderState();
@@ -5881,8 +5786,6 @@ void CMeshMgr::RenderPassWithVertexAndIndexBuffers( void )
 
 //			Warning( "CMeshMgr::RenderPassWithVertexAndIndexBuffers: DrawIndexedPrimitive: m_nFirstIndex = %d numPrimitives = %d\n", ( int )( ( CDynamiCIndexBufferDx8 * )m_pCurrentIndexBuffer )->m_FirstIndex, ( int )( m_nNumIndices / 3 ) );
 			{
-//				VPROF_INCREMENT_COUNTER( "DrawIndexedPrimitive", 1 );
-//				VPROF_INCREMENT_COUNTER( "numPrimitives", numPrimitives );
 
 //				Dx9Device()->DrawIndexedPrimitive( 
 //					m_Mode,

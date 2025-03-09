@@ -21,7 +21,6 @@
 #include "vtf/vtf.h"
 #include "tier1/convar.h"
 #include "tier1/KeyValues.h"
-#include "tier0/vprof.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -201,7 +200,6 @@ float CStudioRender::RampFlexWeight( mstudioflex_t &flex, float w )
 //-----------------------------------------------------------------------------
 void CStudioRender::R_StudioFlexVerts( mstudiomesh_t *pmesh, int lod )
 {
-	VPROF_BUDGET( "CStudioRender::R_StudioFlexVerts", VPROF_BUDGETGROUP_MODEL_RENDERING );
 
 	Assert( pmesh );
 

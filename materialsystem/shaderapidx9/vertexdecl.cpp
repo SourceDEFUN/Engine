@@ -15,7 +15,6 @@
 #include "utlrbtree.h"
 #include "recording.h"
 #include "tier1/strtools.h"
-#include "tier0/vprof.h"
 #include "materialsystem/imesh.h"
 #include "shaderdevicedx8.h"
 

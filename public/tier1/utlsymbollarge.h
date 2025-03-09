@@ -16,7 +16,6 @@
 #include "tier0/threadtools.h"
 #include "tier1/utltshash.h"
 #include "tier1/stringpool.h"
-#include "tier0/vprof.h"
 #include "tier1/utltshash.h"
 
 //-----------------------------------------------------------------------------

@@ -21,7 +21,6 @@
 #endif
 #include "dt_instrumentation_server.h"
 #include "LocalNetworkBackdoor.h"
-#include "tier0/vprof.h"
 #include "host.h"
 #include "networkstringtableserver.h"
 #include "networkstringtable.h"
@@ -353,7 +352,6 @@ void PackEntities_NetworkBackDoor(
 {
 	Assert( clientCount == 1 );
 
-	VPROF_BUDGET( "PackEntities_NetworkBackDoor", VPROF_BUDGETGROUP_OTHER_NETWORKING );
 
 	CGameClient *client = clients[0];	// update variables cl, pInfo, frame for current client
 	CCheckTransmitInfo *pInfo =  &client->m_PackInfo;
@@ -477,7 +475,6 @@ void SV_ComputeClientPacks(
 	MDLCACHE_CRITICAL_SECTION_(g_pMDLCache);
 	// Do some setup for each client
 	{
-		VPROF_BUDGET_FLAGS( "SV_ComputeClientPacks", "CheckTransmit", BUDGETFLAG_SERVER );
 
 		for (int iClient = 0; iClient < clientCount; ++iClient)
 		{
@@ -488,7 +485,6 @@ void SV_ComputeClientPacks(
 		}
 	}
 
-	VPROF_BUDGET_FLAGS( "SV_ComputeClientPacks", "ComputeClientPacks", BUDGETFLAG_SERVER );
 
 	if ( g_pLocalNetworkBackdoor )
 	{

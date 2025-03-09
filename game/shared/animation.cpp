@@ -15,7 +15,6 @@
 #include "scriptevent.h"
 #include "npcevent.h"
 #include "eventlist.h"
-#include "tier0/vprof.h"
 
 #if !defined( CLIENT_DLL ) && !defined( MAKEXVCD )
 #include "util.h"

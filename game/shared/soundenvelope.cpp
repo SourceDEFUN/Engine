@@ -18,7 +18,6 @@
 #include "utlpriorityqueue.h"
 #include "mempool.h"
 #include "SoundEmitterSystem/isoundemittersystembase.h"
-#include "tier0/vprof.h"
 #include "gamerules.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

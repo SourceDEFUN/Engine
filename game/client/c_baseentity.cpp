@@ -19,7 +19,6 @@
 #include "engine/IEngineSound.h"
 #include "engine/IEngineTrace.h"
 #include "engine/ivmodelinfo.h"
-#include "tier0/vprof.h"
 #include "fx_line.h"
 #include "interface.h"
 #include "materialsystem/imaterialsystem.h"
@@ -1934,7 +1933,6 @@ float *C_BaseEntity::GetRenderClipPlane( void )
 //-----------------------------------------------------------------------------
 int C_BaseEntity::DrawBrushModel( bool bDrawingTranslucency, int nFlags, bool bTwoPass )
 {
-	VPROF_BUDGET( "C_BaseEntity::DrawBrushModel", VPROF_BUDGETGROUP_BRUSHMODEL_RENDERING );
 	// Identity brushes are drawn in view->DrawWorld as an optimization
 	Assert ( modelinfo->GetModelType( model ) == mod_brush );
 
@@ -3174,7 +3172,6 @@ static ConVar cl_interpolate( "cl_interpolate", "1.0f", FCVAR_USERINFO | FCVAR_D
 // (static function)
 void C_BaseEntity::InterpolateServerEntities()
 {
-	VPROF_BUDGET( "C_BaseEntity::InterpolateServerEntities", VPROF_BUDGETGROUP_INTERPOLATION );
 
 	s_bInterpolate = cl_interpolate.GetBool();
 
@@ -3225,7 +3222,6 @@ void C_BaseEntity::InterpolateServerEntities()
 void C_BaseEntity::AddVisibleEntities()
 {
 #if !defined( NO_ENTITY_PREDICTION )
-	VPROF_BUDGET( "C_BaseEntity::AddVisibleEntities", VPROF_BUDGETGROUP_WORLD_RENDERING );
 
 	// Let non-dormant client created predictables get added, too
 	int c = predictables->GetPredictableCount();
@@ -6156,7 +6152,6 @@ void C_BaseEntity::GetToolRecordingState( KeyValues *msg )
 	if ( !ToolsEnabled() )
 		return;
 
-	VPROF_BUDGET( "C_BaseEntity::GetToolRecordingState", VPROF_BUDGETGROUP_TOOLS );
 
 	C_BaseEntity *pOwner = m_hOwnerEntity;
 
@@ -6219,7 +6214,6 @@ void C_BaseEntity::RecordToolMessage()
 // (static function)
 void C_BaseEntity::ToolRecordEntities()
 {
-	VPROF_BUDGET( "C_BaseEntity::ToolRecordEnties", VPROF_BUDGETGROUP_TOOLS );
 
 	if ( !ToolsEnabled() || !clienttools->IsInRecordingMode() )
 		return;

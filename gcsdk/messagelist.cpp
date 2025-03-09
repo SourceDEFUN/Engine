@@ -639,7 +639,6 @@ short CMessageList::GetMessageIndex( MsgType_t eMsg )
 
 bool CMessageList::GetMessage( MsgType_t eMsg, const char **ppMsgName, int nTypeMask )
 {
-	VPROF_BUDGET( "GetMessage", VPROF_BUDGETGROUP_JOBS_COROUTINES );
 
 	// if an out variable for the name is provided,
 	// initialize it with a pointer to "unknown" string

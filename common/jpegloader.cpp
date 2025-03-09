@@ -7,7 +7,6 @@
 #include "jpegloader.h"
 #include "tier0/dbg.h"
 #include "tier1/utlvector.h"
-#include "tier0/vprof.h"
 #include "jpeglib/jpeglib.h"
 #include <setjmp.h>
 //#include "fileio.h"
@@ -343,7 +342,6 @@ bool ConvertJpegToRawInternal( const byte *pubJpegData, int cubJpegData, CUtlBuf
 
 	bool bConverted = false;
 	{
-		VPROF_BUDGET( "ConvertJpegToRGB", VPROF_BUDGETGROUP_OTHER_VGUI );
 		bConverted = ConvertJpegToRGB( pubJpegData, cubJpegData, vecRGB, width, height, pcubUsed );
 	}
 
@@ -367,7 +365,6 @@ bool ConvertJpegToRawInternal( const byte *pubJpegData, int cubJpegData, CUtlBuf
 		// convert RGB->RGBA, into the final buffer
 		if ( bMakeRGBA )
 		{
-			VPROF_BUDGET( "ConvertRGBToRGBAImage", VPROF_BUDGETGROUP_OTHER_VGUI );
 			ConvertRGBToRGBAImage( vecRGB, width, height, (byte *)bufOutput.Base(), width, height );
 		}
 		else

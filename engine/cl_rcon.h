@@ -22,7 +22,6 @@
 #include "sv_rcon.h"
 #include "socketcreator.h"
 #include "igameserverdata.h"
-#include "ivprofexport.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

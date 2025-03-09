@@ -19,7 +19,6 @@
 #include "cdll_client_int.h"
 #include "vgui/IVGui.h"
 #include "vgui_controls/Controls.h"
-#include "tier0/vprof_telemetry.h"
 #include <time.h>
 #include "steam/steam_api.h"
 

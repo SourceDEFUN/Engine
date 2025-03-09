@@ -14,7 +14,6 @@
 #include "materialsystem/imesh.h"
 #include "optimize.h"
 #include "mathlib/vmatrix.h"
-#include "tier0/vprof.h"
 #include "tier1/strtools.h"
 #include "tier1/KeyValues.h"
 #include "tier0/memalloc.h"

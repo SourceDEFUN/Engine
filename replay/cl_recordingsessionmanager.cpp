@@ -7,7 +7,6 @@
 #include "cl_replaymanager.h"
 #include "cl_recordingsession.h"
 #include "cl_sessionblockdownloader.h"
-#include "vprof.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -178,7 +177,6 @@ int CClientRecordingSessionManager::GetVersion() const
 
 void CClientRecordingSessionManager::Think()
 {
-	VPROF_BUDGET( "CClientRecordingSessionManager::Think", VPROF_BUDGETGROUP_REPLAY );
 
 	BaseClass::Think();
 

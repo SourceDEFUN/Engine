@@ -638,7 +638,6 @@ void DumpKeyvalues(WCKeyValues &kv)
 //-----------------------------------------------------------------------------
 void COP_Entity::MergeObjectKeyValues(CEditGameClass *pEdit)
 {
-	//VPROF_BUDGET( "COP_Entity::MergeObjectKeyValues", "Object Properties" );
 	for ( int i=pEdit->GetFirstKeyValue(); i != pEdit->GetInvalidKeyValue(); i=pEdit->GetNextKeyValue( i ) )
 	{
 		LPCTSTR pszCurValue = m_kv.GetValue(pEdit->GetKey(i));
@@ -669,7 +668,6 @@ void COP_Entity::MergeObjectKeyValues(CEditGameClass *pEdit)
 //-----------------------------------------------------------------------------
 void COP_Entity::MergeKeyValue(char const *pszKey)
 {
-	//VPROF_BUDGET( "COP_Entity::MergeKeyValue", "Object Properties" );
 
 	Assert(pszKey);
 	if (!pszKey)
@@ -745,7 +743,6 @@ void COP_Entity::MergeKeyValue(char const *pszKey)
 //-----------------------------------------------------------------------------
 void COP_Entity::UpdateData( int Mode, PVOID pData, bool bCanEdit )
 {
-	//VPROF_BUDGET( "COP_Entity::UpdateData", "Object Properties" );
 
 	//DBG("UpdateData\n");
 	//DumpKeyvalues(m_kv);
@@ -960,7 +957,6 @@ BOOL COP_Entity::OnApply(void)
 //-----------------------------------------------------------------------------
 void COP_Entity::ApplyKeyValueToObject(CEditGameClass *pObject, const char *pszKey, const char *pszValue)
 {
-	//VPROF_BUDGET( "COP_Entity::ApplyKeyValueToObject", "Object Properties" );
 
 	GDclass *pClass = pObject->GetClass();
 	if (pClass != NULL)
@@ -1054,7 +1050,6 @@ void COP_Entity::MarkDataDirty()
 //-----------------------------------------------------------------------------
 bool COP_Entity::SaveData(void)
 {
-	//VPROF_BUDGET( "COP_Entity::SaveData", "Object Properties" );
 
 	//DBG("SaveData\n");
 	//DumpKeyvalues(m_kv);
@@ -1425,7 +1420,6 @@ void COP_Entity::ClearVarList()
 //-----------------------------------------------------------------------------
 void COP_Entity::RemoveBlankKeys(void)
 {
-	//VPROF_BUDGET( "COP_Entity::RemoveBlankKeys", "Object Properties" );
 
 	int iNext;
 	for (int i = m_kv.GetFirst(); i != m_kv.GetInvalidIndex(); i=iNext)
@@ -1537,7 +1531,6 @@ void COP_Entity::LoadClassList(void)
 //-----------------------------------------------------------------------------
 BOOL COP_Entity::OnInitDialog(void)
 {
-	//VPROF_BUDGET( "COP_Entity::OnInitDialog", "Object Properties" );
 
 	CObjectPage::OnInitDialog();
 
@@ -1707,7 +1700,6 @@ void COP_Entity::SetCurVarListSelection( int iSel )
 //-----------------------------------------------------------------------------
 void COP_Entity::GetCurKey(CString &strKey)
 {
-	//VPROF_BUDGET( "COP_Entity::GetCurKey", "Object Properties" );
 
 	int iSel = GetCurVarListSelection();
 	if (iSel == -1)
@@ -1727,7 +1719,6 @@ void COP_Entity::GetCurKey(CString &strKey)
 //-----------------------------------------------------------------------------
 void COP_Entity::SetCurKey(LPCTSTR pszKey)
 {
-	//VPROF_BUDGET( "COP_Entity::SetCurKey", "Object Properties" );
 
 	int nSel = m_VarList.GetItemCount();
 
@@ -1762,7 +1753,6 @@ void COP_Entity::SetCurKey(LPCTSTR pszKey)
 //-----------------------------------------------------------------------------
 void COP_Entity::DestroySmartControls(void)
 {
-	//VPROF_BUDGET( "COP_Entity::DestroySmartControls", "Object Properties" );
 
 	for (int i = 0; i < m_SmartControls.Count(); i++)
 	{
@@ -1794,7 +1784,6 @@ void COP_Entity::DestroySmartControls(void)
 //-----------------------------------------------------------------------------
 void COP_Entity::CreateSmartControls(GDinputvariable *pVar, CUtlVector<const char *>*pHelperType)
 {
-	//VPROF_BUDGET( "COP_Entity::CreateSmartControls", "Object Properties" );
 
 	// dvs: TODO: break this monster up into smaller functions
 	if (pVar == NULL)
@@ -2560,7 +2549,6 @@ void COP_Entity::SetSmartControlText(const char *pszText)
 //-----------------------------------------------------------------------------
 void COP_Entity::OnSelchangeKeyvalues(void)
 {
-	//VPROF_BUDGET( "COP_Entity::OnSelchangeKeyvalues", "Object Properties" );
 
 	//
 	// Load new selection's key/values into the key/value 
@@ -2693,7 +2681,6 @@ void COP_Entity::OnChangeKeyorValue(void)
 //-----------------------------------------------------------------------------
 void COP_Entity::OnAddkeyvalue(void)
 {
-	//VPROF_BUDGET( "COP_Entity::OnAddkeyvalue", "Object Properties" );
 
 	// create a new keyvalue at the end of the list
 	CNewKeyValue newkv;
@@ -2784,7 +2771,6 @@ static unsigned long GetMatchingFlagsMask( GDinputvariable *pVar1, GDinputvariab
 //-----------------------------------------------------------------------------
 void COP_Entity::AssignClassDefaults(GDclass *pClass, GDclass *pOldClass)
 {
-	//VPROF_BUDGET( "COP_Entity::AssignClassDefaults", "Object Properties" );
 	
 	if (!pClass)
 		return;
@@ -2870,7 +2856,6 @@ void COP_Entity::AssignClassDefaults(GDclass *pClass, GDclass *pOldClass)
 //-----------------------------------------------------------------------------
 void COP_Entity::UpdateEditClass(const char *pszClass, bool bForce)
 {
-	//VPROF_BUDGET( "COP_Entity::UpdateClass", "Object Properties" );
 	
 	GDclass *pOldEditClass = m_pEditClass;
 	m_pEditClass = pGD->ClassForName(pszClass);
@@ -2916,7 +2901,6 @@ void COP_Entity::UpdateEditClass(const char *pszClass, bool bForce)
 //-----------------------------------------------------------------------------
 void COP_Entity::UpdateKeyValue(const char *szKey, const char *szValue)
 {
-	//VPROF_BUDGET( "COP_Entity::UpdateKeyValue", "Object Properties" );
 
 	m_kvAdded.SetValue(szKey, "1");
 	m_kv.SetValue(szKey, szValue);
@@ -3210,7 +3194,6 @@ void COP_Entity::OnChangeSmartcontrol(void)
 //-----------------------------------------------------------------------------
 void COP_Entity::InternalOnChangeSmartcontrol( const char *szValue )
 {
-	//VPROF_BUDGET( "COP_Entity::OnChangeSmartcontrol", "Object Properties" );
 
 	//
 	// We only respond to this message when it is due to user input.

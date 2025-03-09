@@ -18,7 +18,6 @@
 #include "materialsystem/imaterialvar.h"
 #include "materialsystem/itexture.h"
 #include "materialsystem/imesh.h"
-#include "tier0/vprof.h"
 #include "tier1/KeyValues.h"
 #include "tier1/lzmaDecoder.h"
 #include "random_floats.h"
@@ -1723,37 +1722,11 @@ void CParticleCollection::UpdatePrevControlPoints( float dt )
 		m_ControlPoints[i].m_PrevPosition = m_ControlPoints[i].m_Position;
 	m_nParticleFlags |= PCFLAGS_PREV_CONTROL_POINTS_INITIALIZED;
 }
-
-#if MEASURE_PARTICLE_PERF
-
-#if VPROF_LEVEL > 0
-#define START_OP float flOpStartTime = Plat_FloatTime(); VPROF_ENTER_SCOPE(pOp->GetDefinition()->GetName())
-#else
-#define START_OP float flOpStartTime = Plat_FloatTime();
-#endif
-
-#if VPROF_LEVEL > 0
-#define END_OP  if ( 1 ) {																						\
-	float flETime = Plat_FloatTime() - flOpStartTime;									\
-	IParticleOperatorDefinition *pDef = (IParticleOperatorDefinition *) pOp->m_pDef;	\
-	pDef->RecordExecutionTime( flETime );												\
-} \
-	VPROF_EXIT_SCOPE()
-#else
-#define END_OP  if ( 1 ) {																						\
-	float flETime = Plat_FloatTime() - flOpStartTime;									\
-	IParticleOperatorDefinition *pDef = (IParticleOperatorDefinition *) pOp->m_pDef;	\
-	pDef->RecordExecutionTime( flETime );												\
-}
-#endif
-#else
-#define START_OP
+#define START_OP float flOpStartTime = Plat_FloatTime()
 #define END_OP
-#endif
 
 void CParticleCollection::InitializeNewParticles( int nFirstParticle, int nParticleCount, uint32 nInittedMask )
 {
-	VPROF_BUDGET( "CParticleCollection::InitializeNewParticles", VPROF_BUDGETGROUP_PARTICLE_SIMULATION );
 
 #ifdef _DEBUG
 	m_bIsRunningInitializers = true;
@@ -1920,7 +1893,6 @@ void CParticleCollection::SimulateFirstFrame( )
 
 void CParticleCollection::Simulate( float dt, bool updateBboxOnly )
 {
-	VPROF_BUDGET( "CParticleCollection::Simulate", VPROF_BUDGETGROUP_PARTICLE_SIMULATION );
 	if ( dt < 0.0f )
 		return;
 
@@ -3754,7 +3726,6 @@ void CParticleSystemMgr::DrawRenderCache( bool bShadowDepth )
 	if ( nRenderCacheCount == 0 )
 		return;
 
-	VPROF_BUDGET( "CParticleSystemMgr::DrawRenderCache", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
 
 	CMatRenderContextPtr pRenderContext( g_pMaterialSystem );
 	pRenderContext->MatrixMode( MATERIAL_MODEL );

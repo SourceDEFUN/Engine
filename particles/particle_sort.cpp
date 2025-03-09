@@ -6,7 +6,6 @@
 
 #include <algorithm>
 #include "tier0/platform.h"
-#include "tier0/vprof.h"
 #include "particles/particles.h"
 #include "psheet.h"
 
@@ -142,7 +141,6 @@ static bool SortLessFunc( const ParticleRenderData_t &left, const ParticleRender
 
 void CParticleCollection::GenerateSortedIndexList( Vector vecCamera, CParticleVisibilityData *pVisibilityData, bool bSorted )
 {
-	VPROF_BUDGET( "CParticleCollection::GenerateSortedIndexList", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
 
 	if ( bSorted )
 	{

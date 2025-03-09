@@ -23,7 +23,6 @@
 #include "materialsystem/imaterialvar.h"
 #include "materialsystem/imaterialsystem.h"
 #include "detailobjectsystem.h"
-#include "tier0/vprof.h"
 #include "tier1/mempool.h"
 #include "vstdlib/jobthread.h"
 #include "datacache/imdlcache.h"
@@ -1278,8 +1277,6 @@ void CViewRender::SetCurrentlyDrawingEntity( C_BaseEntity *pEnt )
 
 bool CViewRender::UpdateShadowDepthTexture( ITexture *pRenderTarget, ITexture *pDepthTexture, const CViewSetup &shadowViewIn )
 {
-	VPROF_INCREMENT_COUNTER( "shadow depth textures rendered", 1 );
-
 	CMatRenderContextPtr pRenderContext( materials );
 
 	char szPIXEventName[128];
@@ -2152,7 +2149,6 @@ void CViewRender::RenderView( const CViewSetup &view, int nClearFlags, int whatT
 
 	if ( whatToDraw & RENDERVIEW_DRAWHUD )
 	{
-		VPROF_BUDGET( "VGui_DrawHud", VPROF_BUDGETGROUP_OTHER_VGUI );
 		int viewWidth = view.m_nUnscaledWidth;
 		int viewHeight = view.m_nUnscaledHeight;
 		int viewActualWidth = view.m_nUnscaledWidth;
@@ -2980,7 +2976,6 @@ bool CViewRender::DrawOneMonitor( ITexture *pRenderTarget, int cameraNum, C_Poin
 	const CViewSetup &cameraView, C_BasePlayer *localPlayer, int x, int y, int width, int height )
 {
 #ifdef USE_MONITORS
-	VPROF_INCREMENT_COUNTER( "cameras rendered", 1 );
 	// Setup fog state for the camera.
 	fogparams_t oldFogParams;
 	float flOldZFar = 0.0f;
@@ -3284,7 +3279,6 @@ void CRendering3dView::UpdateRenderablesOpacity()
 void CRendering3dView::BuildWorldRenderLists( bool bDrawEntities, int iForceViewLeaf /* = -1 */, 
 	bool bUseCacheIfEnabled /* = true */, bool bShadowDepth /* = false */, float *pReflectionWaterHeight /*= NULL*/ )
 {
-	VPROF_BUDGET( "BuildWorldRenderLists", VPROF_BUDGETGROUP_WORLD_RENDERING );
 
     // @MULTICORE (toml 8/18/2006): to address....
 	extern void UpdateClientRenderableInPVSStatus();
@@ -3444,8 +3438,6 @@ void CRendering3dView::BuildRenderableRenderLists( int viewID )
 //-----------------------------------------------------------------------------
 void CRendering3dView::DrawWorld( float waterZAdjust )
 {
-	VPROF_INCREMENT_COUNTER( "RenderWorld", 1 );
-	VPROF_BUDGET( "DrawWorld", VPROF_BUDGETGROUP_WORLD_RENDERING );
 	if( !r_drawopaqueworld.GetBool() )
 	{
 		return;
@@ -3842,7 +3834,6 @@ static void DrawOpaqueRenderables_Range( CClientRenderablesList::CEntry *pEntiti
 
 void CRendering3dView::DrawOpaqueRenderables( ERenderDepthMode DepthMode )
 {
-	VPROF_BUDGET("CViewRender::DrawOpaqueRenderables", "DrawOpaqueRenderables" );
 
 	if( !r_drawopaquerenderables.GetBool() )
 		return;
@@ -4061,7 +4052,6 @@ void CRendering3dView::DrawOpaqueRenderables( ERenderDepthMode DepthMode )
 //-----------------------------------------------------------------------------
 void CRendering3dView::DrawTranslucentWorldInLeaves( bool bShadowDepth )
 {
-	VPROF_BUDGET( "CViewRender::DrawTranslucentWorldInLeaves", VPROF_BUDGETGROUP_WORLD_RENDERING );
 	const ClientWorldListInfo_t& info = *m_pWorldListInfo;
 	for( int iCurLeafIndex = info.m_LeafCount - 1; iCurLeafIndex >= 0; iCurLeafIndex-- )
 	{
@@ -4081,7 +4071,6 @@ void CRendering3dView::DrawTranslucentWorldInLeaves( bool bShadowDepth )
 //-----------------------------------------------------------------------------
 void CRendering3dView::DrawTranslucentWorldAndDetailPropsInLeaves( int iCurLeafIndex, int iFinalLeafIndex, int nEngineDrawFlags, int &nDetailLeafCount, LeafIndex_t* pDetailLeafList, bool bShadowDepth )
 {
-	VPROF_BUDGET( "CViewRender::DrawTranslucentWorldAndDetailPropsInLeaves", VPROF_BUDGETGROUP_WORLD_RENDERING );
 	const ClientWorldListInfo_t& info = *m_pWorldListInfo;
 	for( ; iCurLeafIndex >= iFinalLeafIndex; iCurLeafIndex-- )
 	{
@@ -4332,7 +4321,6 @@ void CRendering3dView::DrawTranslucentRenderables( bool bInSkybox, bool bShadowD
 		return;
 	}
 
-	VPROF_BUDGET( "CViewRender::DrawTranslucentRenderables", "DrawTranslucentRenderables" );
 	int iPrevLeaf = info.m_LeafCount - 1;
 	int nDetailLeafCount = 0;
 	LeafIndex_t *pDetailLeafList = (LeafIndex_t*)stackalloc( info.m_LeafCount * sizeof(LeafIndex_t) );
@@ -4778,7 +4766,6 @@ bool CSkyboxView::Setup( const CViewSetup &view, int *pClearFlags, SkyboxVisibil
 //-----------------------------------------------------------------------------
 void CSkyboxView::Draw()
 {
-	VPROF_BUDGET( "CViewRender::Draw3dSkyboxworld", "3D Skybox" );
 
 	ITexture *pRTColor = NULL;
 	ITexture *pRTDepth = NULL;
@@ -4822,7 +4809,6 @@ void CPortalSkyboxView::Draw()
 {
 	AssertMsg( (g_pPortalRender->GetViewRecursionLevel() != 0) && g_pPortalRender->IsRenderingPortal(), "This is designed for through-portal views. Use the regular skybox drawing code for primary views" );
 
-	VPROF_BUDGET( "CViewRender::Draw3dSkyboxworld_Portal", "3D Skybox (portal view)" );
 
 	int iCurrentViewID = g_CurrentViewID;
 
@@ -4877,7 +4863,6 @@ bool DrawingMainView() //for easy externing
 //-----------------------------------------------------------------------------
 void CShadowDepthView::Draw()
 {
-	VPROF_BUDGET( "CShadowDepthView::Draw", VPROF_BUDGETGROUP_SHADOW_DEPTH_TEXTURING );
 
 	// Start view
 	unsigned int visFlags;
@@ -4908,12 +4893,10 @@ void CShadowDepthView::Draw()
 	MDLCACHE_CRITICAL_SECTION();
 
 	{
-		VPROF_BUDGET( "BuildWorldRenderLists", VPROF_BUDGETGROUP_SHADOW_DEPTH_TEXTURING );
 		BuildWorldRenderLists( true, -1, true, true ); // @MULTICORE (toml 8/9/2006): Portal problem, not sending custom vis down
 	}
 
 	{
-		VPROF_BUDGET( "BuildRenderableRenderLists", VPROF_BUDGETGROUP_SHADOW_DEPTH_TEXTURING );
 		BuildRenderableRenderLists( CurrentViewID() );
 	}
 
@@ -4922,7 +4905,6 @@ void CShadowDepthView::Draw()
 	m_DrawFlags = m_pMainView->GetBaseDrawFlags() | DF_RENDER_UNDERWATER | DF_RENDER_ABOVEWATER | DF_SHADOW_DEPTH_MAP;	// Don't draw water surface...
 
 	{
-		VPROF_BUDGET( "DrawWorld", VPROF_BUDGETGROUP_SHADOW_DEPTH_TEXTURING );
 		DrawWorld( 0.0f );
 	}
 
@@ -4931,7 +4913,6 @@ void CShadowDepthView::Draw()
 	modelrender->ForcedMaterialOverride( NULL, OVERRIDE_DEPTH_WRITE );	
 
 	{
-		VPROF_BUDGET( "DrawOpaqueRenderables", VPROF_BUDGETGROUP_SHADOW_DEPTH_TEXTURING );
 		DrawOpaqueRenderables( DEPTH_MODE_SHADOW );
 	}
 
@@ -5366,7 +5347,6 @@ void CBaseWorldView::SSAO_DepthPass()
 	}
 
 #if 1
-	VPROF_BUDGET( "CSimpleWorldView::SSAO_DepthPass", VPROF_BUDGETGROUP_SHADOW_DEPTH_TEXTURING );
 
 	int savedViewID = g_CurrentViewID;
 	g_CurrentViewID = VIEW_SSAO;
@@ -5400,7 +5380,6 @@ void CBaseWorldView::SSAO_DepthPass()
 	m_DrawFlags |= DF_SSAO_DEPTH_PASS;
 
 	{
-		VPROF_BUDGET( "DrawWorld", VPROF_BUDGETGROUP_SHADOW_DEPTH_TEXTURING );
 		DrawWorld( 0.0f );
 	}
 
@@ -5409,14 +5388,12 @@ void CBaseWorldView::SSAO_DepthPass()
 	modelrender->ForcedMaterialOverride( NULL, OVERRIDE_SSAO_DEPTH_WRITE );	
 
 	{
-		VPROF_BUDGET( "DrawOpaqueRenderables", VPROF_BUDGETGROUP_SHADOW_DEPTH_TEXTURING );
 		DrawOpaqueRenderables( DEPTH_MODE_SSA0 );
 	}
 
 #if 0
 	if ( m_bRenderFlashlightDepthTranslucents || r_flashlightdepth_drawtranslucents.GetBool() )
 	{
-		VPROF_BUDGET( "DrawTranslucentRenderables", VPROF_BUDGETGROUP_SHADOW_DEPTH_TEXTURING );
 		DrawTranslucentRenderables( false, true );
 	}
 #endif

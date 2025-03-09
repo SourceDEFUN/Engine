@@ -8,7 +8,6 @@
 
 #include "NextBotInterface.h"
 
-#include "tier0/vprof.h"
 
 #define PATH_NO_LENGTH_LIMIT 0.0f				// non-default argument value for Path::Compute()
 #define PATH_TRUNCATE_INCOMPLETE_PATH false		// non-default argument value for Path::Compute()
@@ -155,7 +154,6 @@ public:
 	template< typename CostFunctor >
 	bool Compute( INextBot *bot, CBaseCombatCharacter *subject, CostFunctor &costFunc, float maxPathLength = 0.0f, bool includeGoalIfPathFails = true )
 	{
-		VPROF_BUDGET( "Path::Compute(subject)", "NextBot" );
 
 		Invalidate();
 
@@ -272,7 +270,6 @@ public:
 	template< typename CostFunctor >
 	bool Compute( INextBot *bot, const Vector &goal, CostFunctor &costFunc, float maxPathLength = 0.0f, bool includeGoalIfPathFails = true )
 	{
-		VPROF_BUDGET( "Path::Compute(goal)", "NextBotSpiky" );
 
 		Invalidate();
 		
@@ -391,7 +388,6 @@ public:
 	 */
 	virtual bool ComputeWithOpenGoal( INextBot *bot, const IPathCost &costFunc, const IPathOpenGoalSelector &goalSelector, float maxSearchRadius = 0.0f )
 	{
-		VPROF_BUDGET( "ComputeWithOpenGoal", "NextBot" );
 
 		int teamID = bot->GetEntity()->GetTeamNumber();
 
@@ -506,7 +502,6 @@ public:
 	 */
 	void AssemblePrecomputedPath( INextBot *bot, const Vector &goal, CNavArea *endArea )
 	{
-		VPROF_BUDGET( "AssemblePrecomputedPath", "NextBot" );
 
 		const Vector &start = bot->GetPosition();
 

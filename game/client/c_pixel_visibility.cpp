@@ -14,7 +14,6 @@
 #include "view.h"
 #include "viewrender.h"
 #include "utlmultilist.h"
-#include "vprof.h"
 #include "icommandline.h"
 #include "sourcevr/isourcevirtualreality.h"
 

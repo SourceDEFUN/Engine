@@ -13,7 +13,6 @@
 
 #include "collisionutils.h"
 #include "vstdlib/random.h"
-#include "tier0/vprof.h"
 #include "bone_accessor.h"
 #include "mathlib/ssequaternion.h"
 #include "bitvec.h"

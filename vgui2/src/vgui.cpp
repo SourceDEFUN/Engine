@@ -40,7 +40,6 @@
 #include "utllinkedlist.h"
 #include "utlpriorityqueue.h"
 #include "utlvector.h"
-#include "tier0/vprof.h"
 #include "tier0/icommandline.h"
 
 #if defined( _X360 )

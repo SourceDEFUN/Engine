@@ -17,7 +17,6 @@
 
 #include "cs_bot.h"
 
-#include "tier0/vprof.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -56,7 +55,6 @@ void CBotManager::RestartRound( void )
  */
 void CBotManager::StartFrame( void )
 {
-	VPROF_BUDGET( "CBotManager::StartFrame", VPROF_BUDGETGROUP_NPCS );
 
 	ValidateActiveGrenades();
 
@@ -265,7 +263,6 @@ bool CBotManager::IsInsideSmokeCloud( const Vector *pos )
  */
 bool CBotManager::IsLineBlockedBySmoke( const Vector &from, const Vector &to, float grenadeBloat )
 {
-	VPROF_BUDGET( "CBotManager::IsLineBlockedBySmoke", VPROF_BUDGETGROUP_NPCS );
 
 	float totalSmokedLength = 0.0f;	// distance along line of sight covered by smoke
 

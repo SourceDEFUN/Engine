@@ -9,7 +9,6 @@
 #include "c_te_effect_dispatch.h"
 #include "particles_new.h"
 #include "networkstringtable_clientdll.h"
-#include "tier0/vprof.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -163,7 +162,6 @@ void C_ParticleSystem::ClientThink( void )
 				float flTimeDelta = gpGlobals->curtime - m_flStartTime;
 				if ( flTimeDelta > 0.01f )
 				{
-					VPROF_BUDGET( "C_ParticleSystem::ClientThink SkipToTime", "Particle Simulation" );
 					pEffect->SkipToTime( flTimeDelta );
 				}
 			}

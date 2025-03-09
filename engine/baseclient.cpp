@@ -1061,7 +1061,6 @@ void CBaseClient::EndTrace( bf_write &msg )
 {
 	if ( m_iTracing == 0 )
 		return;
-	VPROF_BUDGET( "CBaseClient::EndTrace", VPROF_BUDGETGROUP_OTHER_NETWORKING );
 
 	int bits = m_Trace.m_nCurBit - m_Trace.m_nStartBit;
 	float flElapsedMs = ( Plat_FloatTime() - m_Trace.m_StartSendTime ) * 1000.0;
@@ -1110,7 +1109,6 @@ void CBaseClient::TraceNetworkData( bf_write &msg, char const *fmt, ... )
 {
 	if ( !IsTracing() )
 		return;
-	VPROF_BUDGET( "CBaseClient::TraceNetworkData", VPROF_BUDGETGROUP_OTHER_NETWORKING );
 	char buf[ 64 ];
 	va_list argptr;
 	va_start( argptr, fmt );
@@ -1128,7 +1126,6 @@ void CBaseClient::TraceNetworkMsg( int nBits, char const *fmt, ... )
 {
 	if ( !IsTracing() )
 		return;
-	VPROF_BUDGET( "CBaseClient::TraceNetworkMsg", VPROF_BUDGETGROUP_OTHER_NETWORKING );
 	char buf[ 64 ];
 	va_list argptr;
 	va_start( argptr, fmt );
@@ -1278,7 +1275,6 @@ write_again:
 	// is this is a full entity update (no delta) ?
 	if ( !deltaFrame )
 	{
-		VPROF_BUDGET( "SendSnapshot Transmit Full", VPROF_BUDGETGROUP_OTHER_NETWORKING );
 
 		// transmit snapshot as reliable data chunk
 		bSendOK = m_NetChannel->SendData( msg );
@@ -1290,7 +1286,6 @@ write_again:
 	}
 	else
 	{
-		VPROF_BUDGET( "SendSnapshot Transmit Delta", VPROF_BUDGETGROUP_OTHER_NETWORKING );
 
 		// just send it as unreliable snapshot
 		bSendOK = m_NetChannel->SendDatagram( &msg ) > 0;
@@ -1502,7 +1497,6 @@ bool CBaseClient::IsNameChangeOnCooldown( bool bShowStatusMessage /*= false*/ )
 
 void CBaseClient::OnRequestFullUpdate()
 {
-	VPROF_BUDGET( "CBaseClient::OnRequestFullUpdate", VPROF_BUDGETGROUP_OTHER_NETWORKING );
 
 	// client requests a full update 
 	m_pLastSnapshot = NULL;

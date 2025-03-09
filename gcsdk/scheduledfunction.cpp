@@ -135,7 +135,6 @@ void CScheduledFunctionMgr::Cancel( IGCScheduledFunction* pEvent )
 //-------------------------------------------------------------------------
 void CScheduledFunctionMgr::RunFunctions()
 {
-	VPROF_BUDGET( "CGCBase::CallScheduledEvents", VPROF_BUDGETGROUP_STEAM );
 
 	uint64 nCurrTime = CJobTime::LJobTimeCur();
 	for( uint32 nCurrBucket = 0; nCurrBucket < ARRAYSIZE( m_Resolutions ); nCurrBucket++ )

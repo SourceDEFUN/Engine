@@ -179,8 +179,6 @@ def build(bld):
 		'traceinit.cpp',
 		'../public/vallocator.cpp',
 		'voiceserver_impl.cpp',
-		'vprof_engine.cpp',
-		'vprof_record.cpp',
 		'world.cpp',
 		'../public/XZip.cpp',
 		'../public/XUnzip.cpp',
@@ -315,20 +313,12 @@ def build(bld):
 			'audio/voice.cpp', #[!$X360]
 			'audio/voice_sound_engine_interface.cpp', #[!$X360]
 			'../public/vgui_controls/vgui_controls.cpp',
-			'../common/vgui/vgui_basebudgetpanel.cpp',
-			'../common/vgui/vgui_budgetbargraphpanel.cpp',
-			'../common/vgui/vgui_budgethistorypanel.cpp',
-			'../common/vgui/vgui_budgetpanelshared.cpp',
 			'perfuipanel.cpp',
 			'vgui_basepanel.cpp',
 			'vgui_baseui_interface.cpp',
-			'vgui_budgetpanel.cpp',
 			'vgui_DebugSystemPanel.cpp',
 			'vgui_drawtreepanel.cpp',
 			'vgui_helpers.cpp',
-			'vgui_texturebudgetpanel.cpp',
-			'vgui_vprofgraphpanel.cpp',
-			'vgui_vprofpanel.cpp',
 			'toolframework.cpp',
 		]
 		

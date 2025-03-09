@@ -11,7 +11,6 @@
 
 #include "cbase.h"
 
-#include "tier0/vprof.h"
 #include "tier0/tslist.h"
 #include "tier1/utlhash.h"
 #include "vstdlib/jobthread.h"
@@ -1329,7 +1328,6 @@ bool CNavArea::IsConnected( const CNavArea *area, NavDirType dir ) const
  */
 float CNavArea::ComputeGroundHeightChange( const CNavArea *area )
 {
-	VPROF_BUDGET( "CNavArea::ComputeHeightChange", "NextBot" );
 
 	Vector closeFrom, closeTo;
 	area->GetClosestPointOnArea( GetCenter(), &closeTo );
@@ -2568,7 +2566,6 @@ void CNavArea::ComputeClosestPointInPortal( const CNavArea *to, NavDirType dir, 
  */
 bool CNavArea::IsContiguous( const CNavArea *other ) const
 {
-	VPROF_BUDGET( "CNavArea::IsContiguous", "NextBot" );
 
 	// find which side it is connected on
 	int dir;
@@ -2599,7 +2596,6 @@ bool CNavArea::IsContiguous( const CNavArea *other ) const
  */
 float CNavArea::ComputeAdjacentConnectionHeightChange( const CNavArea *destinationArea ) const
 {
-	VPROF_BUDGET( "CNavArea::ComputeAdjacentConnectionHeightChange", "NextBot" );
 
 	// find which side it is connected on
 	int dir;
@@ -5704,7 +5700,6 @@ bool CNavArea::IsPartiallyVisible( const Vector &eye, CBaseEntity *ignore ) cons
 //--------------------------------------------------------------------------------------------------------
 bool CNavArea::IsPotentiallyVisible( const CNavArea *viewedArea ) const
 {
-	VPROF_BUDGET( "CNavArea::IsPotentiallyVisible", "NextBot" );
 
 	if ( viewedArea == NULL )
 	{
@@ -5749,7 +5744,6 @@ bool CNavArea::IsPotentiallyVisible( const CNavArea *viewedArea ) const
 //--------------------------------------------------------------------------------------------------------
 bool CNavArea::IsCompletelyVisible( const CNavArea *viewedArea ) const
 {
-	VPROF_BUDGET( "CNavArea::IsCompletelyVisible", "NextBot" );
 
 	if ( viewedArea == NULL )
 	{
@@ -5796,7 +5790,6 @@ bool CNavArea::IsCompletelyVisible( const CNavArea *viewedArea ) const
  */
 bool CNavArea::IsPotentiallyVisibleToTeam( int teamIndex ) const
 {
-	VPROF_BUDGET( "CNavArea::IsPotentiallyVisibleToTeam", "NextBot" );
 
 	CTeam *team = GetGlobalTeam( teamIndex );
 
@@ -5823,7 +5816,6 @@ bool CNavArea::IsPotentiallyVisibleToTeam( int teamIndex ) const
  */
 bool CNavArea::IsCompletelyVisibleToTeam( int teamIndex ) const
 {
-	VPROF_BUDGET( "CNavArea::IsCompletelyVisibleToTeam", "NextBot" );
 
 	CTeam *team = GetGlobalTeam( teamIndex );
 

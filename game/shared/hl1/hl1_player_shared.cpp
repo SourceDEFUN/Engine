@@ -6,7 +6,6 @@
 //
 //=============================================================================//
 #include "cbase.h"
-#include "tier0/vprof.h"
 
 #ifdef CLIENT_DLL
 #include "hl1_player_shared.h"

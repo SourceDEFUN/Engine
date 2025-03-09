@@ -33,7 +33,6 @@
 #include "gl_cvars.h"
 #include "sv_filter.h"
 #include "ivideomode.h"
-#include "vprof_engine.h"
 #include "iengine.h"
 #include "tier2/tier2.h"
 #include "enginethreads.h"
@@ -83,7 +82,6 @@
 #include "tier1/strtools.h"
 #include "testscriptmgr.h"
 #include "tmessage.h"
-#include "tier0/vprof.h"
 #include "tier0/icommandline.h"
 #include "materialsystem/imaterialsystemhardwareconfig.h"
 #include "MapReslistGenerator.h"
@@ -2206,7 +2204,6 @@ void CL_ProcessXboxVoiceData()
 
 void CL_ProcessVoiceData()
 {
-	VPROF_BUDGET( "CL_ProcessVoiceData", VPROF_BUDGETGROUP_OTHER_NETWORKING );
 
 #if !defined( NO_VOICE )
 	Voice_Idle(host_frametime);
@@ -2623,7 +2620,6 @@ Runs all active servers
 
 void _Host_RunFrame_Input( float accumulated_extra_samples, bool bFinalTick )
 {
-	VPROF_BUDGET( "_Host_RunFrame_Input", _T("Input") );
 
 	// Run a test script?
 	static bool bFirstFrame = true;
@@ -2892,7 +2888,6 @@ void _Host_RunFrame_Sound()
 {
 #ifndef SWDS
 
-	VPROF_BUDGET( "_Host_RunFrame_Sound", VPROF_BUDGETGROUP_OTHER_SOUND );
 
 	g_HostTimes.StartFrameSegment( FRAME_SEGMENT_SOUND );
 
@@ -3504,7 +3499,6 @@ void _Host_RunFrame (float time)
 		if ( pGameJob )
 		{
 			{
-				VPROF_BUDGET( "WaitForAsyncServer", "AsyncServer" );
 				if ( Host_IsSinglePlayerGame() )
 				{
 					// This should change to a YieldWait if the server starts wanting to parallel process. If
@@ -4660,7 +4654,6 @@ bool Host_NewGame( char *mapName, bool loadGame, bool bBackgroundLevel, const ch
 	}
 
 	// init network mode
-	VPROF_SCOPE_BEGIN( "Host_NewGame_SpawnServer" );
 
 	NET_SetMutiplayer( sv.IsMultiplayer() );
 
@@ -4678,8 +4671,6 @@ bool Host_NewGame( char *mapName, bool loadGame, bool bBackgroundLevel, const ch
 	}
 
 	sv.m_bIsLevelMainMenuBackground = bBackgroundLevel;
-
-	VPROF_SCOPE_END();
 
 	// make sure the time is set
 	g_ServerGlobalVariables.curtime = sv.GetTime();
@@ -4862,10 +4853,6 @@ void Host_Shutdown(void)
 	CM_FreeMap();
 
 	host_initialized = false;
-
-#if defined(VPROF_ENABLED)
-	VProfRecord_Shutdown();
-#endif
 
 #if !defined SWDS
 	if ( !sv.IsDedicated() )

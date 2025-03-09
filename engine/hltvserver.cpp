@@ -11,7 +11,6 @@
 
 #include <server_class.h>
 #include <inetmessage.h>
-#include <tier0/vprof.h>
 #include <tier0/vcrmode.h>
 #include <KeyValues.h>
 #include <edict.h>
@@ -1311,7 +1310,6 @@ void CHLTVServer::SignonComplete()
 
 CClientFrame *CHLTVServer::AddNewFrame( CClientFrame *clientFrame )
 {
-	VPROF_BUDGET( "CHLTVServer::AddNewFrame", "HLTV" );
 
 	Assert ( clientFrame );
 	Assert( clientFrame->tick_count > m_nLastTick );
@@ -1534,7 +1532,6 @@ CClientFrame *CHLTVServer::GetDeltaFrame( int nTick )
 
 void CHLTVServer::RunFrame()
 {
-	VPROF_BUDGET( "CHLTVServer::RunFrame", "HLTV" );
 
 	// update network time etc
 	NET_RunFrame( Plat_FloatTime() );
@@ -1581,7 +1578,6 @@ void CHLTVServer::RunFrame()
 
 void CHLTVServer::UpdateTick( void )
 {
-	VPROF_BUDGET( "CHLTVServer::UpdateTick", "HLTV" );
 
 	if ( m_nFirstTick < 0 )
 	{

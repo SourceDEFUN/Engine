@@ -12,7 +12,6 @@
 #include "networkstringtabledefs.h"
 #include "../engine/event_system.h"
 #include "../engine/dt.h"
-#include "tier0/vprof.h"
 #include "convar.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

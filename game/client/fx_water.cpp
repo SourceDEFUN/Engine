@@ -13,7 +13,6 @@
 #include "decals.h"
 #include "engine/IEngineSound.h"
 #include "fx_quad.h"
-#include "tier0/vprof.h"
 #include "fx.h"
 #include "fx_water.h"
 
@@ -82,7 +81,6 @@ void UTIL_GetNormalizedColorTintAndLuminosity( const Vector &color, Vector *tint
 //-----------------------------------------------------------------------------
 void FX_WaterRipple( const Vector &origin, float scale, Vector *pColor, float flLifetime, float flAlpha )
 {
-	VPROF_BUDGET( "FX_WaterRipple", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
 	trace_t	tr;
 
 	Vector	color = pColor ? *pColor : Vector( 0.8f, 0.8f, 0.75f );
@@ -119,7 +117,6 @@ void FX_WaterRipple( const Vector &origin, float scale, Vector *pColor, float fl
 //-----------------------------------------------------------------------------
 void FX_GunshotSplash( const Vector &origin, const Vector &normal, float scale )
 {
-	VPROF_BUDGET( "FX_GunshotSplash", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
 	
 	if ( cl_show_splashes.GetBool() == false )
 		return;
@@ -260,7 +257,6 @@ void FX_GunshotSlimeSplash( const Vector &origin, const Vector &normal, float sc
 	if ( cl_show_splashes.GetBool() == false )
 		return;
 
-	VPROF_BUDGET( "FX_GunshotSlimeSplash", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
 	
 #if 0
 

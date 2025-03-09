@@ -125,7 +125,6 @@ bool CSharedObjectDirtyList::HasElement( const CSharedObject *pObj ) const
 
 bool CSharedObjectDirtyList::GetDirtyFieldSetByIndex( int index, CSharedObject **ppObj, CUtlVector<int> &fieldSet ) const
 {
-	VPROF_BUDGET( "CSharedObjectDirtyList::GetDirtyFieldSetByIndex", VPROF_BUDGETGROUP_STEAM );
 	if( !m_sharedObjectDirtyFieldList.IsValidIndex( index ) )
 	{
 		fieldSet.Purge();

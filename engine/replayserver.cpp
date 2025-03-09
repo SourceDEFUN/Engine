@@ -6,7 +6,6 @@
 
 #include <server_class.h>
 #include <inetmessage.h>
-#include <tier0/vprof.h>
 #include <tier0/vcrmode.h>
 #include <KeyValues.h>
 #include <edict.h>
@@ -816,7 +815,6 @@ void CReplayServer::EntityPVSCheck( CClientFrame *pFrame )
 
 CClientFrame *CReplayServer::AddNewFrame( CClientFrame *clientFrame )
 {
-	VPROF_BUDGET( "CReplayServer::AddNewFrame", "Replay" );
 
 	Assert ( clientFrame );
 	Assert( clientFrame->tick_count > m_nLastTick );
@@ -922,7 +920,6 @@ CClientFrame *CReplayServer::GetDeltaFrame( int nTick )
 
 void CReplayServer::RunFrame()
 {
-	VPROF_BUDGET( "CReplayServer::RunFrame", "Replay" );
 
 	// update network time etc
 	NET_RunFrame( Plat_FloatTime() );
@@ -951,7 +948,6 @@ void CReplayServer::RunFrame()
 
 void CReplayServer::UpdateTick( void )
 {
-	VPROF_BUDGET( "CReplayServer::UpdateTick", "Replay" );
 
 	if ( m_nFirstTick < 0 )
 	{

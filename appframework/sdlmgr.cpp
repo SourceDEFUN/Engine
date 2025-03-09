@@ -14,7 +14,6 @@
 
 #include "togl/rendermechanism.h"
 
-#include "tier0/vprof_telemetry.h"
 #include "tier0/icommandline.h"
 
 #include "tier1/utllinkedlist.h"

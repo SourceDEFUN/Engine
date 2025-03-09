@@ -26,7 +26,6 @@
 #include "engine/IEngineSound.h"
 #include "datacache/imdlcache.h"
 #include "ispatialpartition.h"
-#include "tier0/vprof.h"
 #include "movevars_shared.h"
 #include "hierarchy.h"
 #include "trains.h"
@@ -38,12 +37,6 @@
 #include "tier0/memdbgon.h"
 
 extern ConVar think_limit;
-#ifdef _XBOX
-ConVar vprof_think_limit( "vprof_think_limit", "0" );
-#endif
-
-ConVar vprof_scope_entity_thinks( "vprof_scope_entity_thinks", "0" );
-ConVar vprof_scope_entity_gamephys( "vprof_scope_entity_gamephys", "0" );
 
 ConVar	npc_vphysics	( "npc_vphysics","0");
 //-----------------------------------------------------------------------------
@@ -902,10 +895,6 @@ CBaseEntity *CPhysicsPushedEntities::PerformLinearPush( CBaseEntity *pRoot, floa
 //-----------------------------------------------------------------------------
 void CBaseEntity::PhysicsDispatchThink( BASEPTR thinkFunc )
 {
-	VPROF_ENTER_SCOPE( ( !vprof_scope_entity_thinks.GetBool() ) ? 
-						"CBaseEntity::PhysicsDispatchThink" : 
-						EntityFactoryDictionary()->GetCannonicalName( GetClassname() ) );
-
 	float thinkLimit = think_limit.GetFloat();
 	
 	// The thinkLimit stuff makes a LOT of calls to Sys_FloatTime, which winds up calling into
@@ -938,13 +927,6 @@ void CBaseEntity::PhysicsDispatchThink( BASEPTR thinkFunc )
 		float time = ( engine->Time() - startTime ) * 1000.0f;
 		if ( time > thinkLimit )
 		{
-#if defined( _XBOX ) && !defined( _RETAIL )
-			if ( vprof_think_limit.GetBool() )
-			{
-				extern bool g_VProfSignalSpike;
-				g_VProfSignalSpike = true;
-			}
-#endif
 			// If its an NPC print out the shedule/task that took so long
 			CAI_BaseNPC *pNPC = MyNPCPointer();
 			if (pNPC && pNPC->GetCurSchedule())
@@ -963,8 +945,6 @@ void CBaseEntity::PhysicsDispatchThink( BASEPTR thinkFunc )
 			}
 		}
 	}
-
-	VPROF_EXIT_SCOPE();
 }
 
 //-----------------------------------------------------------------------------

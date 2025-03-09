@@ -25,7 +25,6 @@
 #include "player_resource.h"
 #include "engine/IEngineSound.h"
 
-#include "tier0/vprof.h"
 
 void Host_Say( edict_t *pEdict, bool teamonly );
 

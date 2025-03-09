@@ -23,7 +23,6 @@
 #include "server_class.h"
 #include "debugoverlay.h"
 #include "collisionutils.h"
-#include "tier0/vprof.h"
 #include "convar.h"
 #include "mathlib/polyhedron.h"
 #include "sys_dll.h"
@@ -381,7 +380,6 @@ private:
 //-----------------------------------------------------------------------------
 int	CEngineTrace::GetPointContents( const Vector &vecAbsPosition, IHandleEntity** ppEntity )
 {
-//	VPROF_BUDGET( "CEngineTrace_GetPointContents", "CEngineTrace_GetPointContents" );
 	
 	m_traceStatCounters[TRACE_STAT_COUNTER_POINTCONTENTS]++;
 	// First check the collision model
@@ -1575,11 +1573,6 @@ CON_COMMAND( ray_clear, "Clear the current rays" )
 
 CON_COMMAND_EXTERN( ray_bench, RayBench, "Time the rays" )
 {
-#if VPROF_LEVEL > 0 
-	g_VProfCurrentProfile.Start();
-	g_VProfCurrentProfile.Reset();
-	g_VProfCurrentProfile.ResetPeaks();
-#endif
 	{
 		double tStart = Plat_FloatTime();
 		trace_t trace;
@@ -1629,9 +1622,6 @@ CON_COMMAND_EXTERN( ray_bench, RayBench, "Time the rays" )
 				hit++;
 			else
 				miss++;
-#if VPROF_LEVEL > 0 
-			g_VProfCurrentProfile.MarkFrame();
-#endif
 		}
 		double tEnd = Plat_FloatTime();
 		float ms = (tEnd - tStart) * 1000.0f;
@@ -1644,11 +1634,6 @@ CON_COMMAND_EXTERN( ray_bench, RayBench, "Time the rays" )
 		}
 		Msg("RAY TEST: %d hits, %d misses, %.2fms   (%d rays, %d sweeps) (%d ray/prop, %d box/prop)\n", hit, miss, ms, point, swept, rayVsProp, boxVsProp );
 	}
-#if VPROF_LEVEL > 0 
-	g_VProfCurrentProfile.MarkFrame();
-	g_VProfCurrentProfile.Stop();
-	g_VProfCurrentProfile.OutputReport( VPRT_FULL & ~VPRT_HIERARCHY, NULL );
-#endif
 }
 #endif
 

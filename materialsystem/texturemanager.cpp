@@ -33,8 +33,6 @@
 #include "tier0/icommandline.h"
 #include "ctexturecompositor.h"
 
-#include "vprof_telemetry.h"
-
 // Need lightmaps access here
 #define MATSYS_INTERNAL
 #include "cmatlightmaps.h"

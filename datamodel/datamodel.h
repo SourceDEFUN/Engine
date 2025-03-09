@@ -25,7 +25,6 @@
 #include "clipboardmanager.h"
 #include "undomanager.h"
 #include "tier1/convar.h"
-#include "tier0/vprof.h" 
 
 
 //-----------------------------------------------------------------------------

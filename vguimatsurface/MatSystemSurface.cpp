@@ -46,7 +46,6 @@ ILauncherMgr *g_pLauncherMgr = NULL;
 #include "mathlib/mathlib.h"
 #include <vgui/ILocalize.h>
 #include "mathlib/vmatrix.h"
-#include <tier0/vprof.h>
 #include "materialsystem/itexture.h"
 #ifdef OSX
 #include <malloc/malloc.h>
@@ -55,10 +54,6 @@ ILauncherMgr *g_pLauncherMgr = NULL;
 #endif
 #include "../vgui2/src/VPanel.h"
 #include <vgui/IInputInternal.h>
-#if defined( _X360 )
-#include "xbox/xbox_win32stubs.h"
-#endif
-#include "xbox/xboxstubs.h"
 #include "../vgui2/src/Memorybitmap.h"
 
 #pragma warning( disable : 4706 )
@@ -391,11 +386,6 @@ InitReturnVal_t CMatSystemSurface::Init( void )
 	if ( IsPC() )
 	{
 		bValid = system()->GetRegistryString( "HKEY_CURRENT_USER\\Software\\Valve\\Source\\Language", language, sizeof(language)-1 );
-	}
-	else
-	{
-		Q_strncpy( language, XBX_GetLanguageString(), sizeof( language ) );
-		bValid = true;
 	}
 
 	if ( bValid )

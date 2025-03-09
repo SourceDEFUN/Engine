@@ -323,7 +323,6 @@ inline float ILocomotion::GetStuckDuration( void ) const
 
 inline void ILocomotion::TraceHull( const Vector& start, const Vector& end, const Vector &mins, const Vector &maxs, unsigned int fMask, ITraceFilter *pFilter, trace_t *pTrace ) const
 {
-//	VPROF_BUDGET( "ILocomotion::TraceHull", "TraceHull" );
 	Ray_t ray;
 	ray.Init( start, end, mins, maxs );
 	enginetrace->TraceRay( ray, fMask, pFilter, pTrace );

@@ -99,12 +99,10 @@ bool CJobMgr::BFrameFuncRunSleepingJobs( CLimitTimer &limitTimer )
 	bool bWorkRemaining = false;
 
 	{
-		VPROF_BUDGET( "CJobMgr::BResumeSleepingJobs", VPROF_BUDGETGROUP_JOBS_COROUTINES );
 		bWorkRemaining |= BResumeSleepingJobs( limitTimer );
 	}
 
 	{
-		VPROF_BUDGET( "CJobMgr::CheckForJobTimeouts", VPROF_BUDGETGROUP_JOBS_COROUTINES );
 		CheckForJobTimeouts( limitTimer );
 	}
 
@@ -129,12 +127,10 @@ bool CJobMgr::BFrameFuncRunYieldingJobs( CLimitTimer &limitTimer )
 	bool bWorkRemaining = false;
 
 	{
-		VPROF_BUDGET( "CJobMgr::BResumeYieldingJobs", VPROF_BUDGETGROUP_JOBS_COROUTINES );
 		bWorkRemaining |= BResumeYieldingJobs( limitTimer );
 	}
 
 	{
-		VPROF_BUDGET( "CJobMgr -- Dispatch completed work items", VPROF_BUDGETGROUP_JOBS_COROUTINES );
 		bWorkRemaining |= m_WorkThreadPool.BDispatchCompletedWorkItems( limitTimer, this );
 	}
 
@@ -353,7 +349,6 @@ bool CJobMgr::BRouteMsgToJob( void *pParent, IMsgNetPacket *pNetPacket, const Jo
 	if ( jobMsgInfo.m_JobIDTarget != k_GIDNil )
 	{
 		// This message is a reply to a running job
-		VPROF_BUDGET( "CJobMgr::BRouteMsgToJob() - continue job", VPROF_BUDGETGROUP_JOBS_COROUTINES );
 
 		// Find the job that this packet is destined for
 		int iJob = m_MapJob.Find( jobMsgInfo.m_JobIDTarget );
@@ -371,7 +366,6 @@ bool CJobMgr::BRouteMsgToJob( void *pParent, IMsgNetPacket *pNetPacket, const Jo
 	// no job, so try creating a job that can handle the msg
 	// We pass in a pointer to m_JobIDTarget so that it gets set to the new Job's ID. This ensures
 	// that anyone replying to this message from within the new job has the right JobIDSource.
-	VPROF_BUDGET( "CJobMgr::BRouteMsgToJob() - job", VPROF_BUDGETGROUP_JOBS_COROUTINES );
 	bool bRet = BLaunchJobFromNetworkMsg( pParent, jobMsgInfo, pNetPacket );
 
 	if ( !bRet && jobMsgInfo.m_JobIDTarget != k_GIDNil )
@@ -535,9 +529,7 @@ bool CJobMgr::BYieldingRunQuery( CJob &job, CGCSQLQueryGroup *pQueryGroup, ESche
 		m_mapSQLQueriesInFlight.Insert( job.GetJobID(), sqlJob );
 	}
 
-	VPROF_BUDGET( "GCHost", VPROF_BUDGETGROUP_STEAM );
 	{
-		VPROF_BUDGET( "GCHost - SQLQuery", VPROF_BUDGETGROUP_STEAM );
 		GGCHost()->SQLQuery( job.GetJobID(), pQueryGroup, eSchemaCatalog );
 	}
 	PauseJob( job, k_EJobPauseReasonSQL );

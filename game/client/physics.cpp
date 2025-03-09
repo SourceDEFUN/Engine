@@ -15,7 +15,6 @@
 #include "movevars_shared.h"
 #include "engine/ivmodelinfo.h"
 #include "fx.h"
-#include "tier0/vprof.h"
 #include "c_world.h"
 #include "vphysics/object_hash.h"
 #include "vphysics/collision_set.h"
@@ -433,7 +432,6 @@ void CPhysicsSystem::Update( float frametime )
 
 void CPhysicsSystem::PhysicsSimulate()
 {
-	VPROF_BUDGET( "CPhysicsSystem::PhysicsSimulate", VPROF_BUDGETGROUP_PHYSICS );
 	float frametime = gpGlobals->frametime;
 
 	if ( physenv )

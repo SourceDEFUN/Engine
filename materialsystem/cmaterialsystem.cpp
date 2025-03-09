@@ -3586,7 +3586,6 @@ void CMaterialSystem::EndFrame( void )
 		return;
 
 	Assert( m_bGeneratedConfig );
-	VPROF_BUDGET( "CMaterialSystem::EndFrame", VPROF_BUDGETGROUP_SWAP_BUFFERS );
 
 	GetRenderContextInternal()->EndFrame();
 	   
@@ -3678,7 +3677,6 @@ void CMaterialSystem::EndFrame( void )
 
 	case MATERIAL_QUEUED_THREADED:
 		{
-			VPROF_BUDGET( "Mat_ThreadedEndframe", "Mat_ThreadedEndframe" );
 			if ( !m_bThreadHasOwnership )
 			{
 				ThreadAcquire( true );
@@ -3725,7 +3723,6 @@ void CMaterialSystem::EndFrame( void )
 
 #ifdef MAT_QUEUE_MODE_PROFILE
 		{
-			VPROF_BUDGET( "Mat_ThreadedEndframe", "Mat_QueuedEndframe" );
 
 			g_pShaderAPI->SetDisallowAccess( false );
 			m_pRenderContext.Set( &m_HardwareRenderContext );
@@ -4192,7 +4189,6 @@ void	CMaterialSystem::DoStartupShaderPreloading( void )
 
 void CMaterialSystem::SwapBuffers( void )
 {
-	VPROF_BUDGET( "CMaterialSystem::SwapBuffers", VPROF_BUDGETGROUP_SWAP_BUFFERS );
 	GetRenderContextInternal()->SwapBuffers();
 	g_FrameNum++;
 }

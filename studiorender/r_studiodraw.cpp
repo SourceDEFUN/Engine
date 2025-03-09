@@ -18,7 +18,6 @@
 #include "mathlib/vmatrix.h"
 #include "studiorendercontext.h"
 #include "tier2/tier2.h"
-#include "tier0/vprof.h"
 
 //#define PROFILE_STUDIO VPROF
 #define PROFILE_STUDIO
@@ -1861,7 +1860,6 @@ void CCachedRenderData::ComputeFlexedVertex_StreamOffset<mstudiovertanim_t>( stu
 
 void CStudioRender::R_StudioProcessFlexedMesh_StreamOffset( mstudiomesh_t* pmesh, int lod )
 {
-	VPROF_BUDGET( "ProcessFlexedMesh_SO", _T("HW Morphing") );
 
 	if ( m_VertexCache.IsFlexComputationDone() )
 		return;
@@ -1933,7 +1931,6 @@ void CStudioRender::R_StudioProcessFlexedMesh_StreamOffset( mstudiomesh_t* pmesh
 //-----------------------------------------------------------------------------
 void CStudioRender::R_StudioFlexMeshGroup( studiomeshgroup_t *pGroup )
 {
-	VPROF_BUDGET( "R_StudioFlexMeshGroup", VPROF_BUDGETGROUP_MODEL_RENDERING );
 
 	CMeshBuilder meshBuilder;
 	int nVertexOffsetInBytes = 0;
@@ -2657,7 +2654,6 @@ int CStudioRender::R_StudioDrawEyeball( IMatRenderContext *pRenderContext, mstud
 		// garymcthack!  need to look at the strip flags to figure out what it is.
 		meshBuilder.Begin( pMesh, MATERIAL_TRIANGLES, pmesh->numvertices, 0 );
 //		meshBuilder.Begin( pMesh, MATERIAL_TRIANGLE_STRIP, pmesh->numvertices, 0 );
-		//VPROF_INCREMENT_COUNTER( "TransformFlexVerts", pGroup->m_NumVertices );
 
 		for ( int i=0; i < pGroup->m_NumVertices; ++i)
 		{

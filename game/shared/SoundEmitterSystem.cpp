@@ -12,7 +12,6 @@
 #include "igamesystem.h"
 #include "soundchars.h"
 #include "filesystem.h"
-#include "tier0/vprof.h"
 #include "checksum_crc.h"
 #include "tier0/icommandline.h"
 
@@ -1152,7 +1151,6 @@ static ConCommand Command_Playgamesound( "playgamesound", Playgamesound_f, "Play
 //-----------------------------------------------------------------------------
 void CBaseEntity::EmitSound( const char *soundname, float soundtime /*= 0.0f*/, float *duration /*=NULL*/ )
 {
-	VPROF_BUDGET( "CBaseEntity::EmitSound", _T( "CBaseEntity::EmitSound" ) );
 
 	CPASAttenuationFilter filter( this, soundname );
 
@@ -1171,7 +1169,6 @@ void CBaseEntity::EmitSound( const char *soundname, float soundtime /*= 0.0f*/, 
 //-----------------------------------------------------------------------------
 void CBaseEntity::EmitSound( const char *soundname, HSOUNDSCRIPTHANDLE& handle, float soundtime /*= 0.0f*/, float *duration /*=NULL*/ )
 {
-	VPROF_BUDGET( "CBaseEntity::EmitSound", _T( "CBaseEntity::EmitSound" ) );
 
 	CPASAttenuationFilter filter( this, soundname, handle );
 
@@ -1196,7 +1193,6 @@ void CBaseEntity::EmitSound( IRecipientFilter& filter, int iEntIndex, const char
 	if ( !soundname )
 		return;
 
-	VPROF_BUDGET( "CBaseEntity::EmitSound", _T( "CBaseEntity::EmitSound" ) );
 
 	EmitSound_t params;
 	params.m_pSoundName = soundname;
@@ -1217,7 +1213,6 @@ void CBaseEntity::EmitSound( IRecipientFilter& filter, int iEntIndex, const char
 //-----------------------------------------------------------------------------
 void CBaseEntity::EmitSound( IRecipientFilter& filter, int iEntIndex, const char *soundname, HSOUNDSCRIPTHANDLE& handle, const Vector *pOrigin /*= NULL*/, float soundtime /*= 0.0f*/, float *duration /*=NULL*/ )
 {
-	VPROF_BUDGET( "CBaseEntity::EmitSound", _T( "CBaseEntity::EmitSound" ) );
 
 	EmitSound_t params;
 	params.m_pSoundName = soundname;
@@ -1237,7 +1232,6 @@ void CBaseEntity::EmitSound( IRecipientFilter& filter, int iEntIndex, const char
 //-----------------------------------------------------------------------------
 void CBaseEntity::EmitSound( IRecipientFilter& filter, int iEntIndex, const EmitSound_t & params )
 {
-	VPROF_BUDGET( "CBaseEntity::EmitSound", _T( "CBaseEntity::EmitSound" ) );
 
 #ifdef GAME_DLL
 	CBaseEntity *pEntity = UTIL_EntityByIndex( iEntIndex );
@@ -1261,7 +1255,6 @@ void CBaseEntity::EmitSound( IRecipientFilter& filter, int iEntIndex, const Emit
 //-----------------------------------------------------------------------------
 void CBaseEntity::EmitSound( IRecipientFilter& filter, int iEntIndex, const EmitSound_t & params, HSOUNDSCRIPTHANDLE& handle )
 {
-	VPROF_BUDGET( "CBaseEntity::EmitSound", _T( "CBaseEntity::EmitSound" ) );
 
 #ifdef GAME_DLL
 	CBaseEntity *pEntity = UTIL_EntityByIndex( iEntIndex );

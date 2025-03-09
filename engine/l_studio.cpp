@@ -33,7 +33,6 @@
 #include "filesystem_engine.h"
 #include "ModelInfo.h"
 #include "cl_main.h"
-#include "tier0/vprof.h"
 #include "r_decal.h"
 #include "vstdlib/random.h"
 #include "datacache/idatacache.h"

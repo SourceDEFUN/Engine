@@ -4,7 +4,6 @@
 //
 //=============================================================================//
  
-#include "tier0/vprof.h"
 #include "server.h"
 #include "host_cmd.h"
 #include "keys.h"
@@ -1670,28 +1669,6 @@ CON_COMMAND( memory, "Print memory stats." )
 	}
 #endif
 
-#ifdef VPROF_ENABLED
-	ConMsg("\nVideo Memory Used:\n");
-	CVProfile *pProf = &g_VProfCurrentProfile;
-	int prefixLen = strlen( "TexGroup_Global_" );
-	float total = 0.0f;
-	for ( int i=0; i < pProf->GetNumCounters(); i++ )
-	{
-		if ( pProf->GetCounterGroup( i ) == COUNTER_GROUP_TEXTURE_GLOBAL )
-		{
-			float value = pProf->GetCounterValue( i ) * (1.0f/(1024.0f*1024.0f) );
-			total += value;
-			const char *pName = pProf->GetCounterName( i );
-			if ( !Q_strnicmp( pName, "TexGroup_Global_", prefixLen ) )
-			{
-				pName += prefixLen;
-			}
-			ConMsg( "%5.2f MB: %s\n", value, pName );
-		}
-	}
-	ConMsg("------------------\n");
-	ConMsg( "%5.2f MB: total\n", total );
-#endif
 
 	ConMsg( "\nHunk Memory Used:\n" );
 	Hunk_Print();

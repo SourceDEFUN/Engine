@@ -13,7 +13,6 @@
 #include "fx_sparks.h"
 #include "iefx.h"
 #include "c_te_effect_dispatch.h"
-#include "tier0/vprof.h"
 #include "fx_quad.h"
 #include "fx.h"
 #include "c_pixel_visibility.h"
@@ -299,7 +298,6 @@ void CTrailParticles::SimulateParticles( CParticleSimulateIterator *pIterator )
 
 void FX_ElectricSpark( const Vector &pos, int nMagnitude, int nTrailLength, const Vector *vecDir )
 {
-	VPROF_BUDGET( "FX_ElectricSpark", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
 	CSmartPtr<CTrailParticles> pSparkEmitter	= CTrailParticles::Create( "FX_ElectricSpark 1" );
 
 	if ( !pSparkEmitter )
@@ -549,7 +547,6 @@ void FX_ElectricSpark( const Vector &pos, int nMagnitude, int nTrailLength, cons
 
 void FX_MetalScrape( Vector &position, Vector &normal )
 {
-	VPROF_BUDGET( "FX_MetalScrape", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
 	Vector	offset = position + ( normal * 1.0f );
 
 	CSmartPtr<CTrailParticles> sparkEmitter = CTrailParticles::Create( "FX_MetalScrape 1" );
@@ -619,7 +616,6 @@ void FX_MetalScrape( Vector &position, Vector &normal )
 
 void FX_MetalSpark( const Vector &position, const Vector &direction, const Vector &surfaceNormal, int iScale )
 {
-	VPROF_BUDGET( "FX_MetalSpark", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
 
 	if ( !fx_drawmetalspark.GetBool() )
 		return;
@@ -721,7 +717,6 @@ void FX_MetalSpark( const Vector &position, const Vector &direction, const Vecto
 
 void FX_Sparks( const Vector &pos, int nMagnitude, int nTrailLength, const Vector &vecDir, float flWidth, float flMinSpeed, float flMaxSpeed, char *pSparkMaterial )
 {
-	VPROF_BUDGET( "FX_Sparks", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
 	CSmartPtr<CTrailParticles> pSparkEmitter	= CTrailParticles::Create( "FX_Sparks 1" );
 
 	if ( !pSparkEmitter )
@@ -854,7 +849,6 @@ void FX_Sparks( const Vector &pos, int nMagnitude, int nTrailLength, const Vecto
 
 void FX_EnergySplash( const Vector &pos, const Vector &normal, int nFlags )
 {
-	VPROF_BUDGET( "FX_EnergySplash", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
 	Vector	offset = pos + ( normal * 2.0f );
 
 	// Quick flash
@@ -952,7 +946,6 @@ void FX_EnergySplash( const Vector &pos, const Vector &normal, int nFlags )
 
 void FX_MicroExplosion( Vector &position, Vector &normal )
 {
-	VPROF_BUDGET( "FX_MicroExplosion", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
 	Vector	offset = position + ( normal * 2.0f );
 
 	CSmartPtr<CTrailParticles> sparkEmitter = CTrailParticles::Create( "FX_MicroExplosion 1" );
@@ -1052,7 +1045,6 @@ void FX_MicroExplosion( Vector &position, Vector &normal )
 
 void FX_Explosion( Vector& origin, Vector& normal, char materialType )
 {
-	VPROF_BUDGET( "FX_Explosion", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
 	Vector	offset = origin + ( normal * 2.0f );
 
 	CSmartPtr<CTrailParticles> pSparkEmitter = CTrailParticles::Create( "FX_Explosion 1" );
@@ -1248,7 +1240,6 @@ void FX_Explosion( Vector& origin, Vector& normal, char materialType )
 //-----------------------------------------------------------------------------
 void FX_ConcussiveExplosion( Vector &origin, Vector &normal )
 {
-	VPROF_BUDGET( "FX_ConcussiveExplosion", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
 	Vector	offset = origin + ( normal * 2.0f );
 	Vector	dir;
 	int		i;

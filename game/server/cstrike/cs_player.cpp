@@ -27,7 +27,6 @@
 #include "weapon_parse.h"
 #include "weapon_knife.h"
 #include "movehelper_server.h"
-#include "tier0/vprof.h"
 #include "te_effect_dispatch.h"
 #include "vphysics/player_controller.h"
 #include "weapon_hegrenade.h"

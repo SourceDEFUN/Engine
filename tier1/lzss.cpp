@@ -7,7 +7,6 @@
 
 #include "tier0/platform.h"
 #include "tier0/dbg.h"
-#include "tier0/vprof.h"
 #include "tier0/etwprof.h"
 #include "tier1/lzss.h"
 #include "tier1/utlbuffer.h"

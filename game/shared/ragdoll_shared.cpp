@@ -11,7 +11,6 @@
 #include "vphysics/collision_set.h"
 #include "vcollide_parse.h"
 #include "vphysics_interface.h"
-#include "tier0/vprof.h"
 #include "engine/ivdebugoverlay.h"
 #include "solidsetdefaults.h"
 //CLIENT

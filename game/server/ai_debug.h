@@ -22,14 +22,7 @@
 #define AI_PROFILE_SCOPE_BEGIN_( pszName )	if (0) ; else { AI_PROFILE_SCOPE_( pszName )
 #define AI_PROFILE_SCOPE_END()			} do {} while (0)
 
-#if defined(VPROF_AI)
-#define VProfAI() true
-#else
-#define VProfAI() false
-#endif
-#if defined(VPROF_AI)
-#include "tier0/vprof.h"
-#elif defined(PROFILE_AI)
+#if defined(PROFILE_AI)
 #include "tier0/fasttimer.h"
 #define AI_PROFILE_SCOPE( tag )			PROFILE_SCOPE( tag )
 #define AI_PROFILE_MEASURE_SCOPE( tag )	PROFILE_SCOPE( tag )

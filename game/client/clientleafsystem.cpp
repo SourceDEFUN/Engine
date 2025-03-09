@@ -13,7 +13,6 @@
 #include "utlbidirectionalset.h"
 #include "model_types.h"
 #include "ivrenderview.h"
-#include "tier0/vprof.h"
 #include "bsptreedata.h"
 #include "detailobjectsystem.h"
 #include "engine/IStaticPropMgr.h"
@@ -526,7 +525,6 @@ void CClientLeafSystem::LevelShutdownPostEntity()
 //-----------------------------------------------------------------------------
 void CClientLeafSystem::PreRender()
 {
-	VPROF_BUDGET( "CClientLeafSystem::PreRender", "PreRender" );
 
 	int i;
 	int nIterations = 0;
@@ -1033,7 +1031,6 @@ void CClientLeafSystem::ProjectShadow( ClientLeafShadowHandle_t handle, int nLea
 
 void CClientLeafSystem::ProjectFlashlight( ClientLeafShadowHandle_t handle, int nLeafCount, const int *pLeafList )
 {
-	VPROF_BUDGET( "CClientLeafSystem::ProjectFlashlight", VPROF_BUDGETGROUP_SHADOW_DEPTH_TEXTURING );
 
 	// Remove the shadow from any leaves it current exists in
 	RemoveShadowFromLeaves( handle );
@@ -1323,7 +1320,6 @@ bool CClientLeafSystem::ShouldDrawDetailObjectsInLeaf( int leaf, int frameNumber
 void CClientLeafSystem::ComputeTranslucentRenderLeaf( int count, const LeafIndex_t *pLeafList, const LeafFogVolume_t *pLeafFogVolumeList, int frameNumber, int viewID )
 {
 	ASSERT_NO_REENTRY();
-	VPROF_BUDGET( "CClientLeafSystem::ComputeTranslucentRenderLeaf", "ComputeTranslucentRenderLeaf"  );
 
 	#define LeafToMarker( leaf ) reinterpret_cast<RenderableInfo_t *>(( (leaf) << 1 ) | 1)
 	#define IsLeafMarker( p ) (bool)((reinterpret_cast<size_t>(p)) & 1)
@@ -1743,7 +1739,6 @@ void CClientLeafSystem::SortEntities( const Vector &vecRenderOrigin, const Vecto
 
 void CClientLeafSystem::BuildRenderablesList( const SetupRenderInfo_t &info )
 {
-	VPROF_BUDGET( "BuildRenderablesList", "BuildRenderablesList" );
 	int leafCount = info.m_pWorldListInfo->m_LeafCount;
 	const Vector &vecRenderOrigin = info.m_vecRenderOrigin;
 	const Vector &vecRenderForward = info.m_vecRenderForward;

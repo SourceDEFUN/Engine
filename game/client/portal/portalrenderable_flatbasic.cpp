@@ -21,7 +21,6 @@
 #include "prop_portal_shared.h"
 #include "view_scene.h"
 #include "materialsystem/imaterialvar.h"
-#include "tier0/vprof.h"
 
 
 #define PORTALRENDERABLE_FLATBASIC_MINPIXELVIS 0.0f
@@ -105,7 +104,6 @@ void CPortalRenderable_FlatBasic::GetToolRecordingState( bool bActive, KeyValues
 	if ( !ToolsEnabled() )
 		return;
 
-	VPROF_BUDGET( "CPortalRenderable_FlatBasic::GetToolRecordingState", VPROF_BUDGETGROUP_TOOLS );
 
 	BaseClass::GetToolRecordingState( msg );
 	CPortalRenderable::GetToolRecordingState( bActive, msg );

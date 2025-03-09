@@ -20,7 +20,6 @@
 #define NO_THREAD_LOCAL 1
 
 #include "tier0/wchartypes.h"
-#include "tier0/vprof.h"
 
 #define VC_EXTRALEAN		// Exclude rarely-used stuff from Windows headers
 

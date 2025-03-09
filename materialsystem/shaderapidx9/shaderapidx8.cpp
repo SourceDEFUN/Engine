@@ -57,7 +57,6 @@ mat_fullbright 1 doesn't work properly on alpha materials in testroom_standards
 #include "worldsize.h"
 #include "TransitionTable.h"
 #include "tier0/vcrmode.h"
-#include "tier0/vprof.h"
 #include "tier1/tier1.h"
 #include "tier1/utlbuffer.h"
 #include "vertexdecl.h"
@@ -4271,140 +4270,11 @@ void CShaderAPIDx8::ExportTextureList()
 		AddBufferToTextureList( "BACKBUFFER", desc );
 		AddBufferToTextureList( "FRONTBUFFER", desc );
 	//	ImageFormat imageFormat = ImageLoader::D3DFormatToImageFormat( desc.Format );
-	//	if( imageFormat >= 0 )
-		{
-			VPROF_INCREMENT_GROUP_COUNTER( "TexGroup_frame_" TEXTURE_GROUP_RENDER_TARGET, 
-				COUNTER_GROUP_TEXTURE_PER_FRAME, 
-	//			ImageLoader::SizeInBytes( imageFormat ) * desc.Width * desc.Height );
-				2 * 4 * desc.Width * desc.Height ); // hack (times 2 for front and back buffer)
-		}
 
 		m_pZBufferSurface->GetDesc( &desc );
 		AddBufferToTextureList( "DEPTHBUFFER", desc );
 	//	imageFormat = ImageLoader::D3DFormatToImageFormat( desc.Format );
-	//	if( imageFormat >= 0 )
-		{
-			VPROF_INCREMENT_GROUP_COUNTER( "TexGroup_frame_" TEXTURE_GROUP_RENDER_TARGET, 
-				COUNTER_GROUP_TEXTURE_PER_FRAME, 
-	//			ImageLoader::SizeInBytes( imageFormat ) * desc.Width * desc.Height );
-				4 * desc.Width * desc.Height ); // hack
-		}
 	}
-
-#if defined( _X360 )
-	// toggle to do one shot transmission
-	m_bEnableDebugTextureList = false;
-
-	int numTextures = m_Textures.Count() + 3;
-	xTextureList_t* pXTextureList = (xTextureList_t *)_alloca( numTextures * sizeof( xTextureList_t ) );
-	memset( pXTextureList, 0, numTextures * sizeof( xTextureList_t ) );
-
-	numTextures = 0;
-	for ( ShaderAPITextureHandle_t hTexture = m_Textures.Head() ; hTexture != m_Textures.InvalidIndex(); hTexture = m_Textures.Next( hTexture ) )
-	{
-		Texture_t &tex = m_Textures[hTexture];
-	
-		if ( !m_bDebugGetAllTextures && tex.m_LastBoundFrame != m_CurrentFrame )
-		{
-			continue;
-		}
-		if ( !( tex.m_Flags & Texture_t::IS_ALLOCATED ) )
-		{
-			continue;
-		}
-
-		int refCount;
-		if ( tex.m_Flags & Texture_t::IS_DEPTH_STENCIL )
-		{
-			// interface forces us to ignore these
-			refCount =  -1;
-		}
-		else
-		{
-			refCount = GetD3DTextureRefCount( CShaderAPIDx8::GetD3DTexture( hTexture ) );
-		}
-
-		pXTextureList[numTextures].pName = tex.m_DebugName.String();
-		pXTextureList[numTextures].size = tex.m_SizeBytes * tex.m_NumCopies;
-		pXTextureList[numTextures].pGroupName = tex.m_TextureGroupName.String();
-		pXTextureList[numTextures].pFormatName = D3DFormatName( ImageLoader::ImageFormatToD3DFormat( tex.GetImageFormat() ) );
-		pXTextureList[numTextures].width = tex.GetWidth();
-		pXTextureList[numTextures].height = tex.GetHeight();
-		pXTextureList[numTextures].depth = tex.GetDepth();
-		pXTextureList[numTextures].numLevels = tex.m_NumLevels;
-		pXTextureList[numTextures].binds = tex.m_nTimesBoundThisFrame;
-		pXTextureList[numTextures].refCount = refCount;
-		pXTextureList[numTextures].edram = ( tex.m_Flags & Texture_t::IS_RENDER_TARGET_SURFACE ) != 0;
-		pXTextureList[numTextures].procedural = tex.m_NumCopies > 1;
-		pXTextureList[numTextures].final = ( tex.m_Flags & Texture_t::IS_FINALIZED ) != 0;
-		pXTextureList[numTextures].failed = ( tex.m_Flags & Texture_t::IS_FAILED ) != 0;
-		numTextures++;
-	}
-
-	// build special entries for implicit surfaces/textures
-	D3DSURFACE_DESC desc;
-	m_pBackBufferSurface->GetDesc( &desc );
-	int size = ImageLoader::GetMemRequired( 
-		desc.Width,
-		desc.Height,
-		0,
-		ImageLoader::D3DFormatToImageFormat( desc.Format ),
-		false );
-	pXTextureList[numTextures].pName = "_rt_BackBuffer";
-	pXTextureList[numTextures].size = size;
-	pXTextureList[numTextures].pGroupName = TEXTURE_GROUP_RENDER_TARGET_SURFACE;
-	pXTextureList[numTextures].pFormatName = D3DFormatName( desc.Format );
-	pXTextureList[numTextures].width = desc.Width;
-	pXTextureList[numTextures].height = desc.Height;
-	pXTextureList[numTextures].depth = 1;
-	pXTextureList[numTextures].binds = 1;
-	pXTextureList[numTextures].refCount = 1;
-	pXTextureList[numTextures].sRGB = IS_D3DFORMAT_SRGB( desc.Format );
-	pXTextureList[numTextures].edram = true;
-	numTextures++;
-
-	m_pZBufferSurface->GetDesc( &desc );
-	pXTextureList[numTextures].pName = "_rt_DepthBuffer";
-	pXTextureList[numTextures].size = size;
-	pXTextureList[numTextures].pGroupName = TEXTURE_GROUP_RENDER_TARGET_SURFACE;
-	pXTextureList[numTextures].pFormatName = D3DFormatName( desc.Format );
-	pXTextureList[numTextures].width = desc.Width;
-	pXTextureList[numTextures].height = desc.Height;
-	pXTextureList[numTextures].depth = 1;
-	pXTextureList[numTextures].binds = 1;
-	pXTextureList[numTextures].refCount = 1;
-	pXTextureList[numTextures].sRGB = IS_D3DFORMAT_SRGB( desc.Format );
-	pXTextureList[numTextures].edram = true;
-	numTextures++;
-
-	// front buffer resides in DDR
-	pXTextureList[numTextures].pName = "_rt_FrontBuffer";
-	pXTextureList[numTextures].size = size;
-	pXTextureList[numTextures].pGroupName = TEXTURE_GROUP_RENDER_TARGET;
-	pXTextureList[numTextures].pFormatName = D3DFormatName( desc.Format );
-	pXTextureList[numTextures].width = desc.Width;
-	pXTextureList[numTextures].height = desc.Height;
-	pXTextureList[numTextures].depth = 1;
-	pXTextureList[numTextures].binds = 1;
-	pXTextureList[numTextures].refCount = 1;
-	pXTextureList[numTextures].sRGB = IS_D3DFORMAT_SRGB( desc.Format );
-	numTextures++;
-
-	int totalMemory = 0;
-	for ( int i = 0; i < numTextures; i++ )
-	{
-		if ( pXTextureList[i].edram )
-		{
-			// skip edram based items
-			continue;
-		}
-		totalMemory += pXTextureList[i].size;
-	}
-	Msg( "Total D3D Texture Memory: %.2f MB\n", (float)totalMemory/( 1024.0f * 1024.0f ) );
-
-	// transmit to console
-	XBX_rTextureList( numTextures, pXTextureList );
-#endif
 }
 
 
@@ -8867,7 +8737,6 @@ static inline RECT* RectToRECT( Rect_t *pSrcRect, RECT &dstRect )
 void CShaderAPIDx8::CopyRenderTargetToTextureEx( ShaderAPITextureHandle_t textureHandle, int nRenderTargetID, Rect_t *pSrcRect, Rect_t *pDstRect )
 {
 	LOCK_SHADERAPI();
-	VPROF_BUDGET( "CShaderAPIDx8::CopyRenderTargetToTexture", "Refraction overhead" );
 
 	if ( !TextureIsAllocated( textureHandle ) )
 		return;

@@ -29,7 +29,6 @@
 
 #include "tier0/icommandline.h"
 
-#include "tier0/vprof.h"
 #include "glmtexinlines.h"
 
 #include "materialsystem/IShader.h"

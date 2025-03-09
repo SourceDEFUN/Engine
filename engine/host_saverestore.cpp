@@ -49,7 +49,6 @@
 #include "gl_matsysiface.h"
 #include "cl_main.h"
 #include "pr_edict.h"
-#include "tier0/vprof.h"
 #include <vgui/ILocalize.h>
 #include "vgui_controls/Controls.h"
 #include "tier0/icommandline.h"
@@ -660,7 +659,6 @@ int CSaveRestore::SaveGameSlot( const char *pSaveName, const char *pSaveComment,
 	}
 
 	SaveMsg( "Start save... (%d/%d)\n", ThreadInMainThread(), ThreadGetCurrentId() );
-	VPROF_BUDGET( "SaveGameSlot", "Save" );
 	char			hlPath[256], name[256], *pTokenData;
 	int				tag, i, tokenSize;
 	CSaveRestoreData	*pSaveData;

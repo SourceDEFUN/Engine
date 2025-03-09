@@ -16,7 +16,6 @@
 #include "view.h"
 #include "beamdraw.h"
 #include "enginesprite.h"
-#include "tier0/vprof.h"
 
 extern CEngineSprite *Draw_SetSpriteTexture( const model_t *pSpriteModel, int frame, int rendermode );
 
@@ -421,7 +420,6 @@ void CSpriteTrail::UpdateTrail( void )
 //-----------------------------------------------------------------------------
 int CSpriteTrail::DrawModel( int flags )
 {
-	VPROF_BUDGET( "CSpriteTrail::DrawModel", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
 	
 	// Must have at least one point
 	if ( m_nStepCount < 1 )

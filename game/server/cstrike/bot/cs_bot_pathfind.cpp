@@ -1400,7 +1400,6 @@ bool CCSBot::IsRunning( void ) const
  */
 CCSBot::PathResult CCSBot::UpdatePathMovement( bool allowSpeedChange )
 {
-	VPROF_BUDGET( "CCSBot::UpdatePathMovement", VPROF_BUDGETGROUP_NPCS );
 
 	if (m_pathLength == 0)
 		return PATH_FAILURE;
@@ -1876,7 +1875,6 @@ void CCSBot::BuildTrivialPath( const Vector &goal )
  */
 bool CCSBot::ComputePath( const Vector &goal, RouteType route )
 {
-	VPROF_BUDGET( "CCSBot::ComputePath", VPROF_BUDGETGROUP_NPCS );
 
 	//
 	// Throttle re-pathing

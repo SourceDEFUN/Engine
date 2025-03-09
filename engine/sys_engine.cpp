@@ -19,10 +19,8 @@
 #include "host_state.h"
 #include "cdll_engine_int.h"
 #include "sys_dll.h"
-#include "tier0/vprof.h"
 #include "profile.h"
 #include "gl_matsysiface.h"
-#include "vprof_engine.h"
 #include "server.h"
 #include "cl_demo.h"
 #include "toolframework/itoolframework.h"
@@ -293,7 +291,6 @@ void CEngine::Frame( void )
 	// FIXME:  Move this to main windows message pump?
 	if ( IsPC() && !game->IsActiveApp() && !sv.IsDedicated() && engine_no_focus_sleep.GetInt() > 0 )
 	{
-		VPROF_BUDGET( "Sleep", VPROF_BUDGETGROUP_SLEEPING );
 #if defined( RAD_TELEMETRY_ENABLED )
 		if( !g_Telemetry.Level )
 #endif
@@ -435,23 +432,11 @@ void CEngine::Frame( void )
 			break;
 		}
 	}
-
-#ifdef RAD_TELEMETRY_ENABLED
-	float time = ( tmFastTime() - time0 ) * g_Telemetry.flRDTSCToMilliSeconds;
-	if( time > 0.5f )
-	{
-		tmPlot( TELEMETRY_LEVEL0, TMPT_TIME_MS, 0, time, "CEngine::Frame" );
-	}
-#endif
 	} // profile scope
 
 
 	// Remember old time
 	m_flPreviousTime = m_flCurrentTime;
-
-#if defined( VPROF_ENABLED ) && defined( _X360 )
-	UpdateVXConsoleProfile();
-#endif
 }
 
 

@@ -16,7 +16,6 @@
 #include "engine/IEngineSound.h"
 #include "ispatialpartition.h"
 #include "collisionutils.h"
-#include "tier0/vprof.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

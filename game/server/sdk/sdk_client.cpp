@@ -27,7 +27,6 @@
 #include "engine/IEngineSound.h"
 #include "sdk_player.h"
 #include "sdk_gamerules.h"
-#include "tier0/vprof.h"
 #include "sdk_bot_temp.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

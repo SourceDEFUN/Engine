@@ -17,7 +17,6 @@
 #include "materialsystem/itexture.h"
 #include "materialsystem/imaterialvar.h"
 #include "clienteffectprecachesystem.h"
-#include "tier0/vprof.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

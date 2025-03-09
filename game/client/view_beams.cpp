@@ -16,7 +16,6 @@
 #include "view.h"
 #include "fx.h"
 #include "tier0/icommandline.h"
-#include "tier0/vprof.h"
 #include "c_pixel_visibility.h"
 #include "iviewrender.h"
 #include "view_shared.h"
@@ -1616,7 +1615,6 @@ void CViewRenderBeams::UpdateBeam( Beam_t *pbeam, float frametime )
 //-----------------------------------------------------------------------------
 void CViewRenderBeams::UpdateTempEntBeams( void )
 {
-	VPROF_("UpdateTempEntBeams", 2, VPROF_BUDGETGROUP_CLIENT_SIM, false, BUDGETFLAG_CLIENT);
 	if ( !m_pActiveBeams )
 		return;
 

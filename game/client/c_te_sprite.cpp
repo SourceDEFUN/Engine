@@ -12,7 +12,6 @@
 #include "tempent.h"
 #include "tier1/KeyValues.h"
 #include "toolframework_client.h"
-#include "tier0/vprof.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

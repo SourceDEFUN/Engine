@@ -25,7 +25,6 @@
 #include "c_basehlplayer.h"
 #endif
 
-#include "tier0/vprof.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -1593,7 +1592,6 @@ void CPrediction::Update( int startframe, bool validframe,
 						 int incoming_acknowledged, int outgoing_command )
 {
 #if !defined( NO_ENTITY_PREDICTION )
-	VPROF_BUDGET( "CPrediction::Update", VPROF_BUDGETGROUP_PREDICTION );
 
 	m_bEnginePaused = engine->IsPaused();
 

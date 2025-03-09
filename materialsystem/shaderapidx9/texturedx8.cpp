@@ -21,7 +21,6 @@
 #include "textureheap.h"
 #include "tier1/utlbuffer.h"
 #include "tier1/callqueue.h"
-#include "tier0/vprof.h"
 #include "vtf/vtf.h"
 #include "tier0/icommandline.h"
 
@@ -358,10 +357,6 @@ IDirect3DBaseTexture* CreateD3DTexture( int width, int height, int nDepth,
 	{
 		nMemUsed *= 6;
 	}
-
-	VPROF_INCREMENT_GROUP_COUNTER( "texture count", COUNTER_GROUP_NO_RESET, 1 );
-	VPROF_INCREMENT_GROUP_COUNTER( "texture driver mem", COUNTER_GROUP_NO_RESET, nMemUsed );
-	VPROF_INCREMENT_GROUP_COUNTER( "total driver mem", COUNTER_GROUP_NO_RESET, nMemUsed );
 #endif
 
 	++s_TextureCount;
@@ -391,9 +386,6 @@ void DestroyD3DTexture( IDirect3DBaseTexture* pD3DTex )
 			nMipCount *= 6;
 		}
 		int nMemUsed = nMipCount * 1.1f * 1024;
-		VPROF_INCREMENT_GROUP_COUNTER( "texture count", COUNTER_GROUP_NO_RESET, -1 );
-		VPROF_INCREMENT_GROUP_COUNTER( "texture driver mem", COUNTER_GROUP_NO_RESET, -nMemUsed );
-		VPROF_INCREMENT_GROUP_COUNTER( "total driver mem", COUNTER_GROUP_NO_RESET, -nMemUsed );
 #endif
 
 #if !defined( _X360 )

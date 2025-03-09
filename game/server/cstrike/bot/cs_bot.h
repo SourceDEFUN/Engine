@@ -1717,7 +1717,6 @@ inline bool CCSBot::HasLookAtTarget( void ) const
 
 inline bool CCSBot::IsEnemyPartVisible( VisiblePartType part ) const
 { 
-	VPROF_BUDGET( "CCSBot::IsEnemyPartVisible", VPROF_BUDGETGROUP_NPCS );
 
 	if (!IsEnemyVisible())
 		return false;

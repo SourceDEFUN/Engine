@@ -7,7 +7,6 @@
 //=============================================================================//
 #include "cbase.h"
 #include "querycache.h"
-#include "tier0/vprof.h"
 #include "tier1/utlintrusivelist.h"
 #include "datacache/imdlcache.h"
 #include "vstdlib/jobthread.h"

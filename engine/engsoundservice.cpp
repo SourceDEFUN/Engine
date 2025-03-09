@@ -28,7 +28,6 @@
 #include "datacache/idatacache.h"
 #include "sys_dll.h"
 #include "toolframework/itoolframework.h"
-#include "tier0/vprof.h"
 #include "cl_steamauth.h"
 #include "tier1/fmtstr.h"
 #include "MapReslistGenerator.h"

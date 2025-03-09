@@ -12,7 +12,6 @@
 #include "materialsystem/imesh.h"
 #include "engine/ivmodelinfo.h"
 #include "iviewrender.h"
-#include "tier0/vprof.h"
 #include "view.h"
 #include "physics_saverestore.h"
 #include "vphysics/constraints.h"
@@ -716,7 +715,6 @@ public:
 
 	virtual void BuildTransformations( CStudioHdr *hdr, Vector *pos, Quaternion q[], const matrix3x4_t& cameraTransform, int boneMask, CBoneBitList &boneComputed )
 	{
-		VPROF_BUDGET( "C_ServerRagdollAttached::SetupBones", VPROF_BUDGETGROUP_CLIENT_ANIMATION );
 
 		if ( !hdr )
 			return;

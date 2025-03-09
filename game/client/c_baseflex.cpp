@@ -14,7 +14,6 @@
 #include "soundinfo.h"
 #include "tools/bonelist.h"
 #include "KeyValues.h"
-#include "tier0/vprof.h"
 #include "toolframework/itoolframework.h"
 #include "choreoevent.h"
 #include "choreoscene.h"
@@ -982,7 +981,6 @@ void C_BaseFlex::GetToolRecordingState( KeyValues *msg )
 	if ( !ToolsEnabled() )
 		return;
 
-	VPROF_BUDGET( "C_BaseFlex::GetToolRecordingState", VPROF_BUDGETGROUP_TOOLS );
 
 	BaseClass::GetToolRecordingState( msg );
 

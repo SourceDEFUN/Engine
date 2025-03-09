@@ -17,7 +17,6 @@
 #include "tier1/fmtstr.h"
 #include "tier1/utlvector.h"
 #include "tier1/generichash.h"
-#include "tier0/vprof.h"
 
 #if defined( _X360 )
 #include "xbox/xbox_win32stubs.h"

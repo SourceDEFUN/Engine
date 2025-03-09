@@ -858,7 +858,6 @@ render_to_video:
 
 void CReplayRenderer::LayoffFrame( int nFrame )
 {
-	VPROF_BUDGET( "CReplayRenderer::LayoffFrame", VPROF_BUDGETGROUP_REPLAY );
 	// FIXME: This is somewhat of a hack to get layoff working again
 	// We're rendering into the full preview size, but stretching down to the actual size
 	Rect_t srcRect;
@@ -910,7 +909,6 @@ void CReplayRenderer::LayoffFrame( int nFrame )
 	{
 		// can't run in any other mode	
 		Assert( mat_queue_mode.GetInt() == 0 );
-		VPROF_BUDGET( "CReplayRenderer::LayoffFrame - AppendVideoFrame", VPROF_BUDGETGROUP_REPLAY );
 		m_pMovieMaker->AppendVideoFrame( m_pLayoffBuf );
 	}
 #endif

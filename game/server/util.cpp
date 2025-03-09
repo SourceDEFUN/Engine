@@ -30,7 +30,6 @@
 #include "collisionutils.h"
 #include "movevars_shared.h"
 #include "inetchannelinfo.h"
-#include "tier0/vprof.h"
 #include "ndebugoverlay.h"
 #include "engine/ivdebugoverlay.h"
 #include "datacache/imdlcache.h"
@@ -2958,13 +2957,6 @@ void CC_KDTreeTest( const CCommand &args )
 
 	vtune( true );
 
-#ifdef VPROF_ENABLED
-	g_VProfCurrentProfile.Resume();
-	g_VProfCurrentProfile.Start();
-	g_VProfCurrentProfile.Reset();
-	g_VProfCurrentProfile.MarkFrame();
-#endif
-
 	switch ( nTestType )
 	{
 	case 0:
@@ -3052,13 +3044,6 @@ void CC_KDTreeTest( const CCommand &args )
 			break;
 		}
 	}
-
-#ifdef VPROF_ENABLED
-	g_VProfCurrentProfile.MarkFrame();
-	g_VProfCurrentProfile.Pause();
-	g_VProfCurrentProfile.OutputReport( VPRT_FULL );
-#endif
-	
 	vtune( false );
 }
 

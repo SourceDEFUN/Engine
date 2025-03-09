@@ -3194,7 +3194,6 @@ void CBasePlayer::RunNullCommand( void )
 //-----------------------------------------------------------------------------
 void CBasePlayer::PhysicsSimulate( void )
 {
-	VPROF_BUDGET( "CBasePlayer::PhysicsSimulate", VPROF_BUDGETGROUP_PLAYER );
 
 	// If we've got a moveparent, we must simulate that first.
 	CBaseEntity *pMoveParent = GetMoveParent();
@@ -4515,7 +4514,6 @@ void CBasePlayer::PostThink()
 		if ( IsAlive() )
 		{
 			// set correct collision bounds (may have changed in player movement code)
-			VPROF_SCOPE_BEGIN( "CBasePlayer::PostThink-Bounds" );
 			if ( GetFlags() & FL_DUCKING )
 			{
 				SetCollisionBounds( VEC_DUCK_HULL_MIN, VEC_DUCK_HULL_MAX );
@@ -4524,9 +4522,6 @@ void CBasePlayer::PostThink()
 			{
 				SetCollisionBounds( VEC_HULL_MIN, VEC_HULL_MAX );
 			}
-			VPROF_SCOPE_END();
-
-			VPROF_SCOPE_BEGIN( "CBasePlayer::PostThink-Use" );
 			// Handle controlling an entity
 			if ( m_hUseEntity != NULL )
 			{ 
@@ -4547,12 +4542,9 @@ void CBasePlayer::PostThink()
 					ClearUseEntity();
 				}
 			}
-			VPROF_SCOPE_END();
 
 			// do weapon stuff
-			VPROF_SCOPE_BEGIN( "CBasePlayer::PostThink-ItemPostFrame" );
 			ItemPostFrame();
-			VPROF_SCOPE_END();
 
 			if ( GetFlags() & FL_ONGROUND )
 			{		
@@ -4582,24 +4574,12 @@ void CBasePlayer::PostThink()
 			SetSequence( 0 );
 		}
 
-		VPROF_SCOPE_BEGIN( "CBasePlayer::PostThink-StudioFrameAdvance" );
 		StudioFrameAdvance();
-		VPROF_SCOPE_END();
-
-		VPROF_SCOPE_BEGIN( "CBasePlayer::PostThink-DispatchAnimEvents" );
 		DispatchAnimEvents( this );
-		VPROF_SCOPE_END();
-
 		SetSimulationTime( gpGlobals->curtime );
-
 		//Let the weapon update as well
-		VPROF_SCOPE_BEGIN( "CBasePlayer::PostThink-Weapon_FrameUpdate" );
 		Weapon_FrameUpdate();
-		VPROF_SCOPE_END();
-
-		VPROF_SCOPE_BEGIN( "CBasePlayer::PostThink-UpdatePlayerSound" );
 		UpdatePlayerSound();
-		VPROF_SCOPE_END();
 
 		if ( m_bForceOrigin )
 		{
@@ -4609,9 +4589,7 @@ void CBasePlayer::PostThink()
 			m_Local.m_vecPunchAngleVel.Init();
 		}
 
-		VPROF_SCOPE_BEGIN( "CBasePlayer::PostThink-PostThinkVPhysics" );
 		PostThinkVPhysics();
-		VPROF_SCOPE_END();
 	}
 
 #if !defined( NO_ENTITY_PREDICTION )

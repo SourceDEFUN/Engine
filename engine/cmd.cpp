@@ -35,7 +35,6 @@
 #include "vstdlib/random.h"
 #include "tier1/utldict.h"
 #include "tier0/etwprof.h"
-#include "tier0/vprof.h"
 #include "gl_matsysiface.h"		// update materialsystem config
 
 // memdbgon must be the last include file in a .cpp file!!!

@@ -14,7 +14,6 @@
 
 #include "igamemovement.h"
 #include "cmodel.h"
-#include "tier0/vprof.h"
 
 #define CTEXTURESMAX		512			// max number of textures loaded
 #define CBTEXTURENAMEMAX	13			// only load first n chars of name

@@ -7,7 +7,6 @@
 #include "sv_sessionblockpublisher.h"
 #include "sv_sessioninfopublisher.h"
 #include "replay_dbg.h"
-#include "vprof.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -69,7 +68,6 @@ bool CSessionPublishManager::IsDone() const
 void CSessionPublishManager::Think()
 {
 	// NOTE: This gets called even if replay is disabled.  This is intentional.
-	VPROF_BUDGET( "CSessionPublishManager::Think", VPROF_BUDGETGROUP_REPLAY );
 
 	// Call publishers
 	m_pBlockPublisher->Think();

@@ -65,24 +65,12 @@ int CWorkThread::Run()
 
 	OnStart();
 
-#if 0 // need to port over new vprof code
-#if defined( VPROF_ENABLED )
-	CVProfile *pProfile = GetVProfProfileForCurrentThread();
-#endif
-#endif
-
 	CWorkThreadPool *pPool = m_pThreadPool;
 
 	int nIterations = 0;
 	const int nMaxFastIterations = 4;
 	while ( !m_bExitThread )
 	{
-#if 0 // game vprof doesn't yet support TLS'd vprof instances, until new vprof code is ported
-#if defined( VPROF_ENABLED )
-		if ( pProfile )
-			pProfile->MarkFrame( GetName() );
-#endif
-#endif
 		pPool->m_cActiveThreads++;
 
 		nIterations = 0;
@@ -147,13 +135,6 @@ int CWorkThread::Run()
 				{
 					pWorkItem = NULL;
 				}
-
-#if 0 // game vprof doesn't yet support TLS'd vprof instances, until new vprof code is ported
-#if defined( VPROF_ENABLED )
-				if ( pProfile && pWorkItem )
-					pProfile->MarkFrame( GetName() );
-#endif
-#endif
 			}
 
 			if ( m_bExitThread )
@@ -162,7 +143,6 @@ int CWorkThread::Run()
 			++nIterations;
 			if ( pPool->BNeverSetEventOnAdd() && nIterations < nMaxFastIterations )
 			{
-				VPROF_BUDGET( "CWorkThread -- Sleep", VPROF_BUDGETGROUP_SLEEPING );
 				ThreadSleep( 2 );
 			}
 		}
@@ -171,7 +151,6 @@ int CWorkThread::Run()
 
 		// wait for a new work item to arrive in the queue, check the counts first just to be sure
 		{
-			VPROF_BUDGET( "CWorkThread -- Sleep", VPROF_BUDGETGROUP_SLEEPING );
 #ifdef _SERVER
 			if ( pPool->BNeverSetEventOnAdd() )
 				pPool->m_EventNewWorkItem.Wait( 15 );
@@ -511,7 +490,6 @@ bool CWorkThreadPool::AddWorkItem( CWorkItem *pWorkItem )
 
 	if ( !BNeverSetEventOnAdd() && m_cActiveThreads == 0 )
 	{
-		VPROF_BUDGET( "SetEvent()", VPROF_BUDGETGROUP_THREADINGMAIN );
 		m_EventNewWorkItem.Set();
 	}
 

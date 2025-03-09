@@ -18,7 +18,6 @@
 #include "materialsystem/imaterial.h"
 #include "materialsystem/imaterialvar.h"
 #include "psheet.h"
-#include "tier0/vprof.h"
 
 #ifdef USE_BLOBULATOR
 // TODO: These should be in public by the time the SDK ships

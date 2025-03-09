@@ -731,7 +731,6 @@ void CAI_AssaultBehavior::RunTask( const Task_t *pTask )
 //-----------------------------------------------------------------------------
 CRallyPoint *CAI_AssaultBehavior::FindBestRallyPointInRadius( const Vector &vecCenter, float flRadius )
 {
-	VPROF_BUDGET( "CAI_AssaultBehavior::FindBestRallyPointInRadius", VPROF_BUDGETGROUP_NPCS );
 
 	const int RALLY_SEARCH_ENTS	= 30;
 	CBaseEntity *pEntities[RALLY_SEARCH_ENTS];
@@ -886,7 +885,6 @@ void CAI_AssaultBehavior::UnlockRallyPoint( void )
 //-----------------------------------------------------------------------------
 void CAI_AssaultBehavior::SetParameters( CBaseEntity *pRallyEnt, AssaultCue_t assaultcue )
 {
-	VPROF_BUDGET( "CAI_AssaultBehavior::SetParameters", VPROF_BUDGETGROUP_NPCS );
 
 	// Clean up any soon to be dangling rally points
 	UnlockRallyPoint();
@@ -929,7 +927,6 @@ void CAI_AssaultBehavior::SetParameters( CBaseEntity *pRallyEnt, AssaultCue_t as
 //-----------------------------------------------------------------------------
 void CAI_AssaultBehavior::SetParameters( string_t rallypointname, AssaultCue_t assaultcue, int rallySelectMethod )
 {
-	VPROF_BUDGET( "CAI_AssaultBehavior::SetParameters", VPROF_BUDGETGROUP_NPCS );
 
 	// Clean up any soon to be dangling rally points
 	UnlockRallyPoint();

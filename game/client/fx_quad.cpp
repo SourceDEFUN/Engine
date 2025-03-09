@@ -8,7 +8,6 @@
 #include "view.h"
 #include "materialsystem/imesh.h"
 #include "fx_quad.h"
-#include "tier0/vprof.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -31,7 +30,6 @@ CFXQuad::~CFXQuad( void )
 //-----------------------------------------------------------------------------
 void CFXQuad::Draw( double frametime )
 {
-	VPROF_BUDGET( "FX_Quad::Draw", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
 
 	// Update the effect
 	Update( frametime );

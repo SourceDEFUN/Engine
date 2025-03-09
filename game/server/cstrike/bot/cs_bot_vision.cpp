@@ -162,7 +162,6 @@ void CCSBot::ComputeLadderAngles( float *yaw, float *pitch )
  */
 void CCSBot::UpdateLookAngles( void )
 {
-	VPROF_BUDGET( "CCSBot::UpdateLookAngles", VPROF_BUDGETGROUP_NPCS );
 
 	const float deltaT = g_BotUpkeepInterval;
 	float maxAccel;
@@ -326,7 +325,6 @@ void CCSBot::UpdateLookAngles( void )
  */
 bool CCSBot::IsVisible( const Vector &pos, bool testFOV, const CBaseEntity *ignore ) const
 {
-	VPROF_BUDGET( "CCSBot::IsVisible( pos )", VPROF_BUDGETGROUP_NPCS );
 
 	// we can't see anything if we're blind
 	if (IsBlind())
@@ -359,7 +357,6 @@ bool CCSBot::IsVisible( const Vector &pos, bool testFOV, const CBaseEntity *igno
  */
 bool CCSBot::IsVisible( CCSPlayer *player, bool testFOV, unsigned char *visParts ) const
 {
-	VPROF_BUDGET( "CCSBot::IsVisible( player )", VPROF_BUDGETGROUP_NPCS );
 
 	// optimization - assume if center is not in FOV, nothing is
 	// we're using WorldSpaceCenter instead of GUT so we can skip GetPartPosition below - that's
@@ -454,7 +451,6 @@ void CCSBot::ComputePartPositions( CCSPlayer *player )
 	//const int rightFootBox = 8;
 	const int maxBoxIndex = rightElbowBox;
 
-	VPROF_BUDGET( "CCSBot::ComputePartPositions", VPROF_BUDGETGROUP_NPCS );
 
 	// which PartInfo corresponds to the given player
 	PartInfo *info = &m_partInfo[ player->entindex() % MAX_PLAYERS ];
@@ -523,7 +519,6 @@ void CCSBot::ComputePartPositions( CCSPlayer *player )
  */
 const Vector &CCSBot::GetPartPosition( CCSPlayer *player, VisiblePartType part ) const
 {
-	VPROF_BUDGET( "CCSBot::GetPartPosition", VPROF_BUDGETGROUP_NPCS );
 
 	// which PartInfo corresponds to the given player
 	PartInfo *info = &m_partInfo[ player->entindex() % MAX_PLAYERS ];
@@ -633,7 +628,6 @@ void CCSBot::InhibitLookAround( float duration )
  */
 void CCSBot::UpdatePeripheralVision()
 {
-	VPROF_BUDGET( "CCSBot::UpdatePeripheralVision", VPROF_BUDGETGROUP_NPCS );
 
 	const float peripheralUpdateInterval = 0.29f;		// if we update at 10Hz, this ensures we test once every three
 	if (gpGlobals->curtime - m_peripheralTimestamp < peripheralUpdateInterval)
@@ -672,7 +666,6 @@ void CCSBot::UpdatePeripheralVision()
  */
 void CCSBot::UpdateLookAround( bool updateNow )
 {
-	VPROF_BUDGET( "CCSBot::UpdateLookAround", VPROF_BUDGETGROUP_NPCS );
 
 	//
 	// If we recently saw an enemy, look towards where we last saw them
@@ -913,7 +906,6 @@ void CCSBot::UpdateLookAround( bool updateNow )
  */
 bool CCSBot::BendLineOfSight( const Vector &eye, const Vector &target, Vector *bend, float angleLimit ) const
 {
-	VPROF_BUDGET( "CCSBot::BendLineOfSight", VPROF_BUDGETGROUP_NPCS );
 
 	bool doDebug = false;
 	const float debugDuration = 0.04f;
@@ -1196,7 +1188,6 @@ bool CCSBot::IsNoticable( const CCSPlayer *player, unsigned char visParts ) cons
  */
 CCSPlayer *CCSBot::FindMostDangerousThreat( void )
 {
-	VPROF_BUDGET( "CCSBot::FindMostDangerousThreat", VPROF_BUDGETGROUP_NPCS );
 
 	if (IsBlind())
 	{
@@ -1235,7 +1226,6 @@ CCSPlayer *CCSBot::FindMostDangerousThreat( void )
 	int i;
 
 	{
-		VPROF_BUDGET( "CCSBot::Collect Threats", VPROF_BUDGETGROUP_NPCS );
 
 		for( i = 1; i <= gpGlobals->maxClients; ++i )
 		{
@@ -1367,7 +1357,6 @@ CCSPlayer *CCSBot::FindMostDangerousThreat( void )
 
 
 			{
-				VPROF_BUDGET( "CCSBot::Sort Threats", VPROF_BUDGETGROUP_NPCS );
 
 				// maintain set of visible threats, sorted by increasing distance
 				if (threatCount == 0)
@@ -1403,7 +1392,6 @@ CCSPlayer *CCSBot::FindMostDangerousThreat( void )
 
 
 	{
-		VPROF_BUDGET( "CCSBot::Count nearby Friends & Enemies", VPROF_BUDGETGROUP_NPCS );
 
 		// track the maximum enemy and friend counts we've seen recently
 		int prevEnemies = m_nearbyEnemyCount;
@@ -1433,7 +1421,6 @@ CCSPlayer *CCSBot::FindMostDangerousThreat( void )
 
 
 	{
-		VPROF_BUDGET( "CCSBot::Track enemy Place", VPROF_BUDGETGROUP_NPCS );
 
 		//
 		// Track the place where we saw most of our enemies
@@ -1509,7 +1496,6 @@ CCSPlayer *CCSBot::FindMostDangerousThreat( void )
 
 
 	{
-		VPROF_BUDGET( "CCSBot::Select Threat", VPROF_BUDGETGROUP_NPCS );
 
 		if (threatCount == 0)
 			return NULL;
@@ -1575,7 +1561,6 @@ CCSPlayer *CCSBot::FindMostDangerousThreat( void )
  */
 void CCSBot::UpdateReactionQueue( void )
 {
-	VPROF_BUDGET( "CCSBot::UpdateReactionQueue", VPROF_BUDGETGROUP_NPCS );
 
 	// zombies dont see any threats
 	if (cv_bot_zombie.GetBool())

@@ -18,7 +18,6 @@
 #include "icliententitylist.h"
 #include "client.h"
 #include "host_jmp.h"
-#include "tier0/vprof.h"
 #include "tier0/icommandline.h"
 #include "filesystem_engine.h"
 #include "zone.h"
@@ -732,29 +731,6 @@ void CHostState::OnClientConnected()
 		fp = g_pFileSystem->Open( "vidmemstats.txt", "a" );
 
 		g_pFileSystem->FPrintf( fp, "%s:\n", g_HostState.m_levelName );
-	
-#ifdef VPROF_ENABLED
-		CVProfile *pProf = &g_VProfCurrentProfile;
-
-		int prefixLen = strlen( "TexGroup_Global_" );
-		float total = 0.0f;
-		for ( int i=0; i < pProf->GetNumCounters(); i++ )
-		{
-			if ( pProf->GetCounterGroup( i ) == COUNTER_GROUP_TEXTURE_GLOBAL )
-			{
-				// The counters are in bytes and the panel is all in kilobytes.
-				float value = pProf->GetCounterValue( i ) * ( 1.0f /  ( 1024.0f * 1024.0f ) );
-				total += value;
-				const char *pName = pProf->GetCounterName( i );
-				if( Q_strnicmp( pName, "TexGroup_Global_", prefixLen ) == 0 )
-				{
-					pName += prefixLen;
-				}
-				g_pFileSystem->FPrintf( fp, "%s: %0.3fMB\n", pName, value );
-			}
-		}
-		g_pFileSystem->FPrintf( fp, "vidmem total: %0.3fMB\n", total );
-#endif
 
 #if 0
 		g_pFileSystem->FPrintf( fp, "hunk total: %0.3fMB\n", Cache_TotalUsed() * ( 1.0f / ( 1024.0f * 1024.0f ) ) );
