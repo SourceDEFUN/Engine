@@ -25,7 +25,7 @@ This project is using waf buildsystem. If you have waf-related questions look ht
 - Serverbrowser works without steam
 ## defun
 - [X] SDL3 support (located in SDL3-attempt branch) ([Input partially works](https://gitlab.com/defun/engine/-/issues/1))
-- [ ] Fresh viewmodel bob
+- [X] Fresh viewmodel bob
 - [ ] Increase map size limits
 - [ ] Get rid of useless stuff like telemetry
 - [ ] Replace proprietary code with open source solutions
