@@ -263,9 +263,6 @@ void MakeSkyVec( float s, float t, int axis, float zFar, Vector& position, Vecto
 //-----------------------------------------------------------------------------
 void R_DrawSkyBox( float zFar, int nDrawFlags /*= 0x3F*/  )
 {
-	VPROF("R_DrawSkyBox");
-	tmZoneFiltered( TELEMETRY_LEVEL0, 50, TMZF_NONE, "%s %x", __FUNCTION__, nDrawFlags );
-
 	int		i;
 	Vector	normal;
 

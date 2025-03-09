@@ -166,7 +166,6 @@ void CEngineSoundClient::EmitSoundInternal( IRecipientFilter& filter, int iEntIn
 	float flVolume, soundlevel_t iSoundLevel, int iFlags, int iPitch, int iSpecialDSP,  
 	const Vector *pOrigin, const Vector *pDirection, CUtlVector< Vector >* pUtlVecOrigins, bool bUpdatePositions, float soundtime /*= 0.0f*/, int speakerentity /*= -1*/ )
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
 	if (flVolume < 0 || flVolume > 1)
 	{
 		Warning ("EmitSound: volume out of bounds = %f\n", flVolume);

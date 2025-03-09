@@ -2519,8 +2519,6 @@ void CShaderDeviceDx8::FreeFrameSyncObjects( void )
 		{
 			if ( m_bQueryIssued[i] )
 			{
-				tmZone( TELEMETRY_LEVEL1, TMZF_NONE, "D3DQueryGetData %t", tmSendCallStack( TELEMETRY_LEVEL0, 0 ) );
-
 				double flStartTime = Plat_FloatTime();
 				BOOL dummyData = 0;
 				HRESULT hr = S_OK;
@@ -3295,8 +3293,6 @@ void CShaderDeviceDx8::RefreshFrontBufferNonInteractive()
 	Dx9Device()->SetSamplerState( 0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR );
 	Dx9Device()->SetSamplerState( 0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR );
 
-	tmZone( TELEMETRY_LEVEL1, TMZF_NONE, "%s", __FUNCTION__ );
-
 	Dx9Device()->DrawPrimitiveUP( D3DPT_QUADLIST, 1, Vertices, sizeof( TEXVERTEX ) );
 
 	if ( bInStartupMode )
@@ -3342,8 +3338,6 @@ void CShaderDeviceDx8::RefreshFrontBufferNonInteractive()
 	Dx9Device()->SetPixelShader( NULL );
 	Dx9Device()->SetTexture( 0, NULL );
 	Dx9Device()->SetVertexDeclaration( NULL );
-
-	tmZone( TELEMETRY_LEVEL1, TMZF_NONE, "D3DPresent" );
 
 	Dx9Device()->Present( 0, 0, 0, 0 );
 	g_pShaderAPI->QueueResetRenderState();

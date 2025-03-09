@@ -3147,8 +3147,6 @@ void GLMEndPIXEvent( void )
 	}
 
 	sg_pPIXName[0] = '\0';
-		
-	tmLeave( TELEMETRY_LEVEL2 );
 }
 
 //===============================================================================

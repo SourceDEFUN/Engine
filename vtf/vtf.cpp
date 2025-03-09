@@ -1038,8 +1038,6 @@ bool CVTFTexture::Unserialize( CUtlBuffer &buf, bool bHeaderOnly, int nSkipMipLe
 
 bool CVTFTexture::UnserializeEx( CUtlBuffer &buf, bool bHeaderOnly, int nForceFlags, int nSkipMipLevels )
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s (header only: %d, nForceFlags: %d, skipMips: %d)", __FUNCTION__, bHeaderOnly ? 1 : 0, nForceFlags, nSkipMipLevels );
-
 	// When unserializing, we can skip a certain number of mip levels,
 	// and we also can just load everything but the image data
 	VTFFileHeader_t header;

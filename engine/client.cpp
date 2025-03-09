@@ -2005,8 +2005,6 @@ void CClientState::UpdateAreaBits_BackwardsCompatible()
 {
 	if ( m_pAreaBits )
 	{
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 		memcpy( m_chAreaBits, m_pAreaBits, sizeof( m_chAreaBits ) );
 		
 		// The whole point of adding this array was that the client could react to closed portals.
@@ -2028,9 +2026,6 @@ unsigned char** CClientState::GetAreaBits_BackwardCompatibility()
 void CClientState::RunFrame()
 {
 	CBaseClientState::RunFrame();
-
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 	// Since cl_rate is a virtualized cvar, make sure to pickup changes in it.
 	if ( m_NetChannel )
 		m_NetChannel->SetDataRate( cl_rate->GetFloat() );

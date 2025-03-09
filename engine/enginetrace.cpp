@@ -1674,11 +1674,7 @@ void CEngineTrace::TraceRay( const Ray_t &ray, unsigned int fMask, ITraceFilter 
 		s_BenchmarkRays.AddToTail( ray );
 	}
 #endif
-
-	tmZone( TELEMETRY_LEVEL1, TMZF_NONE, "%s:%d", __FUNCTION__, __LINE__ );
-	VPROF_INCREMENT_COUNTER( "TraceRay", 1 );
 	m_traceStatCounters[TRACE_STAT_COUNTER_TRACERAY]++;
-//	VPROF_BUDGET( "CEngineTrace::TraceRay", "Ray/Hull Trace" );
 	
 	CTraceFilterHitAll traceFilter;
 	if ( !pTraceFilter )

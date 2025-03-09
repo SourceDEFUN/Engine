@@ -859,7 +859,6 @@ bool IsCurrentViewAccessAllowed()
 
 void SetupCurrentView( const Vector &vecOrigin, const QAngle &angles, view_id_t viewID )
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
 
 	// Store off view origin and angles
 	g_vecCurrentRenderOrigin = vecOrigin;
@@ -1029,9 +1028,6 @@ void CViewRender::DrawRenderablesInList( CUtlVector< IClientRenderable * > &list
 //-----------------------------------------------------------------------------
 void CViewRender::DrawViewModels( const CViewSetup &view, bool drawViewmodel )
 {
-	VPROF( "CViewRender::DrawViewModel" );
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 #ifdef PORTAL //in portal, we'd like a copy of the front buffer without the gun in it for use with the depth doubler
 	g_pPortalRender->UpdateDepthDoublerTexture( view );
 #endif
@@ -1154,9 +1150,6 @@ bool CViewRender::ShouldDrawBrushModels( void )
 //-----------------------------------------------------------------------------
 void CViewRender::PerformScreenSpaceEffects( int x, int y, int w, int h )
 {
-	VPROF("CViewRender::PerformScreenSpaceEffects()");
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 	// FIXME: Screen-space effects are busted in the editor
 	if ( engine->IsHammerRunning() )
 		return;
@@ -1188,12 +1181,8 @@ IMaterial *CViewRender::GetScreenOverlayMaterial( )
 //-----------------------------------------------------------------------------
 void CViewRender::PerformScreenOverlay( int x, int y, int w, int h )
 {
-	VPROF("CViewRender::PerformScreenOverlay()");
-
 	if (m_ScreenOverlayMaterial)
 	{
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 		if ( m_ScreenOverlayMaterial->NeedsFullFrameBufferTexture() )
 		{
             // FIXME: check with multi/sub-rect renders. Should this be 0,0,w,h instead?
@@ -1227,8 +1216,6 @@ void CViewRender::DrawUnderwaterOverlay( void )
 
 	if ( pOverlayMat )
 	{
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 		CMatRenderContextPtr pRenderContext( materials );
 
 		int x, y, w, h;
@@ -1312,9 +1299,6 @@ bool CViewRender::UpdateShadowDepthTexture( ITexture *pRenderTarget, ITexture *p
 void CViewRender::ViewDrawScene( bool bDrew3dSkybox, SkyboxVisibility_t nSkyboxVisible, const CViewSetup &view, 
 								int nClearFlags, view_id_t viewID, bool bDrawViewModel, int baseDrawFlags, ViewCustomVisibility_t *pCustomVisibility )
 {
-	VPROF( "CViewRender::ViewDrawScene" );
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 	// this allows the refract texture to be updated once per *scene* on 360
 	// (e.g. once for a monitor scene and once for the main scene)
 	g_viewscene_refractUpdateFrame = gpGlobals->framecount - 1;
@@ -1776,9 +1760,6 @@ void CViewRender::DisableFog( void )
 //-----------------------------------------------------------------------------
 void CViewRender::SetupVis( const CViewSetup& view, unsigned int &visFlags, ViewCustomVisibility_t *pCustomVisibility )
 {
-	VPROF( "CViewRender::SetupVis" );
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 	if ( pCustomVisibility && pCustomVisibility->m_nNumVisOrigins )
 	{
 		// Pass array or vis origins to merge
@@ -1797,8 +1778,6 @@ void CViewRender::SetupVis( const CViewSetup& view, unsigned int &visFlags, View
 //-----------------------------------------------------------------------------
 void CViewRender::RenderPlayerSprites()
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 	GetClientVoiceMgr()->DrawHeadLabels();
 }
 
@@ -1807,8 +1786,6 @@ void CViewRender::RenderPlayerSprites()
 //-----------------------------------------------------------------------------
 void CViewRender::SetupMain3DView( const CViewSetup &view, int &nClearFlags )
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 	// FIXME: I really want these fields removed from CViewSetup 
 	// and passed in as independent flags
 	// Clear the color here if requested.
@@ -1915,7 +1892,6 @@ void CViewRender::RenderView( const CViewSetup &view, int nClearFlags, int whatT
 
 	C_BaseAnimating::AutoAllowBoneAccess boneaccess( true, true );
 	VPROF( "CViewRender::RenderView" );
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
 
 	// Don't want TF2 running less than DX 8
 	if ( g_pMaterialSystemHardwareConfig->GetDXSupportLevel() < 80 )
@@ -2081,8 +2057,6 @@ void CViewRender::RenderView( const CViewSetup &view, int nClearFlags, int whatT
 
 		if ( IsPC() )
 		{
-			tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "GrabPreColorCorrectedFrame" );
-
 			// Grab the pre-color corrected frame for editing purposes
 			engine->GrabPreColorCorrectedFrame( view.x, view.y, view.width, view.height );
 		}
@@ -2126,9 +2100,7 @@ void CViewRender::RenderView( const CViewSetup &view, int nClearFlags, int whatT
 
 		// Draw the overlay
 		if ( m_bDrawOverlay )
-		{	   
-			tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "DrawOverlay" );
-
+		{
 			// This allows us to be ok if there are nested overlay views
 			CViewSetup currentView = m_CurrentView;
 			CViewSetup tempView = m_OverlayViewSetup;
@@ -2257,8 +2229,6 @@ void CViewRender::RenderView( const CViewSetup &view, int nClearFlags, int whatT
 		}
 		pRenderContext.SafeRelease();
 
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "VGui_DrawHud", __FUNCTION__ );
-
 		// paint the vgui screen
 		VGui_PreRender();
 
@@ -2368,8 +2338,6 @@ void CViewRender::Render2DEffectsPostHUD( const CViewSetup &view )
 //-----------------------------------------------------------------------------
 void CViewRender::DetermineWaterRenderInfo( const VisibleFogVolumeInfo_t &fogVolumeInfo, WaterRenderInfo_t &info )
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 	// By default, assume cheap water (even if there's no water in the scene!)
 	info.m_bCheapWater = true;
 	info.m_bRefract = false;
@@ -2533,8 +2501,6 @@ void CViewRender::DetermineWaterRenderInfo( const VisibleFogVolumeInfo_t &fogVol
 void CViewRender::DrawWorldAndEntities( bool bDrawSkybox, const CViewSetup &viewIn, int nClearFlags, ViewCustomVisibility_t *pCustomVisibility )
 {
 	MDLCACHE_CRITICAL_SECTION();
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 	VisibleFogVolumeInfo_t fogVolumeInfo;
 #ifdef PORTAL //in portal, we can't use the fog volume for the camera since it's almost never in the same fog volume as what's in front of the portal
 	if( g_pPortalRender->GetViewRecursionLevel() == 0 )
@@ -2553,8 +2519,7 @@ void CViewRender::DrawWorldAndEntities( bool bDrawSkybox, const CViewSetup &view
 	DetermineWaterRenderInfo( fogVolumeInfo, info );
 
 	if ( info.m_bCheapWater )
-	{		     
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "bCheapWater" );
+	{
 		cplane_t glassReflectionPlane;
 		if ( IsReflectiveGlassInView( viewIn, glassReflectionPlane ) )
 		{								    
@@ -2584,14 +2549,12 @@ void CViewRender::DrawWorldAndEntities( bool bDrawSkybox, const CViewSetup &view
 	// We can see water of some sort
 	if ( !fogVolumeInfo.m_bEyeInFogVolume )
 	{
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "CAboveWaterView" );
 		CRefPtr<CAboveWaterView> pAboveWaterView = new CAboveWaterView( this );
 		pAboveWaterView->Setup( viewIn, bDrawSkybox, fogVolumeInfo, info );
 		AddViewToScene( pAboveWaterView );
 	}
 	else
 	{
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "CUnderWaterView" );
 		CRefPtr<CUnderWaterView> pUnderWaterView = new CUnderWaterView( this );
 		pUnderWaterView->Setup( viewIn, bDrawSkybox, fogVolumeInfo, info );
 		AddViewToScene( pUnderWaterView );
@@ -3100,8 +3063,6 @@ void CViewRender::DrawMonitors( const CViewSetup &cameraView )
 	C_PointCamera *pCameraEnt = GetPointCameraList();
 	if ( !pCameraEnt )
 		return;
-
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
 
 #ifdef _DEBUG
 	g_bRenderingCameraView = true;
@@ -3759,8 +3720,6 @@ static void DrawClippedDepthBox( IClientRenderable *pEnt, float *pClipPlane )
 //-----------------------------------------------------------------------------
 static inline void DrawOpaqueRenderable( IClientRenderable *pEnt, bool bTwoPass, ERenderDepthMode DepthMode, int nDefaultFlags = 0 )
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 	float color[3];
 
 	pEnt->GetColorModulation( color );

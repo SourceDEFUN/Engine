@@ -770,9 +770,6 @@ void CBaseClientState::Disconnect( const char *pszReason, bool bShowMainMenu )
 
 void CBaseClientState::RunFrame (void)
 {
-	VPROF("CBaseClientState::RunFrame");
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 	if ( (m_nSignonState > SIGNONSTATE_NEW) && m_NetChannel && g_GameEventManager.HasClientListenersChanged() )
 	{
 		// assemble a list of all events we listening to and tell the server

@@ -758,8 +758,6 @@ bool CClientState::ProcessBSPDecal( SVC_BSPDecal *msg )
 
 bool CClientState::ProcessGameEvent(SVC_GameEvent *msg)
 {
-	tmZoneFiltered( TELEMETRY_LEVEL0, 50, TMZF_NONE, "%s", __FUNCTION__ );
-
 	int startbit = msg->m_DataIn.GetNumBitsRead();
 
 	IGameEvent *event = g_GameEventManager.UnserializeEvent( &msg->m_DataIn );

@@ -1102,8 +1102,6 @@ void CBaseServer::CalculateCPUUsage( void )
 		return;
 	}
 
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 	float curtime = Sys_FloatTime();
 
 	if ( m_fStartTime == 0 )
@@ -1926,9 +1924,6 @@ Read's packets from clients and executes messages as appropriate.
 
 void CBaseServer::RunFrame( void )
 {
-	VPROF_BUDGET( "CBaseServer::RunFrame", VPROF_BUDGETGROUP_OTHER_NETWORKING );
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "CBaseServer::RunFrame" );
-
 	NET_ProcessSocket( m_Socket, this );	
 
 #ifdef LINUX

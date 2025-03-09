@@ -1043,16 +1043,12 @@ public:
 
 	void AsyncLoad( const AsyncLoadJob_t& job )
 	{
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 		// TODO: This could be made faster by keeping a pool of these things.
 		m_pendingJobs.PushItem( new AsyncLoadJob_t( job ) );
 	}
 
 	void Shutdown()
 	{
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 		m_bQuit = true;
 		ThreadJoin( m_LoaderThread );		
 	}
@@ -1060,14 +1056,11 @@ public:
 	void ThreadMain_Update()
 	{
 		Assert( ThreadInMainThread() );
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
 		
 		AsyncLoadJob_t *pJob = NULL;
 		if ( m_completedJobs.PopItem( &pJob ) )
 		{
 			Assert( pJob != NULL );
-
-			tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - CompleteAsyncLoad", __FUNCTION__ );
 			// Complete the load, then make the callback.
 			assert_cast< CTextureManager* >( g_pTextureManager )->CompleteAsyncLoad( pJob );
 			delete pJob;
@@ -1120,7 +1113,6 @@ private:
 	void ThreadLoader_ProcessLoad( AsyncLoadJob_t *pJob, IVTFTexture* pScratchVTF )
 	{
 		Assert( ThreadInLoaderThread() );
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
 
 		Assert( pJob->m_pResultData );
 
@@ -1163,15 +1155,11 @@ public:
 
 	void AsyncReadback( AsyncReadJob_t* job )
 	{
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 		m_requestedCopies.PushItem( job );
 	}
 
 	void Shutdown()
 	{
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 		m_bQuit = true;
 		ThreadJoin( m_HelperThread );
 	}
@@ -1179,11 +1167,8 @@ public:
 	void ThreadMain_Update()
 	{
 		Assert( ThreadInMainThread() );
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 		while ( !m_queuedMaps.IsEmpty() )
 		{
-			tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "CompleteMap" );
 			AsyncReadJob_t* pMapped = m_queuedMaps.Head();
 			Assert( pMapped != NULL );
 			{
@@ -1222,8 +1207,6 @@ public:
 		// stuff can (mostly) happen on the async thread
 		while ( !m_queuedReads.IsEmpty() )
 		{
-			tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "CompleteQueuedRead" );
-
 			AsyncReadJob_t* pRead = NULL;
 			if ( m_queuedReads.RemoveAtHead( pRead ) )
 			{
@@ -1267,8 +1250,6 @@ public:
 		
 		while ( m_completedJobs.Count() > 0 )
 		{
-			tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "CreateTextureFromBits" );
-			
 			AsyncReadJob_t* pCreate = NULL;
 			if ( m_completedJobs.PopItem( &pCreate ) ) 
 			{
@@ -1321,7 +1302,6 @@ private:
 	void ThreadReader_ProcessRead( AsyncReadJob_t *pJob )
 	{
 		Assert( ThreadInReaderThread() );
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
 
 		// This code does a few things:
 		// 1. Reads from a previously mapped scratch buffer texture and performs byte swapping (if necessary).
@@ -1344,7 +1324,6 @@ private:
 		const int dstMemRequried = ImageLoader::GetMemRequired( w, h, 1, dstFmt, pJob->m_bGenMips );
 		
 		{
-			tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s-Allocations", __FUNCTION__ );
 			srcBufferFinestMip.EnsureCapacity( srcFinestMemRequired );
 			if ( srcFinestMemRequired != srcAllMemRequired )
 			{
@@ -1367,7 +1346,6 @@ private:
 		srcPitch; // Hush compiler.
 
 		{
-			tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s-ByteSwapInPlace", __FUNCTION__ );
 			ImageLoader::ConvertImageFormat( (unsigned char*) pJob->m_pAsyncMap->m_pMemory, GetImageFormatRawReadback( srcFmt ), srcBufferFinestMip.Base(), srcFmt, w, h );
 		}
 		
@@ -1404,15 +1382,11 @@ private:
 
 	void GenerateMipmaps( CUtlMemory< unsigned char >* outBuffer, unsigned char* pSrc, int w, int h, ImageFormat fmt ) const
 	{
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 		ImageLoader::GenerateMipmapLevelsLQ( pSrc, outBuffer->Base(), w, h, fmt, 0 );
 	}
 
 	void ConvertTexelData( CUtlMemory< unsigned char > *outBuffer, ImageFormat dstFmt, /* const */ CUtlMemory< unsigned char > &inBuffer, int w, int h, ImageFormat srcFmt, bool bGenMips )
 	{
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 		const int mipmapCount = bGenMips ? ImageLoader::GetNumMipMapLevels( w, h ) : 1;
 
 		unsigned char* pSrc = inBuffer.Base();
@@ -2364,8 +2338,6 @@ void CTextureManager::MarkUnreferencedTextureForCleanup( ITextureInternal *pText
 
 void CTextureManager::RemoveTexture( ITextureInternal *pTexture )
 {
-	TM_ZONE_DEFAULT( TELEMETRY_LEVEL0 );
-
 	Assert( pTexture->GetReferenceCount() <= 0 );
 
 	if ( !ThreadInMainThread() || MaterialSystem()->GetRenderThreadId() != (uintp)-1 )
@@ -2509,8 +2481,6 @@ int CTextureManager::FindNext( int iIndex, ITextureInternal **pTexInternal )
 
 void CTextureManager::Update()
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 	#ifdef STAGING_ONLY
 		if ( mat_texture_list_dump.GetBool() )
 		{
@@ -2526,8 +2496,6 @@ void CTextureManager::Update()
 // Load a texture asynchronously and then call the provided callback.
 void CTextureManager::AsyncFindOrLoadTexture( const char *pTextureName, const char *pTextureGroupName, IAsyncTextureOperationReceiver* pRecipient, void* pExtraArgs, bool bComplain, int nAdditionalCreationFlags )
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 	bool bStreamingRequest = ( nAdditionalCreationFlags & TEXTUREFLAGS_STREAMABLE ) != 0;
 
 	ITextureInternal* pLoadedTex = FindTexture( pTextureName );
@@ -2570,8 +2538,6 @@ void CTextureManager::AsyncFindOrLoadTexture( const char *pTextureName, const ch
 
 void CTextureManager::CompleteAsyncLoad( AsyncLoadJob_t* pJob )
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 	Assert( pJob );
 	bool bDownloaded = false;
 
@@ -2639,8 +2605,6 @@ void CTextureManager::AsyncLoad( const AsyncLoadJob_t& job )
 
 void CTextureManager::AsyncCreateTextureFromRenderTarget( ITexture* pSrcRt, const char* pDstName, ImageFormat dstFmt, bool bGenMips, int nAdditionalCreationFlags, IAsyncTextureOperationReceiver* pRecipient, void* pExtraArgs )
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 	Assert( pSrcRt );
 
 	AsyncReadJob_t* pAsyncRead = new AsyncReadJob_t( pSrcRt, pDstName, dstFmt, bGenMips, nAdditionalCreationFlags, pRecipient, pExtraArgs );
@@ -2649,8 +2613,6 @@ void CTextureManager::AsyncCreateTextureFromRenderTarget( ITexture* pSrcRt, cons
 
 void CTextureManager::CompleteAsyncRead( AsyncReadJob_t* pJob )
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 	// Release the texture back into the pool.
 	ReleaseReadbackTexture( pJob->m_pSysmemTex );
 	pJob->m_pSysmemTex = NULL;
@@ -2682,8 +2644,6 @@ void CTextureManager::CompleteAsyncRead( AsyncReadJob_t* pJob )
 
 void CTextureManager::AsyncReadTexture( AsyncReadJob_t* pJob )
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 	Assert( m_pAsyncReader );
 	Assert( pJob );
 
@@ -2702,10 +2662,7 @@ void CTextureManager::AsyncReadTexture( AsyncReadJob_t* pJob )
 
 ITextureInternal* CTextureManager::AcquireReadbackTexture( int w, int h, ImageFormat fmt )
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 	{
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s-TryExisting", __FUNCTION__ );
 		MaterialLock_t hMaterialLock = materials->Lock();
 
 		FOR_EACH_VEC( m_ReadbackTextures, i )
@@ -2728,8 +2685,6 @@ ITextureInternal* CTextureManager::AcquireReadbackTexture( int w, int h, ImageFo
 
 		materials->Unlock( hMaterialLock );
 	}
-
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s-CreateNew", __FUNCTION__ );
 	ITextureInternal* stagingTex = CreateProceduralTexture( "readbacktex", TEXTURE_GROUP_OTHER, w, h, 1, fmt, TEXTUREFLAGS_STAGING_MEMORY | TEXTUREFLAGS_NOMIP | TEXTUREFLAGS_SINGLECOPY | TEXTUREFLAGS_IMMEDIATE_CLEANUP );
 	// AddRef here for caller.
 	stagingTex->AddRef();
@@ -2932,8 +2887,6 @@ cleanup:
 
 void CTextureManager::UpdatePostAsync()
 {
-	TM_ZONE_DEFAULT( TELEMETRY_LEVEL0 );
-
 	// Update the async loader, which affects streaming in (streaming out is handled below).
 	// Both stream in and stream out have to happen while the async job is not running because
 	// they muck with shaderapi texture handles which could be in use if the async job is currently
@@ -3034,8 +2987,6 @@ bool CTextureManager::AddTextureCompositorTemplate( const char* pName, KeyValues
 
 bool CTextureManager::VerifyTextureCompositorTemplates()
 {
-	TM_ZONE_DEFAULT( TELEMETRY_LEVEL1 );
-
 	bool allSuccess = true;
 
 	FOR_EACH_DICT_FAST( m_TexCompTemplates, i )

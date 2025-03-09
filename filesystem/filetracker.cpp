@@ -33,8 +33,6 @@ unsigned CFileTracker2::ThreadedProcessMD5Requests()
 
 		while ( m_PendingJobs.PopItem( &stuff ) )
 		{
-			tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ ); 
-
 			MD5Context_t ctx;
 			memset( &ctx, 0, sizeof(MD5Context_t) );
 			MD5Init( &ctx );
@@ -61,8 +59,6 @@ unsigned CFileTracker2::ThreadedProcessMD5Requests()
 		}
 
 		{
-			tmZone( TELEMETRY_LEVEL0, TMZF_IDLE, "m_threadEventWorkToDo" ); 
-
 			m_threadEventWorkToDo.Wait( 1000 );
 		}
 	}

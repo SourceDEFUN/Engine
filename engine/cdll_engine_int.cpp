@@ -1997,8 +1997,6 @@ void ClientDLL_ProcessInput( void )
 	if ( !g_ClientDLL )
 		return;
 
-	VPROF("ClientDLL_ProcessInput");
-	tmZoneFiltered( TELEMETRY_LEVEL0, 50, TMZF_NONE, "%s", __FUNCTION__ );
 	g_ClientDLL->HudProcessInput( cl.IsConnected() );
 }
 
@@ -2009,8 +2007,6 @@ void ClientDLL_FrameStageNotify( ClientFrameStage_t frameStage )
 {
 	if ( !g_ClientDLL )
 		return;
-
-	tmZoneFiltered( TELEMETRY_LEVEL0, 50, TMZF_NONE, "%s", __FUNCTION__ );
 
 	g_ClientDLL->FrameStageNotify( frameStage );
 }

@@ -389,10 +389,6 @@ void CEngine::Frame( void )
 			pSyncReportConVar->SetValue( reportLevel );
 		}
 	}
-
-#ifdef VPROF_ENABLED
-	PreUpdateProfile( m_flFrameTime );
-#endif
 	
 	// Reset swallowed time...
 	m_flFilteredTime = 0.0f;
@@ -405,18 +401,8 @@ void CEngine::Frame( void )
 	}
 #endif
 
-#ifdef VPROF_ENABLED
-	PostUpdateProfile();
-#endif
-	TelemetryTick();
 
 	{ // profile scope
-
-	VPROF_BUDGET( "CEngine::Frame", VPROF_BUDGETGROUP_OTHER_UNACCOUNTED );
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-#ifdef RAD_TELEMETRY_ENABLED
-	TmU64 time0 = tmFastTime();
-#endif
 
 
 	switch( m_nDLLState )

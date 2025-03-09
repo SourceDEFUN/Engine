@@ -606,8 +606,6 @@ void CStudioRender::DrawModelStaticProp( const DrawModelInfo_t& info,
 // NOTE: This is a fast path for simple models with skeletons but not many other features
 void CStudioRender::DrawModelArray( const DrawModelInfo_t &drawInfo, const StudioRenderContext_t &rc, int arrayCount, model_array_instance_t *pInstanceData, int instanceStride, int flags )
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s %d", __FUNCTION__, arrayCount );
-
 #ifndef SWDS												// no drawing on dedicated server
 #if 0
 	FlexWeights_t flex;

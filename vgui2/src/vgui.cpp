@@ -474,7 +474,6 @@ void CVGui::RunFrame()
 
 		m_bCanRemoveTickSignal = false;
 
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - Ticks", __FUNCTION__ );
 		// directly invoke tick all who asked to be ticked
 		int count = m_TickSignalVec.Count();
 		for (int i = count - 1; i >= 0; i-- )
@@ -492,7 +491,6 @@ void CVGui::RunFrame()
 			}
 			
 			t->panel->Client()->OnTick();
-			tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - Ticks: %s", __FUNCTION__, t->panel->Client()->GetName() );
 		}
 
 		m_bCanRemoveTickSignal = true;

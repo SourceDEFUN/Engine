@@ -785,8 +785,6 @@ void DrawScreenSpaceRectangle( IMaterial *pMaterial,
 	if ( ( nWidth <= 0 ) || ( nHeight <= 0 ) )
 		return;
 
-	tmZone( TELEMETRY_LEVEL1, TMZF_NONE, "%s", __FUNCTION__ );
-
 	pRenderContext->MatrixMode( MATERIAL_VIEW );
 	pRenderContext->PushMatrix();
 	pRenderContext->LoadIdentity();

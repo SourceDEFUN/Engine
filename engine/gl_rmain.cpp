@@ -1195,8 +1195,6 @@ void R_DrawLightmaps( IWorldRenderList *pList, int pageId )
 
 void R_CheckForLightingConfigChanges()
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 	UpdateStudioRenderConfig();
 	UpdateMaterialSystemConfig();
 	if( MaterialConfigLightingChanged() || g_RebuildLightmaps )

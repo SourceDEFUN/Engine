@@ -1827,8 +1827,6 @@ void CModelRender::SetupLighting( const Vector &vecCenter )
 //-----------------------------------------------------------------------------
 void CModelRender::ForcedMaterialOverride( IMaterial *newMaterial, OverrideType_t nOverrideType )
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 	g_pStudioRender->ForcedMaterialOverride( newMaterial, nOverrideType );
 }
 

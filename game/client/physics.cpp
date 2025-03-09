@@ -438,8 +438,6 @@ void CPhysicsSystem::PhysicsSimulate()
 
 	if ( physenv )
 	{
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s %d", __FUNCTION__, physenv->GetActiveObjectCount() );
-
 		g_Collisions.BufferTouchEvents( true );
 #ifdef _DEBUG
 		physenv->DebugCheckContacts();

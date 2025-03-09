@@ -264,9 +264,6 @@ static ConVar cl_showpausedimage( "cl_showpausedimage", "1", 0, "Show the 'Pause
 //-----------------------------------------------------------------------------
 void VGui_PreRender()
 {
-	VPROF( "VGui_PreRender" );
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 	// 360 does not use these plaques
 	if ( IsPC() )
 	{

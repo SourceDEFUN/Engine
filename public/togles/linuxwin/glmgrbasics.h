@@ -151,8 +151,6 @@ public:
 };
 
 #if GLMDEBUG
-
-
 //===============================================================================
 // classes
 
@@ -215,8 +213,6 @@ class GLMFuncLogger
 
 // handy macro to go with the function tracking class
 #define	GLM_FUNC			GLMFuncLogger _logger_ ( __FUNCTION__ )
-#else
-#define	GLM_FUNC            tmZone( TELEMETRY_LEVEL1, TMZF_NONE, "%s", __FUNCTION__ )
 #endif
 
 

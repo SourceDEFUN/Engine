@@ -109,7 +109,6 @@ CHintMessageQueue::CHintMessageQueue( CBasePlayer *pPlayer )
 //--------------------------------------------------------------------------------------------------------------
 void CHintMessageQueue::Reset()
 {
-	m_tmMessageEnd = 0;
 	for ( int i=0; i<m_messages.Count(); ++i )
 	{
 		delete m_messages[i];
@@ -130,7 +129,6 @@ void CHintMessageQueue::Update()
 		if ( m_messages.Count() )
 		{
 			CHintMessage *msg = m_messages[0];
-			m_tmMessageEnd = gpGlobals->curtime + msg->GetDuration();
 			msg->Send( m_pPlayer );
 			delete msg;
 			m_messages.Remove( 0 );

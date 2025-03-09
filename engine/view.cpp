@@ -89,8 +89,6 @@ bool V_CheckGamma( void )
 	if ( IsX360() )
 		return false;
 
-	tmZoneFiltered( TELEMETRY_LEVEL0, 50, TMZF_NONE, "%s", __FUNCTION__ );
-
 	static int lastLightmap = -1;
 	extern void GL_RebuildLightmaps( void );
 	
@@ -128,8 +126,6 @@ void V_Shutdown( void )
 //-----------------------------------------------------------------------------
 void V_RenderVGuiOnly_NoSwap()
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 	// Need to clear the screen in this case, cause we're not drawing
 	// the loading screen.
 	UpdateMaterialSystemConfig();
@@ -238,9 +234,7 @@ void V_RenderView( void )
 	bCanRenderWorld = bCanRenderWorld && toolframework->ShouldGameRenderView();
 
 	if ( IsPC() && bCanRenderWorld && g_bTextMode )
-	{	
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "SysSleep()" );
-
+	{
 		// Sleep to let the other textmode clients get some cycles.
 		Sys_Sleep( 15 );
 		bCanRenderWorld = false;

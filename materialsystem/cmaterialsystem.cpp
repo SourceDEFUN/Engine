@@ -3028,8 +3028,6 @@ void CMaterialSystem::UncacheAllMaterials()
 //-----------------------------------------------------------------------------
 void CMaterialSystem::UncacheUnusedMaterials( bool bRecomputeStateSnapshots )
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 	MaterialLock_t hLock = Lock();
 	Flush( true );
 
@@ -3477,13 +3475,9 @@ void CMaterialSystem::BeginFrame( float frameTime )
 	
 	Assert( m_bGeneratedConfig );
 
-	VPROF_BUDGET( "CMaterialSystem::BeginFrame", VPROF_BUDGETGROUP_SWAP_BUFFERS );
-	tmZoneFiltered( TELEMETRY_LEVEL0, 50, TMZF_NONE, "%s", __FUNCTION__ );
-
 	IMatRenderContextInternal *pRenderContext = GetRenderContextInternal();
 	if ( g_config.ForceHWSync() && (IsPC() || m_ThreadMode != MATERIAL_QUEUED_THREADED) )
 	{
-		tmZoneFiltered( TELEMETRY_LEVEL0, 50, TMZF_NONE, "ForceHardwareSync" );
 		pRenderContext->ForceHardwareSync();
 	}
 
@@ -3524,10 +3518,6 @@ ConVar mat_queue_report( "mat_queue_report", "0", FCVAR_ARCHIVE, "Report thread 
 
 void CMaterialSystem::ThreadExecuteQueuedContext( CMatQueuedRenderContext *pContext )
 {
-#ifdef RAD_TELEMETRY_ENABLED
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s-%s", __FUNCTION__, GetMatString( m_ThreadMode ) );
-	CTelemetrySpikeDetector Spike( "ThreadExecuteQueuedContext", 1 );
-#endif
 
 	Assert( m_bThreadHasOwnership );
 
@@ -4957,12 +4947,7 @@ MaterialLock_t CMaterialSystem::Lock()
 
 	if ( m_ThreadMode != MATERIAL_SINGLE_THREADED )
 	{
-		TelemetrySetLockName( TELEMETRY_LEVEL0, (char const *)&g_MatSysMutex, "MatSysMutex" );
-
-		tmTryLock( TELEMETRY_LEVEL0, (char const *)&g_MatSysMutex, "CMaterialSystem" );
 		g_MatSysMutex.Lock();
-		tmEndTryLock( TELEMETRY_LEVEL0, (char const *)&g_MatSysMutex, TMLR_SUCCESS );
-		tmSetLockState( TELEMETRY_LEVEL0, (char const *)&g_MatSysMutex, TMLS_LOCKED, "CMaterialSystem" );
 	}
 #endif
 
@@ -5031,7 +5016,6 @@ void CMaterialSystem::Unlock( MaterialLock_t hMaterialLock )
 	if ( m_ThreadMode != MATERIAL_SINGLE_THREADED )
 	{
 		g_MatSysMutex.Unlock();
-		tmSetLockState( TELEMETRY_LEVEL0, (char const *)&g_MatSysMutex, TMLS_RELEASED, "CMaterialSystem" );
 	}
 #endif
 

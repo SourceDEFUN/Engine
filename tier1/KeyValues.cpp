@@ -645,9 +645,6 @@ void KeyValues::UsesConditionals(bool state)
 //-----------------------------------------------------------------------------
 bool KeyValues::LoadFromFile( IBaseFileSystem *filesystem, const char *resourceName, const char *pathID, bool refreshCache )
 {
-	TM_ZONE_DEFAULT( TELEMETRY_LEVEL0 );
-	TM_ZONE_DEFAULT_PARAM( TELEMETRY_LEVEL0, resourceName );
-
 	Assert(filesystem);
 #ifdef WIN32
 	Assert( IsX360() || ( IsPC() && _heapchk() == _HEAPOK ) );

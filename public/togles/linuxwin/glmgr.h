@@ -1827,8 +1827,6 @@ FORCEINLINE void GLMContext::DrawRangeElements(	GLenum mode, GLuint start, GLuin
 
 #if GLMDEBUG
 	GLM_FUNC;
-#else
-	//tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s %d-%d count:%d mode:%d type:%d", __FUNCTION__, start, end, count, mode, type );
 #endif
 
 	++m_nBatchCounter;

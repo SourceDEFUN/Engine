@@ -36,18 +36,7 @@ Might be interesting to make it so dx9hook.h paid attention to the PIX_ENABLE na
 	#define D3D_BATCH_PERF(...)
 #endif
 
-#if D3D_BATCH_PERF_ANALYSIS
-	#define XXX \
-		tmZone( TELEMETRY_LEVEL3, TMZF_NONE, "D3D9: %s", __FUNCTION__ ); \
-		CD3DCallTimer scopedCallTimer;
-#else
-	#define XXX																													\
-		if( ThreadInMainThread() )  																							\
-		{   																													\
-			tmMessage( TELEMETRY_LEVEL0, TMMF_ICON_NOTE | TMMF_SEVERITY_WARNING, "(source/d3d)%s", __FUNCTION__ );				\
-			tmZoneFiltered( TELEMETRY_LEVEL0, 50, TMZF_NONE, "%s", __FUNCTION__ );												\
-		}
-#endif
+#define XXX CD3DCallTimer scopedCallTimer;
 
 // Hooks for routines which return values.
 #define _DOCALL0( _member )				( m_Data.pHWObj->_member )()
@@ -611,89 +600,6 @@ public:
 			XXX; 
 			hres = _DOCALL(Present, pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion); 
 		}
-				
-#if D3D_BATCH_PERF_ANALYSIS
-		const uint nFrameIndex = m_nTotalFrames;
-		m_nTotalFrames++;
-
-		if (nFrameIndex >= 5)
-		{
-			double flPresentTime = tm.GetDurationInProgress().GetMillisecondsF();
-			uint64 nEndCycles = g_nTotalD3DCycles;
-
-			double flTotalPresentTime = ( nEndCycles - nStartCycles ) * s_rdtsc_to_ms;
-
-			m_nTotalD3DCalls += g_nTotalD3DCalls;
-			m_flTotalD3DTime += g_nTotalD3DCycles * s_rdtsc_to_ms;
-				
-			static int bPrevBatchVis = -1;
-
-			if ((bPrevBatchVis == 1) && m_batch_vis_bitmap.is_valid())
-			{
-				m_nOverallDraws += m_nTotalDraws;
-				m_nOverallPrims += m_nTotalPrims;
-				m_nOverallD3DCalls += m_nTotalD3DCalls;
-				m_flOverallD3DTime += m_flTotalD3DTime;
-
-				m_batch_vis_bitmap.fill_box(0, m_nBatchVisY, (uint)(.5f + flPresentTime / d3d_present_vis_abs_scale.GetFloat() * m_batch_vis_bitmap.width()), 10, 255, 16, 128);
-				m_batch_vis_bitmap.additive_fill_box(0, m_nBatchVisY, (uint)(.5f + flTotalPresentTime / d3d_present_vis_abs_scale.GetFloat() * m_batch_vis_bitmap.width()), 10, 0, 255, 128);
-				m_nBatchVisY += 10;
-			
-				uint y = MAX( 600, m_nBatchVisY + 20 ), l = 0;
-				m_batch_vis_bitmap.draw_formatted_text(0, y+8*(l++), 1, 255, 255, 255, "Frame: %u, Batches: %u, Prims: %u", nFrameIndex, m_nTotalDraws, m_nTotalPrims );
-				m_batch_vis_bitmap.draw_formatted_text(0, y+8*(l++), 1, 255, 255, 255, "Frame: D3D Calls: %u, D3D Time: %3.3fms", m_nTotalD3DCalls, m_flTotalD3DTime);
-				l++;
-				m_batch_vis_bitmap.draw_formatted_text(0, y+8*(l++), 1, 255, 255, 255, "Overall: Batches: %u, Prims: %u", m_nOverallDraws, m_nOverallPrims );
-				m_batch_vis_bitmap.draw_formatted_text(0, y+8*(l++), 1, 255, 255, 255, "Overall: D3D Calls: %u D3D Time: %4.3fms", m_nOverallD3DCalls, m_flOverallD3DTime );
-
-				size_t png_size = 0;
-				void *pPNG_data = tdefl_write_image_to_png_file_in_memory(m_batch_vis_bitmap.get_ptr(), m_batch_vis_bitmap.width(), m_batch_vis_bitmap.height(), 3, &png_size, true);
-				if (pPNG_data)
-				{
-					char filename[256];
-					V_snprintf(filename, sizeof(filename), "left4dead2/batchvis_%u_%u.png", m_nBatchVisFileIdx, m_nBatchVisFrameIndex);
-					FILE* pFile = fopen(filename, "wb");
-					if (pFile)
-					{
-						fwrite(pPNG_data, png_size, 1, pFile);
-						fclose(pFile);
-					}
-					free(pPNG_data);
-				}
-				m_nBatchVisFrameIndex++;
-				m_nBatchVisY = 0;
-				m_batch_vis_bitmap.cls();
-			}
-
-			if (bPrevBatchVis != (int)d3d_batch_vis.GetBool())
-			{
-				bPrevBatchVis = d3d_batch_vis.GetBool();
-				if (!bPrevBatchVis)
-				{
-					m_batch_vis_bitmap.clear();
-				}
-				else
-				{
-					m_batch_vis_bitmap.init(768, 1024);
-				}
-				m_nBatchVisY = 0;
-				m_nBatchVisFrameIndex = 0;
-				m_nBatchVisFileIdx = (uint)time(NULL); //rand();
-
-				m_nOverallDraws = 0;
-				m_nOverallPrims = 0;
-				m_nOverallD3DCalls = 0;
-				m_flOverallD3DTime = 0;
-			}
-		}
-
-		m_nTotalD3DCalls = 0;
-		m_nTotalPrims = 0;
-		m_flTotalD3DTime = 0;
-		g_nTotalD3DCycles = 0;
-		g_nTotalD3DCalls = 0;
-		m_nTotalDraws = 0;
-#else
 		if ( d3d_batch_vis.GetBool() )
 		{
 			d3d_batch_vis.SetValue( false );
@@ -949,62 +855,6 @@ public:
 			XXX; 
 			hres = _DOCALL(DrawIndexedPrimitive, PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount); 
 		}
-		
-#if D3D_BATCH_PERF_ANALYSIS
-		if ( m_batch_vis_bitmap.is_valid() )
-		{
-			double t = tm.GetDurationInProgress().GetMillisecondsF();
-
-			uint h = 1;
-			if ( d3d_batch_vis_y_scale.GetFloat() > 0.0f)
-			{
-				h = ceil( t / d3d_batch_vis_y_scale.GetFloat() );
-				h = MAX(h, 1);
-			}
-
-			m_batch_vis_bitmap.fill_box(0, m_nBatchVisY, (uint)(.5f + t / d3d_batch_vis_abs_scale.GetFloat() * m_batch_vis_bitmap.width()), h, 64, 64, 64);
-
-			if ( s_rdtsc_to_ms == 0.0f )
-			{
-				TmU64 t0 = tmFastTime();
-				double d0 = Plat_FloatTime();
-
-				ThreadSleep( 1 );
-
-				TmU64 t1 = tmFastTime();
-				double d1 = Plat_FloatTime();
-
-				s_rdtsc_to_ms = ( 1000.0f * ( d1 - d0 ) ) / ( t1 - t0 );
-			}
-
-			double flTotalD3DCallMS = g_nTotalD3DCycles * s_rdtsc_to_ms;
-
-			m_batch_vis_bitmap.additive_fill_box(0, m_nBatchVisY, (uint)(.5f + flTotalD3DCallMS / d3d_batch_vis_abs_scale.GetFloat() * m_batch_vis_bitmap.width()), h, 96, 96, 128);
-
-			if (m_batch_state.m_bVertexShaderChanged) m_batch_vis_bitmap.additive_fill_box(0, m_nBatchVisY, 8, h, 0, 0, 64);
-			if (m_batch_state.m_bPixelShaderChanged) m_batch_vis_bitmap.additive_fill_box(32, m_nBatchVisY, 8, h, 64, 0, 64);
-
-			int lm = 80;
-			m_batch_vis_bitmap.fill_box(lm+0+0, m_nBatchVisY, m_batch_state.m_nNumVSConstants, h, 64, 255, 255);
-			m_batch_vis_bitmap.fill_box(lm+64+256+0, m_nBatchVisY, m_batch_state.m_nNumPSConstants, h, 64, 64, 255);
-
-			m_batch_vis_bitmap.fill_box(lm+64+256+32, m_nBatchVisY, m_batch_state.m_nNumSamplersChanged, h, 255, 255, 255);
-			m_batch_vis_bitmap.fill_box(lm+64+256+32+16, m_nBatchVisY, m_batch_state.m_nNumSamplerStatesChanged, h, 92, 128, 255);
-
-			if ( m_batch_state.m_bStreamSourceChanged) m_batch_vis_bitmap.fill_box(lm+64+256+32+16+64, m_nBatchVisY, 16, h, 128, 128, 128);
-			if ( m_batch_state.m_bIndicesChanged ) m_batch_vis_bitmap.fill_box(lm+64+256+32+16+64+16, m_nBatchVisY, 16, h, 128, 128, 255);
-
-			m_nBatchVisY += h;
-			
-			m_nTotalD3DCalls += g_nTotalD3DCalls;
-			m_flTotalD3DTime += flTotalD3DCallMS;
-			
-			g_nTotalD3DCycles = 0;
-			g_nTotalD3DCalls = 0;
-			
-			m_batch_state.Clear();
-		}
-#endif
 
 		return hres;
 	}

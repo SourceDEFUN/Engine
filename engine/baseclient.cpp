@@ -646,8 +646,6 @@ void CBaseClient::Disconnect( const char *fmt, ... )
 
 void CBaseClient::FireGameEvent( IGameEvent *event )
 {
-	tmZoneFiltered( TELEMETRY_LEVEL0, 50, TMZF_NONE, "%s", __FUNCTION__ );
-
 	char buffer_data[MAX_EVENT_BYTES];
 
 	SVC_GameEvent eventMsg;
@@ -1160,10 +1158,6 @@ void CBaseClient::SendSnapshot( CClientFrame *pFrame )
 		m_NetChannel->Transmit();	
 		return;
 	}
-
-	VPROF_BUDGET( "SendSnapshot", VPROF_BUDGETGROUP_OTHER_NETWORKING );
-	tmZoneFiltered( TELEMETRY_LEVEL0, 50, TMZF_NONE, "%s", __FUNCTION__ );
-
 	bool bFailedOnce = false;
 write_again:
 	bf_write msg( "CBaseClient::SendSnapshot", m_SnapshotScratchBuffer, sizeof( m_SnapshotScratchBuffer ) );

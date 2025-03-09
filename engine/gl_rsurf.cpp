@@ -561,8 +561,6 @@ void Shader_DisplacementSurface( CWorldRenderList *pRenderList, SurfaceHandle_t 
 //-----------------------------------------------------------------------------
 void Shader_DrawSurfaceDynamic( IMatRenderContext *pRenderContext, SurfaceHandle_t surfID, bool bShadowDepth )
 {
-	tmZoneFiltered( TELEMETRY_LEVEL0, 50, TMZF_NONE, "%s %d", __FUNCTION__, surfID );
-
 	if( !SurfaceHasPrims( surfID ) )
 	{
 		IMesh *pMesh = pRenderContext->GetDynamicMesh( );
@@ -694,8 +692,6 @@ static inline void Shader_SetChainLightmapState( IMatRenderContext *pRenderConte
 //-----------------------------------------------------------------------------
 void Shader_SetChainTextureState( IMatRenderContext *pRenderContext, SurfaceHandle_t surfID, IClientEntity* pBaseEntity, bool bShadowDepth )
 {
-	tmZoneFiltered( TELEMETRY_LEVEL0, 50, TMZF_NONE, "%s", __FUNCTION__ );
-
 	if ( bShadowDepth )
 	{
 		IMaterial *pDrawMaterial = MSurf_TexInfo( surfID )->material;
@@ -747,8 +743,6 @@ void Shader_SetChainTextureState( IMatRenderContext *pRenderContext, SurfaceHand
 
 void Shader_DrawDynamicChain( const CMSurfaceSortList &sortList, const surfacesortgroup_t &group, bool bShadowDepth )
 {
-	tmZoneFiltered( TELEMETRY_LEVEL0, 50, TMZF_NONE, "%s", __FUNCTION__ );
-
 	CMatRenderContextPtr pRenderContext( materials );
 
 	SurfaceHandle_t hSurfID = sortList.GetSurfaceAtHead(group);
@@ -765,8 +759,6 @@ void Shader_DrawDynamicChain( const CMSurfaceSortList &sortList, const surfaceso
 
 void Shader_DrawChainsDynamic( const CMSurfaceSortList &sortList, int nSortGroup, bool bShadowDepth )
 {
-	tmZoneFiltered( TELEMETRY_LEVEL0, 50, TMZF_NONE, "%s", __FUNCTION__ );
-
 	MSL_FOREACH_GROUP_BEGIN(sortList, nSortGroup, group )
 	{
 		Shader_DrawDynamicChain( sortList, group, bShadowDepth );
@@ -794,9 +786,6 @@ struct batchlist_t
 
 void Shader_DrawChainsStatic( const CMSurfaceSortList &sortList, int nSortGroup, bool bShadowDepth )
 {
-	tmZoneFiltered( TELEMETRY_LEVEL0, 50, TMZF_NONE, "%s", __FUNCTION__ );
-
-	//VPROF("DrawChainsStatic");
 	CUtlVectorFixed<vertexformatlist_t, MAX_VERTEX_FORMAT_CHANGES> meshList;
 	int meshMap[MAX_VERTEX_FORMAT_CHANGES];
 	CUtlVectorFixedGrowable<batchlist_t, 512> batchList;
@@ -916,7 +905,6 @@ void Shader_DrawChainsStatic( const CMSurfaceSortList &sortList, int nSortGroup,
 
 			MSL_FOREACH_SURFACE_IN_GROUP_BEGIN(sortList, group, surfIDList)
 			{
-				tmZoneFiltered( TELEMETRY_LEVEL0, 50, TMZF_NONE, "BuildIndicesForWorldSurface" );
 #ifdef NEWMESH
 				BuildIndicesForWorldSurface( indexBufferBuilder, surfIDList, host_state.worldbrush );
 #else
@@ -1515,8 +1503,6 @@ void AddProjectedTextureDecalsToList( CWorldRenderList *pRenderList, int nSortGr
 //-----------------------------------------------------------------------------
 void Shader_DrawChains( const CWorldRenderList *pRenderList, int nSortGroup, bool bShadowDepth )
 {
-	tmZoneFiltered( TELEMETRY_LEVEL0, 50, TMZF_NONE, "%s", __FUNCTION__ );
-
 	CMatRenderContextPtr pRenderContext(materials);
 	Assert( !g_EngineRenderer->InLightmapUpdate() );
 	VPROF("Shader_DrawChains");
@@ -1578,9 +1564,6 @@ void Shader_DrawChains( const CWorldRenderList *pRenderList, int nSortGroup, boo
 //-----------------------------------------------------------------------------
 void Shader_DrawDispChain( int nSortGroup, const CMSurfaceSortList &list, unsigned long flags, ERenderDepthMode DepthMode )
 {
-	VPROF_BUDGET( "Shader_DrawDispChain", VPROF_BUDGETGROUP_DISPLACEMENT_RENDERING );
-	tmZoneFiltered( TELEMETRY_LEVEL0, 50, TMZF_NONE, "%s", __FUNCTION__ );
-
 	int count = 0;
 	msurface2_t **pList;
 	MSL_FOREACH_GROUP_BEGIN( list, nSortGroup, group )
@@ -1856,8 +1839,6 @@ static ConVar r_flashlightrendermodels(  "r_flashlightrendermodels", "1" );
 //-----------------------------------------------------------------------------
 static void Shader_WorldShadowDepthFill( CWorldRenderList *pRenderList, unsigned long flags )
 {
-	tmZoneFiltered( TELEMETRY_LEVEL0, 50, TMZF_NONE, "%s", __FUNCTION__ );
-
 	// First, count the number of vertices + indices
 	int nVertexCount = 0;
 	int nIndexCount = 0;
@@ -2001,8 +1982,6 @@ static void Shader_WorldShadowDepthFill( CWorldRenderList *pRenderList, unsigned
 //-----------------------------------------------------------------------------
 static void Shader_WorldZFill( CWorldRenderList *pRenderList, unsigned long flags )
 {
-	tmZoneFiltered( TELEMETRY_LEVEL0, 50, TMZF_NONE, "%s", __FUNCTION__ );
-
 	// First, count the number of vertices + indices
 	int nVertexCount = 0;
 	int nIndexCount = 0;
@@ -3263,8 +3242,6 @@ void R_DrawWorldLists( IWorldRenderList *pRenderListIn, unsigned long flags, flo
 	if ( g_bTextMode || g_LostVideoMemory )
 		return;
 
-	VPROF("R_DrawWorldLists");
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__  );
 	Shader_WorldEnd( pRenderList, flags, waterZAdjust );
 
 #ifdef DEBUG_SURF

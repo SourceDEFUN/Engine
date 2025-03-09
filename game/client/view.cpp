@@ -1064,9 +1064,6 @@ void CViewRender::Render( vrect_t *rect )
 	Assert(s_DbgSetupOrigin == m_View.origin);
 	Assert(s_DbgSetupAngles == m_View.angles);
 
-	VPROF_BUDGET( "CViewRender::Render", "CViewRender::Render" );
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 	vrect_t vr = *rect;
 
 	// Stub out the material system if necessary.

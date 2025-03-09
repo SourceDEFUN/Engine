@@ -456,11 +456,8 @@ void S_FreeChannel(channel_t *ch)
 //		 we'll miss data if outputRate < SOUND_DMA_SPEED!
 void MIX_MixChannelsToPaintbuffer( CChannelList &list, int endtime, int flags, int rate, int outputRate )
 {
-	VPROF( "MixChannelsToPaintbuffer" );
 	int		i;
 	int		sampleCount;
-
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s c:%d %d/%d", __FUNCTION__, list.Count(), rate, outputRate );
 
 	// mix each channel into paintbuffer
 	// validate parameters
@@ -571,7 +568,6 @@ void MIX_MixChannelsToPaintbuffer( CChannelList &list, int endtime, int flags, i
 		}
 		else
 		{
-			tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "MixDataToDevice" );
 			ch->pMixer->MixDataToDevice( g_AudioDevice, ch, sampleCount, outputRate, 0 );
 		}
 
@@ -2264,9 +2260,6 @@ extern ConVar snd_soundmixer;
 
 void MIX_PaintChannels( int endtime, bool bIsUnderwater )
 {
-	VPROF("MIX_PaintChannels");
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 	int 	end;
 	int		count;
 	bool	b_spatial_delays = dsp_enhance_stereo.GetInt() != 0 ? true : false;

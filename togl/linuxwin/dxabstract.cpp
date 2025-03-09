@@ -2079,7 +2079,6 @@ HRESULT IDirect3DVertexBuffer9::Lock(UINT OffsetToLock,UINT SizeToLock,void** pp
 {
 	GL_BATCH_PERF_CALL_TIMER;
 	GL_PUBLIC_ENTRYPOINT_CHECKS( m_device );
-	tmZoneFiltered( TELEMETRY_LEVEL2, 25, TMZF_NONE, "VB Lock" );
 
 	// FIXME would be good to have "can't lock twice" logic
 
@@ -2102,8 +2101,6 @@ HRESULT IDirect3DVertexBuffer9::Unlock()
 {
 	GL_BATCH_PERF_CALL_TIMER;
 	GL_PUBLIC_ENTRYPOINT_CHECKS( m_device );
-	
-	tmZoneFiltered( TELEMETRY_LEVEL2, 25, TMZF_NONE, "VB Unlock" );
 
 	m_vtxBuffer->Unlock();
 	return S_OK;
@@ -2113,7 +2110,6 @@ void IDirect3DVertexBuffer9::UnlockActualSize( uint nActualSize, const void *pAc
 {
 	GL_BATCH_PERF_CALL_TIMER;
 	GL_PUBLIC_ENTRYPOINT_CHECKS( m_device );
-	tmZoneFiltered( TELEMETRY_LEVEL2, 25, TMZF_NONE, "VB UnlockActualSize" );
 
 	m_vtxBuffer->Unlock( nActualSize, pActualData );
 }
@@ -2199,8 +2195,6 @@ HRESULT IDirect3DIndexBuffer9::Lock(UINT OffsetToLock,UINT SizeToLock,void** ppb
 	GL_BATCH_PERF_CALL_TIMER;
 	GL_PUBLIC_ENTRYPOINT_CHECKS( m_device );
 	// FIXME would be good to have "can't lock twice" logic
-
-	tmZoneFiltered( TELEMETRY_LEVEL2, 25, TMZF_NONE, "IB Lock" );
 	
 	GLMBuffLockParams lockreq;
 	lockreq.m_nOffset		= OffsetToLock;
@@ -2218,8 +2212,6 @@ HRESULT IDirect3DIndexBuffer9::Unlock()
 	GL_BATCH_PERF_CALL_TIMER;
 	GL_PUBLIC_ENTRYPOINT_CHECKS( m_device );
 
-	tmZoneFiltered( TELEMETRY_LEVEL2, 25, TMZF_NONE, "IB Unlock" );
-
 	m_idxBuffer->Unlock();
 
 	return S_OK;
@@ -2229,7 +2221,6 @@ void IDirect3DIndexBuffer9::UnlockActualSize( uint nActualSize, const void *pAct
 { 
 	GL_BATCH_PERF_CALL_TIMER;
 	GL_PUBLIC_ENTRYPOINT_CHECKS( m_device );
-	tmZoneFiltered( TELEMETRY_LEVEL2, 25, TMZF_NONE, "IB UnlockActualSize" );
 
 	m_idxBuffer->Unlock( nActualSize, pActualData );
 }
@@ -3305,7 +3296,6 @@ HRESULT IDirect3DDevice9::SetRenderTarget(DWORD RenderTargetIndex,IDirect3DSurfa
 {
 	GL_BATCH_PERF_CALL_TIMER;
 	GL_PUBLIC_ENTRYPOINT_CHECKS( this );
-	tmZone( TELEMETRY_LEVEL2, TMZF_NONE, "%s", __FUNCTION__ );
 	
 	Assert( RenderTargetIndex < 4 );
 
@@ -5331,7 +5321,6 @@ HRESULT IDirect3DDevice9::DrawPrimitiveUP(D3DPRIMITIVETYPE PrimitiveType,UINT Pr
 
 HRESULT IDirect3DDevice9::DrawIndexedPrimitive( D3DPRIMITIVETYPE Type, INT BaseVertexIndex, UINT MinVertexIndex, UINT NumVertices, UINT startIndex, UINT primCount )
 {
-	tmZone( TELEMETRY_LEVEL2, TMZF_NONE, "%s", __FUNCTION__ );
 	Assert( m_ctx->m_nCurOwnerThreadId == ThreadGetCurrentId() );
 		
 	TOGL_NULL_DEVICE_CHECK;
@@ -5366,9 +5355,6 @@ HRESULT IDirect3DDevice9::DrawIndexedPrimitive( D3DPRIMITIVETYPE Type, INT BaseV
 		m_ctx->FlushDrawStates( MinVertexIndex, MinVertexIndex + NumVertices - 1, BaseVertexIndex );
 
 		{
-#if !GL_TELEMETRY_ZONES && GL_BATCH_TELEMETRY_ZONES
-			tmZone( TELEMETRY_LEVEL2, TMZF_NONE, "glDrawRangeElements %u", primCount );
-#endif
 			Assert( ( D3DPT_LINELIST == 2 ) && ( D3DPT_TRIANGLELIST == 4 ) && ( D3DPT_TRIANGLESTRIP == 5 ) );
 
 			static const struct prim_t
@@ -5397,80 +5383,6 @@ HRESULT IDirect3DDevice9::DrawIndexedPrimitive( D3DPRIMITIVETYPE Type, INT BaseV
 		}
 	}
 
-#if GL_BATCH_PERF_ANALYSIS
-	if ( s_rdtsc_to_ms == 0.0f )
-	{
-		TmU64 t0 = Plat_Rdtsc();
-		double d0 = Plat_FloatTime();
-
-		ThreadSleep( 1000 );
-
-		TmU64 t1 = Plat_Rdtsc();
-		double d1 = Plat_FloatTime();
-
-		s_rdtsc_to_ms = ( 1000.0f * ( d1 - d0 ) ) / ( t1 - t0 );
-	}
-
-#if GL_BATCH_PERF_ANALYSIS_WRITE_PNGS
-	if ( m_pBatch_vis_bitmap && m_pBatch_vis_bitmap->is_valid() )
-	{
-		double t = tm.GetDurationInProgress().GetMillisecondsF();
-
-		uint h = 1;
-		if ( gl_batch_vis_y_scale.GetFloat() > 0.0f)
-		{
-			h = ceil( t / gl_batch_vis_y_scale.GetFloat() );
-			h = MAX(h, 1);
-		}
-
-		// Total time spent inside any and all our "D3D9" calls
-		double flTotalD3DTime = g_nTotalD3DCycles * s_rdtsc_to_ms;
-		m_pBatch_vis_bitmap->fill_box(0, m_nBatchVisY, (uint)(.5f + flTotalD3DTime / gl_batch_vis_abs_scale.GetFloat() * m_pBatch_vis_bitmap->width()), h, 150, 150, 150);
-
-		// Total total spent processing just DrawIndexedPrimitive() for this batch.
-		m_pBatch_vis_bitmap->fill_box(0, m_nBatchVisY, (uint)(.5f + t / gl_batch_vis_abs_scale.GetFloat() * m_pBatch_vis_bitmap->width()), h, 70, 70, 70);
-		
-		double flTotalGLMS = gGL->m_nTotalGLCycles * s_rdtsc_to_ms;
-		
-		// Total time spent inside of all OpenGL calls
-		m_pBatch_vis_bitmap->additive_fill_box(0, m_nBatchVisY, (uint)(.5f + flTotalGLMS / gl_batch_vis_abs_scale.GetFloat() * m_pBatch_vis_bitmap->width()), h, 0, 0, 64);
-								
-		if (flushStats.m_nNewVS) m_pBatch_vis_bitmap->additive_fill_box(80-16, m_nBatchVisY, 8, h, 0, 110, 0);
-		if (flushStats.m_nNewPS) m_pBatch_vis_bitmap->additive_fill_box(80-8, m_nBatchVisY, 8, h, 110, 0, 110);
-		
-		int lm = 80;
-		m_pBatch_vis_bitmap->fill_box(lm+0+flushStats.m_nFirstVSConstant, m_nBatchVisY, flushStats.m_nNumVSConstants, h, 64, 255, 255);
-		m_pBatch_vis_bitmap->fill_box(lm+64, m_nBatchVisY, flushStats.m_nNumVSBoneConstants, h, 255, 64, 64);
-		m_pBatch_vis_bitmap->fill_box(lm+64+256+flushStats.m_nFirstPSConstant, m_nBatchVisY, flushStats.m_nNumPSConstants, h, 64, 64, 255);
-
-		m_pBatch_vis_bitmap->fill_box(lm+64+256+32, m_nBatchVisY, flushStats.m_nNumChangedSamplers, h, 255, 255, 255);
-		m_pBatch_vis_bitmap->fill_box(lm+64+256+32+16, m_nBatchVisY, flushStats.m_nNumSamplingParamsChanged, h, 92, 128, 255);
-
-		if ( flushStats.m_nVertexBufferChanged ) m_pBatch_vis_bitmap->fill_box(lm+64+256+32+16+64, m_nBatchVisY, 16, h, 128, 128, 128);
-		if ( flushStats.m_nIndexBufferChanged ) m_pBatch_vis_bitmap->fill_box(lm+64+256+32+16+64+16, m_nBatchVisY, 16, h, 128, 128, 255);
-
-		m_pBatch_vis_bitmap->fill_box(lm+64+256+32+16+64+16+16, m_nBatchVisY, ( ( g_nTotalVBLockBytes + g_nTotalIBLockBytes ) * 64 + 2047 ) / 2048, h, 120, 120, 120 );
-		m_pBatch_vis_bitmap->additive_fill_box(lm+64+256+32+16+64+16+16, m_nBatchVisY, ( g_nTotalVBLockBytes * 64 + 2047 ) / 2048, h, 120, 0, 0);
-
-		m_nBatchVisY += h;
-	}
-#endif
-	
-	m_nNumProgramChanges += ((flushStats.m_nNewVS + flushStats.m_nNewPS) != 0);
-
-	m_flTotalD3DTime += g_nTotalD3DCycles * s_rdtsc_to_ms;
-	m_nTotalD3DCalls += g_nTotalD3DCalls;
-	g_nTotalD3DCycles = 0;
-	g_nTotalD3DCalls = 0;
-
-	m_flTotalGLTime += gGL->m_nTotalGLCycles * s_rdtsc_to_ms;
-	m_nTotalGLCalls += gGL->m_nTotalGLCalls;
-	gGL->m_nTotalGLCycles = 0;
-	gGL->m_nTotalGLCalls = 0; 
-
-	g_nTotalVBLockBytes = 0;
-	g_nTotalIBLockBytes = 0;
-#endif
 
 	return S_OK;
 

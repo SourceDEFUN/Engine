@@ -603,8 +603,6 @@ int CAudioMixerWave::MixDataToDevice_( IAudioDevice *pDevice, channel_t *pChanne
 	if ( m_finished )
 		return 0;
 
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 	// save this to compute total output
 	int startingOffset = outputOffset;
 

@@ -498,7 +498,6 @@ GLMContext *GLMgr::GetCurrentContext( void )
 // GLMContext public methods
 void GLMContext::MakeCurrent( bool bRenderThread )
 {
-	tmZone( TELEMETRY_LEVEL0, 0, "GLMContext::MakeCurrent" );
 	Assert( m_nCurOwnerThreadId == 0 || m_nCurOwnerThreadId == ThreadGetCurrentId() );
 		
 #if defined( USE_SDL )
@@ -543,7 +542,6 @@ void GLMContext::MakeCurrent( bool bRenderThread )
 
 void GLMContext::ReleaseCurrent( bool bRenderThread )
 {
-	tmZone( TELEMETRY_LEVEL0, 0, "GLMContext::ReleaseCurrent" );
 	Assert( m_nCurOwnerThreadId == ThreadGetCurrentId() );
 		
 #if defined( USE_SDL )
@@ -2313,11 +2311,6 @@ void GLMContext::Present( CGLMTex *tex )
 	}
 
 	m_nCurFrame++;
-
-#if GL_BATCH_PERF_ANALYSIS
-	tmMessage( TELEMETRY_LEVEL2, TMMF_ICON_EXCLAMATION, "VS Uniform Calls: %u, VS Uniforms: %u|VS Uniform Bone Calls: %u, VS Bone Uniforms: %u|PS Uniform Calls: %u, PS Uniforms: %u", m_nTotalVSUniformCalls, m_nTotalVSUniformsSet, m_nTotalVSUniformBoneCalls, m_nTotalVSUniformsBoneSet, m_nTotalPSUniformCalls, m_nTotalPSUniformsSet );
-	m_nTotalVSUniformCalls = 0, m_nTotalVSUniformBoneCalls = 0, m_nTotalVSUniformsSet = 0, m_nTotalVSUniformsBoneSet = 0, m_nTotalPSUniformCalls = 0, m_nTotalPSUniformsSet = 0;
-#endif
 }
 
 //===============================================================================
@@ -4907,8 +4900,6 @@ void GLMContext::DrawRangeElementsNonInline( GLenum mode, GLuint start, GLuint e
 {
 #if GLMDEBUG
 	GLM_FUNC;
-#else
-	//tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s %d-%d count:%d mode:%d type:%d", __FUNCTION__, start, end, count, mode, type );
 #endif
 
 	++m_nBatchCounter;

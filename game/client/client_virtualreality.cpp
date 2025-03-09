@@ -358,8 +358,6 @@ void CClientVirtualReality::DrawMainMenu()
 	pRenderContext->ClearColor4ub( 0, 0, 0, 0 );
 	pRenderContext->ClearBuffers( true, false );
 
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "VGui_DrawHud", __FUNCTION__ );
-
 	// Make sure the client .dll root panel is at the proper point before doing the "SolveTraverse" calls
 	vgui::VPANEL root = enginevgui->GetPanel( PANEL_CLIENTDLL );
 	if ( root != 0 )

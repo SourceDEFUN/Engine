@@ -2663,10 +2663,6 @@ void _Host_RunFrame_Input( float accumulated_extra_samples, bool bFinalTick )
 
 void _Host_RunFrame_Server( bool finaltick )
 {
-	VPROF_BUDGET( "_Host_RunFrame_Server", VPROF_BUDGETGROUP_GAME );
-	VPROF_INCREMENT_COUNTER( "ticks", 1 );
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 	// Run the Server frame ( read, run physics, respond )
 	g_HostTimes.StartFrameSegment( FRAME_SEGMENT_SERVER );
 	SV_Frame ( finaltick );
@@ -2678,8 +2674,6 @@ void _Host_RunFrame_Server( bool finaltick )
 
 void _Host_RunFrame_Server_Async( int numticks )
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s %d", __FUNCTION__, numticks );
-
 	for ( int tick = 0; tick < numticks; tick++ )
 	{ 
 		g_ServerGlobalVariables.tickcount = sv.m_nTickCount;
@@ -2693,9 +2687,6 @@ void _Host_RunFrame_Server_Async( int numticks )
 void _Host_RunFrame_Client( bool framefinished )
 {
 #ifndef SWDS
-	VPROF( "_Host_RunFrame_Client" );
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s %d", __FUNCTION__, framefinished );
-
 	g_HostTimes.StartFrameSegment( FRAME_SEGMENT_CLIENT );
 
 	// Get any current state update from server, etc.
@@ -2762,9 +2753,6 @@ void CheckSpecialCheatVars()
 void _Host_RunFrame_Render()
 {
 #ifndef SWDS
-	VPROF( "_Host_RunFrame_Render" );
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "_Host_RunFrame_Render" );
-
 	CheckSpecialCheatVars();
 
 	int nOrgNoRendering = mat_norendering.GetInt();
@@ -2781,13 +2769,9 @@ void _Host_RunFrame_Render()
 	CL_LatchInterpolationAmount();
 
 	{
-		VPROF( "_Host_RunFrame_Render - UpdateScreen" );
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "_Host_RunFrame_Render - UpdateScreen" );
 		Host_UpdateScreen();
 	}
 	{
-		VPROF( "_Host_RunFrame_Render - CL_DecayLights" );
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "_Host_RunFrame_Render - CL_DecayLights" );
 		CL_DecayLights ();
 	}
 
@@ -2872,8 +2856,6 @@ void CL_DiscardOldAddAngleEntries( float t )
 #ifndef SWDS
 void CL_ApplyAddAngle()
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 	float curtime = cl.GetTime() - host_state.interval_per_tick;
 
 	AddAngle *prev = NULL, *next = NULL;
@@ -3141,10 +3123,6 @@ void _Host_RunFrame (float time)
 	}
 
 	{
-		// Profile scope, protect from setjmp() problems
-		VPROF( "_Host_RunFrame" );
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "_Host_RunFrame" );
-
 		g_HostTimes.StartFrameSegment( FRAME_SEGMENT_CMD_EXECUTE );
 
 		// process console commands
@@ -3268,13 +3246,11 @@ void _Host_RunFrame (float time)
 			// run HLTV if active
 			if ( hltv )
 			{
-				tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "hltv->RunFrame()" );
 				hltv->RunFrame();
 			}
 
 			if ( hltvtest )
 			{
-				tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "hltvtest->RunFrame()" );
 				hltvtest->RunFrame();
 			}
 
@@ -3303,8 +3279,6 @@ void _Host_RunFrame (float time)
 
 			if ( !sv.IsDedicated() )
 			{
-				tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "Host_SetClientInSimulation" );
-
 				// This causes cl.gettime() to return the true clock being used for rendering (tickcount * rate + remainder)
 				Host_SetClientInSimulation( false );
 				// Now allow for interpolation on client
@@ -3509,8 +3483,6 @@ void _Host_RunFrame (float time)
 		}
 		else
 		{
-			tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "modelloader->UpdateDynamicModels" );
-			VPROF( "UpdateDynamicModels" );
 			CMDLCacheCriticalSection critsec( g_pMDLCache );
 			modelloader->UpdateDynamicModels();
 		}
@@ -3522,9 +3494,6 @@ void _Host_RunFrame (float time)
 #ifndef SWDS
 		if ( !sv.IsDedicated() )
 		{
-			VPROF( "_Host_RunFrame - ClientDLL_Update" );
-			tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "_Host_RunFrame - ClientDLL_Update" );
-
 			// Client-side simulation
 			g_HostTimes.StartFrameSegment( FRAME_SEGMENT_CLDLL );
 
@@ -4262,8 +4231,6 @@ void Host_Init( bool bDedicated )
 
 	// Deal with Gore Settings
 	Host_CheckGore();
-
-	TelemetryTick();
 
 	// Initialize processor subsystem, and print relevant information:
 	Host_InitProcessor();

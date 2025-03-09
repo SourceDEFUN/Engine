@@ -407,8 +407,6 @@ bool CGameEventManager::FireEventIntern( IGameEvent *event, bool bServerOnly, bo
 		return false;
 	}
 
-	tmZoneFiltered( TELEMETRY_LEVEL0, 50, TMZF_NONE, "%s (name: %s listeners: %d)", __FUNCTION__, tmDynamicString( TELEMETRY_LEVEL0, event->GetName() ), descriptor->listeners.Count() );
-
 	// show game events in console
 	if ( net_showevents.GetInt() > 0 )
 	{
@@ -452,8 +450,6 @@ bool CGameEventManager::FireEventIntern( IGameEvent *event, bool bServerOnly, bo
 		if ( listener->m_nListenerType == CLIENTSIDE_OLD ||
 			 listener->m_nListenerType == SERVERSIDE_OLD )
 		{
-			tmZone( TELEMETRY_LEVEL1, TMZF_NONE, "FireGameEvent (i: %d, listenertype: %d (old))", i, listener->m_nListenerType );
-
 			// legacy support for old system
 			IGameEventListener *pCallback = static_cast<IGameEventListener*>(listener->m_pCallback);
 			CGameEvent *pEvent = static_cast<CGameEvent*>(event);
@@ -462,8 +458,6 @@ bool CGameEventManager::FireEventIntern( IGameEvent *event, bool bServerOnly, bo
 		}
 		else
 		{
-			tmZone( TELEMETRY_LEVEL1, TMZF_NONE, "FireGameEvent (i: %d, listenertype: %d (new))", i, listener->m_nListenerType );
-
 			// new system
 			IGameEventListener2 *pCallback =  static_cast<IGameEventListener2*>(listener->m_pCallback);
 

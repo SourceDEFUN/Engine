@@ -508,9 +508,6 @@ Updates the local time and reads/handles messages on client net connection.
 
 void CL_ReadPackets ( bool bFinalTick )
 {
-	VPROF_BUDGET( "CL_ReadPackets", VPROF_BUDGETGROUP_OTHER_NETWORKING );
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 	if ( !Host_ShouldRun() )
 		return;
 	
@@ -534,8 +531,6 @@ void CL_ReadPackets ( bool bFinalTick )
 	// read packets, if any in queue
 	if ( demoplayer->IsPlayingBack() && cl.m_NetChannel )
 	{
-		tmZoneFiltered( TELEMETRY_LEVEL0, 50, TMZF_NONE, "ReadPacket" );
-
 		// process data from demo file
 		cl.m_NetChannel->ProcessPlayback();
 	}
@@ -543,7 +538,6 @@ void CL_ReadPackets ( bool bFinalTick )
 	{
 		if ( !cl_ignorepackets.GetInt() )
 		{
-			tmZoneFiltered( TELEMETRY_LEVEL0, 50, TMZF_NONE, "ProcessSocket" );
 			// process data from net socket
 			NET_ProcessSocket( NS_CLIENT, &cl );
 		}
@@ -1387,8 +1381,6 @@ ConCommand screenshot_internal_command( "__screenshot_internal", screenshot_inte
 
 void CL_TakeSnapshotAndSwap()
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 	bool bReadPixelsFromFrontBuffer = g_pMaterialSystemHardwareConfig->ReadPixelsFromFrontBuffer();
 	if ( bReadPixelsFromFrontBuffer )
 	{
@@ -2124,8 +2116,6 @@ void CL_Move(float accumulated_extra_samples, bool bFinalTick )
 
 	if ( !Host_ShouldRun() )
 		return;
-
-	tmZoneFiltered( TELEMETRY_LEVEL0, 50, TMZF_NONE, "%s", __FUNCTION__ );
 
 	// only send packets on the final tick in one engine frame
 	bool bSendPacket = true;	

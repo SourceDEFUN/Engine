@@ -506,14 +506,12 @@ void D3DDeviceWrapper::ExecutePushBuffer( PushBuffer const* pb)
 		{
 			case PBCMD_END:
 			{
-				VPROF_BUFFER_PLAYBACK( "END" );
 				n_commands_executed--;						// doesn't count
 				return;
 			}
 
 			case PBCMD_SET_RENDERSTATE:
 			{
-				VPROF_BUFFER_PLAYBACK( "SET_RENDERSTATE" );
 				Dx9Device()->SetRenderState((D3DRENDERSTATETYPE) dptr[1],dptr[2]);
 				dptr+=3;
 				break;
@@ -521,7 +519,6 @@ void D3DDeviceWrapper::ExecutePushBuffer( PushBuffer const* pb)
 
 			case PBCMD_SET_SAMPLER_STATE:
 			{
-				VPROF_BUFFER_PLAYBACK( "SET_SAMPLER_STATE" );
 				Dx9Device()->SetSamplerState(dptr[1], (D3DSAMPLERSTATETYPE) dptr[2], dptr[3]);
 				dptr+=4;
 				break;
@@ -529,10 +526,6 @@ void D3DDeviceWrapper::ExecutePushBuffer( PushBuffer const* pb)
 
 			case PBCMD_DRAWPRIM:
 			{
-				VPROF_BUFFER_PLAYBACK( "DRAWPRIM" );
-				
-				tmZone( TELEMETRY_LEVEL2, TMZF_NONE, "Dx9Device()->DrawPrimitive" );
-				
 				Dx9Device()->DrawPrimitive( (D3DPRIMITIVETYPE) dptr[1], dptr[2], dptr[3] );
 				dptr+=4;
 				break;
@@ -540,10 +533,6 @@ void D3DDeviceWrapper::ExecutePushBuffer( PushBuffer const* pb)
 
 			case PBCMD_DRAWINDEXEDPRIM:
 			{
-				VPROF_BUFFER_PLAYBACK( "DRAWINDEXEDPRIM" );
-				
-				tmZone( TELEMETRY_LEVEL2, TMZF_NONE, "Dx9Device()->DrawIndexedPrimitive" );
-
 				Dx9Device()->DrawIndexedPrimitive( (D3DPRIMITIVETYPE) dptr[1], dptr[2], dptr[3],
 												   dptr[4], dptr[5], dptr[6]);
 				dptr+=7;
@@ -786,7 +775,6 @@ void D3DDeviceWrapper::ExecutePushBuffer( PushBuffer const* pb)
 			
 			case PBCMD_PRESENT:
 			{
-				VPROF_BUFFER_PLAYBACK( "PRESENT" );
 				dptr++;
 				RECT const *pSourceRect=0;
 				if (* (dptr++) )
@@ -801,16 +789,12 @@ void D3DDeviceWrapper::ExecutePushBuffer( PushBuffer const* pb)
 				if ( *(dptr++) )
 					pDirtyRegion= (RGNDATA const *) dptr;
 				dptr+=N_DWORDS( RGNDATA );
-
-				tmZone( TELEMETRY_LEVEL1, TMZF_NONE, "!D3DPresent" );
-
 				Dx9Device()->Present( pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion );
 				break;
 			}
 
 			case PBCMD_SET_SCISSOR_RECT:
 			{
-				VPROF_BUFFER_PLAYBACK( "SET_SCISSOR_RECT" );
 				dptr++;
 				const RECT *pRect = ( RECT * )FetchPtr( dptr );
 				dptr += sizeof( RECT );

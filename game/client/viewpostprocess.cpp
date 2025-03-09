@@ -334,8 +334,6 @@ PostProcessingPass HDRSimulate_NonHDR[] =
 
 static void SetRenderTargetAndViewPort(ITexture *rt)
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 	CMatRenderContextPtr pRenderContext( materials );
 	pRenderContext->SetRenderTarget(rt);
 	pRenderContext->Viewport(0,0,rt->GetActualWidth(),rt->GetActualHeight());
@@ -1523,8 +1521,6 @@ static bool s_bScreenEffectTextureIsUpdated = false;
 static void Generate8BitBloomTexture( IMatRenderContext *pRenderContext, float flBloomScale,
 										int x, int y, int w, int h )
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 	pRenderContext->PushRenderTargetAndViewport();
 	ITexture *pSrc = materials->FindTexture( "_rt_FullFrameFB", TEXTURE_GROUP_RENDER_TARGET );
 	int nSrcWidth = pSrc->GetActualWidth();
@@ -1603,8 +1599,6 @@ static void DoPreBloomTonemapping( IMatRenderContext *pRenderContext, int nX, in
 	// Update HDR histogram before bloom
 	if ( mat_dynamic_tonemapping.GetInt() || mat_show_histogram.GetInt() )
 	{
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 		if ( s_bScreenEffectTextureIsUpdated == false )
 		{
 			// FIXME: nX/nY/nWidth/nHeight are used here, but the equivalent parameters are ignored in Generate8BitBloomTexture
@@ -2215,8 +2209,6 @@ static ConVar mat_postprocess_y( "mat_postprocess_y", "1" );
 
 void DoEnginePostProcessing( int x, int y, int w, int h, bool bFlashlightIsOn, bool bPostVGui )
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 	CMatRenderContextPtr pRenderContext( materials );
 
 	if ( g_bDumpRenderTargets )
@@ -2335,8 +2327,6 @@ void DoEnginePostProcessing( int x, int y, int w, int h, bool bFlashlightIsOn, b
 			pRenderContext->EnableColorCorrection( bPerformColCorrect );
 			if ( bPerformBloom || bPerformSoftwareAA || bPerformColCorrect )
 			{
-				tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "ColorCorrection" );
-
 				ITexture *pSrc = materials->FindTexture( "_rt_FullFrameFB", TEXTURE_GROUP_RENDER_TARGET );
 				int nSrcWidth = pSrc->GetActualWidth();
 				int nSrcHeight = pSrc->GetActualHeight();

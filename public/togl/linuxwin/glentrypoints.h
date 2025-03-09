@@ -46,9 +46,6 @@ class CGLExecuteHelperBase
 public:
 	inline void StartCall(const char *pName);
 	inline void StopCall(const char *pName);
-#if GL_TRACK_API_TIME
-	TmU64 m_nStartTime;
-#endif
 };
 
 template < class FunctionType, typename Result >
@@ -352,10 +349,6 @@ inline void CGLExecuteHelperBase::StartCall(const char *pName)
 { 
 	(void)pName;
 
-#if GL_TELEMETRY_ZONES	
-	tmEnter( TELEMETRY_LEVEL3, TMZF_NONE, pName );
-#endif
-
 #if GL_TRACK_API_TIME
 	m_nStartTime = tmFastTime();
 #endif
@@ -381,10 +374,6 @@ inline void CGLExecuteHelperBase::StopCall(const char *pName)
 { 
 #if GL_TRACK_API_TIME
 	uint64 nTotalCycles = tmFastTime() - m_nStartTime;
-#endif
-
-#if GL_TELEMETRY_ZONES
-	tmLeave( TELEMETRY_LEVEL3 );
 #endif
 
 #if GL_TRACK_API_TIME	

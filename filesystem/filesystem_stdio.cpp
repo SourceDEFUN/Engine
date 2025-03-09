@@ -486,11 +486,6 @@ int CFileSystem_Stdio::FS_feof( FILE *fp )
 //-----------------------------------------------------------------------------
 size_t CFileSystem_Stdio::FS_fread( void *dest, size_t destSize, size_t size, FILE *fp )
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-	if( ThreadInMainThread() )
-	{
-		tmPlotI32( TELEMETRY_LEVEL0, TMPT_MEMORY, 0, size, "FileBytesRead" );
-	}
 
 	CStdFilesystemFile *pFile = ((CStdFilesystemFile *)fp);
 	size_t nBytesRead = pFile->FS_fread( dest, destSize, size);
@@ -505,11 +500,6 @@ size_t CFileSystem_Stdio::FS_fread( void *dest, size_t destSize, size_t size, FI
 //-----------------------------------------------------------------------------
 size_t CFileSystem_Stdio::FS_fwrite( const void *src, size_t size, FILE *fp )
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s %t", __FUNCTION__, tmSendCallStack( TELEMETRY_LEVEL0, 0 ) );
-	if( ThreadInMainThread() )
-	{
-		tmPlotI32( TELEMETRY_LEVEL0, TMPT_MEMORY, 0, size, "FileBytesWrite" );
-	}
 
 	CStdFilesystemFile *pFile = ((CStdFilesystemFile *)fp);
 
@@ -1021,11 +1011,6 @@ int CStdioFile::FS_feof()
 //-----------------------------------------------------------------------------
 size_t CStdioFile::FS_fread( void *dest, size_t destSize, size_t size )
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s %t", __FUNCTION__, tmSendCallStack( TELEMETRY_LEVEL0, 0 ) );
-	if( ThreadInMainThread() )
-	{
-		tmPlotI32( TELEMETRY_LEVEL0, TMPT_MEMORY, 0, size, "FileBytesRead" );
-	}
 
 	// read (size) of bytes to ensure truncated reads returns bytes read and not 0
 	return fread( dest, 1, size, m_pFile );
@@ -1042,12 +1027,6 @@ size_t CStdioFile::FS_fread( void *dest, size_t destSize, size_t size )
 //-----------------------------------------------------------------------------
 size_t CStdioFile::FS_fwrite( const void *src, size_t size )
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s %t", __FUNCTION__, tmSendCallStack( TELEMETRY_LEVEL0, 0 ) );
-	if( ThreadInMainThread() )
-	{
-		tmPlotI32( TELEMETRY_LEVEL0, TMPT_MEMORY, 0, size, "FileBytesWrite" );
-	}
-
 	if ( size > WRITE_CHUNK )
 	{
 		size_t remaining = size;
@@ -1387,13 +1366,6 @@ int CWin32ReadOnlyFile::FS_feof()
 //-----------------------------------------------------------------------------
 size_t CWin32ReadOnlyFile::FS_fread( void *dest, size_t destSize, size_t size )
 {
-	VPROF_BUDGET( "CWin32ReadOnlyFile::FS_fread", VPROF_BUDGETGROUP_OTHER_FILESYSTEM );
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s %t", __FUNCTION__, tmSendCallStack( TELEMETRY_LEVEL0, 0 ) );
-	if( ThreadInMainThread() )
-	{
-		tmPlotI32( TELEMETRY_LEVEL0, TMPT_MEMORY, 0, size, "FileBytesRead" );
-	}
-
 	if ( !size || ( m_hFileUnbuffered == INVALID_HANDLE_VALUE && m_hFileBuffered == INVALID_HANDLE_VALUE ) )
 	{
 		return 0;

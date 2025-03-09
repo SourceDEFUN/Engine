@@ -113,7 +113,6 @@ static inline void SV_PackEntity(
 	CFrameSnapshot *pSnapshot )
 {
 	Assert( edictIdx < pSnapshot->m_nNumEntities );
-	tmZoneFiltered( TELEMETRY_LEVEL0, 50, TMZF_NONE, "PackEntities_Normal%s", __FUNCTION__ );
 
 	int iSerialNum = pSnapshot->m_pEntities[ edictIdx ].m_nSerialNumber;
 
@@ -406,7 +405,6 @@ void PackEntities_Normal(
 	CFrameSnapshot *snapshot )
 {
 	Assert( snapshot->m_nValidEntities >= 0 && snapshot->m_nValidEntities <= MAX_EDICTS );
-	tmZoneFiltered( TELEMETRY_LEVEL0, 50, TMZF_NONE, "%s %d", __FUNCTION__, snapshot->m_nValidEntities );
 
 	CUtlVectorFixed< PackWork_t, MAX_EDICTS > workItems;
 
@@ -476,8 +474,6 @@ void SV_ComputeClientPacks(
 	CGameClient **clients,
 	CFrameSnapshot *snapshot )
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 	MDLCACHE_CRITICAL_SECTION_(g_pMDLCache);
 	// Do some setup for each client
 	{

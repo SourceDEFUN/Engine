@@ -471,8 +471,6 @@ bool LockTexture( ShaderAPITextureHandle_t bindId, int copy, IDirect3DBaseTextur
 	RECORD_STRUCT( &s_LockedSrcRect, sizeof(s_LockedSrcRect) );
 	RECORD_INT( flags );
 
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "D3DLockTexture" );
-
 	hr = pSurf->LockRect( &s_LockedRect, &s_LockedSrcRect, flags );
 	pSurf->Release();
 
@@ -490,8 +488,6 @@ bool LockTexture( ShaderAPITextureHandle_t bindId, int copy, IDirect3DBaseTextur
 void UnlockTexture( ShaderAPITextureHandle_t bindId, int copy, IDirect3DBaseTexture* pTexture, int level, 
 	D3DCUBEMAP_FACES cubeFaceID )
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 	Assert( s_bInLock );
 
 	IDirect3DSurface* pSurf;
@@ -575,8 +571,6 @@ inline int DeterminePowerOfTwo( int val )
 #if !defined( _X360 )
 static void BlitSurfaceBits( TextureLoadInfo_t &info, int xOffset, int yOffset, int srcStride )
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 	// Get the level of the texture we want to write into
 	IDirect3DSurface* pTextureLevel;
 
@@ -731,8 +725,6 @@ static void BlitSurfaceBits( TextureLoadInfo_t &info, int xOffset, int yOffset, 
 #endif
 
 	{
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - D3DLockRect", __FUNCTION__ );
-
 		// lock the region (could be the full surface or less)
 		if ( FAILED( pTextureLevel->LockRect( &lockedRect, &srcRect, D3DLOCK_NOSYSLOCK ) ) )
 		{
@@ -743,8 +735,6 @@ static void BlitSurfaceBits( TextureLoadInfo_t &info, int xOffset, int yOffset, 
 	}
 
 	{
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - ConvertImageFormat", __FUNCTION__ );
-
 		// garymcthack : need to make a recording command for this.
 		ImageFormat dstFormat = GetImageFormat( info.m_pTexture );
 		unsigned char *pImage = (unsigned char *)lockedRect.pBits;
@@ -761,8 +751,6 @@ static void BlitSurfaceBits( TextureLoadInfo_t &info, int xOffset, int yOffset, 
 #endif
 
 	{
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - UnlockRect", __FUNCTION__ );
-
 		if ( FAILED( pTextureLevel->UnlockRect() ) ) 
 		{
 			Warning( "CShaderAPIDX8::BlitTextureBits: couldn't unlock texture rect\n" );
@@ -771,7 +759,6 @@ static void BlitSurfaceBits( TextureLoadInfo_t &info, int xOffset, int yOffset, 
 		}
 	}
 
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - pTextureLevel->Release", __FUNCTION__ );
 	pTextureLevel->Release();
 }
 #endif
@@ -1311,8 +1298,6 @@ void LoadCubeTextureFromVTF( TextureLoadInfo_t &info, IVTFTexture* pVTF, int iVT
 
 void LoadTextureFromVTF( TextureLoadInfo_t &info, IVTFTexture* pVTF, int iVTFFrame )
 {
-	TM_ZONE_DEFAULT( TELEMETRY_LEVEL0 );
-
 	if ( !info.m_pTexture || info.m_pTexture->GetType() != D3DRTYPE_TEXTURE )
 	{
 		Assert( 0 );
@@ -1323,7 +1308,6 @@ void LoadTextureFromVTF( TextureLoadInfo_t &info, IVTFTexture* pVTF, int iVTFFra
 
 	D3DSURFACE_DESC desc;
 	{
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - GetLevelDesc", __FUNCTION__ );
 		if ( pTex->GetLevelDesc( 0, &desc ) != S_OK )
 		{
 			Warning( "LoadTextureFromVTF: couldn't get texture level description\n" );
@@ -1350,8 +1334,6 @@ void LoadTextureFromVTF( TextureLoadInfo_t &info, IVTFTexture* pVTF, int iVTFFra
 	IDirect3DTexture9 *pStagingTexture = NULL;
 	if ( !info.m_bTextureIsLockable && iMipCount > 1 )
 	{
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - CreateSysmemTexture", __FUNCTION__ );
-		
 		IDirect3DTexture9 *pTemp;
 		if ( Dx9Device()->CreateTexture( desc.Width, desc.Height, iMipCount, 0, desc.Format, D3DPOOL_SYSTEMMEM, &pTemp, NULL ) != S_OK )
 		{
@@ -1375,7 +1357,6 @@ void LoadTextureFromVTF( TextureLoadInfo_t &info, IVTFTexture* pVTF, int iVTFFra
 	Assert( finest <= coarsest && coarsest < iMipCount );
 
 	{
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - BlitTextureBits", __FUNCTION__ );
 		for ( int iMip = finest; iMip <= coarsest; ++iMip )
 		{
 			int w, h, d;
@@ -1384,8 +1365,6 @@ void LoadTextureFromVTF( TextureLoadInfo_t &info, IVTFTexture* pVTF, int iVTFFra
 			mipInfo.m_nWidth = w;
 			mipInfo.m_nHeight = h;
 			mipInfo.m_pSrcData = pVTF->ImageData( iVTFFrame, iVTFFaceNum, iMip );
-
-			tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - BlitTextureBits - %d", __FUNCTION__, iMip );
 
 			BlitTextureBits( mipInfo, 0, 0, 0 );
 		}
@@ -1396,7 +1375,6 @@ void LoadTextureFromVTF( TextureLoadInfo_t &info, IVTFTexture* pVTF, int iVTFFra
 	{
 		if ( ( coarsest - finest + 1 ) == iMipCount )
 		{
-			tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - UpdateTexture", __FUNCTION__ );
 			if ( Dx9Device()->UpdateTexture( pStagingTexture, pTex ) != S_OK )
 			{
 				Warning( "LoadTextureFromVTF: UpdateTexture failed\n" );
@@ -1404,12 +1382,8 @@ void LoadTextureFromVTF( TextureLoadInfo_t &info, IVTFTexture* pVTF, int iVTFFra
 		}
 		else
 		{
-			tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - UpdateSurface", __FUNCTION__ );
-
 			for ( int mip = finest; mip <= coarsest; ++mip )
 			{
-				tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - UpdateSurface - %d", __FUNCTION__, mip );
-
 				IDirect3DSurface9 *pSrcSurf = NULL, 
 					              *pDstSurf = NULL;
 
@@ -1420,7 +1394,6 @@ void LoadTextureFromVTF( TextureLoadInfo_t &info, IVTFTexture* pVTF, int iVTFFra
 					Warning( "LoadTextureFromVTF: couldn't get surface level %d for dest surface\n", mip );
 
 				{
-					tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - UpdateSurface - Call ", __FUNCTION__, mip );
 					if ( !pSrcSurf || !pDstSurf || Dx9Device()->UpdateSurface( pSrcSurf, NULL, pDstSurf, NULL ) != S_OK ) 
 						Warning( "LoadTextureFromVTF: surface update failed.\n" );
 				}
@@ -1433,7 +1406,6 @@ void LoadTextureFromVTF( TextureLoadInfo_t &info, IVTFTexture* pVTF, int iVTFFra
 			}
 		}
 
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - Cleanup", __FUNCTION__ );
 		pStagingTexture->Release();
 	}
 #endif

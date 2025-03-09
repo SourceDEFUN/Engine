@@ -3969,8 +3969,6 @@ void CShaderAPIDx8::ForceHardwareSync_WithManagedTexture()
 
 	D3DLOCKED_RECT rect;
 
-	tmZone( TELEMETRY_LEVEL1, TMZF_NONE, "%s", __FUNCTION__ );
-
 	HRESULT hr = m_pFrameSyncTexture->LockRect( 0, &rect, NULL, 0 );
 	if ( SUCCEEDED( hr ) )
 	{
@@ -3998,8 +3996,6 @@ void CShaderAPIDx8::ForceHardwareSync_WithManagedTexture()
 				unsigned short indices[3] = { 0, 1, 2 };
 				Vector verts[3] = {vec3_origin, vec3_origin, vec3_origin};
 				
-				tmZone( TELEMETRY_LEVEL1, TMZF_NONE, "DrawIndexedPrimitiveUP" );
-
 				Dx9Device()->DrawIndexedPrimitiveUP(
 					D3DPT_TRIANGLELIST,
 					0,				// Min vertex index
@@ -4026,8 +4022,6 @@ void CShaderAPIDx8::UpdateFrameSyncQuery( int queryIndex, bool bIssue )
 	// wait if already issued
 	if ( m_bQueryIssued[queryIndex] )
 	{
-		tmZone( TELEMETRY_LEVEL1, TMZF_NONE, "%s", __FUNCTION__ );
-
 		double flStartTime = Plat_FloatTime();
 		BOOL dummyData = 0;
 		HRESULT hr = S_OK;
@@ -7150,8 +7144,6 @@ ShaderAPITextureHandle_t CShaderAPIDx8::CreateTextureHandle( void )
 
 void CShaderAPIDx8::CreateTextureHandles( ShaderAPITextureHandle_t *handles, int count )
 {
-	TM_ZONE_DEFAULT( TELEMETRY_LEVEL0 );
-
 	if ( count <= 0 )
 		return;
 
@@ -7161,8 +7153,6 @@ void CShaderAPIDx8::CreateTextureHandles( ShaderAPITextureHandle_t *handles, int
 	ShaderAPITextureHandle_t hTexture;
 
 	{
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - Search", __FUNCTION__ );
-
 		for ( hTexture = m_Textures.Head(); hTexture != m_Textures.InvalidIndex(); hTexture = m_Textures.Next( hTexture ) )
 		{
 			if ( !( m_Textures[hTexture].m_Flags & Texture_t::IS_ALLOCATED ) )
@@ -7174,7 +7164,6 @@ void CShaderAPIDx8::CreateTextureHandles( ShaderAPITextureHandle_t *handles, int
 		}
 	}
 
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - Add", __FUNCTION__ );
 	while ( idxCreating < count )
 		handles[ idxCreating ++ ] = m_Textures.AddToTail();
 }
@@ -7212,11 +7201,7 @@ void CShaderAPIDx8::CreateTextures(
 	const char *pDebugName,
 	const char *pTextureGroupName )
 {
-	TM_ZONE_DEFAULT( TELEMETRY_LEVEL0 );
-
 	LOCK_SHADERAPI();
-
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - PostLock", __FUNCTION__ );
 
 	Assert( this == g_pShaderAPI );
 
@@ -7264,12 +7249,6 @@ void CShaderAPIDx8::CreateTextures(
 	unsigned short usSetFlags = 0;
 	usSetFlags |= ( IsPosix() || ( creationFlags & (TEXTURE_CREATE_DYNAMIC | TEXTURE_CREATE_MANAGED) ) ) ? Texture_t::IS_LOCKABLE : 0;
 	usSetFlags |= ( creationFlags & TEXTURE_CREATE_VERTEXTEXTURE) ? Texture_t::IS_VERTEX_TEXTURE : 0;
-#if defined( _X360 )
-	usSetFlags |= ( creationFlags & TEXTURE_CREATE_RENDERTARGET ) ? Texture_t::IS_RENDER_TARGET : 0;
-	usSetFlags |= ( creationFlags & TEXTURE_CREATE_CANCONVERTFORMAT ) ? Texture_t::CAN_CONVERT_FORMAT : 0;
-#endif
-
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - CreateFrames", __FUNCTION__ );
 
 	for ( int idxFrame = 0; idxFrame < count; ++ idxFrame )
 	{
@@ -7305,16 +7284,12 @@ void CShaderAPIDx8::CreateTextures(
 		// Set the initial texture state
 		if ( numCopies <= 1 )
 		{
-			tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - CreateD3DTexture", __FUNCTION__ );
-
 			pTexture->m_NumCopies = 1;
 			pD3DTex = CreateD3DTexture( width, height, depth, dstImageFormat, numMipLevels, creationFlags, (char*)pDebugName );
 			pTexture->SetTexture( pD3DTex );
 		}
 		else
 		{
-			tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - CreateD3DTexture", __FUNCTION__ );
-
 			pTexture->m_NumCopies = numCopies;
 			{
 // X360TEMP
@@ -8065,8 +8040,6 @@ bool CShaderAPIDx8::DoRenderTargetsNeedSeparateDepthBuffer() const
 //-----------------------------------------------------------------------------
 void CShaderAPIDx8::ModifyTexture( ShaderAPITextureHandle_t textureHandle )
 {
-	tmZone( TELEMETRY_LEVEL2, TMZF_NONE, "%s", __FUNCTION__ );
-
 	LOCK_SHADERAPI();
 	// Can't do this if we're locked!
 	Assert( m_ModifyTextureLockedLevel < 0 );
@@ -8112,8 +8085,6 @@ void CShaderAPIDx8::AdvanceCurrentCopy( ShaderAPITextureHandle_t hTexture )
 bool CShaderAPIDx8::TexLock( int level, int cubeFaceID, int xOffset, int yOffset, 
 								int width, int height, CPixelWriter& writer )
 {
-	tmZone( TELEMETRY_LEVEL2, TMZF_NONE, "%s", __FUNCTION__ );
-
 	LOCK_SHADERAPI();
 
 	Assert( m_ModifyTextureLockedLevel < 0 );
@@ -8162,8 +8133,6 @@ bool CShaderAPIDx8::TexLock( int level, int cubeFaceID, int xOffset, int yOffset
 
 void CShaderAPIDx8::TexUnlock( )
 {
-	tmZone( TELEMETRY_LEVEL2, TMZF_NONE, "%s", __FUNCTION__ );
-
 	LOCK_SHADERAPI();
 	if ( m_ModifyTextureLockedLevel >= 0 )
 	{
@@ -12263,8 +12232,6 @@ void CShaderAPIDx8::CopyBitsFromHostSurface( IDirect3DSurface* pSurfaceBits,
 	HRESULT hr;
 	int flags = D3DLOCK_READONLY | D3DLOCK_NOSYSLOCK;
 
-	tmZone( TELEMETRY_LEVEL1, TMZF_NONE, "%s", __FUNCTION__ );
-
 	hr = pSurfaceBits->LockRect( &lockedRect, &rect, flags );
 	if ( !FAILED( hr ) )
 	{
@@ -12929,8 +12896,6 @@ int CShaderAPIDx8::OcclusionQuery_GetNumPixelsRendered( ShaderAPIOcclusionQuery_
 {
 	LOCK_SHADERAPI();
 	IDirect3DQuery9 *pQuery = (IDirect3DQuery9 *)handle;
-
-	tmZone( TELEMETRY_LEVEL1, TMZF_NONE, "%s", __FUNCTION__ );
 
 	DWORD nPixels;
 	HRESULT hResult = pQuery->GetData( &nPixels, sizeof( nPixels ), bFlush ? D3DGETDATA_FLUSH : 0 );

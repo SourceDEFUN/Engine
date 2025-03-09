@@ -817,8 +817,6 @@ void PixelVisibility_EndCurrentView()
 
 void PixelVisibility_EndScene()
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 	g_PixelVisibilitySystem.EndScene();
 }
 

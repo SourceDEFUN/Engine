@@ -899,9 +899,6 @@ CSfxTable *S_FindName( const char *szName, int *pfInCache )
 double g_flAccumulatedSoundLoadTime = 0.0f;
 CAudioSource *S_LoadSound( CSfxTable *pSfx, channel_t *ch )
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
-	VPROF("S_LoadSound");
 	if ( !pSfx->pSource )
 	{
 		if ( IsX360() )
@@ -1055,8 +1052,6 @@ CAudioSource *S_LoadSound( CSfxTable *pSfx, channel_t *ch )
 //-----------------------------------------------------------------------------
 CSfxTable *S_PrecacheSound( const char *name )
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 	if ( !g_AudioDevice )
 		return NULL;
 
@@ -6497,9 +6492,6 @@ extern void DEBUG_StopSoundMeasure(int type, int samplecount );
 
 void S_Update_Guts( float mixAheadTime )
 {
-	VPROF( "S_Update_Guts" );
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 	DEBUG_StartSoundMeasure(4, 0);
 
 	// Update our perception of audio time.

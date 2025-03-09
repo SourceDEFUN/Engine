@@ -3033,7 +3033,6 @@ void CMatSystemSurface::InternalSolveTraverse(VPANEL panel)
 	VPanel * RESTRICT vp = (VPanel *)panel;
 
 	vp->TraverseLevel( 1 );
-	tmZone( TELEMETRY_LEVEL1, TMZF_NONE, "%s - %s", __FUNCTION__, vp->GetName() );
 
 	// solve the parent
 	vp->Solve();
@@ -3064,7 +3063,6 @@ void CMatSystemSurface::InternalThinkTraverse(VPANEL panel)
 	VPanel * RESTRICT vp = (VPanel *)panel;
 
 	vp->TraverseLevel( 1 );
-	tmZone( TELEMETRY_LEVEL1, TMZF_NONE, "%s - %s", __FUNCTION__, vp->GetName() );
 
 	// think the parent
 	vp->Client()->Think();
@@ -3093,7 +3091,6 @@ void CMatSystemSurface::InternalSchemeSettingsTraverse(VPANEL panel, bool forceA
 	VPanel * RESTRICT vp = (VPanel *)panel;
 
 	vp->TraverseLevel( 1 );
-	tmZone( TELEMETRY_LEVEL1, TMZF_NONE, "%s - %s", __FUNCTION__, vp->GetName() );
 
 	CUtlVector< VPanel * > &children = vp->GetChildren();
 
@@ -3118,20 +3115,14 @@ void CMatSystemSurface::InternalSchemeSettingsTraverse(VPANEL panel, bool forceA
 void CMatSystemSurface::SolveTraverse(VPANEL panel, bool forceApplySchemeSettings)
 {
 	{
-		VPROF( "InternalSchemeSettingsTraverse" );
-		tmZone( TELEMETRY_LEVEL1, TMZF_NONE, "%s - InternalSchemeSettingsTraverse", __FUNCTION__ );
 		InternalSchemeSettingsTraverse(panel, forceApplySchemeSettings);
 	}
 
 	{
-		VPROF( "InternalThinkTraverse" );
-		tmZone( TELEMETRY_LEVEL1, TMZF_NONE, "%s - InternalThinkTraverse", __FUNCTION__ );
 		InternalThinkTraverse(panel);
 	}
 
 	{
-		VPROF( "InternalSolveTraverse" );
-		tmZone( TELEMETRY_LEVEL1, TMZF_NONE, "%s - InternalSolveTraverse", __FUNCTION__ );
 		InternalSolveTraverse(panel);
 	}
 }

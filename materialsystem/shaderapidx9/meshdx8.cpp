@@ -3448,8 +3448,6 @@ void CMeshDX8::RenderPass()
 
 		if ( ( m_Type == MATERIAL_POINTS ) || ( m_Type == MATERIAL_INSTANCED_QUADS ) )
 		{
-			tmZone( TELEMETRY_LEVEL1, TMZF_NONE, "Dx9Device_DrawPrimitive" );
-
 			// (For point/instanced-quad lists, we don't actually fill in indices, but we treat it as
 			// though there are indices for the list up until here).
 			Dx9Device()->DrawPrimitive( m_Mode, s_FirstVertex, pPrim->m_NumIndices );
@@ -3647,18 +3645,14 @@ void CDynamicMeshDX8::PreLock()
 //-----------------------------------------------------------------------------
 void CDynamicMeshDX8::LockMesh( int nVertexCount, int nIndexCount, MeshDesc_t& desc )
 {
-	tmZoneFiltered( TELEMETRY_LEVEL0, 50, TMZF_NONE, "%s %d %d", __FUNCTION__, nVertexCount, nIndexCount );
-
 	ShaderUtil()->SyncMatrices();
 
 	{
-		tmZoneFiltered( TELEMETRY_LEVEL0, 50, TMZF_NONE, "g_ShaderMutex.Lock" );
 		g_ShaderMutex.Lock();
 	}
 
 	// Yes, this may well also be called from BufferedMesh but that's ok
 	{
-		tmZoneFiltered( TELEMETRY_LEVEL0, 50, TMZF_NONE, "PreLock" );
 		PreLock();
 	}
 
@@ -3673,7 +3667,6 @@ void CDynamicMeshDX8::LockMesh( int nVertexCount, int nIndexCount, MeshDesc_t& d
 	}
 
 	{
-		tmZoneFiltered( TELEMETRY_LEVEL0, 50, TMZF_NONE, "Lock" );
 		Lock( nVertexCount, false, *static_cast<VertexDesc_t*>( &desc ) );
 	}
 
@@ -3693,7 +3686,6 @@ void CDynamicMeshDX8::LockMesh( int nVertexCount, int nIndexCount, MeshDesc_t& d
 	{
 		int nFirstIndex;
 		{
-			tmZoneFiltered( TELEMETRY_LEVEL0, 50, TMZF_NONE, "Lock nFirstIndex" );
 			nFirstIndex = Lock( false, -1, nIndexCount, *static_cast<IndexDesc_t*>( &desc ) );
 		}
 		if (m_FirstIndex < 0)
@@ -5199,8 +5191,6 @@ IMesh* CMeshMgr::GetActualDynamicMesh( VertexFormat_t format )
 void CMeshMgr::CopyStaticMeshIndexBufferToTempMeshIndexBuffer( CTempMeshDX8 *pDstIndexMesh,
 															   CMeshDX8 *pSrcIndexMesh )
 {
-	tmZoneFiltered( TELEMETRY_LEVEL0, 50, TMZF_NONE, "%s", __FUNCTION__ );
-
 	Assert( !pSrcIndexMesh->IsDynamic() );
 	int nIndexCount = pSrcIndexMesh->IndexCount();
 	
@@ -5241,8 +5231,6 @@ IMesh *CMeshMgr::GetFlexMesh()
 IMesh* CMeshMgr::GetDynamicMesh( IMaterial* pMaterial, VertexFormat_t vertexFormat, int nHWSkinBoneCount,
 	bool buffered, IMesh* pVertexOverride, IMesh* pIndexOverride )
 {
-	tmZoneFiltered( TELEMETRY_LEVEL0, 50, TMZF_NONE, "%s", __FUNCTION__ );
-
 	Assert( (pMaterial == NULL) || ((IMaterialInternal *)pMaterial)->IsRealTimeVersion() );
 
 	if ( IsX360() )

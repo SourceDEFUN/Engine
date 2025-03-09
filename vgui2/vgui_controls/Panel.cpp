@@ -933,7 +933,6 @@ int Panel::GetYPos()
 //-----------------------------------------------------------------------------
 void Panel::SetSize(int wide, int tall)
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - %s", __FUNCTION__, GetName() );
 	Assert( abs(wide) < 32768 && abs(tall) < 32768 );
 	ipanel()->SetSize(GetVPanel(), wide, tall);
 }
@@ -1115,8 +1114,6 @@ void Panel::Think()
 
 void Panel::OnChildSettingsApplied( KeyValues *pInResourceData, Panel *pChild  )
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - %s", __FUNCTION__, GetName() );
-
 	Panel* pParent = GetParent();
 	if( pParent )
 	{
@@ -1587,8 +1584,6 @@ int Panel::FindChildIndexByName(const char *childName)
 //-----------------------------------------------------------------------------
 Panel *Panel::FindChildByName(const char *childName, bool recurseDown)
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - %s finding %s", __FUNCTION__, GetName(), childName );
-
 	auto idx = m_dictChidlren.Find( childName );
 	if ( idx != m_dictChidlren.InvalidIndex() )
 	{
@@ -3706,7 +3701,6 @@ void Panel::PostActionSignal( KeyValues *message )
 
 void Panel::SetBorder(IBorder *border)
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - %s", __FUNCTION__, GetName() );
 	_border = border;
 
 	if (border)
@@ -4165,8 +4159,6 @@ static Panel *lastWarningParent = 0;
 
 void Panel::ApplyAutoResizeSettings(KeyValues *inResourceData)
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - %s", __FUNCTION__, GetName() );
-
 	int x, y;
 	GetPos(x, y);
 
@@ -4297,8 +4289,6 @@ Panel::PinCorner_e GetPinCornerFromString( const char* pszCornerName )
 //-----------------------------------------------------------------------------
 void Panel::ApplySettings(KeyValues *inResourceData)
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - %s", __FUNCTION__, GetName() );
-
 	// First restore to default values
 	if ( _flags.IsFlagSet( NEEDS_DEFAULT_SETTINGS_APPLIED ) )
 	{
@@ -4569,7 +4559,6 @@ void Panel::ApplySettings(KeyValues *inResourceData)
 		SetName(newName);
 	}
 
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - %s: Action signal", __FUNCTION__, GetName() );
 	// Automatically add an action signal target if one is specified.  This allows for
 	// nested child buttons to add their distant parents as action signal targets.
 	int nActionSignalLevel = inResourceData->GetInt( "actionsignallevel", -1 );
@@ -4600,14 +4589,11 @@ void Panel::ApplySettings(KeyValues *inResourceData)
 	// HPE_END
 	//=============================================================================
 
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - %s: Pin Sibling", __FUNCTION__, GetName() );
 	const char *pszSiblingName = inResourceData->GetString("pin_to_sibling", NULL);
 	PinCorner_e pinOurCornerToSibling = GetPinCornerFromString( inResourceData->GetString( "pin_corner_to_sibling", NULL ) );
 	PinCorner_e pinSiblingCorner = GetPinCornerFromString( inResourceData->GetString( "pin_to_sibling_corner", NULL ) );
 	PinToSibling( pszSiblingName, pinOurCornerToSibling, pinSiblingCorner );
 
-
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - %s: Color overrides", __FUNCTION__, GetName() );
 	// Allow overriding of colors. Used mostly by HUD elements, where scheme color usage is often undesired.
 	IScheme *pScheme = vgui::scheme()->GetIScheme( GetScheme() );
 	for ( int i = 0; i < m_OverridableColorEntries.Count(); i++ )
@@ -4638,7 +4624,6 @@ void Panel::ApplySettings(KeyValues *inResourceData)
 		}
 	}
 
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - %s: Keyboard enabled", __FUNCTION__, GetName() );
 	const char *pKeyboardInputEnabled = inResourceData->GetString( "keyboardinputenabled", NULL );
 	if ( pKeyboardInputEnabled && pKeyboardInputEnabled[0] )
 	{
@@ -6305,8 +6290,6 @@ PanelAnimationMapEntry *Panel::FindPanelAnimationEntry( char const *scriptname, 
 // Recursively invoke settings for PanelAnimationVars
 void Panel::InternalApplySettings( PanelAnimationMap *map, KeyValues *inResourceData)
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - %s", __FUNCTION__, GetName() );
-
 	// Loop through keys
 	KeyValues *kv;
 	

@@ -367,7 +367,7 @@ bool Cbuf_HasRoomForExecutionMarkers( int cExecutionMarkers )
 static void Cbuf_ExecuteCommand( const CCommand &args, cmd_source_t source )
 {
 	// Note: If you remove this, PerfMark needs to do the same logic--so don't do that.
-	tmMessage( TELEMETRY_LEVEL0, TMMF_SEVERITY_LOG | TMMF_ICON_NOTE, "(source/command) %s", tmDynamicString( TELEMETRY_LEVEL0, args.GetCommandString() ) );
+	// tmMessage( TELEMETRY_LEVEL0, TMMF_SEVERITY_LOG | TMMF_ICON_NOTE, "(source/command) %s", tmDynamicString( TELEMETRY_LEVEL0, args.GetCommandString() ) );
 	// Add the command text to the ETW stream to give better context to traces.
 	ETWMark( args.GetCommandString() );
 
@@ -388,9 +388,6 @@ static void Cbuf_ExecuteCommand( const CCommand &args, cmd_source_t source )
 //-----------------------------------------------------------------------------
 void Cbuf_Execute()
 {
-	VPROF("Cbuf_Execute");
-	tmZoneFiltered( TELEMETRY_LEVEL0, 50, TMZF_NONE, "%s", __FUNCTION__ );
-
 	if ( !ThreadInMainThread() )
 	{
 		Warning( "Executing command outside main loop thread\n" );

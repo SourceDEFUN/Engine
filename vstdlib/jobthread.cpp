@@ -354,7 +354,6 @@ private:
 	unsigned Wait()
 	{
 		unsigned waitResult;
-		tmZone( TELEMETRY_LEVEL0, TMZF_IDLE, "%s", __FUNCTION__ );
 #ifdef WIN32
 		enum Event_t
 		{
@@ -409,7 +408,6 @@ private:
 		unsigned waitResult;
 		bool	 bExit = false;
 
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
 
 		m_pOwner->m_nIdleThreads++;
 		m_IdleEvent.Set();
@@ -418,8 +416,6 @@ private:
 			if ( PeekCall() )
 			{
 				CFunctor *pFunctor = NULL;
-				tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s PeekCall():%d", __FUNCTION__, GetCallParam() );
-
 				switch ( GetCallParam() )
 				{
 				case TPM_EXIT:
@@ -453,8 +449,6 @@ private:
 			}
 			else
 			{
-				tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s !PeekCall()", __FUNCTION__ );
-
 				CJob *pJob;
 				bool bTookJob = false;
 				do
@@ -608,8 +602,6 @@ int CThreadPool::ResumeExecution()
 
 int CThreadPool::YieldWait( CThreadEvent **pEvents, int nEvents, bool bWaitAll, unsigned timeout )
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_IDLE, "%s(%d) SPINNING %t", __FUNCTION__, timeout, tmSendCallStack( TELEMETRY_LEVEL0, 0 ) );
-
 	Assert( timeout == TT_INFINITE ); // unimplemented
 
 	int result;

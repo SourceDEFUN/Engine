@@ -1116,8 +1116,6 @@ void CGLMBuffer::Unlock( int nActualSize, const void *pActualData )
 		{
 			if ( nActualSize )
 			{
-				tmZone( TELEMETRY_LEVEL2, TMZF_NONE, "UnlockSubData" );
-
 	#ifdef REPORT_LOCK_TIME
 				double flStart = Plat_FloatTime();
 	#endif
@@ -1166,8 +1164,6 @@ void CGLMBuffer::Unlock( int nActualSize, const void *pActualData )
 	}
 	else
 	{
-		tmZone( TELEMETRY_LEVEL2, TMZF_NONE, "UnlockUnmap" );
-
 		if ( pActualData )
 		{
 			memcpy( m_pLastMappedAddress, pActualData, nActualSize );

@@ -3420,8 +3420,6 @@ public:
 		COMPILE_TIME_ASSERT( ( int )cMaxQueryZones > ( int )cMaxQueryZoneStackSize );
 		if ( m_nNumOutstandingQueryZones >= ( cMaxQueryZones - cMaxQueryZoneStackSize ) )
 		{
-			tmMessage( TELEMETRY_LEVEL2, TMMF_ICON_NOTE | TMMF_SEVERITY_WARNING, "CGPUTimestampManager::EndZone: Too many outstanding query zones - forcing a pipeline flush! This is probably expensive." );
-
 			FlushOutstandingQueries( true );
 		}
 
@@ -3445,15 +3443,11 @@ public:
 
 		FlushOutstandingQueries( false );
 
-		tmMessage( TELEMETRY_LEVEL2, 0, "Total PIX timespan GPU work count: %u", m_nTotalSpanWorkCount );
-		
 		m_nTotalSpanWorkCount = 0;
 	}
 
 	void FlushOutstandingQueries( bool bForce )
 	{
-		tmZone( TELEMETRY_LEVEL2, 0, "FlushOutstandingQueries: %u", m_nNumOutstandingQueryZones );
-
 		if ( bForce )
 		{
 			PipelineFlush();
@@ -3622,13 +3616,6 @@ private:
 #endif
 	}
 
-	inline void NewTimeSpan( uint64 nStartGPUTime, uint64 nEndGPUTime, const char *pName, uint nTotalDraws )
-	{
-		// apparently we must use level0 for timespans?
-		tmBeginTimeSpanAt( TELEMETRY_LEVEL0, 1, 0, nStartGPUTime, "%s [C:%u]", pName ? pName : "", nTotalDraws );
-		tmEndTimeSpanAt( TELEMETRY_LEVEL0, 1, 0, nEndGPUTime, "%s [C:%u]", pName ? pName : "", nTotalDraws );
-	}
-
 	void FlushFinishedZones()
 	{
 		for ( uint i = 0; i < m_nNumFinishedZones; i++ )
@@ -3650,9 +3637,6 @@ private:
 			{
 				uint64 nStartGPUTime = ( ( zone.m_nBeginGPUTime * m_flGPUToS ) + m_flGPUToCPUOffsetInS ) * m_flSToRdtsc;
 				uint64 nEndGPUTime = ( ( zone.m_nEndGPUTime * m_flGPUToS ) + m_flGPUToCPUOffsetInS ) * m_flSToRdtsc;
-
-				NewTimeSpan( nStartGPUTime, nEndGPUTime, zone.m_pName, zone.m_nTotalGPUWorkCount );
-
 				m_nTotalSpanWorkCount += zone.m_nTotalGPUWorkCount;
 			}
 		}
@@ -3727,12 +3711,8 @@ void GLMBeginPIXEvent( const char *str )
 #ifndef OSX
 	char szName[1024];
 	V_snprintf( szName, sizeof( szName ), "[ID:%u FR:%u] %s", g_nPIXEventIndex, g_GPUTimestampManager.GetCurFrame(), str );
-	const char *p = tmDynamicString( TELEMETRY_LEVEL2, szName ); //p can be null if tm is getting shut down
-	tmEnter( TELEMETRY_LEVEL2, TMZF_NONE, "PIX %s", p ? p : ""  );
 
 	g_nPIXEventIndex++;
-			
-	g_GPUTimestampManager.BeginZone( p );
 #endif // !OSX
 	V_strncpy( sg_pPIXName, str, 128 );
 
@@ -3762,8 +3742,6 @@ void GLMEndPIXEvent( void )
 	}
 
 	sg_pPIXName[0] = '\0';
-		
-	tmLeave( TELEMETRY_LEVEL2 );
 }
 
 //===============================================================================

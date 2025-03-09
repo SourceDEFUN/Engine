@@ -1228,8 +1228,6 @@ void BuildGroup::DeleteAllControlsCreatedByControlSettingsFile()
 //-----------------------------------------------------------------------------
 void BuildGroup::ApplySettings( KeyValues *resourceData )
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 	// loop through all the keys, applying them wherever
 	for (KeyValues *controlKeys = resourceData->GetFirstSubKey(); controlKeys != NULL; controlKeys = controlKeys->GetNextKey())
 	{

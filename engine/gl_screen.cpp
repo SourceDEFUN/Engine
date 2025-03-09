@@ -211,8 +211,6 @@ inline void SCR_ShowVCRPlaybackAmount()
 //-----------------------------------------------------------------------------
 void SCR_UpdateScreen( void )
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 	R_StudioCheckReinitLightingCache();
 	
 	// Always force the Gamma Table to be rebuilt. Otherwise,
@@ -254,7 +252,6 @@ void SCR_UpdateScreen( void )
 
 	materials->BeginFrame( host_frametime );
 	{
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "EngineVGui_Simulate" );
 		EngineVGui()->Simulate();
 	}
 
@@ -264,8 +261,6 @@ void SCR_UpdateScreen( void )
 	// This needs to happen before the client DLL is called because the client DLL depends on 
 	// some of the setup in FRAME_RENDER_START.
 	{
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "FrameBegin" );
-	
 		g_EngineRenderer->FrameBegin();
 		toolframework->RenderFrameBegin();
 	}
@@ -289,8 +284,6 @@ void SCR_UpdateScreen( void )
 	ClientDLL_FrameStageNotify( FRAME_RENDER_END );
 
 	{
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "FrameEnd" );
-
 		toolframework->RenderFrameEnd();
 
 		g_EngineRenderer->FrameEnd();
@@ -301,15 +294,11 @@ void SCR_UpdateScreen( void )
 	// Moved here to leave as much of the frame as possible to overlap threads in the case
 	// where we actually have models to load here
 	{
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "modelloader->UpdateDynamicModels" );
-		VPROF( "UpdateDynamicModels" );
 		CMDLCacheCriticalSection critsec( g_pMDLCache );
 		modelloader->UpdateDynamicModels();
 	}
 
 	{
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "materials_EndFrame" );
-
 		materials->EndFrame();
 	}
 }
