@@ -340,7 +340,12 @@ static void ScreenAlignBone( matrix3x4_t *pPoseToWorld, mstudiobone_t *pCurBone,
 // Computes PoseToWorld from BoneToWorld
 //-----------------------------------------------------------------------------
 void ComputePoseToWorld( matrix3x4_t *pPoseToWorld, studiohdr_t *pStudioHdr, int boneMask, const Vector& vecViewOrigin, const matrix3x4_t *pBoneToWorld )
-{ 
+{
+	if (!pBoneToWorld)
+	{
+		Warning("Model %s has invalid BoneToWorld!\n", pStudioHdr->name);
+		return;
+	}
 	if ( pStudioHdr->flags & STUDIOHDR_FLAGS_STATIC_PROP )
 	{
 		// by definition, these always have an identity poseToBone transform

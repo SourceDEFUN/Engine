@@ -481,9 +481,9 @@ bool LoadStudioModel( char const* pModelName, CUtlBuffer& buf )
 
 	Studio_ConvertStudioHdrToNewVersion( pHdr );
 
-	if (pHdr->version != STUDIO_VERSION)
+	if (pHdr->version > STUDIO_VERSION || pHdr->version < STUDIO_MIN_VERSION)
 	{
-		Warning("Error! Invalid model version \"%s\"\n", pModelName );
+		Warning("Warning: invalid model version %s!\n", pModelName );
 		return false;
 	}
 

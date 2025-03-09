@@ -76,7 +76,7 @@ BEGIN_BYTESWAP_DATADESC( dleaf_version_0_t )
 	DEFINE_EMBEDDED( m_AmbientLighting ),
 END_BYTESWAP_DATADESC()
 
-BEGIN_BYTESWAP_DATADESC( dleaf_t )
+BEGIN_BYTESWAP_DATADESC( dleaf_version_1_t )
 	DEFINE_FIELD( contents, FIELD_INTEGER ),
 	DEFINE_FIELD( cluster, FIELD_SHORT ),
 	DEFINE_BITFIELD( bf, FIELD_SHORT, 16 ),
@@ -87,6 +87,19 @@ BEGIN_BYTESWAP_DATADESC( dleaf_t )
 	DEFINE_FIELD( firstleafbrush, FIELD_SHORT ),
 	DEFINE_FIELD( numleafbrushes, FIELD_SHORT ),
 	DEFINE_FIELD( leafWaterDataID, FIELD_SHORT ),
+END_BYTESWAP_DATADESC()
+
+BEGIN_BYTESWAP_DATADESC( dleaf_t )
+	DEFINE_FIELD(contents, FIELD_INTEGER),
+	DEFINE_FIELD(cluster, FIELD_SHORT),
+	DEFINE_BITFIELD(bf, FIELD_SHORT, 16),
+	DEFINE_ARRAY(mins, FIELD_INTEGER, 3),
+	DEFINE_ARRAY(maxs, FIELD_INTEGER, 3),
+	DEFINE_FIELD(firstleafface, FIELD_SHORT),
+	DEFINE_FIELD(numleaffaces, FIELD_SHORT),
+	DEFINE_FIELD(firstleafbrush, FIELD_SHORT),
+	DEFINE_FIELD(numleafbrushes, FIELD_SHORT),
+	DEFINE_FIELD(leafWaterDataID, FIELD_SHORT),
 END_BYTESWAP_DATADESC()
 
 BEGIN_BYTESWAP_DATADESC( CompressedLightCube )	// array of 6 ColorRGBExp32 (3 bytes and 1 char)
@@ -113,8 +126,8 @@ END_BYTESWAP_DATADESC()
 BEGIN_BYTESWAP_DATADESC( dnode_t )
 	DEFINE_FIELD( planenum, FIELD_INTEGER ),
 	DEFINE_ARRAY( children, FIELD_INTEGER, 2 ),
-	DEFINE_ARRAY( mins, FIELD_SHORT, 3 ),
-	DEFINE_ARRAY( maxs, FIELD_SHORT, 3 ),
+	DEFINE_ARRAY( mins, FIELD_INTEGER, 3 ),
+	DEFINE_ARRAY( maxs, FIELD_INTEGER, 3 ),
 	DEFINE_FIELD( firstface, FIELD_SHORT ),
 	DEFINE_FIELD( numfaces, FIELD_SHORT ),
 	DEFINE_FIELD( area, FIELD_SHORT ),
@@ -2073,6 +2086,9 @@ int LoadLeafs( void )
 
 	case 1:
 		return CopyLump( LUMP_LEAFS, dleafs );
+	
+	case 2:
+		return CopyLump( LUMP_LEAFS, dleafs );
 
 	default:
 		Assert( 0 );
@@ -2680,8 +2696,8 @@ void WriteBSPFile( const char *filename, char *pUnused )
 	AddLump( LUMP_VISIBILITY, dvisdata, visdatasize );
 	AddLump( LUMP_ENTITIES, dentdata );
 	AddLump( LUMP_WORLDLIGHTS, dworldlightsLDR, numworldlightsLDR );
-	AddLump( LUMP_WORLDLIGHTS_HDR, dworldlightsHDR, numworldlightsHDR );
-	AddLump( LUMP_LEAFWATERDATA, dleafwaterdata, numleafwaterdata );
+	AddLump( LUMP_WORLDLIGHTS_HDR, dworldlightsHDR, numworldlightsHDR, LUMP_WORLDLIGHTS_VERSION );
+	AddLump( LUMP_LEAFWATERDATA, dleafwaterdata, numleafwaterdata, LUMP_WORLDLIGHTS_VERSION );
 
 	AddOcclusionLump();
 
