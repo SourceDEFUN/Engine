@@ -2883,7 +2883,6 @@ float CBasePlayer::GetHeldObjectMass( IPhysicsObject *pHeldObject )
 //-----------------------------------------------------------------------------
 void CBasePlayer::Jump()
 {
-        ViewPunch(QAngle(0., 0., 0.1));
 }
 
 void CBasePlayer::Duck( )

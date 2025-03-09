@@ -43,11 +43,11 @@ extern IFileSystem *filesystem;
 #define tickcount USE_PLAYER_CURRENT_COMMAND_NUMBER__INSTEAD_OF_TICKCOUNT
 
 #if defined( HL2_DLL )
-ConVar xc_uncrouch_on_jump( "xc_uncrouch_on_jump", "1", FCVAR_ARCHIVE, "Uncrouch when jump occurs" );
+ConVar xc_uncrouch_on_jump( "xc_uncrouch_on_jump", "0", FCVAR_ARCHIVE, "Uncrouch when jump occurs" );
 #endif
 
 #if defined( HL2_DLL ) || defined( HL2_CLIENT_DLL )
-ConVar player_limit_jump_speed( "player_limit_jump_speed", "1", FCVAR_REPLICATED );
+ConVar player_limit_jump_speed( "player_limit_jump_speed", "0", FCVAR_REPLICATED );
 #endif
 
 // option_duck_method is a carrier convar. Its sole purpose is to serve an easy-to-flip
@@ -1915,6 +1915,7 @@ void CGameMovement::WalkMove( void )
 	fmove = mv->m_flForwardMove;
 	smove = mv->m_flSideMove;
 
+
 	// Zero out z components of movement vectors
 	if ( g_bMovementOptimizations )
 	{
@@ -2417,11 +2418,12 @@ bool CGameMovement::CheckJumpButton( void )
 
 
 	// In the air now.
-    SetGroundEntity( NULL );
+	SetGroundEntity( NULL );
 	
 	player->PlayStepSound( (Vector &)mv->GetAbsOrigin(), player->m_pSurfaceData, 1.0, true );
 	
 	MoveHelper()->PlayerSetAnimation( PLAYER_JUMP );
+	player->ViewPunch(QAngle(3,0,0));
 
 	float flGroundFactor = 1.0f;
 	if (player->m_pSurfaceData)

@@ -334,6 +334,7 @@ void CBaseHLCombatWeapon::AddViewmodelBob( CBaseViewModel *viewmodel, Vector &or
 	// AngleVectors( angles, &forward, &right, NULL );
 	
 	CBasePlayer *player = ToBasePlayer( GetOwner() );
+	if (!player) {return;}
 	Vector speed = player->GetLocalVelocity();
 
 	// CalcViewmodelBob();

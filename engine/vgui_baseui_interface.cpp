@@ -556,7 +556,6 @@ bool CEngineVGui::SetVGUIDirectories()
 	// Legacy, not supported anymore
 	return true;
 }
-
 //-----------------------------------------------------------------------------
 // Setup the base vgui panels
 //-----------------------------------------------------------------------------

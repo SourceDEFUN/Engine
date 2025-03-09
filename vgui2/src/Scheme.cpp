@@ -392,11 +392,6 @@ HScheme  CSchemeManager::LoadSchemeFromFileEx( VPANEL sizingPanel, const char *f
 		data->deleteThis();
 		return 0;
 	}
-	
-	if ( IsX360() )
-	{
-		data->ProcessResolutionKeys( g_pSurface->GetResolutionKey() );
-	}
 	if ( IsPC() )
 	{
 		ConVarRef cl_hud_minmode( "cl_hud_minmode", true );
