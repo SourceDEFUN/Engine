@@ -3,3 +3,4 @@
 * Renamed scripts in scripts
 * Renamed launcher
 * Made a new viewmodel bob
+* Increased the maximum map size limit and more!
