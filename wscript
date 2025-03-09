@@ -8,7 +8,7 @@ import sys
 import os
 
 VERSION = '1.0'
-APPNAME = 'source-engine'
+APPNAME = 'SourceDEFUN'
 top = '.'
 
 FT2_CHECK='''extern "C" {
