@@ -9,6 +9,7 @@
 #ifndef STUDIO_H
 #define STUDIO_H
 
+
 #ifdef _WIN32
 #pragma once
 #endif
@@ -70,7 +71,6 @@ Studio models are position independent, so the cache manager can move them.
 #define STUDIO_VERSION		49
 #define STUDIO_MIN_VERSION	44
 
-#ifndef _XBOX
 #define MAXSTUDIOTRIANGLES	65536	// TODO: tune this
 #define MAXSTUDIOVERTS		65536	// TODO: tune this
 #define	MAXSTUDIOFLEXVERTS	10000	// max number of verts that can be flexed per mesh.  TODO: tune this
