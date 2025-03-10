@@ -4,3 +4,5 @@
 * Renamed launcher
 * Made a new viewmodel bob
 * Increased the maximum map size limit and more!
+* Removed Telemetry
+* Removed VProf
