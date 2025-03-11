@@ -66,24 +66,24 @@ Install `git python gcc gcc-multilib sdl3 freetype2 fontconfig zlib bzip2 libjpe
 ## FreeBSD (needs contributor!)
 Required dependencies
 
-1. Use pkg ins python sdl2 freetype2 fontconfig curl pkgconf openal-soft jpeg-turbo png.
+1. Use `pkg ins python sdl2 freetype2 fontconfig curl pkgconf openal-soft jpeg-turbo png`.
 2. Now, Follow instructions for all OS that has label "(needs contributor!)".
 
 ## Android (on Linux)
 1. Download and extract Android NDK r10e from [here](https://github.com/android/ndk/wiki/Unsupported-Downloads).
 2. Download and extract Clang 11 from [GitHub](https://github.com/llvm/llvm-project/releases/download/llvmorg-11.1.0/clang+llvm-11.1.0-x86_64-linux-gnu-ubuntu-16.04.tar.xz) or from [apt.llvm.org](https://apt.llvm.org/).
 3. Run `export ANDROID_NDK_HOME="PATH/TO/NDK/android-ndk-r10e"` and `export PATH="PATH/TO/CLANG/bin:$PATH"` or `export PATH="/usr/lib/llvm-11/bin:$PATH"` if you're using llvm.sh.
-4. Add to WAF args `--togles --android=armeabi-v7a-hard,host,21`. `armeabi-v7a-hard` can be replaced with `aarch64` for `arm64` build, but you need to add `--64bits` argument.
+4. Add to WAF argument `--togles --android=armeabi-v7a-hard,host,21`. `armeabi-v7a-hard` can be replaced with `aarch64` for arm64 build, but you need to add `--64bits` argument. You can check your architecture by executing `uname -m` in Termux.
 
 ## macOS (needs contributor!)
 ### Preparing
 
 1. Install Xcode frop App Store.
-2. Install Xcode build tools with xcode-select --install command.
+2. Install Xcode build tools with `xcode-select --install` command.
 3. Install HomeBrew.
 
 ### Required dependencies
-1. Run brew install sdl2 freetype2 fontconfig pkg-config opus libpng libedit
+1. Run `brew install sdl2 freetype2 fontconfig pkg-config opus libpng libedit`
 2. Now, Follow instructions for all OS that has label "(needs contributor!)".
 
 
