@@ -36,10 +36,10 @@ This project is using waf buildsystem. If you have waf-related questions look ht
 take the following with grain of salt, as some of those might never get realized.
 - [ ] Replace VGUI2 with RmlUI/Custom GUI
 - [ ] FMOD support
-- [ ] Vulkan support
+- [ ] Replace DirectX with Vulkan!
 - [ ] Change VMT syntax!
 - [ ] Replace VTF with PNG/WEBP!
-- [ ] Get rid of brushed and convert to mesh-based world (May require next feature)!!
+- [ ] Get rid of brushes and convert to mesh-based world (May require next feature)!!
 - [ ] Replace MDL with GLB and BSP with GLTF (Requires previous feature)!!!
 - [ ] **Replace Hammer's UI with GTK4 and PORT TO LINUX!!!!**
 
