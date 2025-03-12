@@ -3116,8 +3116,6 @@ char sg_pPIXName[128];
 
 
 #ifndef OSX
-ConVar gl_telemetry_gpu_pipeline_flushing( "gl_telemetry_gpu_pipeline_flushing", "0" );
-
 class CGPUTimestampManager
 {
 	CGPUTimestampManager( const CGPUTimestampManager & );
@@ -3380,9 +3378,6 @@ public:
 		zone.m_nStackLevel = m_nQueryZoneStackSize;
 		
 		zone.m_nTotalGPUWorkCount = g_nTotalDrawsOrClears;
-#if GL_TELEMETRY_GPU_ZONES
-		zone.m_nTotalGPUWorkCount += g_TelemetryGPUStats.GetTotal();
-#endif
 
 		gGL->glQueryCounter( m_QueryZoneStack[m_nQueryZoneStackSize].m_nBeginQuery, GL_TIMESTAMP );
 
@@ -3402,9 +3397,6 @@ public:
 		m_nQueryZoneStackSize--;
 
 		uint nCurGPUWorkCount = g_nTotalDrawsOrClears;
-#if GL_TELEMETRY_GPU_ZONES
-		nCurGPUWorkCount += g_TelemetryGPUStats.GetTotal();
-#endif
 
 		uint nTotalDraws = nCurGPUWorkCount - m_QueryZoneStack[m_nQueryZoneStackSize].m_nTotalGPUWorkCount;
 
@@ -3420,11 +3412,6 @@ public:
 		if ( m_nNumOutstandingQueryZones >= ( cMaxQueryZones - cMaxQueryZoneStackSize ) )
 		{
 			FlushOutstandingQueries( true );
-		}
-
-		if ( gl_telemetry_gpu_pipeline_flushing.GetBool() )
-		{
-			PipelineFlush();
 		}
 	}
 	
@@ -3688,8 +3675,8 @@ void GLMGPUTimestampManagerTick()
 			g_GPUTimestampManager.Deinit();
 		else
 		{
-#if !PIX_ENABLE || !GL_TELEMETRY_GPU_ZONES
-			ConMsg( "Must define PIX_ENABLE and GL_TELEMETRY_GPU_ZONES to use this feature" );
+#if !PIX_ENABLE
+			ConMsg( "Must define PIX_ENABLE to use this feature" );
 #else
 			g_GPUTimestampManager.Init();
 #endif

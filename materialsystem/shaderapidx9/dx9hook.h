@@ -2,8 +2,6 @@
 /* 
 TODO: add option to null out drawprim calls.
  
-Also maybe hook the PIX_ENABLE stuff to Telemetry
- 
 		In imaterialsystem.h:
 		#define PIX_ENABLE 1                   // set this to 1 and build engine/studiorender to enable pix events in the engine
 

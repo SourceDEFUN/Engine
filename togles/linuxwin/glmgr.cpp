@@ -63,10 +63,6 @@ ConVar gl_batch_tex_destroys( "gl_batch_tex_destroys", "0" );
 // g_nTotalDrawsOrClears is reset to 0 in Present()
 uint g_nTotalDrawsOrClears, g_nTotalVBLockBytes, g_nTotalIBLockBytes;
 
-#if GL_TELEMETRY_GPU_ZONES
-TelemetryGPUStats_t g_TelemetryGPUStats;
-#endif
-
 const int kGLMInitialTexCount = 4096;
 const int kGLMReUpTexCount = 1024;
 const int kGLMHighWaterUndeleted = 2048;
@@ -766,10 +762,6 @@ void GLMContext::DelTex( CGLMTex * tex )
 
 void GLMContext::ProcessTextureDeletes()
 {
-#if GL_TELEMETRY_GPU_ZONES
-	CScopedGLMPIXEvent glmEvent( "GLMContext::ProcessTextureDeletes" );
-#endif
-
 	CGLMTex* tex = nullptr;
 	while ( m_DeleteTextureQueue.PopItem( &tex ) )
 	{
@@ -901,11 +893,6 @@ void GLMContext::RestoreSavedColorMask()
 
 void GLMContext::Blit2( CGLMTex *srcTex, GLMRect *srcRect, int srcFace, int srcMip, CGLMTex *dstTex, GLMRect *dstRect, int dstFace, int dstMip, uint filter )
 {
-#if GL_TELEMETRY_GPU_ZONES
-	CScopedGLMPIXEvent glmPIXEvent( "Blit2" );
-	g_TelemetryGPUStats.m_nTotalBlit2++;
-#endif
-	
 	SaveColorMaskAndSetToDefault();
 	
 	Assert( srcFace == 0 );
@@ -1467,11 +1454,6 @@ void GLMContext::BlitTex( CGLMTex *srcTex, GLMRect *srcRect, int srcFace, int sr
 
 void GLMContext::ResolveTex( CGLMTex *tex, bool forceDirty )
 {
-#if GL_TELEMETRY_GPU_ZONES
-	CScopedGLMPIXEvent glmPIXEvent( "ResolveTex" );
-	g_TelemetryGPUStats.m_nTotalResolveTex++;
-#endif
-
 	// only run resolve if it's (a) possible and (b) dirty or force-dirtied
 	if ( ( tex->m_rboName ) && ( tex->IsRBODirty() || forceDirty ) )
 	{
@@ -2202,11 +2184,6 @@ void GLMContext::Present( CGLMTex *tex )
 	GLM_FUNC;
 	
 	{
-#if GL_TELEMETRY_GPU_ZONES
-		CScopedGLMPIXEvent glmPIXEvent( "GLMContext::Present" );
-		g_TelemetryGPUStats.m_nTotalPresent++;
-#endif
-
 		ProcessTextureDeletes();
 
 		bool newRefreshMode = false;

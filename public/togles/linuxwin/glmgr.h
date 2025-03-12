@@ -74,21 +74,6 @@ extern void GLMDebugPrintf( const char *pMsg, ... );
 
 extern uint g_nTotalDrawsOrClears, g_nTotalVBLockBytes, g_nTotalIBLockBytes;
 
-#if GL_TELEMETRY_GPU_ZONES
-struct TelemetryGPUStats_t
-{
-	uint m_nTotalBufferLocksAndUnlocks;
-	uint m_nTotalTexLocksAndUnlocks;
-	uint m_nTotalBlit2;
-	uint m_nTotalResolveTex;
-	uint m_nTotalPresent;
-
-	inline void Clear() { memset( this, 0, sizeof( *this ) ); }
-	inline uint GetTotal() const { return m_nTotalBufferLocksAndUnlocks + m_nTotalTexLocksAndUnlocks + m_nTotalBlit2 + m_nTotalResolveTex + m_nTotalPresent; }
-};
-extern TelemetryGPUStats_t g_TelemetryGPUStats;
-#endif
-
 struct GLMRect;
 typedef void *PseudoGLContextPtr;
 

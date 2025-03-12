@@ -1135,10 +1135,6 @@ netpacket_t *CDemoPlayer::ReadPacket( void )
 		{
 			int playbacktick = GetPlaybackTick();
 
-#if defined( RAD_TELEMETRY_ENABLED )
-			g_Telemetry.playbacktick = playbacktick;
-#endif
-
 			// If the end tick is set, check to see if we should bail
 			if ( m_nEndTick > 0 && playbacktick >= m_nEndTick )
 			{

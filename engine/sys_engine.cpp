@@ -288,13 +288,10 @@ bool CEngine::FilterTime( float dt )
 void CEngine::Frame( void )
 {
 	// yield the CPU for a little while when paused, minimized, or not the focus
-	// FIXME:  Move this to main windows message pump?
+	// FIXME: Move this to main windows message pump?
 	if ( IsPC() && !game->IsActiveApp() && !sv.IsDedicated() && engine_no_focus_sleep.GetInt() > 0 )
 	{
-#if defined( RAD_TELEMETRY_ENABLED )
-		if( !g_Telemetry.Level )
-#endif
-			g_pInputSystem->SleepUntilInput( engine_no_focus_sleep.GetInt() );
+		g_pInputSystem->SleepUntilInput( engine_no_focus_sleep.GetInt() );
 	}
 
 	if ( m_flPreviousTime == 0 )
@@ -309,7 +306,7 @@ void CEngine::Frame( void )
 	if ( frequency.m_timeStamp > s_lastFrequencyTimestamp )
 	{
 		s_lastFrequencyTimestamp = frequency.m_timeStamp;
-		Msg( "~CPU Freq: %1.3f GHz    Percent of requested: %3.1f%%    Minimum percent seen: %3.1f%%\n",
+		Msg( "\nApproximate CPU Frequency: %1.3f GHz\nPercentage of requested: %3.1f%%\nMinimum percentage seen: %3.1f%%\n\n",
 					frequency.m_GHz, frequency.m_percentage, frequency.m_lowestPercentage );
 	}
 

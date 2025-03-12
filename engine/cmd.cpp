@@ -204,12 +204,6 @@ CON_COMMAND( BindToggle, "Performs a bind <key> \"increment var <cvar> 0 1 1\"" 
 	Cbuf_InsertText( newCmd );
 }
 
-CON_COMMAND_F( PerfMark, "inserts a telemetry marker into the stream. If args are provided, they will be included.", FCVAR_NONE )
-{
-	// Nothing to do, we had our message written out by Cbuf_ExecuteCommand. 
-}
-
-
 //-----------------------------------------------------------------------------
 // Init, shutdown
 //-----------------------------------------------------------------------------
@@ -364,9 +358,7 @@ bool Cbuf_HasRoomForExecutionMarkers( int cExecutionMarkers )
 // Executes commands in the buffer
 //-----------------------------------------------------------------------------
 static void Cbuf_ExecuteCommand( const CCommand &args, cmd_source_t source )
-{
-	// Note: If you remove this, PerfMark needs to do the same logic--so don't do that.
-	// tmMessage( TELEMETRY_LEVEL0, TMMF_SEVERITY_LOG | TMMF_ICON_NOTE, "(source/command) %s", tmDynamicString( TELEMETRY_LEVEL0, args.GetCommandString() ) );
+{       // Secton: but i removed it.
 	// Add the command text to the ETW stream to give better context to traces.
 	ETWMark( args.GetCommandString() );
 

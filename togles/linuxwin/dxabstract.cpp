@@ -2486,11 +2486,7 @@ HRESULT	IDirect3DDevice9::Create( IDirect3DDevice9Params *params )
 	// so GetClientRect can return sane answers
 	//uint width, height;		
 	RenderedSize( m_params.m_presentationParameters.BackBufferWidth, m_params.m_presentationParameters.BackBufferHeight, true );	// true = set
-			
-#if GL_TELEMETRY_GPU_ZONES
-	g_TelemetryGPUStats.Clear();
-#endif
-
+	
 	GL_BATCH_PERF( 
 		g_nTotalD3DCalls = 0, g_nTotalD3DCycles = 0, m_nBatchVisY = 0, m_nBatchVisFrameIndex = 0, m_nBatchVisFileIdx = 0, m_nNumProgramChanges = 0, m_flTotalD3DTime = 0, m_nTotalD3DCalls = 0, 
 		m_flTotalD3DTime = 0, m_nTotalGLCalls = 0, m_flTotalGLTime = 0, m_nOverallDraws = 0, m_nOverallPrims = 0, m_nOverallD3DCalls = 0, m_flOverallD3DTime = 0, m_nOverallGLCalls = 0, m_flOverallGLTime = 0, m_nOverallProgramChanges = 0, 
@@ -3066,11 +3062,6 @@ HRESULT IDirect3DDevice9::Present(CONST RECT* pSourceRect,CONST RECT* pDestRect,
 #endif
 
 	g_nTotalDrawsOrClears = 0;
-				
-#if GL_TELEMETRY_GPU_ZONES
-	g_TelemetryGPUStats.Clear();
-#endif
-
 	return S_OK;
 }
 

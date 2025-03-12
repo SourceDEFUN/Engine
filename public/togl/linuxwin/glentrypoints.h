@@ -164,7 +164,7 @@ public:
 	FunctionType Pointer() const { return m_pFn; }
 
 #if GL_USE_EXECUTE_HELPER_FOR_ALL_API_CALLS
-	#if GL_TELEMETRY_ZONES || GL_DUMP_ALL_API_CALLS
+	#if GL_DUMP_ALL_API_CALLS
 		#define GL_FUNC_NAME m_szName
 	#else
 		#define GL_FUNC_NAME ""
@@ -213,12 +213,7 @@ public:
 protected:
 	FunctionType m_pFn;
 
-#if GL_TELEMETRY_ZONES || GL_DUMP_ALL_API_CALLS
-	char m_szName[32];
-	inline void SetFuncName(const char *pFn) { V_strncpy( m_szName, pFn, sizeof( m_szName ) ); }
-#else
 	inline void SetFuncName(const char *pFn) { (void)pFn; }
-#endif
 };
 
 // This works a lot like CDynamicFunctionMustInit, but we use SDL_GL_GetProcAddress().
@@ -375,8 +370,7 @@ inline void CGLExecuteHelperBase::StopCall(const char *pName)
 	uint64 nTotalCycles = tmFastTime() - m_nStartTime;
 #endif
 
-#if GL_TRACK_API_TIME	
-	//double flMilliseconds = g_Telemetry.flRDTSCToMilliSeconds * nTotalCycles;
+#if GL_TRACK_API_TIME
 	if (gGL) 
 	{ 
 		gGL->m_nTotalGLCycles += nTotalCycles;

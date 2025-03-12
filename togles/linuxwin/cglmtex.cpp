@@ -3790,11 +3790,6 @@ void CGLMTex::WriteTexels( GLMTexLockDesc *desc, bool writeWholeSlice, bool noDa
 
 void CGLMTex::Lock( GLMTexLockParams *params, char** addressOut, int* yStrideOut, int *zStrideOut )
 {
-#if GL_TELEMETRY_GPU_ZONES
-	CScopedGLMPIXEvent glmPIXEvent( "CGLMTex::Lock" );
-	g_TelemetryGPUStats.m_nTotalTexLocksAndUnlocks++;
-#endif
-
 	// locate appropriate slice in layout record
 	int sliceIndex = CalcSliceIndex( params->m_face, params->m_mip );
 	
@@ -3962,11 +3957,6 @@ void CGLMTex::Lock( GLMTexLockParams *params, char** addressOut, int* yStrideOut
 
 void CGLMTex::Unlock( GLMTexLockParams *params )
 {
-#if GL_TELEMETRY_GPU_ZONES
-	CScopedGLMPIXEvent glmPIXEvent( "CGLMTex::Unlock" );
-	g_TelemetryGPUStats.m_nTotalTexLocksAndUnlocks++;
-#endif
-
 	// look for an active lock request on this face and mip (doesn't necessarily matter which one, if more than one)
 	// and mark it inactive.
 	// --> if you can't find one, fail. first line of defense against mismatched locks/unlocks..

@@ -3495,19 +3495,6 @@ bool CMaterialSystem::IsInFrame( ) const
 	return m_bInFrame;
 }
 
-#ifdef RAD_TELEMETRY_ENABLED
-static const char *GetMatString( enum MaterialThreadMode_t ThreadMode )
-{
-	switch( ThreadMode )
-	{
-	case MATERIAL_SINGLE_THREADED:			return "single";
-	case MATERIAL_QUEUED_SINGLE_THREADED:	return "queued_single";
-	case MATERIAL_QUEUED_THREADED:			return "queued_threaded";
-	default:								return "???";
-	}
-}
-#endif
-
 ConVar mat_queue_mode( "mat_queue_mode", "-1", FCVAR_ARCHIVE, "The queue/thread mode the material system should use: -1=default, 0=synchronous single thread"
 #ifdef MAT_QUEUE_MODE_PROFILE
 	", 1=queued single thread"

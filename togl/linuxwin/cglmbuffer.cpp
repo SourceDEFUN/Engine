@@ -663,11 +663,6 @@ void CGLMBuffer::FlushRange( uint offset, uint size )
 
 void CGLMBuffer::Lock( GLMBuffLockParams *pParams, char **pAddressOut )
 {
-#if GL_TELEMETRY_GPU_ZONES
-	CScopedGLMPIXEvent glmPIXEvent( "CGLMBuffer::Lock" );
-	g_TelemetryGPUStats.m_nTotalBufferLocksAndUnlocks++;
-#endif
-
 	char *resultPtr = NULL;
 	
 	if ( m_bMapped )
@@ -959,11 +954,6 @@ void CGLMBuffer::Lock( GLMBuffLockParams *pParams, char **pAddressOut )
 
 void CGLMBuffer::Unlock( int nActualSize, const void *pActualData )
 {
-#if GL_TELEMETRY_GPU_ZONES
-	CScopedGLMPIXEvent glmPIXEvent( "CGLMBuffer::Unlock" );
-	g_TelemetryGPUStats.m_nTotalBufferLocksAndUnlocks++;
-#endif
-
 	m_pCtx->CheckCurrent();
 	
 	if ( !m_bMapped )

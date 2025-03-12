@@ -83,25 +83,13 @@
 // GL_ENABLE_UNLOCK_BUFFER_OVERWRITE_DETECTION (currently win32 only) - If 1, VirtualAlloc/VirtualProtect is used to detect cases where the app locks a buffer, copies the ptr away, unlocks, then tries to later write to the buffer.
 #define GL_ENABLE_UNLOCK_BUFFER_OVERWRITE_DETECTION 0
 
-#define GL_BATCH_TELEMETRY_ZONES 0
-
-// GL_BATCH_PERF_ANALYSIS - Enables gl_batch_vis, and various per-batch telemetry statistics messages. 
-#define GL_BATCH_PERF_ANALYSIS 0
-#define GL_BATCH_PERF_ANALYSIS_WRITE_PNGS 0
-
-// GL_TELEMETRY_ZONES - Causes every single OpenGL call to generate a telemetry event
-#define GL_TELEMETRY_ZONES 0
-
 // GL_DUMP_ALL_API_CALLS - Causes a debug message to be printed for every API call if s_bDumpCalls bool is set to 1
 #define GL_DUMP_ALL_API_CALLS 0
-
-// Must also enable PIX_ENABLE to use GL_TELEMETRY_GPU_ZONES.
-#define GL_TELEMETRY_GPU_ZONES 0
 
 // Records global # of OpenGL calls/total cycles spent inside GL
 #define GL_TRACK_API_TIME GL_BATCH_PERF_ANALYSIS
 
-#define GL_USE_EXECUTE_HELPER_FOR_ALL_API_CALLS ( GL_TELEMETRY_ZONES || GL_TRACK_API_TIME || GL_DUMP_ALL_API_CALLS )
+#define GL_USE_EXECUTE_HELPER_FOR_ALL_API_CALLS ( GL_TRACK_API_TIME || GL_DUMP_ALL_API_CALLS )
 
 #if GL_BATCH_PERF_ANALYSIS
 	#define GL_BATCH_PERF(...) __VA_ARGS__
