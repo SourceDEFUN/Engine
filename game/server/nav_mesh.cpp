@@ -82,7 +82,7 @@ CNavMesh::~CNavMesh()
 	if (m_spawnName)
 		delete [] m_spawnName;
 
- // !!!!bug!!! why does this crash in linux on server exit
+ // FIXME: This crashes on Linux on server exit
 	for( unsigned int i=0; i<m_placeCount; ++i )
 	{
 		delete [] m_placeName[i];

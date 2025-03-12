@@ -55,6 +55,10 @@ static VMatrix s_matIdentity( 1.0f, 0.0f, 0.0f, 0.0f,
 static int g_iPolyhedronDumpCounter = 0;
 #endif
 
+#ifndef WIN32
+#include <filesystem>
+#endif
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -64,7 +68,7 @@ void CreateDumpDirectory( const char *szDirectoryName )
 #if defined( WIN32 )
 	CreateDirectory( szDirectoryName, NULL );
 #else
-	Assert( false ); //TODO: create directories in linux
+	std::filesystem::create_directories(subfolder);
 #endif
 }
 #endif

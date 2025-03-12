@@ -5,7 +5,7 @@ dependencies=$2
 objectFilesDir=$3
 
 if [ "$inputModule" == "" -o "$dependencies" == "" -o "$objectFilesDir" == "" ]; then
-	echo "First arg is the module to search. Second arg is dependencies. Third is object files dir."
+	echo "Usage: missingsymbols.sh [module to search] [dependencies] [object files dir]"
 	echo "ex: missingsymbols server_tf_i486.so \"tier0_i486.so vstdlib_i486.so\" ~/linux/src/engine/obj"
 	exit
 fi
