@@ -197,7 +197,11 @@ IZip				*GetPakFile( void );
 IZip				*GetSwapPakFile( void );
 void				ClearPakFile( IZip *pak );
 void				AddFileToPak( IZip *pak, const char *pRelativeName, const char *fullpath, IZip::eCompressionType compressionType = IZip::eCompressionType_None );
-void				AddBufferToPak( IZip *pak, const char *pRelativeName, void *data, int length, bool bTextMode, IZip::eCompressionType compressionType = IZip::eCompressionType_None );
+#ifdef LINUX
+void				AddBufferToPak( IZip *pak, const char *pRelativeName, const char *data, int length, bool bTextMode, IZip::eCompressionType compressionType = IZip::eCompressionType_None );
+#else
+void				AddBufferToPak( IZip *pak, const char *pRelativeName, void       *data, int length, bool bTextMode, IZip::eCompressionType compressionType = IZip::eCompressionType_None );
+#endif
 void				AddDirToPak( IZip *pak, const char *pDirPath, const char *pPakPrefix = NULL );
 bool				FileExistsInPak( IZip *pak, const char *pRelativeName );
 bool				ReadFileFromPak( IZip *pak, const char *pRelativeName, bool bTextMode, CUtlBuffer &buf );

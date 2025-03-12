@@ -844,7 +844,11 @@ void AddFileToPak( IZip *pak, const char *relativename, const char *fullpath, IZ
 //			*data - 
 //			length - 
 //-----------------------------------------------------------------------------
-void AddBufferToPak( IZip *pak, const char *pRelativeName, void *data, int length, bool bTextMode, IZip::eCompressionType compressionType )
+#ifdef LINUX
+void AddBufferToPak( IZip *pak, const char *pRelativeName, const char *data, int length, bool bTextMode, IZip::eCompressionType compressionType )
+#else
+void AddBufferToPak( IZip *pak, const char *pRelativeName, void       *data, int length, bool bTextMode, IZip::eCompressionType compressionType )
+#endif
 {
 	pak->AddBufferToZip( pRelativeName, data, length, bTextMode, compressionType );
 }

@@ -79,6 +79,10 @@ int g_nBlockSize = 4096;
 #define BLOCKS_MIN		(-(BLOCKS_SPACE/2))
 #define BLOCKS_MAX		((BLOCKS_SPACE/2)-1)
 
+#ifdef POSIX
+#define BLOCKS_ARRAY_WIDTH g_nBlockSize
+#endif
+
 int			block_xl = BLOCKS_MIN, block_xh = BLOCKS_MAX, block_yl = BLOCKS_MIN, block_yh = BLOCKS_MAX;
 
 int			entity_num;

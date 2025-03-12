@@ -9,29 +9,28 @@ This project is using waf buildsystem. If you have waf-related questions look ht
 
 # Features
 ## Inherited
-- Android, OSX, FreeBSD, Windows, Linux( glibc, musl ) support
-- Arm support( except windows )
+- Android, macOS, FreeBSD, Windows, Linux (glibc, musl) support
+- ARM support (except windows)
 - 64bit support
-- Modern toolchains support
-- Fixed many undefined behaviours
-- Touch support( even on windows/linux/osx )
+- Partial support of modern toolchains
+- Fixed many undefined behaviors
+- Touchscreen support (even on windows/linux/osx)
 - VTF 7.5 support
-- PBR support
-- bsp v19-v21 support( bsp v21 support is partial, portal 2 and csgo maps works fine )
-- mdl v46-49 support
+- PBR materials
+- BSP v19-20 with partial v21 support.
+- MDL v46-49 support
 - Removed useless/unnecessary dependencies
-- Achivement system working without steam
+- Achivements work without Steam
 - Fixed many bugs
-- Serverbrowser works without steam
+- Server Browser now works without Steam
 ## defun
 - [X] SDL3 support (located in SDL3-attempt branch) ([Input partially works](https://gitlab.com/defun/engine/-/issues/1))
 - [X] Fresh viewmodel bob
 - [X] Increase map size limits
-- [ ] Get rid of useless stuff like telemetry
+- [ ] Get rid of useless stuff like telemetry (Partially done now)
 - [ ] Replace proprietary code with open source solutions
-- [ ] Deferred lighting/shading
-- [ ] PBR Materials
-- [ ] Port some utilities to Linux and get them interface!
+- [ ] Deferred lighting/shading (First attempt did not compile successfully, need to try again later)
+- [ ] Port some utilities to Linux and get them interface! (Might not be easy as i thought)
 ## ooh... Good luck with that!
 take the following with grain of salt, as some of those might never get realized.
 - [ ] Replace VGUI2 with RmlUI/Custom GUI
@@ -55,7 +54,7 @@ Install `git python gcc gcc-multilib sdl3 freetype2 fontconfig zlib bzip2 libjpe
 ### Compile and run
 1. Execute `./waf.py configure -T release/debug` (choose one of the release or debug!). In case of errors inspect what went wrong and try to solve it.
 2. After configuration is done successfully, run `./waf.py build` and wait for it to compile and link. In case of errors, you can try:
-   * Revert latest commit
+   * Reverting to the previous commit
    * Wait for the next one, or...
    * Grab a stable source code release from "Releases", when available.
 3. We will now proceed to put them in a structure similar to all of the Source Engine games. Write in terminal `./waf.py install --destdir=` and then write the path of where you want it to be. Put path around quotes in case it has spaces.
