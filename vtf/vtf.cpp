@@ -428,7 +428,7 @@ bool CVTFTexture::Init( int nWidth, int nHeight, int nDepth, ImageFormat fmt, in
 	{
 		if ( !IsMultipleOf4( nWidth ) || !IsMultipleOf4( nHeight ) || !IsMultipleOf4( nDepth ) )
 		{
-			Warning( "Image dimensions must be multiple of 4!\n" );
+			Warning( "Image dimensions must be multiple of 4!\nHint: Do not use DXT compression.\n" );
 			return false;
 		}
 	}

@@ -577,7 +577,7 @@ def configure(conf):
 	if conf.env.DEST_OS != 'win32':
 		cxxflags += ['-std=c++11','-fpermissive']
 
-	if conf.env.COMPILER_CC == 'gcc':
+	if conf.env.COMPILER_CC == 'gcc': # TODO: Convert to match case! Too lazy to do this for now.
 		conf.define('COMPILER_GCC', 1)
 	elif conf.env.COMPILER_CC == 'msvc':
 		conf.define('COMPILER_MSVC', 1)
@@ -586,6 +586,8 @@ def configure(conf):
 			conf.define('COMPILER_MSVC32', 1)
 		elif conf.env.DEST_CPU in ['x86_64', 'amd64']:
 			conf.define('COMPILER_MSVC64', 1)
+	if conf.env.COMPILER_CXX == 'clang++':
+	    conf.env.append_unique('CFLAGS', "-Qunused-command-line-argument")
 
 	if conf.env.COMPILER_CC != 'msvc':
 		conf.check_cc(cflags=cflags, linkflags=linkflags, msg='Checking for required C flags')
