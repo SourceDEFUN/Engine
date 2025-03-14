@@ -200,7 +200,6 @@ def define_platform(conf):
 		conf.env.append_unique('DEFINES', [
 			'DX_TO_GL_ABSTRACTION',
 			'GL_GLEXT_PROTOTYPES',
-			'BINK_VIDEO'
 		])
 
 	if conf.options.TOGLES:

@@ -14,3 +14,5 @@
 * Removed most of the telemetry (remainders left in `/togl*/glmgrbasics.cpp`)
 * /public/mathlib/polyhedron.cpp: CreateDumpDirectory now supports Linux
 * Added .sh format for scripts in /linux/
+### 13
+* Removed Bink

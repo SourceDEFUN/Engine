@@ -97,8 +97,7 @@ namespace VideoSystem
 		DETERMINE_FROM_FILE_EXTENSION = -1,
 		NONE = 0,
 		
-		BINK,
-		AVI,
+		AVI = 2,
 		WMV,
 		QUICKTIME,
 		WEBM,

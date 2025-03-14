@@ -20,12 +20,6 @@ aftershock_vs20.fxc
 
 appchooser360movie_ps2x.fxc
 
-bik_ps11.psh
-bik_ps14.psh
-bik_ps2x.fxc
-bik_vs11.vsh
-bik_vs20.fxc
-
 Bloom_ps2x.fxc
 
 bloomadd_ps11.fxc

@@ -155,10 +155,6 @@
 #define SUPPORT_PACKED_STORE
 #endif
 
-#if defined( BINK_VIDEO ) && ( defined( _X360 ) || defined( _PS3 ) )
-#define BINK_ENABLED_FOR_CONSOLE
-#endif
-
 #if !defined( PORTAL2 )
 //#define PORTAL2
 #endif

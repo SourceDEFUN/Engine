@@ -3916,7 +3916,7 @@ model_t	*CModelLoader::LoadModel( model_t *mod, REFERENCETYPE *pReferencetype )
 //-----------------------------------------------------------------------------
 // Purpose: Creates the name of the sprite
 //-----------------------------------------------------------------------------
-//static void BuildSpriteLoadName( const char *pName, char *pOut, int outLen, bool &bIsAVI, bool &bIsBIK )
+//static void BuildSpriteLoadName( const char *pName, char *pOut, int outLen )
 static void BuildSpriteLoadName( const char *pName, char *pOut, int outLen, bool &bIsVideo )
 {
 	// If it's a .vmt and they put a path in there, then use the path.

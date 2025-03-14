@@ -13,7 +13,6 @@
 #ifdef _WIN32
 #pragma once
 #endif
-
   
 #include "appframework/IAppSystem.h"
 
@@ -142,10 +141,10 @@ public:
 	// Update the frame (if necessary)
 	virtual bool Update( QUICKTIMEMaterial_t hMaterial ) = 0;
 
-	// Gets the IMaterial associated with an BINK material
+	// Gets the IMaterial associated with an Quicktime material
 	virtual IMaterial* GetMaterial( QUICKTIMEMaterial_t hMaterial ) = 0;
 
-	// Returns the max texture coordinate of the BINK
+	// Returns the max texture coordinate of the Quicktime
 	virtual void GetTexCoordRange( QUICKTIMEMaterial_t hMaterial, float *pMaxU, float *pMaxV ) = 0;
 
 	// Returns the frame size of the QUICKTIME Image Frame (stored in a subrect of the material itself)
@@ -154,10 +153,10 @@ public:
 	// Returns the frame rate of the QUICKTIME
 	virtual int GetFrameRate( QUICKTIMEMaterial_t hMaterial ) = 0;
 
-	// Sets the frame for an BINK material (use instead of SetTime)
+	// Sets the frame for an quicktime material (use instead of SetTime)
 	virtual void SetFrame( QUICKTIMEMaterial_t hMaterial, float flFrame ) = 0;
 
-	// Returns the total frame count of the BINK
+	// Returns the total frame count of the quicktime
 	virtual int GetFrameCount( QUICKTIMEMaterial_t hMaterial ) = 0;
 
 	virtual bool SetSoundDevice( void *pDevice ) = 0;

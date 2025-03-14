@@ -14,7 +14,6 @@
 #include <vgui_controls/EditablePanel.h>
 
 //#define QUICKTIME_VIDEO
-//#define BINK_VIDEO
 
 #include "video/ivideoservices.h"
 

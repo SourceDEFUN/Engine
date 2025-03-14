@@ -24,7 +24,6 @@ def build(bld):
 		'AccumBuff4Sample.cpp',
 		'accumbuff5sample.cpp',
 		'BaseVSShader.cpp',
-		'bik_dx90.cpp',
 		'Bloom.cpp',
 		'BlurFilterX.cpp',
 		'BlurFilterY.cpp',
