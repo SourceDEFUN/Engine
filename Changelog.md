@@ -16,3 +16,5 @@
 * Added .sh format for scripts in /linux/
 ### 13
 * Removed Bink
+### 14
+* Updated prop_sphere (Will need FGD update!)
