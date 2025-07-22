@@ -7,7 +7,11 @@
 #ifndef _RUNCOMMANDS_H
 #define _RUNCOMMANDS_H
 
+#ifndef LINUX
 #include <afxtempl.h>
+#else
+#include "Ports/windef.h"
+#endif
 
 //
 // RunCommands functions

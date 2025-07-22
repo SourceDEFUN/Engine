@@ -1229,7 +1229,7 @@ DLL_EXPORT int LauncherMain( int argc, char **argv )
 #ifdef USE_SDL
 	SDL_version ver;
 	SDL_GetVersion( &ver );
-	Msg("SDL version: %d.%d.%d rev: %s\n", (int)ver.major, (int)ver.minor, (int)ver.patch, SDL_GetRevision());
+	Msg("SDL version %d.%d.%d revision %s\n", (int)ver.major, (int)ver.minor, (int)ver.patch, SDL_GetRevision());
 #endif
 
 #if (defined LINUX || defined PLATFORM_BSD) && defined USE_SDL && defined TOGLES && !defined ANDROID

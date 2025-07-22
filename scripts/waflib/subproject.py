@@ -31,26 +31,26 @@ def opt(f):
 	setattr(Options.OptionsContext, f.__name__, f)
 	return f
 
-def get_waifulib_by_path(path):
+def get_waflib_by_path(path):
 	if not os.path.isabs(path):
 		path = os.path.abspath(path)
 	
-	waifulib = os.path.join(path, 'scripts', 'waifulib')
-	if os.path.isdir(waifulib):
-		return waifulib
+	waflib = os.path.join(path, 'scripts', 'waflib')
+	if os.path.isdir(waflib):
+		return waflib
 	return None
 
-def check_and_add_waifulib(path):
-	waifulib = get_waifulib_by_path(path)
+def check_and_add_waflib(path):
+	waflib = get_waflib_by_path(path)
 	
-	if waifulib:
-		sys.path.insert(0, waifulib)
+	if waflib:
+		sys.path.insert(0, waflib)
 
-def remove_waifulib(path):
-	waifulib = get_waifulib_by_path(path)
+def remove_waflib(path):
+	waflib = get_waflib_by_path(path)
 	
-	if waifulib:
-		sys.path.remove(waifulib)
+	if waflib:
+		sys.path.remove(waflib)
 
 @opt
 def add_subproject(ctx, names):
@@ -69,9 +69,9 @@ def add_subproject(ctx, names):
 			# so this just becomes more noticeable
 			ctx.add_option_group('Cannot find wscript in ' + wscript_path + '. You probably missed submodule update')
 		else:
-			check_and_add_waifulib(wscript_dir)
+			check_and_add_waflib(wscript_dir)
 			ctx.recurse(name)
-			remove_waifulib(wscript_dir)
+			remove_waflib(wscript_dir)
 
 def options(opt):
 	grp = opt.add_option_group('Subproject options')
@@ -137,9 +137,9 @@ def add_subproject(ctx, dirs, prepend = None):
 			ctx.env.SUBPROJECT_PATH = list(subprj_path)
 			
 			ctx.msg(msg='--> %s' % '/'.join(subprj_path), result='in progress', color='BLUE')
-			check_and_add_waifulib(os.path.join(ctx.path.abspath(), prj))
+			check_and_add_waflib(os.path.join(ctx.path.abspath(), prj))
 			ctx.recurse(prj)
-			remove_waifulib(os.path.join(ctx.path.abspath(), prj))
+			remove_waflib(os.path.join(ctx.path.abspath(), prj))
 			ctx.msg(msg='<-- %s' % '/'.join(subprj_path), result='done', color='BLUE')
 			
 			ctx.setenv('') # save env changes
@@ -168,7 +168,7 @@ def add_subproject(ctx, dirs, prepend = None):
 			except:
 				ctx.fatal('Can\'t find env cache %s' % '_'.join(subprj_path))
 			
-			check_and_add_waifulib(os.path.join(ctx.path.abspath(), prj))
+			check_and_add_waflib(os.path.join(ctx.path.abspath(), prj))
 			ctx.recurse(prj)
-			remove_waifulib(os.path.join(ctx.path.abspath(), prj))
+			remove_waflib(os.path.join(ctx.path.abspath(), prj))
 			ctx.env = saveenv

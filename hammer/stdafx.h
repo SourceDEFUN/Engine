@@ -10,8 +10,10 @@
 //      are changed infrequently
 //
 
-#if !defined(AFX_STDAFX_H__2871A74F_7D2F_4026_9DB0_DBACAFB3B7F5__INCLUDED_)
+#ifndef AFX_STDAFX_H__2871A74F_7D2F_4026_9DB0_DBACAFB3B7F5__INCLUDED_
 #define AFX_STDAFX_H__2871A74F_7D2F_4026_9DB0_DBACAFB3B7F5__INCLUDED_
+
+#ifndef LINUX
 
 #if _MSC_VER > 1000
 #pragma once
@@ -63,9 +65,9 @@
 
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.
+#else // From windows to Linux
+#include "Ports/windef.h"
+#include "Ports/winuser.h"
+#endif
 
 #endif // !defined(AFX_STDAFX_H__2871A74F_7D2F_4026_9DB0_DBACAFB3B7F5__INCLUDED_)
-
-
-
-

@@ -164,9 +164,9 @@ sys.path.insert(0, wafdir)
 
 if __name__ == '__main__':
 	from waflib import Context
-	Context.WAFNAME='waifu'
-	Context.WAIFUVERSION='1.1.0'
-	sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'scripts', 'waifulib'))
+	Context.WAFNAME='WAF'
+	Context.WAFVERSION='2.0.26'
+	sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'scripts', 'waflib'))
 	from waflib import Scripting
 	Scripting.waf_entry_point(cwd, VERSION, wafdir)
 

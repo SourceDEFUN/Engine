@@ -4,10 +4,18 @@
 //
 //===========================================================================//
 
+#ifndef LINUX
 #include <windows.h>
 #include <eh.h>
+#else
+#include <wine/msvcrt/eh.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string>
+#include "../hammer/Ports/winuser.h"
+#endif
 #include "appframework/AppFramework.h"
-#include "ihammer.h"
+#include "IHammer.h"
 #include "tier0/dbg.h"
 #include "vstdlib/cvar.h"
 #include "filesystem.h"
@@ -17,7 +25,7 @@
 #include "datacache/idatacache.h"
 #include "datacache/imdlcache.h"
 #include "vphysics_interface.h"
-#include "vgui/ivgui.h"
+#include "vgui/IVGui.h"
 #include "vgui/ISurface.h"
 #include "inputsystem/iinputsystem.h"
 #include "tier0/icommandline.h"

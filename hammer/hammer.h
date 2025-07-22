@@ -16,7 +16,7 @@
 #endif
 
 #include "resource.h"       // main symbols
-#include "RunCommands.h"
+#include "runcommands.h"
 #include "IHammer.h"
 #include "tier1/utlmap.h"
 #include "tier3/tier3dm.h"
@@ -61,14 +61,14 @@ class CCommandSequence
 class CHammerDocTemplate : public CMultiDocTemplate
 {
 public:
-	CHammerDocTemplate( UINT nIDResource, CRuntimeClass* pDocClass, CRuntimeClass* pFrameClass, CRuntimeClass* pViewClass ) :
+	CHammerDocTemplate( uint nIDResource, CRuntimeClass* pDocClass, CRuntimeClass* pFrameClass, CRuntimeClass* pViewClass ) :
 	  CMultiDocTemplate( nIDResource, pDocClass, pFrameClass, pViewClass )
 	  {
 	  }
 
-	  virtual	CDocument	*OpenDocumentFile( LPCTSTR lpszPathName, BOOL bMakeVisible = TRUE );
-	  virtual	void		CloseAllDocuments( BOOL bEndSession );
-	  virtual	void		InitialUpdateFrame( CFrameWnd* pFrame, CDocument* pDoc, BOOL bMakeVisible = TRUE );
+	  virtual	CDocument	*OpenDocumentFile( LPCTSTR lpszPathName, bool bMakeVisible = true );
+	  virtual	void		CloseAllDocuments( bool bEndSession );
+	  virtual	void		InitialUpdateFrame( CFrameWnd* pFrame, CDocument* pDoc, bool bMakeVisible = true );
 				void		UpdateInstanceMap( CMapDoc *pInstanceMapDoc );
 };
 
@@ -112,10 +112,10 @@ public:
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CHammer)
 	public:
-	virtual BOOL InitInstance();
+	virtual bool InitInstance();
 	virtual int ExitInstance();
 	virtual CDocument* OpenDocumentFile(LPCTSTR lpszFileName);
-	virtual BOOL OnIdle(LONG lCount);
+	virtual bool OnIdle(long lCount);
 	virtual int Run(void);
 	//}}AFX_VIRTUAL
 
@@ -145,7 +145,7 @@ public:
 	CGameConfig *PromptForGameConfig();
 
 	void OpenURL(const char *pszURL, HWND hwnd);
-	void OpenURL(UINT nID, HWND hwnd);
+	void OpenURL(uint nID, HWND hwnd);
 	// list of "command arrays" for compiling files:
 	CTypedPtrArray<CPtrArray,CCommandSequence*> m_CmdSequences;
 	void SaveSequences();

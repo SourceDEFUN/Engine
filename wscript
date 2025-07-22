@@ -8,7 +8,7 @@ import sys
 import os
 
 VERSION = '1.0'
-APPNAME = 'source-engine'
+APPNAME = 'SourceDEFUN'
 top = '.'
 
 FT2_CHECK='''extern "C" {
@@ -187,7 +187,7 @@ def define_platform(conf):
 	arch64 = conf.run_test(CPP_64BIT_CHECK, 'Testing 64bit support')
 
 	if not (arch32 ^ arch64):
-		conf.fatal('Your compiler sucks')
+		conf.fatal('Your compiler does not pass 32bit and 64bit tests!')
 
 	if conf.options.DEDICATED:
 		conf.options.SDL = False
@@ -259,7 +259,7 @@ def define_platform(conf):
 		])
 
 	elif conf.env.DEST_OS in ['freebsd', 'openbsd', 'netbsd', 'dragonflybsd']: # Tested only in freebsd
-		conf.env.append_unique('DEFINES', [
+		conf.env.append_unique('DEFINES', [                                    # Secton: well then, TODO: Test on other BSDs!
 			'POSIX=1', '_POSIX=1', 'PLATFORM_POSIX=1',
 			'GNUC', # but uses clang
 			'PLATFORM_BSD=1',

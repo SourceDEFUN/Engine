@@ -1,5 +1,5 @@
 # encoding: utf-8
-# fwgslib.py -- utils for Waifu build system(Waf with extensions) by FWGS
+# fwgslib.py -- utils for Waf with extensions by FWGS
 # Copyright (C) 2018 a1batross, Michel Mooij (michel.mooij
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
