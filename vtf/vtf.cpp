@@ -100,7 +100,7 @@ BEGIN_BYTESWAP_DATADESC_( VTFFileHeaderX360_t, VTFFileBaseHeader_t )
 	DEFINE_FIELD( compressedSize, FIELD_INTEGER ),
 END_DATADESC()
 
-#if defined( POSIX ) || defined( _X360 )
+#if defined( POSIX )
 // stub functions
 const char* S3TC_GetBlock(
         const void *pCompressed,
@@ -310,10 +310,6 @@ CVTFTexture::CVTFTexture()
 	m_pLowResImageData = NULL;
 	m_nLowResImageAllocSize = 0;
 
-#if defined( _X360 )
-	m_nMipSkipCount = 0;
-	*(unsigned int *)m_LowResImageSample = 0;
-#endif
 
 	Assert( m_arrResourcesInfo.Count() == 0 );
 	Assert( m_arrResourcesData.Count() == 0 );
@@ -465,9 +461,6 @@ bool CVTFTexture::Init( int nWidth, int nHeight, int nDepth, ImageFormat fmt, in
 
 	m_nFaceCount = (iFlags & TEXTUREFLAGS_ENVMAP) ? CUBEMAP_FACE_COUNT : 1;
 
-#if defined( _X360 )
-	m_nMipSkipCount = 0;
-#endif
 
 	// Need to do this because Shutdown deallocates the low-res image
 	m_nLowResImageWidth = m_nLowResImageHeight = 0;
@@ -557,10 +550,6 @@ void CVTFTexture::ReleaseResources()
 //-----------------------------------------------------------------------------
 void CVTFTexture::Shutdown()
 {
-#if defined( _X360 )
-	// must be first to ensure X360 aliased pointers are unhooked, otherwise memory corruption
-	ReleaseImageMemory();
-#endif
 
 	delete[] m_pImageData;
 	m_pImageData = NULL;

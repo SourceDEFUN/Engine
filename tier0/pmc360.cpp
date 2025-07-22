@@ -7,9 +7,7 @@
 
 #include "pch_tier0.h"
 
-#ifndef _X360
-#error pmc360.cpp must only be compiled for XBOX360! 
-#else
+#error Support for XBox 360 has been removed.
 
 #include "tier0/platform.h"
 #include "tier0/vprof.h"

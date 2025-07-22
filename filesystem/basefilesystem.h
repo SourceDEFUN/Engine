@@ -14,12 +14,10 @@
 
 #if defined( _WIN32 )
 
-#if !defined( _X360 )
 	#include <io.h>
 	#include <direct.h>
 	#define WIN32_LEAN_AND_MEAN
 	#include <windows.h>
-#endif
 #undef GetCurrentDirectory
 #undef GetJob
 #undef AddJob

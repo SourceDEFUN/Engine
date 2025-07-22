@@ -9,15 +9,11 @@
 
 #if !defined(STEAM) && !defined(NO_MALLOC_OVERRIDE)
 
-#if defined( _WIN32 ) && !defined( _X360 )
+#if defined( _WIN32 )
 #define WIN_32_LEAN_AND_MEAN
 #include <windows.h>
 #define VA_COMMIT_FLAGS MEM_COMMIT
 #define VA_RESERVE_FLAGS MEM_RESERVE
-#elif defined( _X360 )
-#undef Verify
-#define VA_COMMIT_FLAGS (MEM_COMMIT|MEM_NOZERO|MEM_LARGE_PAGES)
-#define VA_RESERVE_FLAGS (MEM_RESERVE|MEM_LARGE_PAGES)
 #endif
 
 #ifdef OSX
@@ -35,9 +31,6 @@
 #include "tier0/threadtools.h"
 #include "mem_helpers.h"
 #include "memstd.h"
-#ifdef _X360
-#include "xbox/xbox_console.h"
-#endif
 
 
 // Force on redirecting all allocations to the process heap on Win64,
@@ -1715,9 +1708,6 @@ void CStdMemAlloc::DumpStatsFileBase( char const *pchFileBase )
 	fprintf( pFile, "\nSBH:\n" );
 	m_SmallBlockHeap.DumpStats(pFile);	// Dump statistics to small block heap
 
-#if defined( _X360 ) && !defined( _RETAIL )
-	XBX_rMemDump( filename );
-#endif
 
 		fclose( pFile );
 #endif
@@ -1725,38 +1715,10 @@ void CStdMemAlloc::DumpStatsFileBase( char const *pchFileBase )
 
 void CStdMemAlloc::GlobalMemoryStatus( size_t *pUsedMemory, size_t *pFreeMemory )
 {
-	if ( !pUsedMemory || !pFreeMemory )
-		return;
-
-#if defined ( _X360 )
-
-	// GlobalMemoryStatus tells us how much physical memory is free
-	MEMORYSTATUS stat;
-	::GlobalMemoryStatus( &stat );
-	*pFreeMemory = stat.dwAvailPhys;
-
-	// NOTE: we do not count free memory inside our small block heaps, as this could be misleading
-	//       (even with lots of SBH memory free, a single allocation over 2kb can still fail)
-
-#if defined( USE_DLMALLOC )
-	// Account for free memory contained within DLMalloc
-	for ( int i = 0; i < ARRAYSIZE( g_AllocRegions ); i++ )
-	{
-		mallinfo info = mspace_mallinfo( g_AllocRegions[ i ] );
-		*pFreeMemory += info.fordblks;
-	}
-#endif
-
-	// Used is total minus free (discount the 32MB system reservation)
-	*pUsedMemory = ( stat.dwTotalPhys - 32*1024*1024 ) - *pFreeMemory;
-
-#else
-
+	if ( !pUsedMemory || !pFreeMemory ) return;
 	// no data
 	*pFreeMemory = 0;
 	*pUsedMemory = 0;
-
-#endif
 }
 
 void CStdMemAlloc::CompactHeap()
@@ -1776,19 +1738,6 @@ MemAllocFailHandler_t CStdMemAlloc::SetAllocFailHandler( MemAllocFailHandler_t p
 
 size_t CStdMemAlloc::DefaultFailHandler( size_t nBytes )
 {
-	if ( IsX360() && !IsRetail() )
-	{
-#ifdef _X360 
-		ExecuteOnce(
-		{
-			char buffer[256];
-			_snprintf( buffer, sizeof( buffer ), "***** Memory pool overflow, attempted allocation size: %u ****\n", nBytes );
-			XBX_OutputDebugString( buffer ); 
-		}
-		);
-#endif
-	}
-
 	return 0;
 }
 

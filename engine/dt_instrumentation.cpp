@@ -5,7 +5,7 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#if (defined(_WIN32) && (!defined(_X360) ) )
+#if defined(_WIN32)
 #include <windows.h>
 #endif
 #include "tier0/platform.h"

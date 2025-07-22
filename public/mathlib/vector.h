@@ -2171,7 +2171,6 @@ inline void AngularImpulseToQAngle( const AngularImpulse &impulse, QAngle &angle
 	angles.z = impulse.x;
 }
 
-#if !defined( _X360 )
 
 FORCEINLINE vec_t InvRSquared( float const *v )
 {
@@ -2280,7 +2279,6 @@ FORCEINLINE void VectorNormalizeFast( Vector &vec )
 	vec.z *= den;
 }
 
-#endif // _X360
 
 
 inline vec_t Vector::NormalizeInPlace()

@@ -8,7 +8,7 @@
 //===========================================================================//
 
 // support QueryPerformanceCounter
-#if defined(_WIN32) && !defined(_X360)
+#if defined(_WIN32)
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #endif
@@ -114,7 +114,7 @@ static int CreateExecutionMarker()
 		}
 		else
 		{
-#if defined(_WIN32) && !defined(_X360)
+#if defined(_WIN32)
 			LARGE_INTEGER CurrentTime;
 
 			QueryPerformanceCounter( &CurrentTime );

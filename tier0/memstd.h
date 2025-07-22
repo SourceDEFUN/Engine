@@ -6,16 +6,8 @@
 #include "pch_tier0.h"
 
 #if defined(_WIN32)
-#if !defined(_X360)
 #define WIN_32_LEAN_AND_MEAN
 #include <windows.h>
-#else
-#undef Verify
-#define _XBOX
-#include <xtl.h>
-#undef _XBOX
-#include "xbox/xbox_win32stubs.h"
-#endif
 #endif
 
 #ifdef OSX
@@ -32,9 +24,6 @@
 
 #pragma pack(4)
 
-#ifdef _X360
-#define USE_PHYSICAL_SMALL_BLOCK_HEAP 1
-#endif
 
 
 // #define NO_SBH	1
@@ -44,13 +33,8 @@
 #define MIN_SBH_ALIGN	8
 #define MAX_SBH_BLOCK	2048
 #define MAX_POOL_REGION (4*1024*1024)
-#if !defined(_X360)
 #define SBH_PAGE_SIZE		(4*1024)
 #define COMMIT_SIZE		(16*SBH_PAGE_SIZE)
-#else
-#define SBH_PAGE_SIZE		(64*1024)
-#define COMMIT_SIZE		(SBH_PAGE_SIZE)
-#endif
 #if _M_X64
 #define NUM_POOLS		34
 #else

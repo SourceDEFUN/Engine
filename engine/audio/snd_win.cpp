@@ -132,17 +132,6 @@ IAudioDevice *IAudioDevice::AutoDetectInit( bool waveOnly )
 #error
 #endif
 	}
-#if defined( _X360 )
-	else
-	{
-		pDevice = Audio_CreateXAudioDevice( true );
-		if ( pDevice )
-		{
-			// xaudio requires threaded mixing
-			S_EnableThreadedMixing( true );
-		}
-	}
-#endif
 
 #if defined( WIN32 ) && !defined( USE_SDL )
 NULLDEVICE:

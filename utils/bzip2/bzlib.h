@@ -113,7 +113,7 @@ typedef
 /* Need a definitition for FILE */
 #include <stdio.h>
 
-#if defined(_WIN32) && !defined(_X360)
+#if defined(_WIN32)
 #   include <windows.h>
 #   ifdef small
       /* windows.h define small to char */

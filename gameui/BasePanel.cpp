@@ -77,11 +77,7 @@ using namespace vgui;
 #include "OptionsSubAudio.h"
 #include "hl2orange.spa.h"
 #include "CustomTabExplanationDialog.h"
-#if defined( _X360 )
-#include "xbox/xbox_launch.h"
-#else
 #include "xbox/xboxstubs.h"
-#endif
 
 #include "../engine/imatchmaking.h"
 #include "tier1/utlstring.h"
@@ -310,20 +306,6 @@ public:
 			m_pConsoleFooter = new CFooterPanel( parent, "MainMenuFooter" );
 
 			int iFixedWidth = 245;
-
-#ifdef _X360
-			// In low def we need a smaller highlight
-			XVIDEO_MODE videoMode;
-			XGetVideoMode( &videoMode );
-			if ( !videoMode.fIsHiDef )
-			{
-				iFixedWidth = 240;
-			}
-			else
-			{
-				iFixedWidth = 350;
-			}
-#endif
 
 			SetFixedWidth( iFixedWidth );
 		}
@@ -827,10 +809,6 @@ CBasePanel::CBasePanel() : Panel(NULL, "BaseGameUIPanel")
 		{
 			m_pConsoleControlSettings->ProcessResolutionKeys( surface()->GetResolutionKey() );
 		}
-
-#ifdef _X360
-		x360_audio_english.SetValue( XboxLaunch()->GetForceEnglish() );
-#endif
 	}
 
 	m_pGameMenuButtons.AddToTail( CreateMenuButton( this, "GameMenuButton", ModInfo().GetGameTitle() ) );
@@ -1553,11 +1531,6 @@ void CBasePanel::CreateGameLogo()
 
 void CBasePanel::CheckBonusBlinkState()
 {
-#ifdef _X360
-	// On 360 if we have a storage device at this point and try to read the bonus data it can't find the bonus file!
-	return;
-#endif
-
 	if ( BonusMapsDatabase()->GetBlink() )
 	{
 		if ( GameUI().IsConsoleUI() )
@@ -1703,46 +1676,7 @@ void CBasePanel::RunFrame()
 // Purpose: Tells XBox Live our user is in the current game's menu
 //-----------------------------------------------------------------------------
 void CBasePanel::UpdateRichPresenceInfo()
-{
-#if defined( _X360 )
-	// For all other users logged into this console (not primary), set to idle to satisfy cert
-	for( uint i = 0; i < XUSER_MAX_COUNT; ++i )
-	{
-		XUSER_SIGNIN_STATE State = XUserGetSigninState( i );
-
-		if( State != eXUserSigninState_NotSignedIn )
-		{
-			if ( i != XBX_GetPrimaryUserId() )
-			{
-				// Set rich presence as 'idle' for users logged in that can't participate in orange box.
-				if ( !xboxsystem->UserSetContext( i, X_CONTEXT_PRESENCE, CONTEXT_PRESENCE_IDLE, true ) )
-				{
-					Warning( "BasePanel: UserSetContext failed.\n" );
-				}
-			}
-		}
-	}
-
-	if ( !GameUI().IsInLevel() )
-	{
-		if ( !xboxsystem->UserSetContext( XBX_GetPrimaryUserId(), CONTEXT_GAME, m_iGameID, true ) )
-		{
-			Warning( "BasePanel: UserSetContext failed.\n" );
-		}
-		if ( !xboxsystem->UserSetContext( XBX_GetPrimaryUserId(), X_CONTEXT_PRESENCE, CONTEXT_PRESENCE_MENU, true ) )
-		{
-			Warning( "BasePanel: UserSetContext failed.\n" );
-		}
-		if ( m_bSinglePlayer )
-		{
-			if ( !xboxsystem->UserSetContext( XBX_GetPrimaryUserId(), X_CONTEXT_GAME_MODE, CONTEXT_GAME_MODE_SINGLEPLAYER, true ) )
-			{
-				Warning( "BasePanel: UserSetContext failed.\n" );
-			}
-		}
-	}
-#endif
-}
+{}
 
 //-----------------------------------------------------------------------------
 // Purpose: Lays out the position of the taskbar
@@ -1957,34 +1891,6 @@ void CBasePanel::OnGameUIActivated()
 		// Layout the first time to avoid focus issues (setting menus visible will grab focus)
 		UpdateGameMenus();
 		m_bEverActivated = true;
-
-#if defined( _X360 )
-		
-		// Open all active containers if we have a valid storage device
-		if ( XBX_GetPrimaryUserId() != XBX_INVALID_USER_ID && XBX_GetStorageDeviceId() != XBX_INVALID_STORAGE_ID && XBX_GetStorageDeviceId() != XBX_STORAGE_DECLINED )
-		{
-			// Open user settings and save game container here
-			uint nRet = engine->OnStorageDeviceAttached();
-			if ( nRet != ERROR_SUCCESS )
-			{
-				// Invalidate the device
-				XBX_SetStorageDeviceId( XBX_INVALID_STORAGE_ID );
-
-				// FIXME: We don't know which device failed!
-				// Pop a dialog explaining that the user's data is corrupt
-				BasePanel()->ShowMessageDialog( MD_STORAGE_DEVICES_CORRUPT );
-			}
-		}
-
-		// determine if we're starting up because of a cross-game invite
-		int fLaunchFlags = XboxLaunch()->GetLaunchFlags();
-		if ( fLaunchFlags & LF_INVITERESTART )
-		{
-			XNKID nSessionID;
-			XboxLaunch()->GetInviteSessionID( &nSessionID );
-			matchmaking->JoinInviteSessionByID( nSessionID );
-		}
-#endif
 
 		// Brute force check to open tf matchmaking ui.
 		if ( GameUI().IsConsoleUI() )
@@ -2334,7 +2240,7 @@ void CBasePanel::RunMenuCommand(const char *command)
 			V_snprintf( szSteamURL, sizeof(szSteamURL), "steam://run/%d/%s", engine->GetAppID(), COptionsSubAudio::GetUpdatedAudioLanguage() );
 
 			// Set Steam URL for re-launch in registry. Launcher will check this registry key and exec it in order to re-load the game in the proper language
-#if defined( WIN32 ) && !defined( _X360 )
+#if defined( WIN32 )
 			HKEY hKey;
 
 			if ( IsPC() && RegOpenKeyEx( HKEY_CURRENT_USER, "Software\\Valve\\Source", NULL, KEY_WRITE, &hKey) == ERROR_SUCCESS )
@@ -2350,7 +2256,6 @@ void CBasePanel::RunMenuCommand(const char *command)
 				fprintf( fp, "%s\n", szSteamURL );
 			}
 			fclose( fp );
-#elif defined( _X360 )
 #else
 #error
 #endif
@@ -2470,10 +2375,6 @@ void CBasePanel::ExecuteAsync( CAsyncJobContext *pAsync )
 	ThreadHandle_t hHandle = CreateSimpleThread( PanelJobWrapperFn, reinterpret_cast< void * >( pAsync ) );
 	pAsync->m_hThreadHandle = hHandle;
 
-#ifdef _X360
-	ThreadSetAffinity( hHandle, XBOX_PROCESSOR_3 );
-#endif
-
 #else
 	pAsync->ExecuteAsync();
 #endif
@@ -2575,9 +2476,6 @@ void CAsyncCtxOnDeviceAttached::ExecuteAsync()
 	// Make the QOS system initialized for multiplayer games
 	if ( !ModInfo().IsSinglePlayerOnly() )
 	{
-#if defined( _X360 )
-		( void ) matchmaking->GetQosWithLIVE();
-#endif
 	}
 }
 
@@ -2639,29 +2537,6 @@ void CBasePanel::OnCompletedAsyncDeviceAttached( CAsyncCtxOnDeviceAttached *job 
 //-----------------------------------------------------------------------------
 bool CBasePanel::ValidateStorageDevice( void )
 {
-	if ( m_bUserRefusedStorageDevice == false )
-	{
-#if defined( _X360 )
-		if ( XBX_GetStorageDeviceId() == XBX_INVALID_STORAGE_ID )
-		{
-			// Try to discover content on the user's storage devices
-			DWORD nFoundDevice = xboxsystem->DiscoverUserData( XBX_GetPrimaryUserId(), COM_GetModDirectory() );
-			if ( nFoundDevice == XBX_INVALID_STORAGE_ID )
-			{
-				// They don't have a device, so ask for one
-				ShowMessageDialog( MD_PROMPT_STORAGE_DEVICE );
-				return false;
-			}
-			else
-			{
-				// Take this device
-				XBX_SetStorageDeviceId( nFoundDevice );
-				OnDeviceAttached();
-			}
-			// Fall through
-		}
-#endif
-	}
 	return true;
 }
 
@@ -2698,52 +2573,6 @@ bool CBasePanel::ValidateStorageDevice( int *pStorageDeviceValidated )
 //-----------------------------------------------------------------------------
 bool CBasePanel::HandleSignInRequest( const char *command )
 {
-#ifdef _X360
-	// If we have a post-prompt command, we're coming back into the call from that prompt
-	bool bQueuedCall = ( m_strPostPromptCommand.IsEmpty() == false );
-
-	XUSER_SIGNIN_INFO info;
-	bool bValidUser = ( XUserGetSigninInfo( XBX_GetPrimaryUserId(), 0, &info ) == ERROR_SUCCESS );
-
-	if ( bValidUser )
-		return true;
-
-	// Queued command means we're returning from a prompt or blade
-	if ( bQueuedCall )
-	{
-		// Blade has returned with nothing
-		if ( m_bUserRefusedSignIn )
-			return true;
-		
-		// User has not denied the storage device, so ask
-		ShowMessageDialog( MD_PROMPT_SIGNIN );
-		m_strPostPromptCommand = command;
-		
-		// Do not run command
-		return false;
-	}
-	else
-	{
-		// If the user refused the sign-in and we respect that on this command, we're done
-		if ( m_bUserRefusedSignIn && CommandRespectsSignInDenied( command ) )
-			return true;
-
-		// If the message is required first, then do that instead
-		if ( CommandRequiresSignIn( command ) )
-		{
-			ShowMessageDialog( MD_PROMPT_SIGNIN_REQUIRED );
-			m_strPostPromptCommand = command;
-			return false;
-		}
-
-		// Pop a blade out
-		xboxsystem->ShowSigninUI( 1, 0 );
-		m_strPostPromptCommand = command;
-		m_bWaitingForUserSignIn = true;
-		m_bUserRefusedSignIn = false;
-		return false;	
-	}
-#endif // _X360
 	return true;
 }
 
@@ -2857,26 +2686,6 @@ void CBasePanel::OnCommand( const char *command )
 {
 	if ( GameUI().IsConsoleUI() )
 	{
-#if defined( _X360 )
-
-		// See if this is a command we need to intercept
-		if ( IsPromptableCommand( command ) )
-		{
-			// Handle the sign in case
-			if ( HandleSignInRequest( command ) == false )
-				return;
-			
-			// Handle storage
-			if ( HandleStorageDeviceRequest( command ) == false )
-				return;
-
-			// If we fall through, we'll need to track this again
-			m_bStorageBladeShown = false;
-
-			// Fall through
-		}
-#endif // _X360
-
 		RunAnimationWithCallback( this, command, new KeyValues( "RunMenuCommand", "command", command ) );
 	
 		// Clear our pending command if we just executed it
@@ -3543,43 +3352,8 @@ void CBasePanel::SystemNotification( const int notification )
 	{
 		pBase->SystemNotification( notification );
 	}
-
-	if ( notification == SYSTEMNOTIFY_USER_SIGNEDIN )
-	{
-#if defined( _X360 )
-		// See if it was the active user who signed in
-		uint state = XUserGetSigninState( XBX_GetPrimaryUserId() );
-		if ( state != eXUserSigninState_NotSignedIn )
-		{
-			// Reset a bunch of state
-			m_bUserRefusedSignIn = false;
-			m_bUserRefusedStorageDevice = false;
-			m_bStorageBladeShown = false;
-		}	
-		UpdateRichPresenceInfo();
-		engine->GetAchievementMgr()->DownloadUserData();
-		engine->GetAchievementMgr()->EnsureGlobalStateLoaded();
-#endif
-	}
 	else if ( notification == SYSTEMNOTIFY_USER_SIGNEDOUT  )
 	{
-#if defined( _X360 )
-		// See if it was the active user who signed out
-		uint state = XUserGetSigninState( XBX_GetPrimaryUserId() );
-		if ( state != eXUserSigninState_NotSignedIn )
-		{
-			return;
-		}
-
-		// Invalidate their storage ID
-		engine->OnStorageDeviceDetached();
-		m_bUserRefusedStorageDevice = false;
-		m_bUserRefusedSignIn = false;
-		m_iStorageID = XBX_INVALID_STORAGE_ID;
-		engine->GetAchievementMgr()->InitializeAchievements();
-		m_MessageDialogHandler.CloseAllMessageDialogs();
-
-#endif
 		if ( GameUI().IsInLevel() )
 		{
 			if ( m_pGameLogo )
@@ -4262,21 +4036,6 @@ void CFooterPanel::Paint( void )
 }	
 
 DECLARE_BUILD_FACTORY( CFooterPanel );
-
-#ifdef _X360
-//-----------------------------------------------------------------------------
-// Purpose: Reload the resource files on the Xbox 360
-//-----------------------------------------------------------------------------
-void CBasePanel::Reload_Resources( const CCommand &args )
-{
-	m_pConsoleControlSettings->Clear();
-	if ( m_pConsoleControlSettings->LoadFromFile( g_pFullFileSystem, "resource/UI/XboxDialogs.res" ) )
-	{
-		m_pConsoleControlSettings->ProcessResolutionKeys( surface()->GetResolutionKey() );
-	}
-}
-#endif
-
 
 // X360TBD: Move into a separate module when completed
 CMessageDialogHandler::CMessageDialogHandler()

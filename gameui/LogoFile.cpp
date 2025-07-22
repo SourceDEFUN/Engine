@@ -6,18 +6,12 @@
 //
 //=============================================================================//
 
-#if !defined( _X360 )
 #include <windows.h>
-#endif
 #include <stdio.h>
 #include "tier1/utlbuffer.h"
 #include <vgui/VGUI.h>
 #include <vgui_controls/Controls.h>
 #include "filesystem.h"
-
-#if defined( _X360 )
-#include "xbox/xbox_win32stubs.h"
-#endif
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

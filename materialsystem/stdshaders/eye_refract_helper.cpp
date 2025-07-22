@@ -13,10 +13,8 @@
 #include "eye_refract_ps20.inc"
 #include "eye_refract_ps20b.inc"
 
-#ifndef _X360
 #include "eye_refract_vs30.inc"
 #include "eye_refract_ps30.inc"
-#endif
 
 #include "convar.h"
 
@@ -141,9 +139,7 @@ void Draw_Eyes_Refract_Internal( CBaseVSShader *pShader, IMaterialVar** params, 
 			pShaderShadow->EnableTexture( SHADER_SAMPLER5, true );	// Flashlight cookie
 		}
 
-#ifndef _X360
 		if ( !g_pHardwareConfig->HasFastVertexTextures() )
-#endif
 		{
 			DECLARE_STATIC_VERTEX_SHADER( eye_refract_vs20 );
 			SET_STATIC_VERTEX_SHADER_COMBO( HALFLAMBERT, IS_FLAG_SET( MATERIAL_VAR_HALFLAMBERT ) );
@@ -180,7 +176,6 @@ void Draw_Eyes_Refract_Internal( CBaseVSShader *pShader, IMaterialVar** params, 
 				SET_STATIC_PIXEL_SHADER( eye_refract_ps20 );
 			}
 		}
-#ifndef _X360
 		else
 		{
 			// The vertex shader uses the vertex id stream
@@ -210,7 +205,6 @@ void Draw_Eyes_Refract_Internal( CBaseVSShader *pShader, IMaterialVar** params, 
 				pShaderShadow->EnableTexture( SHADER_SAMPLER7, true );	// Noise map
 			}
 		}
-#endif
 
 		// On DX9, get the gamma read and write correct
 		pShaderShadow->EnableSRGBRead( SHADER_SAMPLER1, true );			// Iris
@@ -280,9 +274,7 @@ void Draw_Eyes_Refract_Internal( CBaseVSShader *pShader, IMaterialVar** params, 
 			pShaderAPI->GetDX9LightState( &lightState );
 		}
 
-#ifndef _X360
 		if ( !g_pHardwareConfig->HasFastVertexTextures() )
-#endif
 		{
 			DECLARE_DYNAMIC_VERTEX_SHADER( eye_refract_vs20 );
 			SET_DYNAMIC_VERTEX_SHADER_COMBO( DOWATERFOG, pShaderAPI->GetSceneFogMode() == MATERIAL_FOG_LINEAR_BELOW_FOG_Z );
@@ -293,7 +285,6 @@ void Draw_Eyes_Refract_Internal( CBaseVSShader *pShader, IMaterialVar** params, 
 			SET_DYNAMIC_VERTEX_SHADER_COMBO( COMPRESSED_VERTS, (int)vertexCompression );
 			SET_DYNAMIC_VERTEX_SHADER( eye_refract_vs20 );
 		}
-#ifndef _X360
 		else
 		{
 			pShader->SetHWMorphVertexShaderState( VERTEX_SHADER_SHADER_SPECIFIC_CONST_10, VERTEX_SHADER_SHADER_SPECIFIC_CONST_11, SHADER_VERTEXTEXTURE_SAMPLER0 );
@@ -308,7 +299,6 @@ void Draw_Eyes_Refract_Internal( CBaseVSShader *pShader, IMaterialVar** params, 
 			SET_DYNAMIC_VERTEX_SHADER_COMBO( COMPRESSED_VERTS, (int)vertexCompression );
 			SET_DYNAMIC_VERTEX_SHADER( eye_refract_vs30 );
 		}
-#endif
 
 		// Get luminance of ambient cube and saturate it
 		float fAverageAmbient = max(0.0f, min( pShaderAPI->GetAmbientLightCubeLuminance(), 1.0f ) );
@@ -355,9 +345,7 @@ void Draw_Eyes_Refract_Internal( CBaseVSShader *pShader, IMaterialVar** params, 
 		}
 
 		// Flashlight tax
-#ifndef _X360
 		if ( !g_pHardwareConfig->HasFastVertexTextures() )
-#endif
 		{
 			if ( g_pHardwareConfig->SupportsPixelShaders_2_b() )
 			{
@@ -373,7 +361,6 @@ void Draw_Eyes_Refract_Internal( CBaseVSShader *pShader, IMaterialVar** params, 
 				SET_DYNAMIC_PIXEL_SHADER( eye_refract_ps20 );
 			}
 		}
-#ifndef _X360
 		else
 		{
 			DECLARE_DYNAMIC_PIXEL_SHADER( eye_refract_ps30 );
@@ -381,7 +368,6 @@ void Draw_Eyes_Refract_Internal( CBaseVSShader *pShader, IMaterialVar** params, 
 			SET_DYNAMIC_PIXEL_SHADER_COMBO( FLASHLIGHTSHADOWS, bFlashlightShadows );
 			SET_DYNAMIC_PIXEL_SHADER( eye_refract_ps30 );
 		}
-#endif
 
 		pShaderAPI->SetPixelShaderFogParams( PSREG_FOG_PARAMS );
 

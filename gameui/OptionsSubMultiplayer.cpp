@@ -6,7 +6,7 @@
 //=============================================================================//
 
 
-#if defined( WIN32 ) && !defined( _X360 )
+#if defined( WIN32 )
 #include <windows.h> // SRC only!!
 #endif
 
@@ -59,10 +59,6 @@
 #include "ivtex.h"
 #ifdef WIN32
 #include <io.h>
-#endif
-
-#if defined( _X360 )
-#include "xbox/xbox_win32stubs.h"
 #endif
 
 // memdbgon must be the last include file in a .cpp file!!!

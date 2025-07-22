@@ -4,7 +4,7 @@
 //
 //==============================================================================
 
-#if defined (WIN32) && !defined( _X360 )
+#if defined (WIN32)
 #include <windows.h>
 #elif POSIX
 #define _cdecl
@@ -174,11 +174,7 @@ protected:
 CColorCorrectionSystem g_ColorCorrectionSystem;
 IColorCorrectionSystem *g_pColorCorrectionSystem = &g_ColorCorrectionSystem;
 
-#ifndef _X360
-// Don't allow this on the 360.. it doesn't work in mat_queued_mode
 EXPOSE_SINGLE_INTERFACE_GLOBALVAR( CColorCorrectionSystem, IColorCorrectionSystem, COLORCORRECTION_INTERFACE_VERSION, g_ColorCorrectionSystem );
-#endif
-
 
 //-----------------------------------------------------------------------------
 //  Wrappers for release/restore functionality

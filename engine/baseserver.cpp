@@ -11,7 +11,7 @@
 
 
 
-#if defined(_WIN32) && !defined(_X360)
+#if defined(_WIN32)
 #include "winlite.h"		// FILETIME
 #elif defined(POSIX)
 #include <time.h>
@@ -21,7 +21,6 @@
 */
 #include <sys/resource.h>
 #include <netinet/in.h>
-#elif defined(_X360)
 #else
 #error "Includes for CPU usage calcs here"
 #endif
@@ -57,10 +56,6 @@
 #include "cl_steamauth.h"
 #include "sv_filter.h"
 #include "master.h"
-
-#if defined( _X360 )
-#include "xbox/xbox_win32stubs.h"
-#endif
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

@@ -4,9 +4,7 @@
 //
 //===========================================================================//
 
-#if !defined( _X360 )
 #include <windows.h>
-#endif
 #include "appframework/iappsystemgroup.h"
 #include "appframework/appframework.h"
 #include "tier0/dbg.h"
@@ -45,18 +43,7 @@
 #include "materialsystem/itexture.h"
 #include "filesystem/IQueuedLoader.h"
 #include "xwvfile.h"
-#if defined( _X360 )
-#include "hl2orange.spa.h"
-#include "xbox/xbox_console.h"
-#include "xbox/xbox_win32stubs.h"
-#include "xbox/xbox_launch.h"
-#include <xaudio.h>
-#include <xmedia.h>
-#include <xmp.h>
-#endif
-#if !defined( _X360 )
 #include "xbox/xboxstubs.h"
-#endif
 #include "tier0/memdbgon.h"
 
 #define INACTIVITY_TIMEOUT	120

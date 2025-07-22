@@ -344,9 +344,7 @@ void CReplayMovieManager::SetupHighQualityHDR()
 
 void CReplayMovieManager::SetupHighQualityWaterDetail()
 {
-#ifndef _X360
 	g_pEngine->Cbuf_AddText( "r_waterforceexpensive 1\n" );
-#endif
 	g_pEngine->Cbuf_AddText( "r_waterforcereflectentities 1\n" );
 }
 

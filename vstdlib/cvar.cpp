@@ -17,9 +17,6 @@
 #include "tier1/tier1.h"
 #include "tier1/utlbuffer.h"
 
-#ifdef _X360
-#include "xbox/xbox_console.h"
-#endif
 
 #ifdef POSIX
 #include <wctype.h>
@@ -94,9 +91,6 @@ public:
 	virtual void			RevertFlaggedConVars( int nFlag );
 	virtual void			InstallCVarQuery( ICvarQuery *pQuery );
 
-#if defined( _X360 )
-	virtual void			PublishToVXConsole( );
-#endif
 
 	virtual bool			IsMaterialThreadSetAllowed( ) const;
 	virtual void			QueueMaterialThreadSetValue( ConVar *pConVar, const char *pValue );
@@ -830,39 +824,6 @@ void CCvar::ConsoleDPrintf( const char *pFormat, ... ) const
 		m_DisplayFuncs[ i ]->DPrint( temp );
 	}
 }
-
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-#if defined( _X360 )
-
-void CCvar::PublishToVXConsole()
-{
-	const char *commands[4096];
-	const char *helptext[4096];
-	const ConCommandBase *pCur;
-	int	numCommands = 0;
-
-	// iterate and publish commands to the remote console
-	for ( pCur = m_pConCommandList; pCur; pCur=pCur->GetNext() )
-	{
-		// add unregistered commands to list
-		if ( numCommands < sizeof(commands)/sizeof(commands[0]) )
-		{
-			commands[numCommands] = pCur->GetName();
-			helptext[numCommands] = pCur->GetHelpText();
-			numCommands++;
-		}
-	}
-
-	if ( numCommands )
-	{
-		XBX_rAddCommands( numCommands, commands, helptext );
-	}
-}
-
-#endif
 
 
 //-----------------------------------------------------------------------------

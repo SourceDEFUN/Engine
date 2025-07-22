@@ -28,12 +28,10 @@
 
 
 CLIENTEFFECT_REGISTER_BEGIN( PrecacheFlatBasicPortalDrawingMaterials )
-#if !defined( _X360 ) //XBox 360 is guaranteed to use stencil mode, and therefore doesn't need texture mode materials
 CLIENTEFFECT_MATERIAL( "models/portals/portal_1_dynamicmesh" )
 CLIENTEFFECT_MATERIAL( "models/portals/portal_2_dynamicmesh" )
 CLIENTEFFECT_MATERIAL( "models/portals/portal_1_renderfix_dynamicmesh" )
 CLIENTEFFECT_MATERIAL( "models/portals/portal_2_renderfix_dynamicmesh" )
-#endif
 CLIENTEFFECT_MATERIAL( "models/portals/portal_depthdoubler" )
 CLIENTEFFECT_MATERIAL( "models/portals/portalstaticoverlay_1" )
 CLIENTEFFECT_MATERIAL( "models/portals/portalstaticoverlay_2" )

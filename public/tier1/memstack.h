@@ -22,9 +22,6 @@ public:
 	~CMemoryStack();
 
 	bool Init( unsigned maxSize = 0, unsigned commitSize = 0, unsigned initialCommit = 0, unsigned alignment = 16 );
-#ifdef _X360
-	bool InitPhysical( unsigned size = 0, unsigned alignment = 16 );
-#endif
 	void Term();
 
 	int GetSize();
@@ -58,9 +55,6 @@ private:
 #ifdef _WIN32
 	unsigned m_commitSize;
 	unsigned m_minCommit;
-#endif
-#ifdef _X360
-	bool m_bPhysical;
 #endif
 };
 

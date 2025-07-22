@@ -42,11 +42,7 @@ class CMatCallQueue;
 //-----------------------------------------------------------------------------
 // Render targets
 //-----------------------------------------------------------------------------
-#if !defined( _X360 )
 #define MAX_RENDER_TARGETS 4
-#else
-#define MAX_RENDER_TARGETS 1
-#endif
 
 
 //-----------------------------------------------------------------------------
@@ -565,11 +561,6 @@ public:
 	DELEGATE_TO_OBJECT_2V(					SetResetable, ColorCorrectionHandle_t, bool, g_pColorCorrectionSystem );
 
 	virtual void							SetFullScreenDepthTextureValidityFlag( bool bIsValid );
-
-#if defined( _X360 )
-	DELEGATE_TO_OBJECT_1V(                  PushVertexShaderGPRAllocation, int, g_pShaderAPI );
-	DELEGATE_TO_OBJECT_0V(                  PopVertexShaderGPRAllocation, g_pShaderAPI );
-#endif
 
 	// A special path used to tick the front buffer while loading on the 360
 	virtual void							SetNonInteractivePacifierTexture( ITexture *pTexture, float flNormalizedX, float flNormalizedY, float flNormalizedSize );

@@ -38,9 +38,6 @@
 #include <direct.h>
 #endif
 
-#if defined( _X360 )
-#include "xbox/xbox_win32stubs.h"
-#endif
 
 #include "tier0/memdbgon.h"
 
@@ -128,9 +125,7 @@ char* CmdLib_FGets( char *pOut, int outSize, FileHandle_t hFile )
 	return pOut;
 }
 
-#if !defined( _X360 )
 #include <wincon.h>
-#endif
 
 // This pauses before exiting if they use -StopOnExit. Useful for debugging.
 class CExitStopper
@@ -153,7 +148,6 @@ static unsigned short g_BadColor = 0xFFFF;
 static WORD g_BackgroundFlags = 0xFFFF;
 static void GetInitialColors( )
 {
-#if !defined( _X360 )
 	// Get the old background attributes.
 	CONSOLE_SCREEN_BUFFER_INFO oldInfo;
 	GetConsoleScreenBufferInfo( GetStdHandle( STD_OUTPUT_HANDLE ), &oldInfo );
@@ -169,13 +163,11 @@ static void GetInitialColors( )
 		g_BadColor |= FOREGROUND_BLUE;
 	if (g_BackgroundFlags & BACKGROUND_INTENSITY)
 		g_BadColor |= FOREGROUND_INTENSITY;
-#endif
 }
 
 WORD SetConsoleTextColor( int red, int green, int blue, int intensity )
 {
 	WORD ret = g_LastColor;
-#if !defined( _X360 )
 	
 	g_LastColor = 0;
 	if( red )	g_LastColor |= FOREGROUND_RED;
@@ -188,16 +180,13 @@ WORD SetConsoleTextColor( int red, int green, int blue, int intensity )
 		g_LastColor = g_InitialColor;
 
 	SetConsoleTextAttribute( GetStdHandle( STD_OUTPUT_HANDLE ), g_LastColor | g_BackgroundFlags );
-#endif
 	return ret;
 }
 
 void RestoreConsoleTextColor( WORD color )
 {
-#if !defined( _X360 )
 	SetConsoleTextAttribute( GetStdHandle( STD_OUTPUT_HANDLE ), color | g_BackgroundFlags );
 	g_LastColor = color;
-#endif
 }
 
 
@@ -435,7 +424,7 @@ Mimic unix command line expansion
 #define	MAX_EX_ARGC	1024
 int		ex_argc;
 char	*ex_argv[MAX_EX_ARGC];
-#if defined( _WIN32 ) && !defined( _X360 )
+#if defined( _WIN32 )
 #include "io.h"
 void ExpandWildcards (int *argc, char ***argv)
 {

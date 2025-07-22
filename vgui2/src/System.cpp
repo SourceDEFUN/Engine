@@ -6,14 +6,12 @@
 //=============================================================================//
 
 
-#if !defined( _X360 )
 #define WIN32_LEAN_AND_MEAN
 #define OEMRESOURCE
 #include <windows.h>
 #include <shellapi.h>
 #include <shlwapi.h>
 #include <shlobj.h>
-#endif
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -46,9 +44,6 @@
 #include "vgui_key_translation.h"
 #include "filesystem.h"
 
-#if defined( _X360 )
-#include "xbox/xbox_win32stubs.h"
-#endif
 
 #define PROTECTED_THINGS_DISABLE
 // memdbgon must be the last include file in a .cpp file!!!
@@ -57,7 +52,6 @@
 
 
 
-#ifndef _X360
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -124,7 +118,6 @@ static HWND GetMainApplicationWindowHWND()
 }
 
 
-#endif // #ifndef _X360
 
 
 
@@ -139,11 +132,7 @@ using namespace vgui;
 
 SHORT System_GetKeyState( int virtualKeyCode )
 {
-#ifndef _X360
 	return VCRHook_GetKeyState(virtualKeyCode);
-#else
-	return 0;
-#endif
 }
 
 class CSystem : public ISystem
@@ -308,22 +297,17 @@ long CSystem::GetTimeMillis()
 
 void CSystem::ShellExecute( const char *command, const char *file )
 {
-#ifndef _X360
 	::ShellExecuteA(NULL, command, file, NULL, NULL, SW_SHOWNORMAL);
-#endif
 }
 
 void CSystem::ShellExecuteEx( const char *command, const char *file, const char *pParams )
 {
-#ifndef _X360
 	::ShellExecuteA(NULL, command, file, pParams, NULL, SW_SHOWNORMAL);
-#endif
 }
 
 
 void CSystem::SetClipboardImage( void *pWnd, int x1, int y1, int x2, int y2 )
 {
-#ifndef _X360
 	if ( x2 <= x1 || y2 <= y1 )
 		return;
 
@@ -360,12 +344,10 @@ void CSystem::SetClipboardImage( void *pWnd, int x1, int y1, int x2, int y2 )
 	}
 
 	CloseClipboard();
-#endif
 }
 
 void CSystem::SetClipboardText(const char *text, int textLen)
 {
-#ifndef _X360
 	if (!text)
 		return;
 
@@ -392,7 +374,6 @@ void CSystem::SetClipboardText(const char *text, int textLen)
 	}
 	
 	CloseClipboard();
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -400,7 +381,6 @@ void CSystem::SetClipboardText(const char *text, int textLen)
 //-----------------------------------------------------------------------------
 void CSystem::SetClipboardText(const wchar_t *text, int textLen)
 {
-#ifndef _X360
 	if (!text)
 		return;
 
@@ -428,12 +408,10 @@ void CSystem::SetClipboardText(const wchar_t *text, int textLen)
 	}
 	
 	CloseClipboard();
-#endif
 }
 
 int CSystem::GetClipboardTextCount()
 {
-#ifndef _X360
 	int count = 0;
 	
 	if ( VCRGetMode() != VCR_Playback )
@@ -452,14 +430,10 @@ int CSystem::GetClipboardTextCount()
 	VCRGenericValue( "clipboard", &count, sizeof( count ) );
 
 	return count;
-#else
-	return 0;
-#endif
 }
 
 int CSystem::GetClipboardText(int offset, char *buf, int bufLen)
 {
-#ifndef _X360
 	int count = 0;
 	if ( buf && bufLen > 0 && VCRGetMode() != VCR_Playback )
 	{
@@ -496,9 +470,6 @@ int CSystem::GetClipboardText(int offset, char *buf, int bufLen)
 	VCRGenericValue( "cb", buf, count );
 
 	return count;
-#else
-	return 0;
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -506,7 +477,6 @@ int CSystem::GetClipboardText(int offset, char *buf, int bufLen)
 //-----------------------------------------------------------------------------
 int CSystem::GetClipboardText(int offset, wchar_t *buf, int bufLen)
 {
-#ifndef _X360
 	int retVal = 0;
 	if ( buf && bufLen > 0 && VCRGetMode() != VCR_Playback )
 	{
@@ -541,9 +511,6 @@ int CSystem::GetClipboardText(int offset, wchar_t *buf, int bufLen)
 	VCRGenericValue( "cb", buf, retVal*sizeof(wchar_t) );
 
 	return retVal;
-#else
-	return 0;
-#endif
 }
 
 static bool staticSplitRegistryKey(const char *key, char *key0, int key0Len, char *key1, int key1Len)
@@ -585,7 +552,6 @@ static bool staticSplitRegistryKey(const char *key, char *key0, int key0Len, cha
 
 bool CSystem::SetRegistryString(const char *key, const char *value)
 {
-#ifndef _X360
 	HKEY hKey;
 
 	HKEY hSlot = HKEY_CURRENT_USER;
@@ -618,14 +584,12 @@ bool CSystem::SetRegistryString(const char *key, const char *value)
 	}
 
 	VCRHook_RegCloseKey(hKey);
-#endif
 
 	return false;
 }
 
 bool CSystem::GetRegistryString(const char *key, char *value, int valueLen)
 {
-#ifndef _X360
 	if (!value)
 		return false;
 	value[0] = 0;
@@ -663,14 +627,12 @@ bool CSystem::GetRegistryString(const char *key, char *value, int valueLen)
 	}
 
 	VCRHook_RegCloseKey(hKey);
-#endif
 
 	return false;
 }
 
 bool CSystem::SetRegistryInteger(const char *key, int value)
 {
-#ifndef _X360
 	HKEY hKey;
 	HKEY hSlot = HKEY_CURRENT_USER;
 	if (!strncmp(key, "HKEY_LOCAL_MACHINE", 18))
@@ -702,13 +664,11 @@ bool CSystem::SetRegistryInteger(const char *key, int value)
 	}
 
 	VCRHook_RegCloseKey(hKey);
-#endif
 	return false;
 }
 
 bool CSystem::GetRegistryInteger(const char *key, int &value)
 {
-#ifndef _X360
 	HKEY hKey;
 	HKEY hSlot = HKEY_CURRENT_USER;
 	if (!strncmp(key, "HKEY_LOCAL_MACHINE", 18))
@@ -741,7 +701,6 @@ bool CSystem::GetRegistryInteger(const char *key, int &value)
 	}
 
 	VCRHook_RegCloseKey(hKey);
-#endif
 	return false;
 }
 
@@ -750,7 +709,6 @@ bool CSystem::GetRegistryInteger(const char *key, int &value)
 //-----------------------------------------------------------------------------
 bool CSystem::DeleteRegistryKey(const char *key)
 {
-#ifndef _X360
 	HKEY hSlot = HKEY_CURRENT_USER;
 	if (!strncmp(key, "HKEY_LOCAL_MACHINE", 18))
 	{
@@ -767,7 +725,6 @@ bool CSystem::DeleteRegistryKey(const char *key)
 	{
 		return true;
 	}
-#endif
 	return false;
 }
 
@@ -811,7 +768,7 @@ double CSystem::GetTimeSinceLastUse()
 //-----------------------------------------------------------------------------
 int CSystem::GetAvailableDrives(char *buf, int bufLen)
 {
-#if defined( _X360 ) || defined ( OSX )
+#if defined ( OSX )
 	return 0;
 #else // Windows
 	return GetLogicalDriveStrings( bufLen, buf );
@@ -977,7 +934,6 @@ bool CSystem::GetCurrentTimeAndDate(int *year, int *month, int *dayOfWeek, int *
 //-----------------------------------------------------------------------------
 bool CSystem::CreateShortcut(const char *linkFileName, const char *targetPath, const char *arguments, const char *workingDirectory, const char *iconFile)
 {
-#ifndef _X360
 	bool bSuccess = false;
 	char temp[MAX_PATH];
 	strcpy(temp, linkFileName);
@@ -1022,9 +978,6 @@ bool CSystem::CreateShortcut(const char *linkFileName, const char *targetPath, c
 		psl->Release();
 	}
 	return bSuccess;
-#else
-	return false;
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -1032,7 +985,6 @@ bool CSystem::CreateShortcut(const char *linkFileName, const char *targetPath, c
 //-----------------------------------------------------------------------------
 bool CSystem::GetShortcutTarget(const char *linkFileName, char *targetPath, char *arguments, int destBufferSizes)
 {
-#ifndef _X360
 	char temp[MAX_PATH];
 	strcpy(temp, linkFileName);
 	strlwr(temp);
@@ -1071,9 +1023,6 @@ bool CSystem::GetShortcutTarget(const char *linkFileName, char *targetPath, char
 		psl->Release();
 	}
 	return (targetPath[0] != 0);
-#else
-	return false;
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -1081,7 +1030,6 @@ bool CSystem::GetShortcutTarget(const char *linkFileName, char *targetPath, char
 //-----------------------------------------------------------------------------
 bool CSystem::ModifyShortcutTarget(const char *linkFileName, const char *targetPath, const char *arguments, const char *workingDirectory)
 {
-#ifndef _X360
 	bool bSuccess = false;
 	char temp[MAX_PATH];
 	strcpy(temp, linkFileName);
@@ -1118,9 +1066,6 @@ bool CSystem::ModifyShortcutTarget(const char *linkFileName, const char *targetP
 		psl->Release();
 	}
 	return bSuccess;
-#else
-	return false;
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -1128,7 +1073,6 @@ bool CSystem::ModifyShortcutTarget(const char *linkFileName, const char *targetP
 //-----------------------------------------------------------------------------
 const char *CSystem::GetDesktopFolderPath()
 {
-#ifndef _X360
 	static char folderPath[MAX_PATH];
 	folderPath[0] = 0;
 
@@ -1146,6 +1090,5 @@ const char *CSystem::GetDesktopFolderPath()
 	{
 		return folderPath;
 	}
-#endif
 	return NULL;
 }

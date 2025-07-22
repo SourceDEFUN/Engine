@@ -4,7 +4,7 @@
 //
 //=============================================================================
 
-#if defined( WIN32) && !defined( _X360 )
+#if defined(WIN32)
 #include "winlite.h"
 #endif
 #include "tier0/platform.h"
@@ -76,7 +76,7 @@ void CMPAException::ShowError()
     }
     strcat( szErrorMsg, m_szErrors[m_ErrorID] );
 
-#if defined(WIN32) && !defined(_X360)
+#if defined(WIN32)
     if( m_bGetLastError )
     {
         // get error message of last system error id

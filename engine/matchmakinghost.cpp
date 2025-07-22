@@ -349,20 +349,7 @@ void CMatchmaking::UpdateAcceptingConnections()
 // Purpose: Set the host data that gets sent in replies to client searches
 //-----------------------------------------------------------------------------
 void CMatchmaking::UpdateSessionReplyData( uint flags )
-{
-#if defined( _X360 )
-	if ( m_Session.GetSessionHandle() == INVALID_HANDLE_VALUE )
-		return;
-
-	// Enable listening for client Quality Of Service probes
-	XNKID id = m_Session.GetSessionId();
-	uint ret = XNetQosListen( &id, (BYTE*)&m_HostData, sizeof( m_HostData ), 0, flags );
-	if ( ret )
-	{
-		Warning( "Failed to update QOS Listener\n" );
-	}
-#endif
-}
+{}
 
 //-----------------------------------------------------------------------------
 // Purpose: Change properties of the current session

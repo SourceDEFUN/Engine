@@ -17,7 +17,7 @@
 #include "tier0/systeminformation.h"
 
 // fixme - stick this in a header file.
-#if defined( _DEBUG ) && !defined( _X360 )
+#if defined( _DEBUG )
 // define this if you want to range check all indices when drawing
 #define CHECK_INDICES
 #endif
@@ -1023,59 +1023,10 @@ inline void D3DSetStreamSource( unsigned int streamNumber, IDirect3DVertexBuffer
 // Tracks stream state and queued data
 //-----------------------------------------------------------------------------
 void Unbind( IDirect3DIndexBuffer9 *pIndexBuffer )
-{
-#ifdef _X360
-	IDirect3DIndexBuffer9 *pBoundBuffer;
-	Dx9Device()->GetIndices( &pBoundBuffer );
-	if ( pBoundBuffer == pIndexBuffer )
-	{
-		// xboxissue - cannot lock indexes set in a d3d device, clear possibly set indices
-		Dx9Device()->SetIndices( NULL );
-		g_pLastIndex = NULL;
-		g_pLastIndexBuffer = NULL;
-	}
-
-	if ( pBoundBuffer )
-	{
-		pBoundBuffer->Release();
-	}
-#endif
-}
+{}
 
 void Unbind( IDirect3DVertexBuffer9 *pVertexBuffer )
-{
-#ifdef _X360
-	UINT nOffset, nStride;
-	IDirect3DVertexBuffer9 *pBoundBuffer;
-	for ( int i = 0; i < MAX_DX8_STREAMS; ++i )
-	{
-		Dx9Device()->GetStreamSource( i, &pBoundBuffer, &nOffset, &nStride );
-		if ( pBoundBuffer == pVertexBuffer )
-		{
-			// xboxissue - cannot lock indexes set in a d3d device, clear possibly set indices
-			Dx9Device()->SetStreamSource( i, 0, 0, 0 );
-			switch ( i )
-			{
-			case 0:
-				g_pLastVertex = NULL;
-				g_pLastVertexBuffer = NULL;
-				break;
-
-			case 1:
-				g_pLastColorMesh = NULL;
-				g_nLastColorMeshVertOffsetInBytes = 0;
-				break;
-			}
-		}
-
-		if ( pBoundBuffer )
-		{
-			pBoundBuffer->Release();
-		}
-	}
-#endif
-}
-
+{}
 
 //-----------------------------------------------------------------------------
 // Helpers to count texture coordinates
@@ -1213,7 +1164,6 @@ bool CIndexBufferDx8::Allocate()
 	HRESULT hr = Dx9Device()->CreateIndexBuffer( 
 		m_nBufferSize, usage, format, D3DPOOL_DEFAULT, &m_pIndexBuffer, NULL );
 
-#if !defined( _X360 )
 	if ( ( hr == D3DERR_OUTOFVIDEOMEMORY ) || ( hr == E_OUTOFMEMORY ) )
 	{
 		// Don't have the memory for this.  Try flushing all managed resources
@@ -1223,7 +1173,6 @@ bool CIndexBufferDx8::Allocate()
 		hr = Dx9Device()->CreateIndexBuffer( 
 			m_nBufferSize, usage, format, D3DPOOL_DEFAULT, &m_pIndexBuffer, NULL );
 	}
-#endif // !X360
 
 	if ( FAILED(hr) || ( m_pIndexBuffer == NULL ) )
 	{
@@ -1459,12 +1408,7 @@ bool CIndexBufferDx8::Lock( int nMaxIndexCount, bool bAppend, IndexDesc_t &desc 
 		}
 	}
 
-#if !defined( _X360 )
-	hr = m_pIndexBuffer->Lock(  m_nFirstUnwrittenOffset, nMemoryRequired, &pLockedData, nLockFlags );
-#else
-	hr = m_pIndexBuffer->Lock( 0, 0, &pLockedData, nLockFlags );
-	pLockedData = ( ( unsigned char * )pLockedData + m_nFirstUnwrittenOffset );
-#endif
+	hr = m_pIndexBuffer->Lock( m_nFirstUnwrittenOffset, nMemoryRequired, &pLockedData, nLockFlags );
 
 	if ( FAILED( hr ) )
 	{
@@ -1629,7 +1573,6 @@ bool CVertexBufferDx8::Allocate()
 	HRESULT hr = Dx9Device()->CreateVertexBuffer( 
 		m_nBufferSize, usage, 0, pool, &m_pVertexBuffer, NULL );
 
-#if !defined( _X360 )
 	if ( ( hr == D3DERR_OUTOFVIDEOMEMORY ) || ( hr == E_OUTOFMEMORY ) )
 	{
 		// Don't have the memory for this.  Try flushing all managed resources
@@ -1639,7 +1582,6 @@ bool CVertexBufferDx8::Allocate()
 		hr = Dx9Device()->CreateVertexBuffer( 
 			m_nBufferSize, usage, 0, pool, &m_pVertexBuffer, NULL );
 	}
-#endif // !X360
 
 	if ( FAILED(hr) || ( m_pVertexBuffer == NULL ) )
 	{
@@ -1857,12 +1799,7 @@ bool CVertexBufferDx8::Lock( int nMaxVertexCount, bool bAppend, VertexDesc_t &de
 		}
 	}
 
-#if !defined( _X360 )
 	hr = m_pVertexBuffer->Lock( m_nFirstUnwrittenOffset, nMemoryRequired, &pLockedData, nLockFlags );
-#else
-	hr = m_pVertexBuffer->Lock( 0, 0, &pLockedData, nLockFlags );
-	pLockedData = (unsigned char*)pLockedData + m_nFirstUnwrittenOffset;
-#endif
 
 	if ( FAILED( hr ) )
 	{
@@ -2423,11 +2360,6 @@ inline D3DPRIMITIVETYPE ComputeMode( MaterialPrimitiveType_t type )
 {
 	switch(type)
 	{
-#ifdef _X360
-	case MATERIAL_INSTANCED_QUADS:
-		return D3DPT_QUADLIST;
-#endif
-
 	case MATERIAL_POINTS:
 		return D3DPT_POINTLIST;
 		
@@ -3205,11 +3137,7 @@ void CMeshDX8::SetVertexStreamState( int nVertOffsetInBytes )
 	}
 
 	// MESHFIXME: Make sure this jives between the mesh/ib/vb version.
-#ifdef _X360
-	if ( ( g_pLastVertex != m_pVertexBuffer ) || ( m_pVertexBuffer->IsDynamic() ) || ( g_nLastVertOffsetInBytes != nVertOffsetInBytes ) )
-#else
 	if ( ( g_pLastVertex != m_pVertexBuffer ) || ( g_nLastVertOffsetInBytes != nVertOffsetInBytes ) )
-#endif
 	{
 		Assert( m_pVertexBuffer );
 
@@ -3229,11 +3157,7 @@ void CMeshDX8::SetVertexStreamState( int nVertOffsetInBytes )
 
 void CMeshDX8::SetIndexStreamState( int firstVertexIdx )
 {
-#ifdef _X360
-	if ( ( g_pLastIndexBuffer != NULL ) || (g_pLastIndex != m_pIndexBuffer) || ( m_pIndexBuffer->IsDynamic() ) || ( firstVertexIdx != g_LastVertexIdx ) )
-#else
 	if ( ( g_pLastIndexBuffer != NULL ) || (g_pLastIndex != m_pIndexBuffer) || ( firstVertexIdx != g_LastVertexIdx ) )
-#endif
 	{
 		Assert( m_pIndexBuffer );
 
@@ -5122,14 +5046,12 @@ void CMeshMgr::DestroyVertexBuffers()
 	RECORD_INT( 0 );
 	D3DSetStreamSource( 2, 0, 0, 0 );
 
-#ifndef _X360
 	RECORD_COMMAND( DX8_SET_STREAM_SOURCE, 4 );
 	RECORD_INT( -1 );
 	RECORD_INT( 3 );
 	RECORD_INT( 0 );
 	RECORD_INT( 0 );
 	D3DSetStreamSource( 3, 0, 0, 0 );
-#endif
 
 	for (int i = m_DynamicVertexBuffers.Count(); --i >= 0; )
 	{

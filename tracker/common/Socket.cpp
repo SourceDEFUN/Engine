@@ -4,17 +4,11 @@
 //
 // $NoKeywords: $
 //=============================================================================
-#if !defined( _X360 )
 #define FD_SETSIZE 1024
-#endif
 
 #include <assert.h>
 #include "winlite.h"
-#if !defined( _X360 )
 #include "winsock.h"
-#else
-#include "winsockx.h"
-#endif
 #include "msgbuffer.h"
 #include "socket.h"
 #include "inetapi.h"
@@ -22,9 +16,6 @@
 
 #include <VGUI/IVGui.h>
 
-#if defined( _X360 )
-#include "xbox/xbox_win32stubs.h"
-#endif
 
 //-----------------------------------------------------------------------------
 // Purpose: All socket I/O occurs on a thread

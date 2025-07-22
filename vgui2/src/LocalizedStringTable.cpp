@@ -7,7 +7,7 @@
 
 
 #pragma warning( disable: 4018 ) // '==' : signed/unsigned mismatch in rbtree
-#if defined( WIN32 ) && !defined( _X360 )
+#if defined( WIN32 )
 #include <windows.h>
 #elif defined( POSIX )
 #include <iconv.h>
@@ -30,9 +30,6 @@
 #include "tier0/icommandline.h"
 #include "byteswap.h"
 
-#if defined( _X360 )
-#include "xbox/xbox_win32stubs.h"
-#endif
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -535,12 +532,8 @@ bool CLocalizedStringTable::AddFile( const char *szFileName, const char *pPathID
 									// the language symbols are true if we are in that language
 									// english is assumed when no language is present
 									const char *pLanguageString;
-#ifdef _X360
-									pLanguageString = XBX_GetLanguageString();
-#else
 									static ConVarRef cl_language( "cl_language" );
 									pLanguageString = cl_language.GetString();
-#endif
 									if ( !pLanguageString || !pLanguageString[0] )
 									{
 										pLanguageString = "english";

@@ -443,12 +443,6 @@ static OutputRowFunc_t GetOutputRowFunc( ImageFormat imageFormat )
 		return &OutputRowBGR565;
 	case IMAGE_FORMAT_BGRX5551:
 		return &OutputRowBGRX5551;
-#ifdef _X360
-	case IMAGE_FORMAT_LINEAR_RGB888:
-		return &OutputRowRGB888;
-	case IMAGE_FORMAT_LINEAR_BGR888:
-		return &OutputRowBGR888;
-#endif
 	default:
 		return NULL;
 		break;

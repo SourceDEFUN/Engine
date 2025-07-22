@@ -381,9 +381,6 @@ private:
 	struct InviteWaitingInfo_t
 	{
 		DWORD				m_UserIdx;
-#if defined( _X360 )
-		XUSER_SIGNIN_INFO	m_SignInInfo;
-#endif
 		DWORD				m_SignInState;
 		BOOL				m_PrivilegeMultiplayer;
 		int					m_InviteStorageDeviceSelected;

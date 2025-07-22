@@ -457,15 +457,6 @@ fltx4 g_IVPToHLDir = { 1.0f, -1.0f, 1.0f, 1.0f };
 
 //static const fltx4 g_IVPToHLPosition = { IVP2HL(1.0f), -IVP2HL(1.0f), IVP2HL(1.0f), IVP2HL(1.0f) };
 
-#if defined(_X360)
-
-FORCEINLINE fltx4 ConvertDirectionToIVP( const fltx4 & a )
-{
-	fltx4 t = __vpermwi( a, VPERMWI_CONST( 0, 2, 1, 3 ) );
-	// negate Y
-	return MulSIMD( t, g_IVPToHLDir );
-}
-#else
 FORCEINLINE fltx4 ConvertDirectionToIVP( const fltx4 & a )
 {
 	// swap Z & Y
@@ -473,7 +464,6 @@ FORCEINLINE fltx4 ConvertDirectionToIVP( const fltx4 & a )
 	// negate Y
 	return MulSIMD( t, g_IVPToHLDir );
 }
-#endif
 
 CTraceIVP::CTraceIVP( const CPhysCollide *pCollide, const Vector &origin, const QAngle &angles )
 {
@@ -686,14 +676,7 @@ int CTraceIVP::SupportMapCached( const Vector &dir, Vector *pOut ) const
 	VPROF("SupportMapCached");
 #if USE_VERT_CACHE
 	FourVectors fourDir;
-#if defined(_X360)
-	fltx4 vec = LoadUnaligned3SIMD( dir.Base() );
-	fourDir.x = SplatXSIMD(vec);
-	fourDir.y = SplatYSIMD(vec);
-	fourDir.z = SplatZSIMD(vec);
-#else
 	fourDir.DuplicateVector(dir);
-#endif
 
 	fltx4 index = g_IndexBase;
 	fltx4 maxIndex = g_IndexBase;
@@ -1416,18 +1399,7 @@ static void CalculateSeparatingPlane( trace_t *ptr, ITraceObject *sweepObject, C
 // So the origin is the point in the field where the distance between the 
 // objects is zero.  This means they intersect.
 //-----------------------------------------------------------------------------
-#if defined(_X360)
-inline void VectorNormalize_FastLowPrecision( Vector &a ) 
-{
-	float quad = (a.x*a.x) + (a.y*a.y) + (a.z*a.z);
-	float ilen = __frsqrte(quad);
-	a.x *= ilen;
-	a.y *= ilen;
-	a.z *= ilen;
-}
-#else
 #define VectorNormalize_FastLowPrecision VectorNormalize
-#endif
 
 bool CTraceSolver::SweepSingleConvex( void )
 {

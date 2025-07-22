@@ -39,9 +39,6 @@
 #include "LoadScreenUpdate.h"
 #include "client.h"
 #include "sourcevr/isourcevirtualreality.h"
-#if defined( _X360 )
-#include "xbox/xbox_launch.h"
-#endif
 
 #if defined( USE_SDL )
 #include "SDL.h"
@@ -123,19 +120,13 @@ static ConVar mat_monitorgamma_tv_range_min( "mat_monitorgamma_tv_range_min", "1
 static ConVar mat_monitorgamma_tv_range_max( "mat_monitorgamma_tv_range_max", "255" );
 // TV's generally have a 2.5 gamma, so we need to convert our 2.2 frame buffer into a 2.5 frame buffer for display on a TV
 static ConVar mat_monitorgamma_tv_exp( "mat_monitorgamma_tv_exp", "2.5", 0, "", true, 1.0f, true, 4.0f );
-#ifdef _X360
-static ConVar mat_monitorgamma_tv_enabled( "mat_monitorgamma_tv_enabled", "1", FCVAR_ARCHIVE, "" );
-#else
 static ConVar mat_monitorgamma_tv_enabled( "mat_monitorgamma_tv_enabled", "0", FCVAR_ARCHIVE, "" );
-#endif
 				  
 ConVar r_drawbrushmodels( "r_drawbrushmodels", "1", FCVAR_CHEAT, "Render brush models. 0=Off, 1=Normal, 2=Wireframe" );
 
 ConVar r_shadowrendertotexture( "r_shadowrendertotexture", "0" );
 ConVar r_flashlightdepthtexture( "r_flashlightdepthtexture", "1" );
-#ifndef _X360
 ConVar r_waterforceexpensive( "r_waterforceexpensive", "0", FCVAR_ARCHIVE );
-#endif
 ConVar r_waterforcereflectentities( "r_waterforcereflectentities", "0" );
 
 // Note: this is only here so we can ship an update without changing materialsystem.dll.
@@ -233,9 +224,7 @@ static const char *s_pRegistryConVars[] =
 	"mat_reducefillrate",
 	"r_shadowrendertotexture",
 	"r_rootlod",
-#ifndef _X360
 	"r_waterforceexpensive",
-#endif
 	"r_waterforcereflectentities",
 	"mat_antialias",
 	"mat_aaquality",
@@ -879,9 +868,7 @@ void GetMaterialSystemConfigForBenchmarkUpload(KeyValues *dataToUpload)
 	dataToUpload->SetInt( "ReduceFillRate", (g_pMaterialSystemConfig->m_Flags & MATSYS_VIDCFG_FLAGS_REDUCE_FILLRATE) ? 1 : 0 );
 	dataToUpload->SetInt( "RenderToTextureShadows", r_shadowrendertotexture.GetInt() ? 1 : 0 );
 	dataToUpload->SetInt( "FlashlightDepthTexture", r_flashlightdepthtexture.GetInt() ? 1 : 0 );
-#ifndef _X360
 	dataToUpload->SetInt( "RealtimeWaterReflection", r_waterforceexpensive.GetInt() ? 1 : 0 );
-#endif
 	dataToUpload->SetInt( "WaterReflectEntities", r_waterforcereflectentities.GetInt() ? 1 : 0 );
 #endif
 }
@@ -910,9 +897,7 @@ void PrintMaterialSystemConfig( const MaterialSystem_Config_t &config )
 	Warning( "r_shadowrendertotexture: %s\n", r_shadowrendertotexture.GetInt() ? "true" : "false" );
 	Warning( "motionblur: %s\n", config.m_bMotionBlur ? "true" : "false" );
 	Warning( "shadowdepthtexture: %s\n", config.m_bShadowDepthTexture ? "true" : "false" );
-#ifndef _X360
 	Warning( "r_waterforceexpensive: %s\n", r_waterforceexpensive.GetInt() ? "true" : "false" );
-#endif
 	Warning( "r_waterforcereflectentities: %s\n", r_waterforcereflectentities.GetInt() ? "true" : "false" );
 }
 
@@ -922,7 +907,7 @@ CON_COMMAND( mat_configcurrent, "show the current video control panel config for
 	PrintMaterialSystemConfig( config );
 }
 
-#if !defined(SWDS) && !defined( _X360 )
+#if !defined(SWDS)
 CON_COMMAND( mat_setvideomode, "sets the width, height, windowed state of the material system" )
 {
 	if ( args.ArgC() != 4 )
@@ -1511,16 +1496,10 @@ void InitStartupScreen()
 	if ( !IsX360() )
 		return;
 
-#ifdef _X360
-	XVIDEO_MODE videoMode;
-	XGetVideoMode( &videoMode );
-	bool bIsWidescreen = videoMode.fIsWideScreen != FALSE;
-#else
 	int width, height;
 	materials->GetBackBufferDimensions( width, height );
 	float aspectRatio = (float)width/(float)height;
 	bool bIsWidescreen = aspectRatio >= 1.5999f;
-#endif
 
 	// NOTE: Brutal hackery, this code is duplicated in gameui.dll
 	// but I have to do this prior to gameui being loaded.

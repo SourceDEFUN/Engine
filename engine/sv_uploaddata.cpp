@@ -7,12 +7,12 @@
 //=============================================================================//
 
 
-#if defined(_WIN32) && !defined(_X360)
+#if defined(_WIN32)
 #include <winsock.h>
 #elif POSIX
 #include <sys/socket.h>
 #include <netinet/in.h>
-#elif !defined(_X360)
+#else
 #error "define socket.h"
 #endif
 #include "host.h"

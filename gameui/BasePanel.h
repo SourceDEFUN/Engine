@@ -20,10 +20,7 @@
 #include "tier1/CommandBuffer.h"
 
 #include "ixboxsystem.h"
-
-#if !defined( _X360 )
 #include "xbox/xboxstubs.h"
-#endif
 
 enum
 {
@@ -279,10 +276,6 @@ public:
 
 	void CloseBaseDialogs( void );
 	bool IsWaitingForConsoleUI( void ) { return m_bWaitingForStorageDeviceHandle || m_bWaitingForUserSignIn || m_bXUIVisible; }
-
-#if defined( _X360 )
-	CON_COMMAND_MEMBER_F( CBasePanel, "gameui_reload_resources", Reload_Resources, "Reload the Xbox 360 UI res files", 0 );
-#endif
 
 	int  GetMenuAlpha( void );
 

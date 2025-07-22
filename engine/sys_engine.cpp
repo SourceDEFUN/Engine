@@ -463,7 +463,7 @@ void CEngine::Frame( void )
 	// Remember old time
 	m_flPreviousTime = m_flCurrentTime;
 
-#if defined( VPROF_ENABLED ) && defined( _X360 )
+#if defined( VPROF_ENABLED )
 	UpdateVXConsoleProfile();
 #endif
 }

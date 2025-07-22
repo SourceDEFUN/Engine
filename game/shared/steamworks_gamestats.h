@@ -15,9 +15,7 @@
 #include "steam/steam_api.h"
 #include "utlvector.h"
 
-#ifndef	_X360
 #include "steam/isteamgamestats.h"
-#endif
 
 // Container to hold all the KeyValue stats to send only if the convar "steamworks_immediate_upload" is set to 0.
 // Otherwise, the stats are uploaded as they are received.

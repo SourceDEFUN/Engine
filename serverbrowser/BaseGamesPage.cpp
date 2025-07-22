@@ -7,9 +7,6 @@
 
 #include "pch_serverbrowser.h"
 
-#if defined( _X360 )
-#include "xbox/xbox_win32stubs.h"
-#endif
 
 using namespace vgui;
 

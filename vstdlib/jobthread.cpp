@@ -4,7 +4,7 @@
 //
 //=============================================================================
 
-#if defined( _WIN32 ) && !defined( _X360 )
+#if defined( _WIN32 )
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #endif
@@ -19,9 +19,6 @@
 #include "tier1/generichash.h"
 #include "tier0/vprof.h"
 
-#if defined( _X360 )
-#include "xbox/xbox_win32stubs.h"
-#endif
 
 #include "tier0/memdbgon.h"
 

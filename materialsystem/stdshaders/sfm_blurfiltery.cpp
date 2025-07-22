@@ -52,9 +52,7 @@ BEGIN_VS_SHADER_FLAGS( sfm_blurfiltery_shader, "Help for BlurFilterY", SHADER_NO
 			if( g_pHardwareConfig->SupportsPixelShaders_2_b() )
 			{
 				DECLARE_STATIC_PIXEL_SHADER( blurfilter_ps20b );
-#ifndef _X360
 				SET_STATIC_PIXEL_SHADER_COMBO( APPROX_SRGB_ADAPTER, 0 );
-#endif
 				SET_STATIC_PIXEL_SHADER( blurfilter_ps20b );
 			}
 			else

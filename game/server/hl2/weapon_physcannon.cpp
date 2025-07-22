@@ -1048,7 +1048,7 @@ void CPlayerPickupController::Init( CBasePlayer *pPlayer, CBaseEntity *pObject )
 	
 	m_grabController.AttachEntity( pPlayer, pObject, pPhysics, false, vec3_origin, false );
 	// NVNT apply a downward force to simulate the mass of the held object.
-#if defined( WIN32 ) && !defined( _X360 )
+#if defined( WIN32 )
 	HapticSetConstantForce(m_pPlayer,clamp(m_grabController.GetLoadWeight()*0.1,1,6)*Vector(0,-1,0));
 #endif
 	
@@ -1073,7 +1073,7 @@ void CPlayerPickupController::Shutdown( bool bThrown )
 
 	m_grabController.DetachEntity( bClearVelocity );
 	// NVNT if we have a player, issue a zero constant force message
-#if defined( WIN32 ) && !defined( _X360 )
+#if defined( WIN32 )
 	if(m_pPlayer)
 		HapticSetConstantForce(m_pPlayer,Vector(0,0,0));
 #endif
@@ -2421,7 +2421,7 @@ bool CWeaponPhysCannon::AttachObject( CBaseEntity *pObject, const Vector &vPosit
 
 	if( pOwner )
 	{
-#if defined( WIN32 ) && !defined( _X360 )
+#if defined( WIN32 )
 		// NVNT set the players constant force to simulate holding mass
 		HapticSetConstantForce(pOwner,clamp(m_grabController.GetLoadWeight()*0.05,1,5)*Vector(0,-1,0));
 #endif
@@ -2881,7 +2881,7 @@ void CWeaponPhysCannon::DetachObject( bool playSound, bool wasLaunched )
 		{
 			pOwner->RumbleEffect( RUMBLE_357, 0, RUMBLE_FLAG_RESTART );
 		}
-#if defined( WIN32 ) && !defined( _X360 )
+#if defined( WIN32 )
 		// NVNT clear constant force
 		HapticSetConstantForce(pOwner,Vector(0,0,0));
 #endif

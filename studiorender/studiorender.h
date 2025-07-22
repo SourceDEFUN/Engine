@@ -22,7 +22,7 @@
 #include "flexrenderdata.h"
 #include "mathlib/compressed_vector.h"
 #include "r_studiolight.h"
-#if defined( _WIN32 ) && !defined( _X360 )
+#if defined( _WIN32 )
 #include <xmmintrin.h>
 #endif
 #include "tier0/dbg.h"
@@ -256,7 +256,7 @@ public:
 	// Performs the lighting computation
 	inline void R_ComputeLightAtPoint3( const Vector &pos, const Vector &norm, Vector &color );
 
-#if defined( _WIN32 ) && !defined( _X360 )
+#if defined( _WIN32 )
 	// sse-ized lighting pipeline. lights 4 vertices at once
 	inline void R_ComputeLightAtPoints3( const FourVectors &pos, const FourVectors &norm, FourVectors &color );
 	void R_MouthLighting( __m128 fIllum, const FourVectors& normal, const FourVectors& forward, FourVectors& light );

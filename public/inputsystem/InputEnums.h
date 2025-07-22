@@ -13,11 +13,7 @@
 // Standard maximum +/- value of a joystick axis
 #define MAX_BUTTONSAMPLE			32768
 
-#if !defined( _X360 )
 #define INVALID_USER_ID		-1
-#else
-#define INVALID_USER_ID		XBX_INVALID_USER_ID
-#endif
 
 //-----------------------------------------------------------------------------
 // Forward declarations: 

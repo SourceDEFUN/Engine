@@ -4,10 +4,8 @@
 //
 //=============================================================================//
 #ifdef _WIN32
-#if !defined( _X360 )
 #include "winlite.h"
 #include <winsock2.h> // INADDR_ANY defn
-#endif
 #elif POSIX
 #include <netinet/in.h>
 #endif

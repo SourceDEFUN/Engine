@@ -20,9 +20,6 @@
 #include "filesystem.h"
 #include "filesystem_engine.h"
 #include "tier1/utlbuffer.h"
-#if defined( _X360 )
-#include "xauddefs.h"
-#endif
 
 #include "steam/steam_api.h"
 

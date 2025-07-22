@@ -14,10 +14,8 @@
 #include "cloak_ps20.inc"
 #include "cloak_ps20b.inc"
 
-#ifndef _X360
 #include "cloak_vs30.inc"
 #include "cloak_ps30.inc"
-#endif
 
 static ConVar r_lightwarpidentity( "r_lightwarpidentity", "0", FCVAR_CHEAT );
 
@@ -105,9 +103,7 @@ void DrawCloak_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderDynami
 
 		pShaderShadow->VertexShaderVertexFormat( flags, nTexCoordCount, NULL, userDataSize );
 
-#ifndef _X360
 		if ( !g_pHardwareConfig->HasFastVertexTextures() )
-#endif
 		{
 			bool bUseStaticControlFlow = g_pHardwareConfig->SupportsStaticControlFlow();
 
@@ -130,7 +126,6 @@ void DrawCloak_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderDynami
 				SET_STATIC_PIXEL_SHADER( cloak_ps20 );
 			}
 		}
-#ifndef _X360
 		else
 		{
 			// The vertex shader uses the vertex id stream
@@ -145,7 +140,6 @@ void DrawCloak_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderDynami
 			SET_STATIC_PIXEL_SHADER_COMBO( LIGHTWARPTEXTURE, hasDiffuseWarp );
 			SET_STATIC_PIXEL_SHADER( cloak_ps30 );
 		}
-#endif
 
 		pShader->DefaultFog();
 
@@ -182,9 +176,7 @@ void DrawCloak_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderDynami
 		LightState_t lightState;
 		pShaderAPI->GetDX9LightState( &lightState );
 
-#ifndef _X360
 		if ( !g_pHardwareConfig->HasFastVertexTextures() )
-#endif
 		{
 			bool bUseStaticControlFlow = g_pHardwareConfig->SupportsStaticControlFlow();
 
@@ -218,7 +210,6 @@ void DrawCloak_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderDynami
 				SET_DYNAMIC_PIXEL_SHADER( cloak_ps20 );
 			}
 		}
-#ifndef _X360
 		else
 		{
 			pShader->SetHWMorphVertexShaderState( VERTEX_SHADER_SHADER_SPECIFIC_CONST_6, VERTEX_SHADER_SHADER_SPECIFIC_CONST_7, SHADER_VERTEXTEXTURE_SAMPLER0 );
@@ -236,7 +227,6 @@ void DrawCloak_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderDynami
 			SET_DYNAMIC_PIXEL_SHADER_COMBO( PIXELFOGTYPE, pShaderAPI->GetPixelFogCombo() );
 			SET_DYNAMIC_PIXEL_SHADER( cloak_ps30 );
 		}
-#endif
 
 		pShader->SetVertexShaderTextureTransform( VERTEX_SHADER_SHADER_SPECIFIC_CONST_1, info.m_nBumpTransform );
 

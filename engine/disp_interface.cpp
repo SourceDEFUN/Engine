@@ -529,9 +529,7 @@ void CDispInfo::SetTag()
 //-----------------------------------------------------------------------------
 
 // This function crashes in release without this pragma.
-#if !defined( _X360 )
 #pragma optimize( "g", off )
-#endif
 #pragma optimize( "", on )
 
 void DispInfo_BuildPrimLists( int nSortGroup, SurfaceHandle_t *pList, int listCount, bool bDepthOnly,

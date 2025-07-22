@@ -37,9 +37,6 @@
 #include "hud_vote.h"
 #include "ienginevgui.h"
 #include "sourcevr/isourcevirtualreality.h"
-#if defined( _X360 )
-#include "xbox/xbox_console.h"
-#endif
 
 #if defined( REPLAY_ENABLED )
 #include "replay/replaycamera.h"
@@ -175,11 +172,6 @@ CON_COMMAND_F( crash, "Crash the client. Optional parameter -- type of crash:\n 
 		case 1:
 			*((int *)NULL) = 42;
 			break;
-#if defined( _X360 )
-		case 2:
-			XBX_CrashDump(false);
-			break;
-#endif
 		default:
 			Msg("Unknown variety of crash. You have now failed to crash. I hope you're happy.\n");
 			break;

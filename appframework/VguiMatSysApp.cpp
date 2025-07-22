@@ -8,7 +8,7 @@
 //=============================================================================
 #ifdef _WIN32
 
-#if defined( _WIN32 ) && !defined( _X360 )
+#if defined( _WIN32 )
 #include <windows.h>
 #endif
 #include "appframework/vguimatsysapp.h"

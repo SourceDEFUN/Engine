@@ -40,11 +40,6 @@ bool CLC_VoiceData::WriteToBuffer( bf_write &buffer )
 
 	buffer.WriteWord( m_nLength );	// length in bits
 
-	//Send this client's XUID (only needed on the 360)
-#if defined ( _X360 )
-	buffer.WriteLongLong( m_xuid );
-#endif
-	
 	return buffer.WriteBits( m_DataOut.GetBasePointer(), m_nLength );
 }
 
@@ -53,10 +48,6 @@ bool CLC_VoiceData::ReadFromBuffer( bf_read &buffer )
 	VPROF( "CLC_VoiceData::ReadFromBuffer" );
 
 	m_nLength = buffer.ReadWord();	// length in bits
-
-#if defined ( _X360 )
-	m_xuid	= buffer.ReadLongLong();
-#endif
 
 	m_DataIn = buffer;
 

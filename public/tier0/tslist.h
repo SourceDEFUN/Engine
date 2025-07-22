@@ -18,7 +18,7 @@
 #pragma warning( disable : 4700 )
 #endif
 
-#if defined( USE_NATIVE_SLIST ) && !defined( _X360 )
+#if defined( USE_NATIVE_SLIST )
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #endif
@@ -28,9 +28,6 @@
 #include "tier0/memalloc.h"
 #include "tier0/memdbgoff.h"
 
-#if defined( _X360 )
-#define USE_NATIVE_SLIST
-#endif
 
 //-----------------------------------------------------------------------------
 
@@ -217,12 +214,7 @@ public:
 #endif
 
 #ifdef USE_NATIVE_SLIST
-#ifdef _X360
-		// integrated write-release barrier
-		return (TSLNodeBase_t *)InterlockedPushEntrySListRelease( &m_Head, pNode );
-#else
 		return (TSLNodeBase_t *)InterlockedPushEntrySList( &m_Head, pNode );
-#endif
 #else
 		TSLHead_t oldHead;
 		TSLHead_t newHead;
@@ -258,12 +250,7 @@ public:
 	NO_ASAN TSLNodeBase_t *Pop()
 	{
 #ifdef USE_NATIVE_SLIST
-#ifdef _X360
-		// integrated read-acquire barrier
-		TSLNodeBase_t *pNode = (TSLNodeBase_t *)InterlockedPopEntrySListAcquire( &m_Head );
-#else
 		TSLNodeBase_t *pNode = (TSLNodeBase_t *)InterlockedPopEntrySList( &m_Head );
-#endif
 		return pNode;
 #else
 		TSLHead_t oldHead;
@@ -300,7 +287,7 @@ public:
 	{
 #ifdef USE_NATIVE_SLIST
 		TSLNodeBase_t *pBase = (TSLNodeBase_t *)InterlockedFlushSList( &m_Head );
-#if defined( _X360 ) || defined( _PS3 )
+#if defined( _PS3 )
 		__lwsync(); // read-acquire barrier
 #endif
 		return pBase;

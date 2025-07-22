@@ -36,7 +36,7 @@
 #endif
 
 // Steam API export macro
-#if defined( _WIN32 ) && !defined( _X360 )
+#if defined( _WIN32 )
 	#if defined( STEAM_API_EXPORTS )
 	#define S_API extern "C" __declspec( dllexport ) 
 	#elif defined( STEAM_API_NODLL )

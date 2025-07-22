@@ -174,9 +174,6 @@ BEGIN_VS_SHADER( DecalBaseTimesLightmapAlphaBlendSelfIllum_DX9, "" )
 			SET_STATIC_VERTEX_SHADER_COMBO( RELIEF_MAPPING,  false );
 			SET_STATIC_VERTEX_SHADER_COMBO( SEAMLESS,  false );
 			SET_STATIC_VERTEX_SHADER_COMBO( BUMPMASK,  false );
-#ifdef _X360
-			SET_STATIC_VERTEX_SHADER_COMBO( FLASHLIGHT,  0 );
-#endif
 			SET_STATIC_VERTEX_SHADER( lightmappedgeneric_vs20 );
 
 			if( g_pHardwareConfig->SupportsPixelShaders_2_b() )

@@ -2137,21 +2137,8 @@ bool CNavArea::IsCoplanar( const CNavArea *area ) const
 float CNavArea::GetZ( float x, float y ) const RESTRICT
 {
 	// guard against division by zero due to degenerate areas
-#ifdef _X360 
-	// do the compare-against-zero on the integer unit to avoid a fcmp
-	// IEEE754 float positive zero is simply 0x00. There is also a 
-	// floating-point negative zero (-0.0f == 0x80000000), but given 
-	// how m_inv is computed earlier, that's not a possible value for
-	// it here, so we don't have to check for that.
-	//
-	// oddly, the compiler isn't smart enough to do this on its own
-	if ( *reinterpret_cast<const unsigned *>(&m_invDxCorners) == 0 ||
-		 *reinterpret_cast<const unsigned *>(&m_invDyCorners) == 0 )
-		return m_neZ;
-#else
 	if (m_invDxCorners == 0.0f || m_invDyCorners == 0.0f)
 		return m_neZ;
-#endif
 
 	float u = (x - m_nwCorner.x) * m_invDxCorners;
 	float v = (y - m_nwCorner.y) * m_invDyCorners;

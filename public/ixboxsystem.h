@@ -12,9 +12,7 @@
 #pragma once
 #endif
 
-#if !defined( _X360 )
 #include "xbox/xboxstubs.h"
-#endif
 
 typedef void* AsyncHandle_t;
 typedef void* XboxHandle_t;

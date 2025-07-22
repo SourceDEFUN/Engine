@@ -19,11 +19,7 @@ static CFontManager s_FontManager;
 extern bool s_bSupportsUnicode;
 #endif
 
-#if !defined( _X360 )
 #define MAX_INITIAL_FONTS	100
-#else
-#define MAX_INITIAL_FONTS	1
-#endif
 
 //-----------------------------------------------------------------------------
 // Purpose: singleton accessor
@@ -658,64 +654,10 @@ const char *CFontManager::GetForeignFallbackFontName()
 #endif
 }
 
-#if defined( _X360 )
-bool CFontManager::GetCachedXUIMetrics( const char *pFontName, int tall, int style, XUIFontMetrics *pFontMetrics, XUICharMetrics charMetrics[256] )
-{
-	// linear lookup is good enough
-	CUtlSymbol fontSymbol = pFontName;
-	bool bFound = false;
-	int i;
-	for ( i = 0; i < m_XUIMetricCache.Count(); i++ )
-	{
-		if ( m_XUIMetricCache[i].fontSymbol == fontSymbol && m_XUIMetricCache[i].tall == tall && m_XUIMetricCache[i].style == style )
-		{
-			bFound = true;
-			break;
-		}
-	}
-	if ( !bFound )
-	{
-		return false;
-	}
 
-	// get from the cache
-	*pFontMetrics = m_XUIMetricCache[i].fontMetrics;
-	V_memcpy( charMetrics, m_XUIMetricCache[i].charMetrics, 256 * sizeof( XUICharMetrics ) );
-	return true;
-}
-#endif
-
-#if defined( _X360 )
-void CFontManager::SetCachedXUIMetrics( const char *pFontName, int tall, int style, XUIFontMetrics *pFontMetrics, XUICharMetrics charMetrics[256] )
-{
-	MEM_ALLOC_CREDIT();
-
-	int i = m_XUIMetricCache.AddToTail();
-
-	m_XUIMetricCache[i].fontSymbol = pFontName;
-	m_XUIMetricCache[i].tall = tall;
-	m_XUIMetricCache[i].style = style;
-	m_XUIMetricCache[i].fontMetrics = *pFontMetrics;
-	V_memcpy( m_XUIMetricCache[i].charMetrics, charMetrics, 256 * sizeof( XUICharMetrics ) );
-}
-#endif
 
 void CFontManager::ClearTemporaryFontCache()
 {
-#if defined( _X360 )
-	COM_TimestampedLog( "ClearTemporaryFontCache(): Start" );
-
-	m_XUIMetricCache.Purge();
-
-	// many fonts are blindly precached by vgui and never used
-	// font will re-open if glyph is actually requested
-	for ( int i = 0; i < m_Win32Fonts.Count(); i++ )
-	{
-		m_Win32Fonts[i]->CloseResource();
-	}
-
-	COM_TimestampedLog( "ClearTemporaryFontCache(): Finish" );
-#endif
 }
 
 //-----------------------------------------------------------------------------

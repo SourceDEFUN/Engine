@@ -375,22 +375,17 @@ BEGIN_DATADESC( CWorld )
 	DEFINE_FIELD( m_flWaveHeight, FIELD_FLOAT ),
 
 	// keyvalues are parsed from map, but not saved/loaded
-	DEFINE_KEYFIELD( m_iszChapterTitle, FIELD_STRING, "chaptertitle" ),
-	DEFINE_KEYFIELD( m_bStartDark,		FIELD_BOOLEAN, "startdark" ),
-	DEFINE_KEYFIELD( m_bDisplayTitle,	FIELD_BOOLEAN, "gametitle" ),
-	DEFINE_FIELD( m_WorldMins, FIELD_VECTOR ),
-	DEFINE_FIELD( m_WorldMaxs, FIELD_VECTOR ),
-#ifdef _X360
-	DEFINE_KEYFIELD( m_flMaxOccludeeArea, FIELD_FLOAT, "maxoccludeearea_x360" ),
-	DEFINE_KEYFIELD( m_flMinOccluderArea, FIELD_FLOAT, "minoccluderarea_x360" ),
-#else
-	DEFINE_KEYFIELD( m_flMaxOccludeeArea, FIELD_FLOAT, "maxoccludeearea" ),
-	DEFINE_KEYFIELD( m_flMinOccluderArea, FIELD_FLOAT, "minoccluderarea" ),
-#endif
-	DEFINE_KEYFIELD( m_flMaxPropScreenSpaceWidth, FIELD_FLOAT, "maxpropscreenwidth" ),
-	DEFINE_KEYFIELD( m_flMinPropScreenSpaceWidth, FIELD_FLOAT, "minpropscreenwidth" ),
-	DEFINE_KEYFIELD( m_iszDetailSpriteMaterial, FIELD_STRING, "detailmaterial" ),
-	DEFINE_KEYFIELD( m_bColdWorld,		FIELD_BOOLEAN, "coldworld" ),
+	DEFINE_KEYFIELD ( m_iszChapterTitle,           FIELD_STRING , "chaptertitle" ),
+	DEFINE_KEYFIELD ( m_bStartDark,		           FIELD_BOOLEAN, "startdark" ),
+	DEFINE_KEYFIELD ( m_bDisplayTitle,	           FIELD_BOOLEAN, "gametitle" ),
+	DEFINE_FIELD    ( m_WorldMins,                 FIELD_VECTOR ),
+	DEFINE_FIELD    ( m_WorldMaxs,                 FIELD_VECTOR ),
+	DEFINE_KEYFIELD ( m_flMaxOccludeeArea,         FIELD_FLOAT  , "maxoccludeearea" ),
+	DEFINE_KEYFIELD ( m_flMinOccluderArea,         FIELD_FLOAT  , "minoccluderarea" ),
+	DEFINE_KEYFIELD ( m_flMaxPropScreenSpaceWidth, FIELD_FLOAT  , "maxpropscreenwidth" ),
+	DEFINE_KEYFIELD( m_flMinPropScreenSpaceWidth, FIELD_FLOAT  , "minpropscreenwidth" ),
+	DEFINE_KEYFIELD( m_iszDetailSpriteMaterial,   FIELD_STRING , "detailmaterial" ),
+	DEFINE_KEYFIELD( m_bColdWorld,		           FIELD_BOOLEAN, "coldworld" ),
 
 END_DATADESC()
 

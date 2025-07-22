@@ -12,10 +12,8 @@
 #include "depthwrite_ps20b.inc"
 #include "depthwrite_vs20.inc"
 
-#if !defined( _X360 )
 #include "depthwrite_ps30.inc"
 #include "depthwrite_vs30.inc"
-#endif
 
 BEGIN_VS_SHADER_FLAGS( DepthWrite, "Help for Depth Write", SHADER_NOT_EDITABLE )
 
@@ -72,9 +70,7 @@ BEGIN_VS_SHADER_FLAGS( DepthWrite, "Help for Depth Write", SHADER_NOT_EDITABLE )
 			// If a material was already marked nocull, don't cull it
 			pShaderShadow->EnableCulling( IS_FLAG_SET(MATERIAL_VAR_ALPHATEST) && !IS_FLAG_SET(MATERIAL_VAR_NOCULL) );
 
-#ifndef _X360
 			if ( !g_pHardwareConfig->HasFastVertexTextures() )
-#endif
 			{
 				DECLARE_STATIC_VERTEX_SHADER( depthwrite_vs20 );
 				SET_STATIC_VERTEX_SHADER_COMBO( ONLY_PROJECT_POSITION, !bAlphaClip && IsX360() && !nColorDepth ); //360 needs to know if it *shouldn't* output texture coordinates to avoid shader patches
@@ -103,7 +99,6 @@ BEGIN_VS_SHADER_FLAGS( DepthWrite, "Help for Depth Write", SHADER_NOT_EDITABLE )
 					}
 				}
 			}
-#ifndef _X360
 			else
 			{
 				SET_FLAGS2( MATERIAL_VAR2_USES_VERTEXID );
@@ -120,14 +115,11 @@ BEGIN_VS_SHADER_FLAGS( DepthWrite, "Help for Depth Write", SHADER_NOT_EDITABLE )
 				SET_STATIC_PIXEL_SHADER_COMBO( COLOR_DEPTH, nColorDepth );
 				SET_STATIC_PIXEL_SHADER( depthwrite_ps30 );
 			}
-#endif
 		}
 		DYNAMIC_STATE
 		{
 
-#ifndef _X360
 			if ( !g_pHardwareConfig->HasFastVertexTextures() )
-#endif
 			{
 				depthwrite_vs20_Dynamic_Index vshIndex;
 				vshIndex.SetSKINNING( pShaderAPI->GetCurrentNumBones() > 0 );
@@ -160,7 +152,6 @@ BEGIN_VS_SHADER_FLAGS( DepthWrite, "Help for Depth Write", SHADER_NOT_EDITABLE )
 					SET_DYNAMIC_PIXEL_SHADER( depthwrite_ps20 );
 				}
 			}
-#ifndef _X360
 			else // 3.0 shader case (PC only)
 			{
 				SetHWMorphVertexShaderState( VERTEX_SHADER_SHADER_SPECIFIC_CONST_6, VERTEX_SHADER_SHADER_SPECIFIC_CONST_7, SHADER_VERTEXTEXTURE_SAMPLER0 );
@@ -188,7 +179,6 @@ BEGIN_VS_SHADER_FLAGS( DepthWrite, "Help for Depth Write", SHADER_NOT_EDITABLE )
 				SET_DYNAMIC_PIXEL_SHADER_COMBO( ALPHACLIP, bAlphaClip );
 				SET_DYNAMIC_PIXEL_SHADER( depthwrite_ps30 );
 			}
-#endif
 
 			Vector4D vParms;
 

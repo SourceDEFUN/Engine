@@ -14,7 +14,7 @@
 #include "tier0/platform.h"
 #include "tier0/dbg.h"
 
-#if defined( POSIX ) && !defined( _PS3 ) && !defined( _X360 )
+#if defined( POSIX ) && !defined( _PS3 )
 #include <pthread.h>
 #include <errno.h>
 #define WAIT_OBJECT_0 0
@@ -23,7 +23,7 @@
 #define THREAD_PRIORITY_HIGHEST 2
 #endif
 
-#if !defined( _X360 ) && !defined( _PS3 ) && defined(COMPILER_MSVC)
+#if !defined( _PS3 ) && defined(COMPILER_MSVC)
 // For _ReadWriteBarrier()
 #include <intrin.h>
 #endif
@@ -160,10 +160,10 @@ extern bool gbCheckNotMultithreaded;
 	#define CHECK_NOT_MULTITHREADED()
 #endif // _PS3
 
-#if defined( _X360 ) || defined( _PS3 )
+#if defined( _PS3 )
 #define MAX_THREADS_SUPPORTED 16
 #else
-#define MAX_THREADS_SUPPORTED 32
+#define MAX_THREADS_SUPPORTED 32 // Secton: huh?
 #endif
 
 
@@ -205,19 +205,8 @@ PLATFORM_INTERFACE ThreadHandle_t ThreadGetCurrentHandle();
 PLATFORM_INTERFACE int ThreadGetPriority( ThreadHandle_t hThread = NULL );
 PLATFORM_INTERFACE bool ThreadSetPriority( ThreadHandle_t hThread, int priority );
 inline		 bool ThreadSetPriority( int priority ) { return ThreadSetPriority( NULL, priority ); }
-#ifndef _X360
 PLATFORM_INTERFACE bool ThreadInMainThread();
 PLATFORM_INTERFACE void DeclareCurrentThreadIsMainThread();
-#else
-PLATFORM_INTERFACE byte *g_pBaseMainStack;
-PLATFORM_INTERFACE byte *g_pLimitMainStack;
-inline bool ThreadInMainThread()
-{
-	byte b;
-	byte *p = &b;
-	return ( p < g_pBaseMainStack && p >= g_pLimitMainStack );
-}
-#endif
 
 // NOTE: ThreadedLoadLibraryFunc_t needs to return the sleep time in milliseconds or TT_INFINITE
 typedef uintp (*ThreadedLoadLibraryFunc_t)(void *pParam); 
@@ -304,7 +293,7 @@ PLATFORM_INTERFACE void ThreadSetAffinity( ThreadHandle_t hThread, int nAffinity
 #define NOINLINE __attribute__ ((noinline))
 #endif
 
-#if defined( _X360 ) || defined( _PS3 )
+#if defined( _PS3 )
 #define ThreadMemoryBarrier() __lwsync()
 #elif defined(COMPILER_MSVC)
 // Prevent compiler reordering across this barrier. This is
@@ -399,15 +388,6 @@ PLATFORM_INTERFACE inline bool ThreadInterlockedAssignIf( int32 volatile * ea, i
 PLATFORM_INTERFACE inline int64 ThreadInterlockedCompareExchange64( int64 volatile *pDest, int64 value, int64 comperand )	{	return cellAtomicCompareAndSwap64( ( uint64_t* ) pDest, comperand, value ); }
 PLATFORM_INTERFACE inline bool ThreadInterlockedAssignIf64( volatile int64 *pDest, int64 value, int64 comperand )			{ return ( cellAtomicCompareAndSwap64( ( uint64_t* ) pDest, comperand, value ) == ( uint64_t ) comperand ); }
 
-#elif defined( _X360 )
-#define TO_INTERLOCK_PARAM(p)		((volatile long *)p)
-#define TO_INTERLOCK_PTR_PARAM(p)	((void **)p)
-FORCEINLINE int32 ThreadInterlockedIncrement( int32 volatile *pDest )										{ Assert( (size_t)pDest % 4 == 0 ); return InterlockedIncrement( TO_INTERLOCK_PARAM(pDest) ); }
-FORCEINLINE int32 ThreadInterlockedDecrement( int32 volatile *pDest )										{ Assert( (size_t)pDest % 4 == 0 ); return InterlockedDecrement( TO_INTERLOCK_PARAM(pDest) ); }
-FORCEINLINE int32 ThreadInterlockedExchange( int32 volatile *pDest, int32 value )							{ Assert( (size_t)pDest % 4 == 0 ); return InterlockedExchange( TO_INTERLOCK_PARAM(pDest), value ); }
-FORCEINLINE int32 ThreadInterlockedExchangeAdd( int32 volatile *pDest, int32 value )						{ Assert( (size_t)pDest % 4 == 0 ); return InterlockedExchangeAdd( TO_INTERLOCK_PARAM(pDest), value ); }
-FORCEINLINE int32 ThreadInterlockedCompareExchange( int32 volatile *pDest, int32 value, int32 comperand )	{ Assert( (size_t)pDest % 4 == 0 ); return InterlockedCompareExchange( TO_INTERLOCK_PARAM(pDest), value, comperand ); }
-FORCEINLINE bool ThreadInterlockedAssignIf( int32 volatile *pDest, int32 value, int32 comperand )			{ Assert( (size_t)pDest % 4 == 0 ); return ( InterlockedCompareExchange( TO_INTERLOCK_PARAM(pDest), value, comperand ) == comperand ); }
 #else
 // non 32-bit windows and 360 implementation
 PLATFORM_INTERFACE int32 ThreadInterlockedIncrement( int32 volatile * ) NOINLINE;
@@ -971,11 +951,7 @@ private:
 #ifdef _WIN64
 	#define TT_SIZEOF_CRITICALSECTION 40	
 #else
-#ifndef _X360
 	#define TT_SIZEOF_CRITICALSECTION 24
-#else
-	#define TT_SIZEOF_CRITICALSECTION 28
-#endif // !_X360
 #endif // _WIN64
 	byte m_CriticalSection[TT_SIZEOF_CRITICALSECTION];
 #elif defined( _PS3 )
@@ -2157,7 +2133,6 @@ public:
 typedef struct _RTL_CRITICAL_SECTION RTL_CRITICAL_SECTION;
 typedef RTL_CRITICAL_SECTION CRITICAL_SECTION;
 
-#ifndef _X360
 extern "C"
 {
 	void __declspec(dllimport) __stdcall InitializeCriticalSection(CRITICAL_SECTION *);
@@ -2165,7 +2140,6 @@ extern "C"
 	void __declspec(dllimport) __stdcall LeaveCriticalSection(CRITICAL_SECTION *);
 	void __declspec(dllimport) __stdcall DeleteCriticalSection(CRITICAL_SECTION *);
 };
-#endif
 #endif
 
 //---------------------------------------------------------

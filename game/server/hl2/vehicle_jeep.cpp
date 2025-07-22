@@ -905,7 +905,7 @@ void CPropJeep::FireCannon( void )
 	Vector aimDir;
 	GetCannonAim( &aimDir );
 
-#if defined( WIN32 ) && !defined( _X360 ) 
+#if defined( WIN32 )
 	// NVNT apply a punch on fire
 	HapticPunch(m_hPlayer,0,0,hap_jeep_cannon_mag.GetFloat());
 #endif

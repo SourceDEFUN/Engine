@@ -13,13 +13,11 @@
 
 
 #ifdef WIN32
-#if !defined( _X360 )
 #define _WIN32_WINNT 0x502
 #include <windows.h>
 #include <zmouse.h>
 #include "xbox/xboxstubs.h"
 #include "../../dx9sdk/include/XInput.h"
-#endif
 #endif
 
 #ifdef POSIX
@@ -36,11 +34,6 @@
 #include "bitvec.h"
 #include "tier1/utlvector.h"
 #include "tier1/utlflags.h"
-
-#if defined( _X360 )
-#include "xbox/xbox_win32stubs.h"
-#include "xbox/xbox_console.h"
-#endif
 
 #include "steam/steam_api.h"
 
@@ -97,7 +90,7 @@ public:
 	virtual void SleepUntilInput( int nMaxSleepTimeMS );
 	virtual int GetPollCount() const;
 	virtual void SetCursorPosition( int x, int y );
-#if defined( WIN32 ) && !defined ( _X360 )
+#if defined( WIN32 )
 	virtual void *GetHapticsInterfaceAddress() const;
 #else
 	virtual void *GetHapticsInterfaceAddress() const { return NULL;}	
@@ -252,7 +245,7 @@ public:
 	void ShutdownTouch( void );
 	
 
-#if defined( WIN32 ) && !defined ( _X360 )
+#if defined( WIN32 )
 	// NVNT attaches window to novint devices
 	void AttachWindowToNovintDevices( void * hWnd );
 
@@ -445,7 +438,7 @@ public:
 	bool m_bSteamControllerActionsInitialized;		// true if our action sets and handles were successfully initialized (this doesn't mean a controller is necessarily connected, or that in-game client actions were initialized)
 	bool m_bSteamControllerActive;					// true if our action sets and handles were successfully initialized *and* that at least one controller is actually connected and switched on.
 
-#if defined( WIN32 ) && !defined ( _X360 )
+#if defined( WIN32 )
 	// NVNT Novint device info
 	int m_nNovintDeviceCount;
 	bool m_bNovintDevices;
@@ -468,7 +461,7 @@ public:
 	CSysModule   *m_pXInputDLL;
 	CSysModule   *m_pRawInputDLL;
 	
-#if defined( WIN32 ) && !defined ( _X360 )
+#if defined( WIN32 )
 	// NVNT falcon module
 	CSysModule	 *m_pNovintDLL;
 #endif

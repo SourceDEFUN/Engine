@@ -55,9 +55,7 @@ BEGIN_VS_SHADER_FLAGS( BlurFilterX, "Help for BlurFilterX", SHADER_NOT_EDITABLE 
 			if( g_pHardwareConfig->SupportsPixelShaders_2_b() || g_pHardwareConfig->ShouldAlwaysUseShaderModel2bShaders() )
 			{
 				DECLARE_STATIC_PIXEL_SHADER( blurfilter_ps20b );
-#ifndef _X360
 				SET_STATIC_PIXEL_SHADER_COMBO( APPROX_SRGB_ADAPTER, bForceSRGBReadAndWrite );
-#endif
 				SET_STATIC_PIXEL_SHADER( blurfilter_ps20b );
 			}
 			else

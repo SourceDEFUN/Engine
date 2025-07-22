@@ -12,9 +12,7 @@
 
 
 #ifdef _WIN32
-#if !defined( _X360 )
 #include "winlite.h"
-#endif
 #endif
 
 #include "tier0/vcrmode.h"
@@ -34,16 +32,9 @@
 #include "matchmaking.h"
 
 #if defined(_WIN32)
-
-#if !defined( _X360 )
 #include <winsock.h>
-#else
-#include "winsockx.h"
-#endif
-
 // #include <process.h>
 typedef int socklen_t;
-
 #elif defined POSIX
 
 #include <unistd.h>
@@ -80,10 +71,6 @@ typedef int SOCKET;
 #include "sv_rcon.h"
 #ifndef SWDS
 #include "cl_rcon.h"
-#endif
-
-#if defined( _X360 )
-#include "xbox/xbox_win32stubs.h"
 #endif
 
 #endif // NET_WS_HEADERS_H

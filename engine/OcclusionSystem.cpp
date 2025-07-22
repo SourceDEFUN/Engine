@@ -31,11 +31,7 @@
 //-----------------------------------------------------------------------------
 // Used to visualizes what the occlusion system is doing.
 //-----------------------------------------------------------------------------
-#ifdef _X360
-#define DEFAULT_MIN_OCCLUDER_AREA  70.0f
-#else
 #define DEFAULT_MIN_OCCLUDER_AREA  5.0f
-#endif
 #define DEFAULT_MAX_OCCLUDEE_AREA  5.0f
 
 

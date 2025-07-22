@@ -1,4 +1,4 @@
-//===== Copyright © 1996-2005, Valve Corporation, All rights reserved. ======//
+//===== Copyright ï¿½ 1996-2005, Valve Corporation, All rights reserved. ======//
 //
 // Purpose: 
 //
@@ -66,12 +66,6 @@ enum PartitionTrees_t
 
 class CPartitionVisitor;
 
-#if defined( _X360 )
-#pragma bitfield_order( push, lsb_to_msb )
-#elif defined( _PS3 )
-#pragma ms_struct on
-#pragma reverse_bitfields on
-#endif
 union Voxel_t
 {
 	struct
@@ -82,12 +76,6 @@ union Voxel_t
 	} bitsVoxel;
 	unsigned int uiVoxel;  
 };
-#if defined( _X360 )
-#pragma bitfield_order( pop )
-#elif defined( _PS3 )
-#pragma ms_struct off
-#pragma reverse_bitfields off
-#endif
 
 enum EntityInfoFlags_t
 {
@@ -209,7 +197,7 @@ public:
 	inline Voxel_t VoxelIndexFromPoint( const Vector &vecWorldPoint );
 	inline void VoxelIndexFromPoint( const Vector &vecWorldPoint, int pPoint[3] );
 
-#if defined(_X360) || defined(_PS3)
+#if defined(_PS3)
 	inline Voxel_t VoxelIndexFromPoint( const fltx4 &vecWorldPoint );
 	inline void VoxelIndexFromPoint( const fltx4 &vecWorldPoint, int pPoint[3] );
 #endif
@@ -503,7 +491,7 @@ inline void CVoxelHash::PackVoxel( int iX, int iY, int iZ, Voxel_t &voxel )
 }
 
 
-#if defined(_X360) || defined(_PS3)
+#if defined(_PS3)
 
 // NOTE: This isn't supportable on SSE but it isn't necessary either
 inline double FloatConvertToIntegerFormat( double flVal )
@@ -517,20 +505,12 @@ inline double FloatConvertToIntegerFormat( double flVal )
 
 inline fltx4 ConvertToSignedIntegerSIMD( fltx4 fl4Data )
 {
-#if defined(_X360)
-	return __vctsxs( fl4Data, 0 );	 // NOTE: 0 is power of 2 to scale by
-#else
 	return (fltx4)vec_cts( fl4Data, 0 );
-#endif
 }
 
 inline fltx4 ShiftRightSIMD( const fltx4 &fl4Data, const fltx4 &fl4Shift )
 {
-#if defined(_X360)
-	return __vsrw( fl4Data, fl4Shift );
-#else
 	return (fltx4)vec_sr( (u32x4)fl4Data, (u32x4)fl4Shift );
-#endif
 }
 
 union doublecnv_t
@@ -2424,7 +2404,7 @@ bool CVoxelTree::EnumerateElementsAlongRay_ExtrudedRay( SpatialPartitionListMask
 
 	// Early out: Check to see if the range of voxels at the endpoint
 	// is the same as the range at the start point. If so, we're done.
-#if defined(_X360) || defined(_PS3)
+#if defined(_PS3)
 	fltx4 fl4RayEnd = LoadUnaligned3SIMD(vecEnd.Base());
 	fltx4 fl4Extents = LoadAlignedSIMD(ray.m_Extents.Base());
 	fltx4 vecEndMin = SubSIMD( fl4RayEnd, fl4Extents );

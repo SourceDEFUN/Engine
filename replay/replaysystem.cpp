@@ -21,10 +21,8 @@
 #include "vprof.h"
 #include "sv_fileservercleanup.h"
 
-#if !defined( _X360 )
 #include "winlite.h"
 #include "xbox/xboxstubs.h"
-#endif
 
 // TODO: Deal with linux build includes
 #ifdef IS_WINDOWS_PC

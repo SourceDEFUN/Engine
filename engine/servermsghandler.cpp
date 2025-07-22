@@ -49,10 +49,6 @@
 
 #include "audio_pch.h"
 
-#if defined ( _X360 )
-#include "matchmaking.h"
-#endif
-
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -220,7 +216,6 @@ void CClientState::Disconnect( const char *pszReason, bool bShowMainMenu )
 
 	CBaseClientState::Disconnect( pszReason, bShowMainMenu );
 
-#ifndef _X360
 	IGameEvent *event = g_GameEventManager.CreateEvent( "client_disconnect" );
 	if ( event )
 	{
@@ -229,13 +224,10 @@ void CClientState::Disconnect( const char *pszReason, bool bShowMainMenu )
 		event->SetString( "message", pszReason );
 		g_GameEventManager.FireEventClientSide( event );
 	}
-#endif
 
 	// stop any demo activities
-#ifndef _XBOX
 	demoplayer->StopPlayback();
 	demorecorder->StopRecording();
-#endif
 
 	S_StopAllSounds( true );
 	
@@ -483,19 +475,6 @@ bool CClientState::ProcessVoiceData( SVC_VoiceData *msg )
 {
 	char chReceived[4096];
 	int bitsRead = msg->m_DataIn.ReadBitsClamped( chReceived, msg->m_nLength );
-
-#if defined ( _X360 )
-	DWORD dwLength = msg->m_nLength;
-	XUID xuid = msg->m_xuid;
-	Audio_GetXVoice()->PlayIncomingVoiceData( xuid, (byte*)chReceived, dwLength );
-
-	if ( voice_debugfeedback.GetBool() )
-	{
-		Msg( "Received voice from: %d\n", msg->m_nFromClient + 1 );
-	}
-
-	return true;
-#endif
 
 #if !defined( NO_VOICE )//#ifndef _XBOX
 	int iEntity = msg->m_nFromClient + 1;

@@ -8,7 +8,6 @@
 #ifndef COMMON_PRAGMAS_H_
 #define COMMON_PRAGMAS_H_
 
-//
 // Validated shader models:
 //
 // SHADER_MODEL_VS_1_1
@@ -22,12 +21,8 @@
 // SHADER_MODEL_PS_3_0
 //
 //
-//
 // Platforms:
-//
 //  PC
-// _X360
-//
 
 // Special pragmas silencing common warnings
 #pragma warning ( disable : 3557 ) // warning X3557: Loop only executes for N iteration(s), forcing loop to unroll

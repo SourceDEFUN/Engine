@@ -256,18 +256,6 @@ int CZipPackFile::ReadFromPack( int nEntryIndex, void* pBuffer, int nDestBytes, 
 		}
 	}
 
-#if defined ( _X360 )
-	// fell through as a direct request from within the pack
-	// intercept to possible embedded section
-	if ( m_pSection )
-	{
-		// a section is a special update zip that has no files, only preload
-		// it has to be in the section
-		V_memcpy( pBuffer, (byte*)m_pSection + nOffset, nBytes );
-		return nBytes;
-	}
-#endif
-
 	// Otherwise, do the read from the pack
 	m_mutex.Lock();
 
@@ -543,13 +531,6 @@ void CZipPackFile::SetupPreloadData()
 	MEM_ALLOC_CREDIT_( "xZip" );
 
 	void *pPreload;
-#if defined ( _X360 )
-	if ( m_pSection )
-	{
-		pPreload = (byte*)m_pSection + m_nPreloadSectionOffset;
-	}
-	else
-#endif
 	{
 		pPreload = malloc( m_nPreloadSectionSize );
 		if ( !pPreload )
@@ -588,16 +569,7 @@ void CZipPackFile::DiscardPreloadData()
 		// already discarded
 		return;
 	}
-
-#if defined ( _X360 )
-	// a section is an alias, the header becomes an alias, not owned memory
-	if ( !m_pSection )
-	{
-		free( m_pPreloadHeader );
-	}
-#else
 	free( m_pPreloadHeader );
-#endif
 	m_pPreloadHeader = NULL;
 }
 
@@ -809,10 +781,6 @@ CZipPackFile::CZipPackFile( CBaseFileSystem* fs, void *pSection )
 	m_pPreloadRemapTable = NULL;
 	m_nPreloadSectionOffset = 0;
 	m_nPreloadSectionSize = 0;
-
-#if defined( _X360 )
-	m_pSection = pSection;
-#endif
 }
 
 CZipPackFile::~CZipPackFile()

@@ -547,7 +547,7 @@ public:
 		{
 			EmitCloseCaption( filter, entindex, params, ep );
 		}
-#if defined( WIN32 ) && !defined( _X360 )
+#if defined( WIN32 )
 		// NVNT notify the haptics system of this sound
 		HapticProcessSound(ep.m_pSoundName, entindex);
 #endif

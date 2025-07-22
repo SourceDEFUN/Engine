@@ -64,7 +64,7 @@ COptionsDialog::COptionsDialog(vgui::Panel *parent) : PropertyDialog(parent, "Op
 	// debug timing code, this function takes too long
 //	double s4 = system()->GetCurrentTime();
 
-#if defined( WIN32 ) && !defined( _X360 )
+#if defined( WIN32 )
 	// NVNT START see if the user has a haptic device via convar. if so create haptics dialog.
 	ConVarRef checkHap("hap_HasDevice");
 	checkHap.Init("hap_HasDevice",true);

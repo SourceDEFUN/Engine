@@ -360,8 +360,6 @@ void CDODWinPanel::FireGameEvent( IGameEvent * event )
 
 void CDODWinPanel::SetupAvatar( const char *pSide, int pos, int iPlayerIndex )
 {
-#if !defined( _X360 )
-
 	bool bVisible = ( iPlayerIndex > 0 );
 
 	CAvatarImagePanel *pPlayerAvatar = dynamic_cast<CAvatarImagePanel *>( FindChildByName( CFmtStr( "%s_%d_avatar", pSide, pos ) ) );
@@ -379,7 +377,6 @@ void CDODWinPanel::SetupAvatar( const char *pSide, int pos, int iPlayerIndex )
 
 		pPlayerAvatar->SetVisible( bVisible );
 	}
-#endif
 }
 
 void CDODWinPanel::SetFinalCaptureLabel( const char *szCappers, bool bShowAvatar )

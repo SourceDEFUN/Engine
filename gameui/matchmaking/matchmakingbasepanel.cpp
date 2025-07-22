@@ -542,23 +542,6 @@ void CMatchmakingBasePanel::SystemNotification( const int notification )
 	{
 	case SYSTEMNOTIFY_USER_SIGNEDOUT:
 		// See if this was us
-#if defined( _X360 )
-		uint state = XUserGetSigninState( XBX_GetPrimaryUserId() );
-		if ( state == eXUserSigninState_NotSignedIn )
-		{
-			matchmaking->KickPlayerFromSession( 0 );
-			CloseAllDialogs();
-		}
-		else if ( state != eXUserSigninState_SignedInToLive )
-		{
-			// User was signed out of live
-			if ( m_bPlayingOnline )
-			{
-				matchmaking->KickPlayerFromSession( 0 );
-				CloseAllDialogs();
-			}
-		}
-#endif
 		break;
 	}
 }
@@ -572,37 +555,6 @@ bool CMatchmakingBasePanel::ValidateSigninAndStorage( bool bOnlineRequired, cons
 	bool bSignedIn = false;
 	bool bOnlineEnabled = false;
 	bool bOnlineSignedIn = false;
-
-#if defined( _X360 )
-	int userIdx = XBX_GetPrimaryUserId();
-	if ( userIdx != INVALID_USER_ID )
-	{
-		XUSER_SIGNIN_INFO info;
-		uint ret = XUserGetSigninInfo( userIdx, 0, &info );
-		if ( ret == ERROR_SUCCESS )
-		{
-			bSignedIn = true;
-			if ( info.dwInfoFlags & XUSER_INFO_FLAG_LIVE_ENABLED )
-			{
-				bOnlineEnabled = true;
-				uint state = XUserGetSigninState( XBX_GetPrimaryUserId() );
-				if ( state == eXUserSigninState_SignedInToLive )
-				{
-					bOnlineSignedIn = true;
-
-					// Check privileges
-					BOOL bPrivCheck = false;
-					DWORD dwPrivCheck = XUserCheckPrivilege( userIdx, XPRIVILEGE_MULTIPLAYER_SESSIONS, &bPrivCheck );
-					if ( ERROR_SUCCESS != dwPrivCheck ||
-						 !bPrivCheck )
-					{
-						bOnlineEnabled = false;
-					}
-				}
-			}
-		}
-	}
-#endif
 
 	if ( bOnlineRequired && !bOnlineEnabled )
 	{

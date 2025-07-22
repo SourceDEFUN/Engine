@@ -322,10 +322,8 @@ void CTransitionTable::Reset()
 
 static inline void SetTextureStageState( int stage, D3DTEXTURESTAGESTATETYPE state, DWORD val )
 {
-#if !defined( _X360 )
 	Assert( !g_pShaderDeviceDx8->IsDeactivated() );
 	Dx9Device()->SetTextureStageState( stage, state, val );
-#endif
 }
 
 //Moved to a #define so every instance of this skips unsupported render states at compile time
@@ -462,10 +460,6 @@ APPLY_TEXTURE_STAGE_STATE_FUNC( D3DTSS_TEXCOORDINDEX,	TexCoordIndex )
 void ApplyZWriteEnable( const ShadowState_t& shaderState, int arg )
 {
 	SetRenderStateConstMacro( D3DRS_ZWRITEENABLE, shaderState.m_ZWriteEnable );
-#if defined( _X360 )
-	//SetRenderStateConstMacro( D3DRS_HIZWRITEENABLE, shaderState.m_ZWriteEnable ? D3DHIZ_AUTOMATIC : D3DHIZ_DISABLE );
-#endif
-
 	UPDATE_BOARD_RENDER_STATE( D3DRS_ZWRITEENABLE, ZWriteEnable );
 }
 
@@ -479,15 +473,9 @@ void ApplyColorWriteEnable( const ShadowState_t& shaderState, int arg )
 
 void ApplySRGBReadEnable( const ShadowState_t& shaderState, int stage )
 {
-#	if ( !defined( _X360 ) )
 	{
 		SetSamplerState( stage, D3DSAMP_SRGBTEXTURE, shaderState.m_SamplerState[stage].m_SRGBReadEnable );
 	}
-#	else
-	{
-		ShaderAPI()->ApplySRGBReadState( stage, shaderState.m_SamplerState[stage].m_SRGBReadEnable );
-	}
-#	endif
 
 	UPDATE_BOARD_SAMPLER_STATE( D3DSAMP_SRGBTEXTURE, SRGBReadEnable, stage );
 }
@@ -577,9 +565,6 @@ void CTransitionTable::SetZEnable( D3DZBUFFERTYPE nEnable )
 	if (m_CurrentState.m_ZEnable != nEnable )
 	{
 		SetRenderStateConstMacro( D3DRS_ZENABLE, nEnable );
-#if defined( _X360 )
-		//SetRenderState( D3DRS_HIZENABLE, nEnable ? D3DHIZ_AUTOMATIC : D3DHIZ_DISABLE );
-#endif
 		m_CurrentState.m_ZEnable = nEnable;
 	}
 }
@@ -1301,13 +1286,9 @@ bool CTransitionTable::TestShadowState( const ShadowState_t& state, const Shadow
 	// Just make sure we've got a good snapshot
 	RECORD_COMMAND( DX8_VALIDATE_DEVICE, 0 );
 
-#if !defined( _X360 )
 	DWORD numPasses;
 	HRESULT hr = Dx9Device()->ValidateDevice( &numPasses );
 	bool ok = !FAILED(hr);
-#else
-	bool ok = true;
-#endif
 
 	// Now set the board state to match the default state
 	ApplyTransition( m_DefaultTransition, m_DefaultStateSnapshot );
@@ -1589,10 +1570,6 @@ void CTransitionTable::ApplyShaderState( const ShadowState_t &shadowState, const
 	{
 		ShaderManager()->SetVertexShader( INVALID_SHADER );
 		ShaderManager()->SetPixelShader( INVALID_SHADER );
-#if defined( _X360 )
-		// no fixed function support
-		Assert( 0 );
-#endif
 
 #ifdef DEBUG_BOARD_STATE
 		BoardShaderState().m_VertexShader = INVALID_SHADER;
@@ -1671,9 +1648,6 @@ void CTransitionTable::UseDefaultState( )
 	m_CurrentState.m_ZFunc = D3DCMP_LESSEQUAL;
 	m_CurrentState.m_ZBias = SHADER_POLYOFFSET_DISABLE;
 	SetRenderStateConstMacro( D3DRS_ZENABLE, m_CurrentState.m_ZEnable );
-#if defined( _X360 )
-	//SetRenderStateConstMacro( D3DRS_HIZENABLE, m_CurrentState.m_ZEnable ? D3DHIZ_AUTOMATIC : D3DHIZ_DISABLE );
-#endif
 	SetRenderStateConstMacro( D3DRS_ZFUNC, m_CurrentState.m_ZFunc );
 
 	m_CurrentState.m_AlphaTestEnable = false;
@@ -1775,9 +1749,6 @@ void CTransitionTable::OverrideDepthEnable( bool bEnable, bool bDepthEnable )
 		{
 			SetZEnable( D3DZB_TRUE );
 			SetRenderStateConstMacro( D3DRS_ZWRITEENABLE, m_CurrentState.m_OverrideZWriteEnable );
-#if defined( _X360 )
-			//SetRenderStateConstMacro( D3DRS_HIZWRITEENABLE, m_CurrentState.m_OverrideZWriteEnable ? D3DHIZ_AUTOMATIC : D3DHIZ_DISABLE );
-#endif
 		}
 		else
 		{
@@ -1785,9 +1756,6 @@ void CTransitionTable::OverrideDepthEnable( bool bEnable, bool bDepthEnable )
 			{
 				SetZEnable( CurrentShadowState()->m_ZEnable );
 				SetRenderStateConstMacro( D3DRS_ZWRITEENABLE, CurrentShadowState()->m_ZWriteEnable );
-#if defined( _X360 )
-				//SetRenderStateConstMacro( D3DRS_HIZWRITEENABLE, CurrentShadowState()->m_ZWriteEnable ? D3DHIZ_AUTOMATIC : D3DHIZ_DISABLE );
-#endif
 			}
 		}
 	}
@@ -1895,9 +1863,6 @@ void CTransitionTable::PerformShadowStateOverrides( )
 	{
 		SetZEnable( D3DZB_TRUE );
 		SetRenderStateConstMacro( D3DRS_ZWRITEENABLE, m_CurrentState.m_OverrideZWriteEnable );
-#if defined( _X360 )
-		//SetRenderStateConstMacro( D3DRS_HIZWRITEENABLE, m_CurrentState.m_OverrideZWriteEnable ? D3DHIZ_AUTOMATIC : D3DHIZ_DISABLE );
-#endif
 	}
 
 	if ( m_CurrentState.m_bOverrideAlphaWriteEnable )

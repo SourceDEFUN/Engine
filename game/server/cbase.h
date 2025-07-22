@@ -59,12 +59,6 @@
 #include "shareddefs.h"
 #include "ehandle.h"
 
-// app
-#if defined(_X360)
-#define DISABLE_DEBUG_HISTORY 1
-#endif
-
-
 #include "datamap.h"
 #include "util.h"
 #include "predictable_entity.h"

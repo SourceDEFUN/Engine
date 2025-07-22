@@ -17,23 +17,11 @@
 
 #include "materialsystem/imaterialsystem.h"
 
-
 //-----------------------------------------------------------------------------
 // Activate, deactivate loader updates
 //-----------------------------------------------------------------------------
-#ifdef _X360
-
-void BeginLoadingUpdates( MaterialNonInteractiveMode_t mode );
-void RefreshScreenIfNecessary();
-void EndLoadingUpdates();
-
-#else
-
 inline void BeginLoadingUpdates( MaterialNonInteractiveMode_t mode ) {}
 inline void RefreshScreenIfNecessary() {}
 inline void EndLoadingUpdates() {}
-
-#endif
-
 
 #endif /* LOAD_SCREEN_UPDATE_H */

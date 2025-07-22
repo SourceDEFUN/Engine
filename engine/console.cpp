@@ -13,18 +13,11 @@
 #include "server.h"
 #include "MapReslistGenerator.h"
 #include "tier0/vcrmode.h"
-#if defined( _X360 )
-#include "xbox/xbox_console.h"
-#endif
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-#if !defined( _X360 )
 #define	MAXPRINTMSG	4096
-#else
-#define	MAXPRINTMSG	1024
-#endif
 
 bool con_debuglog = false;
 bool con_initialized = false;
@@ -582,28 +575,6 @@ void Con_ColorPrint( const Color& clr, char const *msg )
 		}
 		g_bInColorPrint = false;
 	}
-
-#if defined( _X360 )
-	int			r,g,b,a;
-	char		buffer[MAXPRINTMSG];
-	const char	*pFrom;
-	char		*pTo;
-
-	clr.GetColor(r, g, b, a);
-
-	// fixup percent printers
-	pFrom = msg;
-	pTo   = buffer;
-	while ( *pFrom && pTo < buffer+sizeof(buffer)-1 )
-	{
-		*pTo = *pFrom++;
-		if ( *pTo++ == '%' )
-			*pTo++ = '%';
-	}
-	*pTo = '\0';
-
-	XBX_DebugString( XMAKECOLOR(r,g,b), buffer );
-#endif
 }
 #endif
 
@@ -647,11 +618,7 @@ void Con_Print( const char *msg )
 	}
 	else
 	{
-#if !defined( _X360 )
 		Color clr( 255, 255, 255, 255 );
-#else
-		Color clr( 0, 0, 0, 255 );
-#endif
 		Con_ColorPrint( clr, msg );
 	}
 #endif
@@ -690,11 +657,7 @@ void Con_Printf( const char *fmt, ... )
 	}
 	else
 	{
-#if !defined( _X360 )
 		Color clr( 255, 255, 255, 255 );
-#else
-		Color clr( 0, 0, 0, 255 );
-#endif
 		Con_ColorPrint( clr, msg );
 	}
 #endif

@@ -359,8 +359,6 @@ GLOBAL(void) jpeg_UtlBuffer_dest (j_compress_ptr cinfo, CUtlBuffer *pBuffer )
 
 bool ImageToJPEGBuffer( Image_t *image, CUtlBuffer& buf, int quality )
 {
-#if !defined( _X360 )
-
 	// Validate quality level
 	quality = clamp( quality, 1, 100 );
 
@@ -444,10 +442,6 @@ bool ImageToJPEGBuffer( Image_t *image, CUtlBuffer& buf, int quality )
 
 	delete[] pImage;
 
-#else
-	// not supporting
-	Assert( 0 );
-#endif
 	return true;
 }
 

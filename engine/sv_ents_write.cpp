@@ -498,7 +498,6 @@ static inline void SV_DetermineUpdateType( CEntityWriteInfo &u )
 		return;
 	}
 
-#ifndef _X360
 		int nBits;
 #if defined( REPLAY_ENABLED )
 	if ( !u.m_bCullProps && (hltv || replay) )
@@ -531,7 +530,6 @@ static inline void SV_DetermineUpdateType( CEntityWriteInfo &u )
 			return; // we used the cache, great
 		}
 	}
-#endif
 
 	int checkProps[MAX_DATATABLE_PROPS];
 	int nCheckProps = u.m_pNewPack->GetPropsChangedAfterTick( u.m_pFromSnapshot->m_nTickCount, checkProps, ARRAYSIZE( checkProps ) );
@@ -601,7 +599,6 @@ static inline void SV_DetermineUpdateType( CEntityWriteInfo &u )
 	}
 	else
 	{
-#ifndef _X360
 		if ( !u.m_bCullProps )
 		{
 			if ( hltv )
@@ -618,7 +615,6 @@ static inline void SV_DetermineUpdateType( CEntityWriteInfo &u )
 			}
 #endif
 		}
-#endif
 		u.m_UpdateType = PreserveEnt;
 	}
 }

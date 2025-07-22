@@ -17,11 +17,8 @@
 //=============================================================================
 #include "pch_serverbrowser.h"
 
-#if defined( _X360 )
-#include "xbox/xbox_win32stubs.h"
-#endif
 
-#if defined( _WIN32 ) && !defined( _X360 )
+#if defined( _WIN32 )
 #define WIN32_LEAN_AND_MEAN
 #include <winsock.h>
 #endif

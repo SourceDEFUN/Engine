@@ -12,7 +12,7 @@
 
 #include "interface.h"
 
-#if defined( WIN32 ) && !defined( _X360 )	// DWORD
+#if defined( WIN32 )	// DWORD
 #include "winlite.h"
 #include <windows.h>
 #else

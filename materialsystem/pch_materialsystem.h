@@ -11,7 +11,7 @@
 #pragma once
 #endif
 
-#if defined( _WIN32 ) && !defined( _X360 )
+#if defined( _WIN32 )
 #define WIN32_LEAN_AND_MEAN 1
 #include "windows.h"
 #endif

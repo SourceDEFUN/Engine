@@ -1508,61 +1508,6 @@ void CNewGameDialog::OnCommand( const char *command )
 		}
 	}
 
-#ifdef _X360
-	else if ( !stricmp( command, "StartNewGame" ) )
-	{
-		ConVarRef commentary( "commentary" );
-
-		if ( m_bCommentaryMode && !commentary.GetBool() )
-		{
-			// Using the commentary menu, but not already in commentary mode, explain the rules
-			PostMessage( (vgui::Panel*)this, new KeyValues( "command", "command", "StartNewGameWithCommentaryExplanation" ), 0.2f );
-		}
-		else
-		{
-			if ( XBX_GetStorageDeviceId() == XBX_INVALID_STORAGE_ID || XBX_GetStorageDeviceId() == XBX_STORAGE_DECLINED || 
-				 !ModInfo().IsSinglePlayerOnly() )
-			{
-				// Multiplayer or no storage device so don't bore them with autosave details
-				m_bMapStarting = true;
-				OnCommand( "StartNewGameNoCommentaryExplanation" );
-			}
-			else
-			{
-				// Don't allow other inputs
-				m_bMapStarting = true;
-
-				// Remind them how autosaves work
-				PostMessage( (vgui::Panel*)this, new KeyValues( "command", "command", "StartNewGameWithAutosaveExplanation" ), 0.2f );
-			}
-		}
-	}
-	else if ( !stricmp( command, "StartNewGameWithAutosaveExplanation" ) )
-	{
-		BasePanel()->ShowMessageDialog( MD_AUTOSAVE_EXPLANATION, this );
-	}
-	else if ( !stricmp( command, "StartNewGameWithCommentaryExplanation" ) )
-	{
-		if ( ModInfo().IsSinglePlayerOnly() )
-		{
-			// Don't allow other inputs
-			m_bMapStarting = true;
-			BasePanel()->ShowMessageDialog( MD_COMMENTARY_EXPLANATION, this );
-		}
-		else
-		{
-			// Don't allow other inputs
-			m_bMapStarting = true;
-			BasePanel()->ShowMessageDialog( MD_COMMENTARY_EXPLANATION_MULTI, this );
-		}
-	}
-	else if ( !stricmp( command, "StartNewGameNoCommentaryExplanation" ) )
-	{
-		vgui::surface()->PlaySound( "UI/buttonclickrelease.wav" );
-		BasePanel()->RunAnimationWithCallback( this, "CloseNewGameDialog", new KeyValues( "StartGame" ) );
-	}
-#endif
-
 	else if ( !stricmp( command, "Next" ) )
 	{
 		if ( m_bMapStarting )

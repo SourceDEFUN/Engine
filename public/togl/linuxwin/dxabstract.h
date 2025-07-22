@@ -1429,14 +1429,9 @@ TOGL_INTERFACE HRESULT D3DXCompileShader(
 	#error sorry man
 	#endif
 
-	#ifdef _X360
-		#include "d3d9.h"
-		#include "d3dx9.h"
-	#else
-		#include <windows.h>
-		#include "../../dx9sdk/include/d3d9.h"
-		#include "../../dx9sdk/include/d3dx9.h"
-	#endif
+	#include <windows.h>
+	#include "../../dx9sdk/include/d3d9.h"
+	#include "../../dx9sdk/include/d3dx9.h"
 	typedef HWND VD3DHWND;
 
 #endif // DX_TO_GL_ABSTRACTION

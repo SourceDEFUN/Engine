@@ -55,17 +55,7 @@ static double s_rdtsc_to_ms;
 #include "dx9hook.h"
 #endif
 
-#ifndef _X360
 #include "wmi.h"
-#endif
-
-#if defined( _X360 )
-#include "xbox/xbox_console.h"
-#include "xbox/xbox_win32stubs.h"
-#endif
-
-
-//#define DX8_COMPATABILITY_MODE
 
 //-----------------------------------------------------------------------------
 // Globals
@@ -80,11 +70,6 @@ EXPOSE_SINGLE_INTERFACE_GLOBALVAR( CShaderDeviceMgrDx8, IShaderDeviceMgr,
 	SHADER_DEVICE_MGR_INTERFACE_VERSION, g_ShaderDeviceMgrDx8 )
 
 #endif
-
-#if defined( _X360 )
-IDirect3D9 *m_pD3D;
-#endif
-
 IDirect3DDevice *g_pD3DDevice = NULL;
 
 #if defined(IS_WINDOWS_PC) && defined(SHADERAPIDX9)
@@ -380,12 +365,7 @@ void CShaderDeviceMgrDx8::CheckVendorDependentShadowMappingSupport( HardwareCaps
 		pCaps->m_NullTextureFormat = IMAGE_FORMAT_RGB565;
 	}
 
-#if defined( _X360 )
-	pCaps->m_ShadowDepthTextureFormat = ReverseDepthOnX360() ? IMAGE_FORMAT_X360_DST24F : IMAGE_FORMAT_X360_DST24;
-	pCaps->m_bSupportsShadowDepthTextures = true;
-	pCaps->m_bSupportsFetch4 = false;
-	return;
-#elif defined ( DX_TO_GL_ABSTRACTION )
+#if defined ( DX_TO_GL_ABSTRACTION )
 	// We may want to only do this on the higher-end Mac SKUs, since it's not free...
 	pCaps->m_ShadowDepthTextureFormat = IMAGE_FORMAT_NV_DST16; // This format shunts us down the right shader combo path
 
@@ -500,16 +480,6 @@ void CShaderDeviceMgrDx8::CheckVendorDependentAlphaToCoverage( HardwareCaps_t *p
 
 	if ( pCaps->m_nDXSupportLevel < 90 )
 		return;
-
-#ifdef _X360
-	{
-		pCaps->m_bSupportsAlphaToCoverage	 = true;
-		pCaps->m_AlphaToCoverageEnableValue	 = TRUE;
-		pCaps->m_AlphaToCoverageDisableValue = FALSE;
-		pCaps->m_AlphaToCoverageState		 = D3DRS_ALPHATOMASKENABLE;
-		return;
-	}
-#endif // _X360
 
 	if ( pCaps->m_VendorID == VENDORID_NVIDIA )
 	{
@@ -1298,12 +1268,8 @@ int CShaderDeviceMgrDx8::GetModeCount( int nAdapter ) const
 	LOCK_SHADERAPI();
 	Assert( m_pD3D && (nAdapter < GetAdapterCount() ) );
 
-#if !defined( _X360 )
 	// fixme - what format should I use here?
 	return m_pD3D->GetAdapterModeCount( nAdapter, D3DFMT_X8R8G8B8 );
-#else
-	return 1; // Only one mode, which is the current mode set in the 360 dashboard.  Going to fill it in with exactly what the 360 is set to.
-#endif
 }
 
 
@@ -1318,7 +1284,6 @@ void CShaderDeviceMgrDx8::GetModeInfo( ShaderDisplayMode_t* pInfo, int nAdapter,
 	Assert( m_pD3D && (nAdapter < GetAdapterCount() ) );
 	Assert( nMode < GetModeCount( nAdapter ) );
 
-#if !defined( _X360 )
 	HRESULT hr;
 	D3DDISPLAYMODE d3dInfo;
 
@@ -1331,14 +1296,6 @@ void CShaderDeviceMgrDx8::GetModeInfo( ShaderDisplayMode_t* pInfo, int nAdapter,
 	pInfo->m_Format      = ImageLoader::D3DFormatToImageFormat( d3dInfo.Format );
 	pInfo->m_nRefreshRateNumerator = d3dInfo.RefreshRate;
 	pInfo->m_nRefreshRateDenominator = 1;
-#else
-	pInfo->m_Format = ImageLoader::D3DFormatToImageFormat( D3DFMT_X8R8G8B8 );
-	pInfo->m_nRefreshRateNumerator = 60;
-	pInfo->m_nRefreshRateDenominator = 1;
-
-	pInfo->m_nWidth = GetSystemMetrics( SM_CXSCREEN );
-	pInfo->m_nHeight = GetSystemMetrics( SM_CYSCREEN );
-#endif
 }
 
 
@@ -1354,24 +1311,8 @@ void CShaderDeviceMgrDx8::GetCurrentModeInfo( ShaderDisplayMode_t* pInfo, int nA
 
 	HRESULT hr;
 	D3DDISPLAYMODE mode = { 0 };
-#if !defined( _X360 )
 	hr = D3D()->GetAdapterDisplayMode( nAdapter, &mode );
 	Assert( !FAILED(hr) );
-#else
-	if ( !g_pD3DDevice )
-	{
-		// the console has no prior display or mode until its created
-		mode.Width  = GetSystemMetrics( SM_CXSCREEN );
-		mode.Height = GetSystemMetrics( SM_CYSCREEN );
-		mode.RefreshRate = 60;
-		mode.Format = D3DFMT_X8R8G8B8;
-	}
-	else
-	{
-		hr = g_pD3DDevice->GetDisplayMode( 0, &mode );
-		Assert( !FAILED(hr) );
-	}
-#endif
 
 	pInfo->m_nWidth = mode.Width;
 	pInfo->m_nHeight = mode.Height;
@@ -1484,9 +1425,7 @@ bool CShaderDeviceMgrDx8::ValidateMode( int nAdapter, const ShaderDeviceInfo_t &
 //-----------------------------------------------------------------------------
 int CShaderDeviceMgrDx8::GetVidMemBytes( int nAdapter ) const
 {
-#if defined( _X360 )
-	return 256*1024*1024;
-#elif defined (DX_TO_GL_ABSTRACTION)
+#if defined (DX_TO_GL_ABSTRACTION)
 	D3DADAPTER_IDENTIFIER9 devIndentifier;
 	D3D()->GetAdapterIdentifier( nAdapter, D3DENUM_WHQL_LEVEL, &devIndentifier );
 	return devIndentifier.VideoMemory;
@@ -1573,10 +1512,6 @@ static DWORD ComputeDeviceCreationFlags( D3DCAPS& caps, bool bSoftwareVertexProc
 	}
 	nDeviceCreationFlags |= D3DCREATE_FPU_PRESERVE;
 
-#ifdef _X360
-	nDeviceCreationFlags |= D3DCREATE_BUFFER_2_FRAMES;
-#endif
-
 	return nDeviceCreationFlags;
 }
 
@@ -1588,7 +1523,6 @@ D3DMULTISAMPLE_TYPE CShaderDeviceDx8::ComputeMultisampleType( int nSampleCount )
 {
 	switch (nSampleCount)
 	{
-#if !defined( _X360 )
 	case 2: return D3DMULTISAMPLE_2_SAMPLES;
 	case 3: return D3DMULTISAMPLE_3_SAMPLES;
 	case 4: return D3DMULTISAMPLE_4_SAMPLES;
@@ -1604,10 +1538,6 @@ D3DMULTISAMPLE_TYPE CShaderDeviceDx8::ComputeMultisampleType( int nSampleCount )
 	case 14: return D3DMULTISAMPLE_14_SAMPLES;
 	case 15: return D3DMULTISAMPLE_15_SAMPLES;
 	case 16: return D3DMULTISAMPLE_16_SAMPLES;
-#else
-	case 2: return D3DMULTISAMPLE_2_SAMPLES;
-	case 4: return D3DMULTISAMPLE_4_SAMPLES;
-#endif
 	default:
 	case 0:
 	case 1:
@@ -1644,11 +1574,7 @@ void CShaderDeviceDx8::SetPresentParameters( void* hWnd, int nAdapter, const Sha
 		// always stencil for dx9/hdr
 		m_bUsingStencil = true;
 	}
-#if defined( _X360 )
-	D3DFORMAT nDepthFormat = ReverseDepthOnX360() ? D3DFMT_D24FS8 : D3DFMT_D24S8;
-#else
 	D3DFORMAT nDepthFormat = m_bUsingStencil ? D3DFMT_D24S8 : D3DFMT_D24X8;
-#endif
 	m_PresentParameters.AutoDepthStencilFormat = FindNearestSupportedDepthFormat( 
 		nAdapter, m_AdapterFormat, backBufferFormat, nDepthFormat );
 	m_PresentParameters.hDeviceWindow = (VD3DHWND)hWnd;
@@ -1659,18 +1585,12 @@ void CShaderDeviceDx8::SetPresentParameters( void* hWnd, int nAdapter, const Sha
 	case D3DFMT_D24S8:
 		m_iStencilBufferBits = 8;
 		break;
-#if defined( _X360 )
-	case D3DFMT_D24FS8:
-		m_iStencilBufferBits = 8;
-		break;
-#else
 	case D3DFMT_D24X4S4:
 		m_iStencilBufferBits = 4;
 		break;
 	case D3DFMT_D15S1:
 		m_iStencilBufferBits = 1;
 		break;
-#endif
 	default:
 		m_iStencilBufferBits = 0;
 		m_bUsingStencil = false; //couldn't acquire a stencil buffer
@@ -1683,9 +1603,6 @@ void CShaderDeviceDx8::SetPresentParameters( void* hWnd, int nAdapter, const Sha
 		m_PresentParameters.BackBufferWidth = useDefault ? mode.m_nWidth : info.m_DisplayMode.m_nWidth;
 		m_PresentParameters.BackBufferHeight = useDefault ? mode.m_nHeight : info.m_DisplayMode.m_nHeight;
 		m_PresentParameters.BackBufferFormat = ImageLoader::ImageFormatToD3DFormat( backBufferFormat );
-#if defined( _X360 )
-		m_PresentParameters.FrontBufferFormat = D3DFMT_LE_X8R8G8B8;
-#endif
 		if ( !info.m_bWaitForVSync || CommandLine()->FindParm( "-forcenovsync" ) )
 		{
 			m_PresentParameters.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
@@ -1697,41 +1614,6 @@ void CShaderDeviceDx8::SetPresentParameters( void* hWnd, int nAdapter, const Sha
 
 		m_PresentParameters.FullScreen_RefreshRateInHz = info.m_DisplayMode.m_nRefreshRateDenominator ? 
 			info.m_DisplayMode.m_nRefreshRateNumerator / info.m_DisplayMode.m_nRefreshRateDenominator : D3DPRESENT_RATE_DEFAULT;
-
-#if defined( _X360 )
-		XVIDEO_MODE videoMode;
-		XGetVideoMode( &videoMode );
-
-		// want 30 for 60Hz, and 25 for 50Hz (PAL)
-		int nNewFpsMax = ( ( int )( videoMode.RefreshRate + 0.5f ) ) >> 1;
-		// slam to either 30 or 25 so that we don't end up with any other cases.
-		if( nNewFpsMax < 26 )
-		{
-			nNewFpsMax = 25;
-		}
-		else
-		{
-			nNewFpsMax = 30;
-		}
-		DevMsg( "*******Monitor refresh is %f, setting fps_max to %d*********\n", videoMode.RefreshRate, nNewFpsMax );
-		ConVarRef fps_max( "fps_max" );
-		fps_max.SetValue( nNewFpsMax );
-
-		// setup hardware scaling - should be native 720p upsampling to 1080i
-		if ( info.m_bScaleToOutputResolution )
-		{
-			m_PresentParameters.VideoScalerParameters.ScalerSourceRect.x2 = m_PresentParameters.BackBufferWidth;
-			m_PresentParameters.VideoScalerParameters.ScalerSourceRect.y2 = m_PresentParameters.BackBufferHeight;
-			m_PresentParameters.VideoScalerParameters.ScaledOutputWidth = videoMode.dwDisplayWidth;
-			m_PresentParameters.VideoScalerParameters.ScaledOutputHeight = videoMode.dwDisplayHeight;
-			DevMsg( "VIDEO SCALING: scaling from %dx%d to %dx%d\n", ( int )m_PresentParameters.BackBufferWidth, ( int )m_PresentParameters.BackBufferHeight,
-				( int )videoMode.dwDisplayWidth, ( int )videoMode.dwDisplayHeight );
-		}
-		else
-		{
-			DevMsg( "VIDEO SCALING: No scaling: %dx%d\n", ( int )m_PresentParameters.BackBufferWidth, ( int )m_PresentParameters.BackBufferHeight );
-		}
-#endif
 	}
 	else
 	{
@@ -2201,7 +2083,6 @@ IDirect3DDevice9* CShaderDeviceDx8::InvokeCreateDevice( void* hWnd, int nAdapter
 #endif
 
 #if 1	// with the changes for opengl to enable threading, we no longer need the d3d device to have threading guards
-#ifndef _X360
 	// Create the device with multi-threaded safeguards if we're using mat_queue_mode 2.
 	// The logic to enable multithreaded rendering happens well after the device has been created, 
 	// so we replicate some of that logic here.
@@ -2212,7 +2093,6 @@ IDirect3DDevice9* CShaderDeviceDx8::InvokeCreateDevice( void* hWnd, int nAdapter
 	{
 		deviceCreationFlags |= D3DCREATE_MULTITHREADED;
 	}
-#endif
 #endif
 
 #ifdef ENABLE_NULLREF_DEVICE_SUPPORT
@@ -2288,7 +2168,7 @@ bool CShaderDeviceDx8::CreateD3DDevice( void* pHWnd, int nAdapter, const ShaderD
 
 	VD3DHWND hWnd = (VD3DHWND)pHWnd;
 
-#if ( !defined( PIX_INSTRUMENTATION ) && !defined( _X360 ) && !defined( NVPERFHUD ) )
+#if ( !defined( PIX_INSTRUMENTATION ) && !defined( NVPERFHUD ) )
 	D3DPERF_SetOptions(1);	// Explicitly disallow PIX instrumented profiling in external builds
 #endif
 
@@ -2327,62 +2207,6 @@ bool CShaderDeviceDx8::CreateD3DDevice( void* pHWnd, int nAdapter, const ShaderD
 	Dx9Device() = new CStubD3DDevice( pD3DDevice, g_pFullFileSystem );
 #else
 	g_pD3DDevice = pD3DDevice;
-#endif
-
-#if defined( _X360 )
-	// Create the depth buffer, created manually to enable hierarchical z
-	{
-		D3DSURFACE_PARAMETERS DepthStencilParams;
-
-		// Depth is immediately after the back buffer in EDRAM
-		// allocate the hierarchical z tiles at the end of the area so all other allocations can trivially allocate at 0
-		DepthStencilParams.Base = XGSurfaceSize( 
-			m_PresentParameters.BackBufferWidth,
-			m_PresentParameters.BackBufferHeight, 
-			m_PresentParameters.BackBufferFormat, 
-			m_PresentParameters.MultiSampleType );
-		DepthStencilParams.ColorExpBias = 0;
-		DepthStencilParams.HierarchicalZBase = GPU_HIERARCHICAL_Z_TILES - XGHierarchicalZSize( m_PresentParameters.BackBufferWidth, m_PresentParameters.BackBufferHeight, m_PresentParameters.MultiSampleType );
-
-		IDirect3DSurface *pDepthStencilSurface = NULL;
-		hr = Dx9Device()->CreateDepthStencilSurface( 
-			m_PresentParameters.BackBufferWidth, 
-			m_PresentParameters.BackBufferHeight, 
-			m_PresentParameters.AutoDepthStencilFormat,
-			m_PresentParameters.MultiSampleType, 
-			m_PresentParameters.MultiSampleQuality,
-			TRUE,
-			&pDepthStencilSurface,
-			&DepthStencilParams );
-		Assert( SUCCEEDED( hr ) );
-		if ( FAILED( hr ) )
-			return false;
-
-		hr = Dx9Device()->SetDepthStencilSurface( pDepthStencilSurface );
-		Assert( SUCCEEDED( hr ) );
-		if ( FAILED( hr ) )
-			return false;
-	}
-
-	// Initialize XUI, needed for TTF font rasterization
-	// xui requires and shares our d3d device
-	{
-		hr = XuiRenderInitShared( pD3DDevice, &m_PresentParameters, XuiD3DXTextureLoader );
-		if ( FAILED( hr ) )
-			return false;
-
-		XUIInitParams xuiInit;
-		XUI_INIT_PARAMS( xuiInit );
-		xuiInit.dwFlags = XUI_INIT_PARAMS_FLAGS_NONE;
-		xuiInit.pHooks = NULL;
-		hr = XuiInit( &xuiInit );
-		if ( FAILED( hr ) )
-			return false;
-
-		hr = XuiRenderCreateDC( &m_hDC );
-		if ( FAILED( hr ) )
-			return false;
-	}
 #endif
 
 	// CheckDeviceLost();
@@ -2806,13 +2630,12 @@ void CShaderDeviceDx8::MarkDeviceLost( )
 //-----------------------------------------------------------------------------
 // Checks if the device was lost
 //-----------------------------------------------------------------------------
-#if defined( _DEBUG ) && !defined( _X360 )
+#if defined( _DEBUG )
 ConVar mat_forcelostdevice( "mat_forcelostdevice", "0" );
 #endif
 
 void CShaderDeviceDx8::CheckDeviceLost( bool bOtherAppInitializing )
 {
-#if !defined( _X360 )
 	// FIXME: We could also queue up if WM_SIZE changes and look at that
 	// but that seems to only make sense if we have resizable windows where 
 	// we do *not* allocate buffers as large as the entire current video mode
@@ -2942,178 +2765,10 @@ void CShaderDeviceDx8::CheckDeviceLost( bool bOtherAppInitializing )
 
 		ResizeWindow( m_PendingVideoModeChangeConfig );
 	}
-#endif
 }
 
-
-//-----------------------------------------------------------------------------
-// Special method to refresh the screen on the XBox360
-//-----------------------------------------------------------------------------
 bool CShaderDeviceDx8::AllocNonInteractiveRefreshObjects()
 {
-#if defined( _X360 )
-
-	const char *strVertexShaderProgram = 
-		" float4x4 matWVP : register(c0);"  
-		" struct VS_IN"  
-		" {" 
-		" float4 ObjPos : POSITION;"
-		" float2 TexCoord : TEXCOORD;"
-		" };" 
-		" struct VS_OUT" 
-		" {" 
-		" float4 ProjPos : POSITION;" 
-		" float2 TexCoord : TEXCOORD;"
-		" };"  
-		" VS_OUT main( VS_IN In )"  
-		" {"  
-		" VS_OUT Out; "  
-		" Out.ProjPos = mul( matWVP, In.ObjPos );"
-		" Out.TexCoord = In.TexCoord;"
-		" return Out;"  
-		" }";
-
-	const char *strPixelShaderProgram = 
-		" struct PS_IN"
-		" {"
-		" float2 TexCoord : TEXCOORD;"
-		" };"
-		" sampler detail : register( s0 );"
-		" float4 main( PS_IN In ) : COLOR"  
-		" {"  
-		" return tex2D( detail, In.TexCoord );"
-		" }"; 
-
-	const char *strPixelShaderProgram2 = 
-		" struct PS_IN"
-		" {"
-		" float2 TexCoord : TEXCOORD;"
-		" };"
-		" sampler detail : register( s0 );"
-		" float4 main( PS_IN In ) : COLOR"  
-		" {"  
-		" return tex2D( detail, In.TexCoord );"
-		" }"; 
-
-	const char *strPixelShaderProgram3 = 
-		" struct PS_IN"
-		" {"
-		" float2 TexCoord : TEXCOORD;"
-		" };"
-		" float SrgbGammaToLinear( float flSrgbGammaValue )"
-		" {"
-		"	float x = saturate( flSrgbGammaValue );"
-		"	return ( x <= 0.04045f ) ? ( x / 12.92f ) : ( pow( ( x + 0.055f ) / 1.055f, 2.4f ) );"
-		" }"
-		"float X360LinearToGamma( float flLinearValue )"
-		"{"
-		"		float fl360GammaValue;"
-		""
-		"	flLinearValue = saturate( flLinearValue );"
-		"	if ( flLinearValue < ( 128.0f / 1023.0f ) )"
-		"	{"
-		"		if ( flLinearValue < ( 64.0f / 1023.0f ) )"
-		"		{"
-		"			fl360GammaValue = flLinearValue * ( 1023.0f * ( 1.0f / 255.0f ) );"
-		"		}"
-		"		else"
-		"		{"
-		"			fl360GammaValue = flLinearValue * ( ( 1023.0f / 2.0f ) * ( 1.0f / 255.0f ) ) + ( 32.0f / 255.0f );"
-		"		}"
-		"	}"
-		"	else"
-		"	{"
-		"		if ( flLinearValue < ( 512.0f / 1023.0f ) )"
-		"		{"
-		"			fl360GammaValue = flLinearValue * ( ( 1023.0f / 4.0f ) * ( 1.0f / 255.0f ) ) + ( 64.0f / 255.0f );"
-		"		}"
-		"		else"
-		"		{"
-		"			fl360GammaValue = flLinearValue * ( ( 1023.0f /8.0f ) * ( 1.0f / 255.0f ) ) + ( 128.0f /255.0f );"
-		"			if ( fl360GammaValue > 1.0f )"
-		"			{"
-		"				fl360GammaValue = 1.0f;"
-		"			}"
-		"		}"
-		"	}"
-		""
-		"	fl360GammaValue = saturate( fl360GammaValue );"
-		"	return fl360GammaValue;"
-		"}"
-		" sampler detail : register( s0 );"
-		" float4 main( PS_IN In ) : COLOR"  
-		" {"  
-		"	float4 vTextureColor = tex2D( detail, In.TexCoord );"
-		"	vTextureColor.r = X360LinearToGamma( SrgbGammaToLinear( vTextureColor.r ) );" 
-		"	vTextureColor.g = X360LinearToGamma( SrgbGammaToLinear( vTextureColor.g ) );"
-		"	vTextureColor.b = X360LinearToGamma( SrgbGammaToLinear( vTextureColor.b ) );"
-		"	return vTextureColor;"
-		" }"; 
-
-	D3DVERTEXELEMENT9 VertexElements[4] =
-	{
-		{ 0,  0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0 },
-		{ 0, 12, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0 },
-		D3DDECL_END()
-	};
-
-	ID3DXBuffer *pErrorMsg = NULL;
-	ID3DXBuffer *pShaderCode = NULL;
-
-	HRESULT hr = D3DXCompileShader( strVertexShaderProgram, (UINT)strlen( strVertexShaderProgram ), NULL, NULL, "main", "vs_2_0", 0, &pShaderCode, &pErrorMsg, NULL );
-	if ( FAILED( hr ) )
-		return false;
-
-	Dx9Device()->CreateVertexShader( (DWORD*)pShaderCode->GetBufferPointer(), &m_NonInteractiveRefresh.m_pVertexShader );
-	pShaderCode->Release();
-	pShaderCode = NULL;
-	if ( pErrorMsg )
-	{
-		pErrorMsg->Release();
-		pErrorMsg = NULL;
-	}
-
-	hr = D3DXCompileShader( strPixelShaderProgram, (UINT)strlen( strPixelShaderProgram ), NULL, NULL, "main", "ps_2_0", 0, &pShaderCode, &pErrorMsg, NULL );
-	if ( FAILED(hr) )
-		return false;
-
-	Dx9Device()->CreatePixelShader( (DWORD*)pShaderCode->GetBufferPointer(), &m_NonInteractiveRefresh.m_pPixelShader );
-	pShaderCode->Release();
-	if ( pErrorMsg )
-	{
-		pErrorMsg->Release();
-		pErrorMsg = NULL;
-	}
-
-	hr = D3DXCompileShader( strPixelShaderProgram3, (UINT)strlen( strPixelShaderProgram3 ), NULL, NULL, "main", "ps_2_0", 0, &pShaderCode, &pErrorMsg, NULL );
-	if ( FAILED(hr) )
-		return false;
-
-	Dx9Device()->CreatePixelShader( (DWORD*)pShaderCode->GetBufferPointer(), &m_NonInteractiveRefresh.m_pPixelShaderStartup );
-	pShaderCode->Release();
-	if ( pErrorMsg )
-	{
-		pErrorMsg->Release();
-		pErrorMsg = NULL;
-	}
-
-	hr = D3DXCompileShader( strPixelShaderProgram2, (UINT)strlen( strPixelShaderProgram2 ), NULL, NULL, "main", "ps_2_0", 0, &pShaderCode, &pErrorMsg, NULL );
-	if ( FAILED(hr) )
-		return false;
-
-	Dx9Device()->CreatePixelShader( (DWORD*)pShaderCode->GetBufferPointer(), &m_NonInteractiveRefresh.m_pPixelShaderStartupPass2 );
-	pShaderCode->Release();
-	if ( pErrorMsg )
-	{
-		pErrorMsg->Release();
-		pErrorMsg = NULL;
-	}
-
-	// Create a vertex declaration from the element descriptions.
-	Dx9Device()->CreateVertexDeclaration( VertexElements, &m_NonInteractiveRefresh.m_pVertexDecl );
-	
-#endif	
-	
 	return true;
 }
 
@@ -3181,19 +2836,6 @@ void CShaderDeviceDx8::EnableNonInteractiveMode( MaterialNonInteractiveMode_t mo
 			mat_monitorgamma_tv_exp.GetFloat(), mat_monitorgamma_tv_enabled.GetBool() );
 	}
 
-#ifdef _X360
-	if ( mode != MATERIAL_NON_INTERACTIVE_MODE_NONE )
-	{
-		// HACK: VSync off (prevents us wasting time blocking on VSync due to our irregular present intervals)
-		Dx9Device()->SetRenderState( D3DRS_PRESENTINTERVAL, D3DPRESENT_INTERVAL_IMMEDIATE );
-	}
-	else
-	{
-		// HACK: VSync on (defaulting to on on 360 is fine, but really should save+restore this state)
-		Dx9Device()->SetRenderState( D3DRS_PRESENTINTERVAL, D3DPRESENT_INTERVAL_ONE );
-	}
-#endif
-
 //	Msg( "Time elapsed: %.3f Peak %.3f Ave %.5f Count %d Count Above %d\n", Plat_FloatTime() - m_NonInteractiveRefresh.m_flStartTime,
 //		m_NonInteractiveRefresh.m_flPeakDt, m_NonInteractiveRefresh.m_flTotalDt / m_NonInteractiveRefresh.m_nSamples, m_NonInteractiveRefresh.m_nSamples, m_NonInteractiveRefresh.m_nCountAbove66 );
 
@@ -3232,125 +2874,6 @@ void CShaderDeviceDx8::RefreshFrontBufferNonInteractive()
 
 	// Other code should not be talking to D3D at the same time as this
 	AUTO_LOCK( m_nonInteractiveModeMutex );
-
-#ifdef _X360
-	g_pShaderAPI->OwnGPUResources( false );
-	IDirect3DBaseTexture *pTexture = g_pShaderAPI->GetD3DTexture( m_NonInteractiveRefresh.m_Info.m_hTempFullscreenTexture );
-
-	int w, h;
-	g_pShaderAPI->GetBackBufferDimensions( w, h );
-	XMMATRIX matWVP = XMMatrixOrthographicOffCenterLH( 0, (FLOAT)w, (FLOAT)h, 0, 0, 1 );
-
-	// Structure to hold vertex data.
-	struct TEXVERTEX
-	{
-		FLOAT       Position[3];
-		FLOAT       TexCoord[2];
-	};
-	TEXVERTEX Vertices[4];
-
-	Vertices[0].Position[0] = -0.5f;
-	Vertices[0].Position[1] = -0.5f;
-	Vertices[0].Position[2] = 0;
-	Vertices[0].TexCoord[0] = 0;
-	Vertices[0].TexCoord[1] = 0;
-
-	Vertices[1].Position[0] = w-0.5f;
-	Vertices[1].Position[1] = -0.5f;
-	Vertices[1].Position[2] = 0;
-	Vertices[1].TexCoord[0] = 1;
-	Vertices[1].TexCoord[1] = 0;
-
-	Vertices[2].Position[0] = w-0.5f;
-	Vertices[2].Position[1] = h-0.5f;
-	Vertices[2].Position[2] = 0;
-	Vertices[2].TexCoord[0] = 1;
-	Vertices[2].TexCoord[1] = 1;
-
-	Vertices[3].Position[0] = -0.5f;
-	Vertices[3].Position[1] = h-0.5f;
-	Vertices[3].Position[2] = 0;
-	Vertices[3].TexCoord[0] = 0;
-	Vertices[3].TexCoord[1] = 1;
-
-	D3DVIEWPORT9 viewport;
-	viewport.X = viewport.Y = 0;
-	viewport.Width = w; viewport.Height = h;
-	viewport.MinZ = ReverseDepthOnX360() ? 1.0f : 0.0f;
-	viewport.MaxZ = 1.0f - viewport.MinZ;
-
-	bool bInStartupMode = ( m_NonInteractiveRefresh.m_Mode == MATERIAL_NON_INTERACTIVE_MODE_STARTUP );
-
-	float flDepth = (ShaderUtil()->GetConfig().bReverseDepth ^ ReverseDepthOnX360()) ? 0.0f : 1.0f;
-	Dx9Device()->Clear( 0, NULL, D3DCLEAR_ZBUFFER, 0, flDepth, 0L );
-
-	Dx9Device()->SetViewport( &viewport );
-	Dx9Device()->SetTexture( 0, pTexture );
-	Dx9Device()->SetVertexShader( m_NonInteractiveRefresh.m_pVertexShader );
-	Dx9Device()->SetPixelShader( bInStartupMode ? m_NonInteractiveRefresh.m_pPixelShaderStartup : m_NonInteractiveRefresh.m_pPixelShader );
-	Dx9Device()->SetVertexShaderConstantF( 0, (FLOAT*)&matWVP, 4 );
-	Dx9Device()->SetVertexDeclaration( m_NonInteractiveRefresh.m_pVertexDecl );
-	Dx9Device()->SetSamplerState( 0, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP );
-	Dx9Device()->SetSamplerState( 0, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP );
-	Dx9Device()->SetSamplerState( 0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR );
-	Dx9Device()->SetSamplerState( 0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR );
-
-	tmZone( TELEMETRY_LEVEL1, TMZF_NONE, "%s", __FUNCTION__ );
-
-	Dx9Device()->DrawPrimitiveUP( D3DPT_QUADLIST, 1, Vertices, sizeof( TEXVERTEX ) );
-
-	if ( bInStartupMode )
-	{
-		float flXPos = m_NonInteractiveRefresh.m_Info.m_flNormalizedX;
-		float flYPos = m_NonInteractiveRefresh.m_Info.m_flNormalizedY;
-		float flHeight = m_NonInteractiveRefresh.m_Info.m_flNormalizedSize;
-		int nSize = h * flHeight;
-		int x = w * flXPos - nSize * 0.5f;
-		int y = h * flYPos - nSize * 0.5f;
-		w = h = nSize;
-
-		Vertices[0].Position[0] = x - 0.5f;
-		Vertices[0].Position[1] = y - 0.5f;
-		Vertices[1].Position[0] = x+w-0.5f;
-		Vertices[1].Position[1] = y - 0.5f;
-		Vertices[2].Position[0] = x+w-0.5f;
-		Vertices[2].Position[1] = y+h-0.5f;
-		Vertices[3].Position[0] = x - 0.5f;
-		Vertices[3].Position[1] = y+h-0.5f;
-
-		float t = Plat_FloatTime();
-		float flDt = t - m_NonInteractiveRefresh.m_flLastPacifierTime;
-		if ( flDt > 0.030f )
-		{
-			if ( ++m_NonInteractiveRefresh.m_nPacifierFrame >= m_NonInteractiveRefresh.m_Info.m_nPacifierCount )
-			{
-				m_NonInteractiveRefresh.m_nPacifierFrame = 0;
-			}
-			m_NonInteractiveRefresh.m_flLastPacifierTime = t;
-		}
-
-		pTexture = g_pShaderAPI->GetD3DTexture( m_NonInteractiveRefresh.m_Info.m_pPacifierTextures[ m_NonInteractiveRefresh.m_nPacifierFrame ] );
-		Dx9Device()->SetRenderState( D3DRS_ALPHABLENDENABLE, 1 );
-		Dx9Device()->SetRenderState( D3DRS_SRCBLEND, D3DBLEND_SRCALPHA );
-		Dx9Device()->SetRenderState( D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA );
-		Dx9Device()->SetTexture( 0, pTexture );
-		Dx9Device()->SetPixelShader( m_NonInteractiveRefresh.m_pPixelShaderStartupPass2 );
-		Dx9Device()->DrawPrimitiveUP( D3DPT_QUADLIST, 1, Vertices, sizeof( TEXVERTEX ) );
-	}
-
-	Dx9Device()->SetVertexShader( NULL );
-	Dx9Device()->SetPixelShader( NULL );
-	Dx9Device()->SetTexture( 0, NULL );
-	Dx9Device()->SetVertexDeclaration( NULL );
-
-	tmZone( TELEMETRY_LEVEL1, TMZF_NONE, "D3DPresent" );
-
-	Dx9Device()->Present( 0, 0, 0, 0 );
-	g_pShaderAPI->QueueResetRenderState();
-	g_pShaderAPI->OwnGPUResources( true );
-
-	UpdatePresentStats();
-#endif
 }
 
 
@@ -3664,47 +3187,3 @@ IIndexBuffer *CShaderDeviceDx8::GetDynamicIndexBuffer( MaterialIndexFormat_t fmt
 	LOCK_SHADERAPI();
 	return MeshMgr()->GetDynamicIndexBuffer( fmt, bBuffered );
 }
-
-#ifdef _X360
-void CShaderDeviceDx8::SpewVideoInfo360( const CCommand &args )
-{
-	XVIDEO_MODE videoMode;
-	XGetVideoMode( &videoMode );
-
-	Warning( "back buffer size: %dx%d\n", m_PresentParameters.BackBufferWidth, m_PresentParameters.BackBufferHeight );
-	Warning( "display resolution: %dx%d %s\n", videoMode.dwDisplayWidth, videoMode.dwDisplayHeight, videoMode.fIsInterlaced ? "interlaced" : "progressive" );
-	Warning( "refresh rate: %f\n", videoMode.RefreshRate );
-	Warning( "aspect: %s\n", videoMode.fIsWideScreen ? "16x9 (widescreen)" : "4x3 (normal)" );
-	Warning( "%s\n", videoMode.fIsHiDef ? "hidef" : "lodef" );
-	switch( videoMode.VideoStandard )
-	{
-	case XC_VIDEO_STANDARD_NTSC_M:
-		Warning( "video standard: NTSC_M\n" );
-		break;
-	case XC_VIDEO_STANDARD_NTSC_J:
-		Warning( "video standard: NTSC_J\n" );
-		break;
-	case XC_VIDEO_STANDARD_PAL_I:
-		Warning( "video standard: PAL_I\n" );
-		break;
-	default:
-		Warning( "error: UNKNOWN VIDEO STANDARD!\n" );
-		Assert( 0 );
-		break;
-	}
-	ConVarRef fps_max( "fps_max" );
-	Warning( "fps_max: %f\n", fps_max.GetFloat() );
-	switch( m_PresentParameters.MultiSampleType )
-	{
-	case D3DMULTISAMPLE_NONE:
-		Warning( "multisample type: D3DMULTISAMPLE_NONE\n" );
-		break;
-	case D3DMULTISAMPLE_2_SAMPLES:
-		Warning( "multisample type: D3DMULTISAMPLE_2_SAMPLES\n" );
-		break;
-	case D3DMULTISAMPLE_4_SAMPLES:
-		Warning( "multisample type: D3DMULTISAMPLE_4_SAMPLES\n" );
-		break;
-	}
-}
-#endif

@@ -28,11 +28,7 @@ extern IXboxSystem *g_pXboxSystem;
 
 void SaveInMemoryCallback( IConVar *var, const char *pOldString, float flOldValue );
 
-#ifdef _X360
-ConVar save_in_memory( "save_in_memory", "1", 1, "Set to 1 to save to memory instead of disk (Xbox 360)", SaveInMemoryCallback );
-#else
 ConVar save_in_memory( "save_in_memory", "0", 0, "Set to 1 to save to memory instead of disk (Xbox 360)", SaveInMemoryCallback );
-#endif // _X360
 
 #define INVALID_INDEX	(GetDirectory().InvalidIndex())
 enum { READ_ONLY, WRITE_ONLY };
@@ -762,15 +758,6 @@ void CSaveRestoreFileSystem::DirectoryCopy( const char *pPath, const char *pDest
 		}
 	}
 
-	// Fail to write
-#if defined( _X360 )
-	if ( nWriteSize > XBX_SAVEGAME_BYTES )
-	{
-		// FIXME: This error is now lost in the ether!
-		return;
-	}
-#endif
-
 	g_pFileSystem->AsyncWriteFile( pDestFileName, saveFile.pBuffer, saveFile.nSize, true, false );
 
 	// AsyncWriteFile() takes control of the utlbuffer, so don't let RemoveFile() delete it.
@@ -1402,11 +1389,7 @@ private:
 static CSaveRestoreFileSystem				s_SaveRestoreFileSystem;
 static CSaveRestoreFileSystemPassthrough	s_SaveRestoreFileSystemPassthrough;
 
-#ifdef _X360
-ISaveRestoreFileSystem *g_pSaveRestoreFileSystem = &s_SaveRestoreFileSystem;
-#else
 ISaveRestoreFileSystem *g_pSaveRestoreFileSystem = &s_SaveRestoreFileSystemPassthrough;
-#endif // _X360
 
 //-----------------------------------------------------------------------------
 // Purpose: Called when switching between saving in memory and saving to disk.

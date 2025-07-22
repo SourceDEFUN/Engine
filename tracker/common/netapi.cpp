@@ -7,11 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #if defined( WIN32 )
-#if !defined( _X360 )
 #include "winsock.h"
-#else
-#include "winsockx.h"
-#endif
 #elif defined( POSIX )
 #include <sys/socket.h>
 #include <netdb.h>
@@ -23,9 +19,6 @@
 #endif
 #include "inetapi.h"
 
-#if defined( _X360 )
-#include "xbox/xbox_win32stubs.h"
-#endif
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>

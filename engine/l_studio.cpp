@@ -40,7 +40,7 @@
 #include "materialsystem/materialsystem_config.h"
 #include "materialsystem/itexture.h"
 #include "IHammer.h"
-#if defined( _WIN32 ) && !defined( _X360 )
+#if defined( _WIN32 )
 #include <xmmintrin.h>
 #endif
 #include "staticpropmgr.h"
@@ -3434,9 +3434,7 @@ void CModelRender::ComputeModelVertexLightingOld( mstudiomodel_t *pModel,
 			{
 				// hint the next vertex
 				// data is loaded with one extra vertex for read past
-#if !defined( _X360 ) // X360TBD
 				_mm_prefetch( (char*)&pFatVerts[i+1], _MM_HINT_T0 );
-#endif
 		}
 #endif
 
@@ -4355,16 +4353,11 @@ ModelInstanceHandle_t CModelRender::CreateInstance( IClientRenderable *pRenderab
 		ValidateStaticPropColorData( handle );
 
 		// 360 persists the color meshes across same map loads
-#ifdef _X360
-		if ( r_decalstaticprops.GetBool() && instance.m_LightCacheHandle )
-			instance.m_AmbientLightingState = *(LightcacheGetStatic( *pCache, NULL, LIGHTCACHEFLAGS_STATIC ));
-#else
 		if ( instance.m_ColorMeshHandle == DC_INVALID_HANDLE )
 		{
 			// builds out color meshes or loads disk colors, now at load/create time
 			RecomputeStaticLighting( handle );
 		}
-#endif
 	}
 
 	return handle;

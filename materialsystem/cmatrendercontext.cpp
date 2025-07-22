@@ -47,11 +47,6 @@
 #define ForceSync() ((void)(0))
 #endif
 
-#ifdef _X360
-static bool s_bDirtyDisk = false;
-#endif
-
-
 void ValidateMatrices( const VMatrix &m1, const VMatrix &m2, float eps = .001 )
 {
 	if ( !ShouldValidateMatrices() )
@@ -62,18 +57,6 @@ void ValidateMatrices( const VMatrix &m1, const VMatrix &m2, float eps = .001 )
 		AssertFloatEquals( m1.Base()[i], m1.Base()[i], eps );
 	}
 }
-
-
-//-----------------------------------------------------------------------------
-// The dirty disk error report function (NOTE: Could be called from any thread!)
-//-----------------------------------------------------------------------------
-#ifdef _X360
-unsigned ThreadedDirtyDiskErrorDisplay( void *pParam )
-{
-	XShowDirtyDiscErrorUI( XBX_GetPrimaryUserId() );
-}
-#endif
-
 
 void SpinPresent()
 {
@@ -86,20 +69,7 @@ void SpinPresent()
 }
 
 void ReportDirtyDisk()
-{
-#ifdef _X360
-	s_bDirtyDisk = true;
-	ThreadHandle_t h = CreateSimpleThread( ThreadedDirtyDiskErrorDisplay, NULL );
-	ThreadSetPriority( h, THREAD_PRIORITY_HIGHEST );
-
-	// If this is being called from the render thread, immediately swap
-	if ( ( ThreadGetCurrentId() == MaterialSystem()->GetRenderThreadId() ) ||
-		( ThreadInMainThread() && g_pMaterialSystem->GetThreadMode() != MATERIAL_QUEUED_THREADED ) )
-	{
-		SpinPresent();
-	}
-#endif
-}
+{}
 
 
 //-----------------------------------------------------------------------------
@@ -132,11 +102,7 @@ CMatRenderContextBase::CMatRenderContextBase() :
 
 	// Put a special element at the top of the RT stack (indicating back buffer is current top of stack)
 	// NULL indicates back buffer, -1 indicates full-size viewport
-#if !defined( _X360 )
-                RenderTargetStackElement_t initialElement = { {NULL, NULL, NULL, NULL}, NULL, 0, 0, -1, -1 };
-#else
-                RenderTargetStackElement_t initialElement = { {NULL}, NULL, 0, 0, -1, -1 };
-#endif
+	RenderTargetStackElement_t initialElement = { {NULL, NULL, NULL, NULL}, NULL, 0, 0, -1, -1 };
 
 
 	m_RenderTargetStack.Push( initialElement );
@@ -806,11 +772,7 @@ void CMatRenderContextBase::PushRenderTargetAndViewport( )
 void CMatRenderContextBase::PushRenderTargetAndViewport( ITexture *pTexture )
 {
 	// Just blindly push the data on the stack with flags indicating full bounds
-#if !defined( _X360 )
 	RenderTargetStackElement_t element = { {pTexture, NULL, NULL, NULL}, 0, 0, -1, -1 };
-#else
-	RenderTargetStackElement_t element = { {pTexture}, 0, 0, -1, -1 };
-#endif
 	m_RenderTargetStack.Push( element );
 	CommitRenderTargetAndViewport();
 }
@@ -836,11 +798,7 @@ void CMatRenderContextBase::PushRenderTargetAndViewport( ITexture *pTexture, int
 void CMatRenderContextBase::PushRenderTargetAndViewport( ITexture *pTexture, ITexture *pDepthTexture, int nViewX, int nViewY, int nViewW, int nViewH )
 {
 	// Just blindly push the data on the stack
-#if !defined( _X360 )
 	RenderTargetStackElement_t element = { {pTexture, NULL, NULL, NULL}, pDepthTexture, nViewX, nViewY, nViewW, nViewH };
-#else
-	RenderTargetStackElement_t element = { {pTexture}, pDepthTexture, nViewX, nViewY, nViewW, nViewH };
-#endif
 	m_RenderTargetStack.Push( element );
 	CommitRenderTargetAndViewport();
 }
@@ -1553,13 +1511,6 @@ void CMatRenderContext::SwapBuffers()
 	g_pMorphMgr->AdvanceFrame();
 	g_pOcclusionQueryMgr->AdvanceFrame();
 	g_pShaderDevice->Present();
-
-#ifdef _X360
-	if ( s_bDirtyDisk )
-	{
-		SpinPresent();
-	}
-#endif
 }
 
 
@@ -1910,22 +1861,6 @@ void CMatRenderContext::SetNonInteractiveTempFullscreenBuffer( ITexture *pTextur
 void CMatRenderContext::RefreshFrontBufferNonInteractive()
 {
 	g_pShaderDevice->RefreshFrontBufferNonInteractive();
-#ifdef _X360
-	if ( s_bDirtyDisk )
-	{
-		if ( m_NonInteractiveMode == MATERIAL_NON_INTERACTIVE_MODE_NONE )
-		{
-			SpinPresent();
-		}
-		else
-		{
-			while ( true )
-			{
-				g_pShaderDevice->RefreshFrontBufferNonInteractive();
-			}
-		}
-	}
-#endif
 }
 
 void CMatRenderContext::EnableNonInteractiveMode( MaterialNonInteractiveMode_t mode )

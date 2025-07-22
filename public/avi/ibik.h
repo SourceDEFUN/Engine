@@ -108,13 +108,8 @@ public:
 	virtual void SetFrame( BIKMaterial_t hMaterial, float flFrame ) = 0;
 
 #ifdef WIN32
-#if !defined( _X360 )
 	// Sets the direct sound device that Bink will decode to
 	virtual bool SetDirectSoundDevice( void	*pDevice ) = 0;
-#else
-	//needs to be called after xaudio is initialized
-	virtual bool HookXAudio( void ) = 0;
-#endif
 #elif defined( LINUX )
 	// Sets the SDL device that Bink will decode to
 	virtual bool SetSDLDevice( int frequency, uint16 format, int nchannels ) = 0;

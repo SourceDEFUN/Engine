@@ -609,12 +609,7 @@ bool DispInfo_LoadDisplacements( model_t *pWorld, bool bRestoring )
 	
 	// load the displacement info structures into temporary space
 	// using temporary storage that is not the stack for compatibility with console stack
-#ifndef _X360
 	ddispinfo_t tempDisps[MAX_MAP_DISPINFO];
-#else
-	CUtlMemory< ddispinfo_t > m_DispInfoBuf( 0, MAX_MAP_DISPINFO );
-	ddispinfo_t *tempDisps = m_DispInfoBuf.Base();
-#endif
 	ErrorIfNot( 
 		nDisplacements <= MAX_MAP_DISPINFO,
 		("DispInfo_LoadDisplacements: nDisplacements (%d) > MAX_MAP_DISPINFO (%d)", nDisplacements, MAX_MAP_DISPINFO)
@@ -638,20 +633,9 @@ bool DispInfo_LoadDisplacements( model_t *pWorld, bool bRestoring )
 
 	// Now setup each displacement one at a time.
 	// using temporary storage that is not the stack for compatibility with console stack
-#ifndef _X360
 	CDispVert tempVerts[MAX_DISPVERTS];
-#else
-	CUtlMemory< CDispVert > m_DispVertsBuf( 0, MAX_DISPVERTS );
-	CDispVert *tempVerts = m_DispVertsBuf.Base();
-#endif
 
-#ifndef _X360
 	CDispTri tempTris[MAX_DISPTRIS];
-#else
-	// using temporary storage that is not the stack for compatibility with console stack
-	CUtlMemory< CDispTri > m_DispTrisBuf( 0, MAX_DISPTRIS );
-	CDispTri *tempTris = m_DispTrisBuf.Base();
-#endif
 
 	int iCurVert = 0;
 	int iCurTri = 0;

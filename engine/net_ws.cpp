@@ -54,30 +54,11 @@ static ConVar recvpackets	( "net_recvpackets", "-1", FCVAR_CHEAT, "Receive exact
 static ConVar	net_savelargesplits( "net_savelargesplits", "-1", 0, "If not -1, then if a split has this many or more split parts, save the entire packet to disc for analysis." );
 #endif
 
-#ifdef _X360
-static void NET_LogServerCallback( IConVar *var, const char *pOldString, float flOldValue );
-static ConVar net_logserver( "net_logserver", "0", 0,  "Dump server stats to a file", NET_LogServerCallback );
-static ConVar net_loginterval( "net_loginterval", "1", 0, "Time in seconds between server logs" );
-#endif
-
 //-----------------------------------------------------------------------------
 // Toggle Xbox 360 network security to allow cross-platform testing
 //-----------------------------------------------------------------------------
-#if !defined( _X360 )
 #define X360SecureNetwork() false
 #define IPPROTO_VDP	IPPROTO_UDP
-#elif defined( _RETAIL )
-#define X360SecureNetwork() true
-#else
-bool X360SecureNetwork( void )
-{
-	if ( CommandLine()->FindParm( "-xnet_bypass_security" ) )
-	{
-		return false;
-	}
-	return true;
-}
-#endif
 
 extern ConVar net_showudp;
 extern ConVar net_showtcp;
@@ -1925,31 +1906,6 @@ void NET_LogBadPacket(netpacket_t * packet)
 int NET_SendToImpl( SOCKET s, const char FAR * buf, int len, const struct sockaddr FAR * to, int tolen, int iGameDataLength )
 {
 	int nSend = 0;
-#if defined( _X360 )
-	if ( X360SecureNetwork() )
-	{
-		// 360 uses VDP protocol to piggyback voice data across the network.
-		// Two-byte VDP Header contains the number of game data bytes
-
-		// NOTE: The header bytes *should* be swapped to network endian, however when communicating 
-		// with XLSP servers (the only cross-platform communication possible with a secure network)
-		// the server's network stack swaps the header at the receiving end.
-		const int nVDPHeaderBytes = 2;
-		Assert( len < (unsigned short)-1 );
-
-		const unsigned short nDataBytes = iGameDataLength == -1 ? len : iGameDataLength;
-
-		WSABUF buffers[2];
-		buffers[0].len = nVDPHeaderBytes;
-		buffers[0].buf = (char*)&nDataBytes;
-
-		buffers[1].len = len;
-		buffers[1].buf = const_cast<char*>( buf );
-
-		WSASendTo( s, buffers, 2, (DWORD*)&nSend, 0, to, tolen, NULL, NULL );
-	}
-	else
-#endif //defined( _X360 )
 	{
 		nSend = sendto( s, buf, len, 0, to, tolen );
 	}
@@ -2817,124 +2773,6 @@ bool NET_IsDedicated( void )
 	return net_dedicated;
 }
 
-#ifdef _X360
-#include "iengine.h"
-static FileHandle_t g_fh;
-void NET_LogServerStatus( void )
-{
-	if ( !g_fh )
-		return;
-
-	static float fNextTime = 0.f;
-	float fCurrentTime = eng->GetCurTime();
-
-	if ( fCurrentTime >= fNextTime )
-	{
-		fNextTime = fCurrentTime + net_loginterval.GetFloat();
-	}
-	else
-	{
-		return;
-	}
-
-	AUTO_LOCK_FM( s_NetChannels );
-	int numChannels = s_NetChannels.Count();
-
-	if ( numChannels == 0 )
-	{
-		ConMsg( "No active net channels.\n" );
-		return;
-	}
-
-	enum
-	{
-		NET_LATENCY,
-		NET_LOSS,
-		NET_PACKETS_IN,
-		NET_PACKETS_OUT,
-		NET_CHOKE_IN,
-		NET_CHOKE_OUT,
-		NET_FLOW_IN,
-		NET_FLOW_OUT,
-		NET_TOTAL_IN,
-		NET_TOTAL_OUT,
-		NET_LAST,
-	};
-	float fStats[NET_LAST] = {0.f};
-
-	for ( int i = 0; i < numChannels; ++i )
-	{
-		INetChannel *chan = s_NetChannels[i];
-		fStats[NET_LATENCY] += chan->GetAvgLatency(FLOW_OUTGOING);
-		fStats[NET_LOSS] += chan->GetAvgLoss(FLOW_INCOMING);
-		fStats[NET_PACKETS_IN] += chan->GetAvgPackets(FLOW_INCOMING);
-		fStats[NET_PACKETS_OUT] += chan->GetAvgPackets(FLOW_OUTGOING);
-		fStats[NET_CHOKE_IN] += chan->GetAvgChoke(FLOW_INCOMING);
-		fStats[NET_CHOKE_OUT] += chan->GetAvgChoke(FLOW_OUTGOING);
-		fStats[NET_FLOW_IN] += chan->GetAvgData(FLOW_INCOMING);
-		fStats[NET_FLOW_OUT] += chan->GetAvgData(FLOW_OUTGOING);
-		fStats[NET_TOTAL_IN] += chan->GetTotalData(FLOW_INCOMING);
-		fStats[NET_TOTAL_OUT] += chan->GetTotalData(FLOW_OUTGOING);
-	}
-
-	for ( int i = 0; i < NET_LAST; ++i )
-	{
-		fStats[i] /= numChannels;
-	}
-
-	const unsigned int size = 128;
-	char msg[size];
-	Q_snprintf( msg, size, "%.0f,%d,%.0f,%.0f,%.0f,%.1f,%.1f,%.1f,%.1f,%.1f\n", 
-				fCurrentTime,
-				numChannels,
-				fStats[NET_LATENCY],
-				fStats[NET_LOSS],
-				fStats[NET_PACKETS_IN], 
-				fStats[NET_PACKETS_OUT],
-				fStats[NET_FLOW_IN]/1024.0f, 
-				fStats[NET_FLOW_OUT]/1024.0f,
-				fStats[NET_CHOKE_IN],
-				fStats[NET_CHOKE_OUT]
-			 );
-
-	g_pFileSystem->Write( msg, Q_strlen( msg ), g_fh );
-}
-
-void NET_LogServerCallback( IConVar *pConVar, const char *pOldString, float flOldValue )
-{
-	ConVarRef var( pConVar );
-
-	if ( var.GetBool() )
-	{
-		if ( g_fh )
-		{
-			g_pFileSystem->Close( g_fh );
-			g_fh = 0;
-		}
-
-		g_fh = g_pFileSystem->Open( "dump.csv", "wt" );
-		if ( !g_fh )
-		{
-			Msg( "Failed to open log file\n" );
-			pConVar->SetValue( 0 );
-			return;
-		}
-
-		char msg[128];
-		Q_snprintf( msg, 128, "Time,Channels,Latency,Loss,Packets In,Packets Out,Flow In(kB/s),Flow Out(kB/s),Choke In,Choke Out\n" );
-		g_pFileSystem->Write( msg, Q_strlen( msg ), g_fh );
-	}
-	else
-	{
-		if ( g_fh )
-		{
-			g_pFileSystem->Close( g_fh );
-			g_fh = 0;
-		}
-	}
-}
-#endif
-
 /*
 ====================
 NET_SetTime
@@ -2991,13 +2829,6 @@ void NET_RunFrame( double flRealtime )
 
 	master->RunFrame();
 
-#ifdef _X360
-	if ( net_logserver.GetInt() )
-	{
-		NET_LogServerStatus();
-	}
-	g_pMatchmaking->RunFrame();
-#endif
 	if ( !NET_IsMultiplayer() || net_notcp )
 		return;
 
@@ -3226,33 +3057,6 @@ void NET_Init( bool bIsDedicated )
 	else
 	{
 #if defined(_WIN32)
-
-#if defined(_X360)
-		XNetStartupParams xnsp;
-		memset( &xnsp, 0, sizeof( xnsp ) );
-		xnsp.cfgSizeOfStruct = sizeof( XNetStartupParams );
-		if ( X360SecureNetwork() )
-		{
-			Msg( "Xbox 360 network is Secure\n" );
-		}
-		else
-		{
-			// Allow cross-platform communication
-			xnsp.cfgFlags = XNET_STARTUP_BYPASS_SECURITY;
-			Msg( "Xbox 360 network is Unsecure\n" );
-		}
-
-		INT err = XNetStartup( &xnsp );
-		if ( err )
-		{
-			ConMsg( "Error! Failed to set XNET Security Bypass.\n");
-		}
-		err = XOnlineStartup();
-		if ( err != ERROR_SUCCESS )
-		{
-			ConMsg( "Error! XOnlineStartup failed.\n");
-		}
-#else
 		// initialize winsock 2.0
 		WSAData wsaData;
 		if ( WSAStartup( MAKEWORD(2,0), &wsaData ) != 0 )
@@ -3260,7 +3064,6 @@ void NET_Init( bool bIsDedicated )
 			ConMsg( "Error! Failed to load network socket library.\n");
 			net_noip = true;
 		}
-#endif	// _X360
 #endif	// _WIN32
 	}
 
@@ -3347,13 +3150,6 @@ void NET_Shutdown (void)
 		{
 			Msg("Failed to complete WSACleanup = 0x%x.\n", nError );
 		}
-#if defined(_X360)
-		nError = XOnlineCleanup();
-		if ( nError != ERROR_SUCCESS )
-		{
-			Msg( "Warning! Failed to complete XOnlineCleanup = 0x%x.\n", nError );
-		}
-#endif	// _X360
 	}
 #endif	// _WIN32
 

@@ -111,12 +111,6 @@ CAudioMixer *CreateWaveMixer( IWaveData *data, int format, int nChannels, int bi
 	{
 		return CreateADPCMMixer( data );
 	}
-#if defined( _X360 )
-	else if ( format == WAVE_FORMAT_XMA )
-	{
-		return CreateXMAMixer( data, initialStreamPosition );
-	}
-#endif
 	else
 	{
 		// unsupported format or wav file missing!!!
@@ -280,7 +274,7 @@ int CAudioMixerWave::SkipSamples( channel_t *pChannel, int sampleCount, int outp
 // wrapper routine to append without overflowing the temp buffer
 static uint AppendToBuffer( char *pBuffer, const char *pSampleData, size_t nBytes, const char *pBufferEnd )
 {
-#if defined(_WIN32) && !defined(_X360)
+#if defined(_WIN32)
 	// FIXME: Some clients are crashing here. Let's try to detect why.
 	if ( nBytes > 0 && ( (size_t)pBuffer <= 0xFFF || (size_t)pSampleData <= 0xFFF ) )
 	{

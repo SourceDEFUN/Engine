@@ -58,10 +58,6 @@
 #include "sound.h"
 #include "voice.h"
 #include "sv_rcon.h"
-#if defined( _X360 )
-#include "xbox/xbox_console.h"
-#include "xbox/xbox_launch.h"
-#endif
 #include "filesystem/IQueuedLoader.h"
 #include "sys.h"
 
@@ -211,59 +207,6 @@ int	gHostSpawnCount = 0;
 
 // If any quit handlers balk, then aborts quit sequence
 bool EngineTool_CheckQuitHandlers();
-
-#if defined( _X360 )
-CON_COMMAND( quit_x360, "" )
-{
-	int launchFlags = LF_EXITFROMGAME;
-
-	// allocate the full payload
-	int nPayloadSize = XboxLaunch()->MaxPayloadSize();
-	byte *pPayload = (byte *)stackalloc( nPayloadSize );
-	V_memset( pPayload, 0, sizeof( nPayloadSize ) );
-
-	// payload is at least the command line
-	// any user data needed must be placed AFTER the command line
-	const char *pCmdLine = CommandLine()->GetCmdLine();
-	int nCmdLineLength = (int)strlen( pCmdLine ) + 1;
-	V_memcpy( pPayload, pCmdLine, min( nPayloadSize, nCmdLineLength ) );
-
-	// add any other data here to payload, after the command line
-	// ...
-
-	// storage device may have changed since previous launch
-	XboxLaunch()->SetStorageID( XBX_GetStorageDeviceId() );
-
-	// Close the storage devices
-	g_pXboxSystem->CloseContainers();
-	// persist the user id
-	bool bInviteRestart = args.FindArg( "invite" );
-	DWORD nUserID = ( bInviteRestart ) ? XBX_GetInvitedUserId() : XBX_GetPrimaryUserId();
-	XboxLaunch()->SetUserID( nUserID );
-
-	if ( args.FindArg( "restart" ) )
-	{
-		launchFlags |= LF_GAMERESTART;
-	}
-	
-	// If we're relaunching due to invite
-	if ( bInviteRestart )
-	{
-		launchFlags |= LF_INVITERESTART;
-		XNKID nSessionID = XBX_GetInviteSessionId();
-		XboxLaunch()->SetInviteSessionID( &nSessionID );
-	}
-
-	bool bLaunch = XboxLaunch()->SetLaunchData( pPayload, nPayloadSize, launchFlags );
-	if ( bLaunch )
-	{
-		COM_TimestampedLog( "Launching: \"%s\" Flags: 0x%8.8x", pCmdLine, XboxLaunch()->GetLaunchFlags() );
-		g_pMaterialSystem->PersistDisplay();
-		XBX_DisconnectConsoleMonitor();
-		XboxLaunch()->Launch();
-	}
-}
-#endif
 
 /*
 ==================
@@ -418,63 +361,6 @@ CON_COMMAND( status, "Display map and connection status." )
 	IClient	*client;
 	int j;
 	void (*print) (const char *fmt, ...);
-
-#if defined( _X360 )
-	Vector org;
-	QAngle ang;
-	const char *pName;
-
-	if ( cl.IsActive() )
-	{
-		pName = cl.m_szLevelNameShort;
-		org = MainViewOrigin();
-		VectorAngles( MainViewForward(), ang );
-		IClientEntity *localPlayer = entitylist->GetClientEntity( cl.m_nPlayerSlot + 1 );
-		if ( localPlayer )
-		{
-			org = localPlayer->GetAbsOrigin();
-		}
-	}
-	else
-	{
-		pName = "";
-		org.Init();
-		ang.Init();
-	}
-
-	// send to vxconsole
-	xMapInfo_t mapInfo;
-	mapInfo.position[0] = org[0];
-	mapInfo.position[1] = org[1];
-	mapInfo.position[2] = org[2];
-	mapInfo.angle[0]    = ang[0];
-	mapInfo.angle[1]    = ang[1];
-	mapInfo.angle[2]    = ang[2];
-	mapInfo.build       = build_number();
-	mapInfo.skill       = skill.GetInt();
-
-	// generate the qualified path where .sav files are expected to be written
-	char savePath[MAX_PATH];
-	V_snprintf( savePath, sizeof( savePath ), "%s", saverestore->GetSaveDir() );
-	V_StripTrailingSlash( savePath );
-	g_pFileSystem->RelativePathToFullPath( savePath, "MOD", mapInfo.savePath, sizeof( mapInfo.savePath ) );
-	V_FixSlashes( mapInfo.savePath );
-
-	if ( pName[0] )
-	{
-		// generate the qualified path from where the map was loaded
-		char mapPath[MAX_PATH];
-		Q_snprintf( mapPath, sizeof( mapPath ), "maps/%s.360.bsp", pName );
-		g_pFileSystem->GetLocalPath( mapPath, mapInfo.mapPath, sizeof( mapInfo.mapPath ) );
-		Q_FixSlashes( mapInfo.mapPath );
-	}
-	else
-	{
-		mapInfo.mapPath[0] = '\0';
-	}
-
-	XBX_rMapInfo( &mapInfo );
-#endif
 
 	if ( cmd_source == src_command )
 	{

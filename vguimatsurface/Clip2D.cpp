@@ -10,9 +10,6 @@
 #include "Clip2D.h"
 #include "tier0/dbg.h"
 #include "utlvector.h"
-#if defined( _X360 )
-#include "materialsystem/imaterialsystem.h"
-#endif
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -70,13 +67,6 @@ void SetScissorRect( int left, int top, int right, int bottom )
 	g_ScissorRect.right  = right;
 	g_ScissorRect.bottom = bottom;
 
-#if defined( _X360 )
-	// no reason to waste cpu on full screen scissor, gpu does it
-	CMatRenderContextPtr pRenderContext( g_pMaterialSystem );
-	int vx, vy, vw, vh;
-	pRenderContext->GetViewport( vx, vy, vw, vh );
-	g_bFullScreenScissor = (left <= vx && top <= vy && right >= vw && bottom >= vh );
-#endif
 }
 
 void GetScissorRect( int &left, int &top, int &right, int &bottom, bool &enabled )

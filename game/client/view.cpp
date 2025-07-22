@@ -71,13 +71,8 @@ bool ToolFramework_SetupEngineMicrophone( Vector &origin, QAngle &angles );
 extern ConVar default_fov;
 extern bool g_bRenderingScreenshot;
 
-#if !defined( _X360 )
 #define SAVEGAME_SCREENSHOT_WIDTH	180
 #define SAVEGAME_SCREENSHOT_HEIGHT	100
-#else
-#define SAVEGAME_SCREENSHOT_WIDTH	128
-#define SAVEGAME_SCREENSHOT_HEIGHT	128
-#endif
 
 #ifndef _XBOX
 extern ConVar sensitivity;
@@ -95,7 +90,7 @@ bool g_bRenderingCameraView = false;
 
 // These are the vectors for the "main" view - the one the player is looking down.
 // For stereo views, they are the vectors for the middle eye.
-static Vector g_vecRenderOrigin(0,0,0);
+static Vector g_vecRenderOrigin(0,0,0); // Secton TODO: Research it and make view bob!
 static QAngle g_vecRenderAngles(0,0,0);
 static Vector g_vecPrevRenderOrigin(0,0,0);	// Last frame's render origin
 static QAngle g_vecPrevRenderAngles(0,0,0); // Last frame's render angles
@@ -829,7 +824,6 @@ void CViewRender::SetUpViews()
 void CViewRender::WriteSaveGameScreenshotOfSize( const char *pFilename, int width, int height, bool bCreatePowerOf2Padded/*=false*/,
 												 bool bWriteVTF/*=false*/ )
 {
-#ifndef _X360
 	CMatRenderContextPtr pRenderContext( materials );
 	pRenderContext->MatrixMode( MATERIAL_PROJECTION );
 	pRenderContext->PushMatrix();
@@ -968,7 +962,6 @@ void CViewRender::WriteSaveGameScreenshotOfSize( const char *pFilename, int widt
 	pRenderContext->PopMatrix();
 
 	g_bRenderingScreenshot = false;
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -1291,11 +1284,8 @@ void CViewRender::Render( vrect_t *rect )
 	g_pClientMode->PostRender();
 	engine->EngineStats_EndFrame();
 
-#if !defined( _X360 )
 	// Stop stubbing the material system so we can see the budget panel
 	matStub.End();
-#endif
-
 
 	// Draw all of the UI stuff "fullscreen"
     // (this is not health, ammo, etc. Nor is it pre-game briefing interface stuff - this is the stuff that appears when you hit Esc in-game)

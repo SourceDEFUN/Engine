@@ -4,7 +4,7 @@
 //
 //=============================================================================
 
-#if defined( WIN32) && !defined( _X360 )
+#if defined(WIN32)
 #include "winlite.h"
 #endif
 #include "tier0/platform.h"

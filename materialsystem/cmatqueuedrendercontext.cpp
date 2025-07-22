@@ -32,7 +32,6 @@ void FastCopy( byte *pDest, const byte *pSrc, size_t nBytes )
 		return;
 	}
 
-#if !defined( _X360 )
 	if ( (size_t)pDest % 16 == 0 && (size_t)pSrc % 16 == 0 )
 	{
 		const int BYTES_PER_FULL = 128;
@@ -74,25 +73,6 @@ void FastCopy( byte *pDest, const byte *pSrc, size_t nBytes )
 	{
 		memcpy( pDest, pSrc, nBytes );
 	}
-#else
-	if ( (size_t)pDest % 4 == 0 && nBytes % 4 == 0 )
-	{
-		XMemCpyStreaming_WriteCombined( pDest, pSrc, nBytes );
-	}
-	else
-	{
-		// work around a bug in memcpy
-		if ((size_t)pDest % 2 == 0 && nBytes == 4)
-		{
-			*(reinterpret_cast<short *>(pDest)) = *(reinterpret_cast<const short *>(pSrc));
-			*(reinterpret_cast<short *>(pDest)+1) = *(reinterpret_cast<const short *>(pSrc)+1);
-		}
-		else
-		{
-			memcpy( pDest, pSrc, nBytes );
-		}
-	}
-#endif
 }
 #else
 #define FastCopy memcpy
@@ -1572,13 +1552,13 @@ byte *CMatQueuedRenderContext::AllocVertices( int nVerts, int nVertexSize )
 {
 	MEM_ALLOC_CREDIT();
 
-#if defined(_WIN32) && !defined(_X360)
+#if defined(_WIN32)
 	const byte *pNextAlloc = (const byte *)(m_Vertices.GetBase()) + m_Vertices.GetUsed() + AlignValue( nVerts * nVertexSize, 16 );
 	const byte *pCommitLimit = (const byte *)(m_Vertices.GetBase()) + m_Vertices.GetSize();
 #endif
 
 	void *pResult = m_Vertices.Alloc( nVerts * nVertexSize, false );
-#if defined(_WIN32) && !defined(_X360)
+#if defined(_WIN32)
 	if ( !pResult )
 	{
 		// Force a crash with useful minidump info in the registers.
@@ -1615,13 +1595,13 @@ uint16 *CMatQueuedRenderContext::AllocIndices( int nIndices )
 {
 	MEM_ALLOC_CREDIT();
 
-#if defined(_WIN32) && !defined(_X360)
+#if defined(_WIN32)
 	const byte *pNextAlloc = (const byte *)(m_Indices.GetBase()) + m_Indices.GetUsed() + AlignValue( nIndices * sizeof(uint16), 16 );
 	const byte *pCommitLimit = (const byte *)(m_Indices.GetBase()) + m_Indices.GetSize();
 #endif
 
 	void *pResult = m_Indices.Alloc( nIndices * sizeof(uint16), false );
-#if defined(_WIN32) && !defined(_X360)
+#if defined(_WIN32)
 	if ( !pResult )
 	{
 		// Force a crash with useful minidump info in the registers.

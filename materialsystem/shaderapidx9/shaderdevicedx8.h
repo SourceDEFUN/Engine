@@ -85,12 +85,10 @@ public:
 	// Returns the amount of video memory in bytes for a particular adapter
 	virtual int GetVidMemBytes( int nAdapter ) const;
 
-#if !defined( _X360 )
 	FORCEINLINE IDirect3D9 *D3D() const
 	{ 
 		return m_pD3D; 
 	}
-#endif
 
 #if defined( PIX_INSTRUMENTATION ) && defined ( DX_TO_GL_ABSTRACTION ) && defined( _WIN32 )
 	HMODULE m_hD3D9;
@@ -121,9 +119,7 @@ private:
 	void ComputeDXSupportLevel( HardwareCaps_t &caps );
 
 	// Used to enumerate adapters, attach to windows
-#if !defined( _X360 )
 	IDirect3D9 *m_pD3D;
-#endif
 
 	bool m_bObeyDxCommandlineOverride : 1;
 	bool m_bAdapterInfoIntialized : 1;
@@ -135,16 +131,6 @@ extern CShaderDeviceMgrDx8* g_pShaderDeviceMgrDx8;
 //-----------------------------------------------------------------------------
 // IDirect3D accessor
 //-----------------------------------------------------------------------------
-#if defined( _X360 )
-
-extern IDirect3D9 *m_pD3D;
-inline IDirect3D9* D3D()  
-{
-	return m_pD3D;
-}
-
-#else
-
 inline IDirect3D9* D3D()  
 {
 	return g_pShaderDeviceMgrDx8->D3D();
@@ -324,19 +310,11 @@ protected:
 	// amount of stencil variation we have available
 	int					m_iStencilBufferBits;
 
-#ifdef _X360
-	CON_COMMAND_MEMBER_F( CShaderDeviceDx8, "360vidinfo", SpewVideoInfo360, "Get information on the video mode on the 360", 0 );
-#endif
-
 	// Frame sync objects
 	IDirect3DQuery9		*m_pFrameSyncQueryObject[NUM_FRAME_SYNC_QUERIES];
 	bool				m_bQueryIssued[NUM_FRAME_SYNC_QUERIES];
 	int					m_currentSyncQuery;
 	IDirect3DTexture9	*m_pFrameSyncTexture;
-
-#if defined( _X360 )
-	HXUIDC m_hDC;
-#endif
 
 	CUtlString			m_sDisplayDeviceName;
 

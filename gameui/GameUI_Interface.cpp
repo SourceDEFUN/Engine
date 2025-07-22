@@ -6,9 +6,7 @@
 //===========================================================================//
 
 #ifdef WIN32
-#if !defined( _X360 )
 #include <windows.h>
-#endif
 #include <io.h>
 #include <direct.h>
 #elif defined( POSIX )
@@ -74,10 +72,6 @@
 #include "tier0/vcrmode.h"
 #include "matsys_controls/matsyscontrols.h"
 #include "steam/steam_api.h"
-
-#if defined( _X360 )
-#include "xbox/xbox_win32stubs.h"
-#endif
 
 #include "tier0/dbg.h"
 #include "engine/IEngineSound.h"

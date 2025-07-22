@@ -25,7 +25,7 @@ PLATFORM_INTERFACE void WriteMiniDump( const char *pszFilenameSuffix = NULL );
 typedef void (*FnWMain)( int , tchar *[] );
 typedef void (*FnVoidPtrFn)( void * );
 
-#if defined(_WIN32) && !defined(_X360)
+#if defined(_WIN32)
 
 // calls the passed in function pointer and catches any exceptions/crashes thrown by it, and writes a minidump
 // use from wmain() to protect the whole program
@@ -82,7 +82,7 @@ PLATFORM_INTERFACE void MinidumpSetUnhandledExceptionFunction( FnMiniDump pfn );
 // being silently swallowed. We should always call this at startup.
 PLATFORM_INTERFACE void EnableCrashingOnCrashes();
 
-#endif // defined(_WIN32) && !defined(_X360)
+#endif // defined(_WIN32)
 
 //
 // Minidump User Stream Info Comments.

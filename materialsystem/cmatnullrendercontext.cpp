@@ -819,18 +819,6 @@ public:
 	virtual void EnableNonInteractiveMode( MaterialNonInteractiveMode_t mode ) {}
 	virtual void RefreshFrontBufferNonInteractive() {}
 
-#if defined( _X360 )
-	virtual void PushVertexShaderGPRAllocation( int iVertexShaderCount = 64 )
-	{
-		Assert( 0 );
-	}
-
-	virtual void PopVertexShaderGPRAllocation( void )
-	{
-		Assert( 0 );
-	}
-#endif
-
 #ifdef DX_TO_GL_ABSTRACTION
 	void									DoStartupShaderPreloading( void ) {};
 #endif

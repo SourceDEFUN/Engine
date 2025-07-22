@@ -122,10 +122,6 @@
 #include "soundservice.h"
 #include "profile.h"
 #include "steam/isteamremotestorage.h"
-#if defined( _X360 )
-#include "xbox/xbox_win32stubs.h"
-#include "audio_pch.h"
-#endif
 #if defined( LINUX )
 #include <locale.h>
 
@@ -732,106 +728,6 @@ void CheckForFlushMemory( const char *pCurrentMapName, const char *pDestMapName 
 {
 	if ( host_flush_threshold.GetInt() == 0 )
 		return;
-
-#if defined(_X360)
-	// There are three cases in which we flush memory
-	//   Case 1: changing from one map to another
-	//          -> flush temp data caches
-	//   Case 2: loading any map (inc. A to A) and free memory is below host_flush_threshold MB
-	//          -> flush everything
-	//   Case 3: loading a 'blacklisted' map (the known biggest memory users, or where texture sets change)
-	//          -> flush everything
-	static const char *mapBlackList[] = 
-	{
-		// --hl2--
-		"d1_canals_01",
-		"d1_canals_05",
-		"d1_eli_01",
-		"d1_town_01",
-		"d2_coast_01",
-		"d2_prison_01",
-		"d3_c17_01",
-		"d3_c17_05",
-		"d3_c17_09",
-		"d3_citadel_01",
-		"d3_breen_01",
-		// --ep1--
-		"ep1_c17_02",
-		"ep1_c17_02b",
-		"ep1_c17_05",
-		"ep1_c17_06",
-		// --ep2--
-		"ep2_outland_06a",
-		"ep2_outland_09",
-		"ep2_outland_11",
-		"ep2_outland_12",
-		"ep2_outland_12a",
-		// --tf--
-		"tc_hydro"
-	};
-
-	char szCurrentMapName[MAX_PATH];
-	char szDestMapName[MAX_PATH];
-	if ( pCurrentMapName )
-	{
-		V_FileBase( pCurrentMapName, szCurrentMapName, sizeof( szCurrentMapName ) );
-	}
-	else
-	{
-		szCurrentMapName[0] = '\0';
-	}
-	pCurrentMapName = szCurrentMapName;
-
-	if ( pDestMapName )
-	{
-		V_FileBase( pDestMapName, szDestMapName, sizeof( szDestMapName ) );
-	}
-	else
-	{
-		szDestMapName[0] = '\0';
-	}
-	pDestMapName = szDestMapName;
-
-	bool bIsMapChanging = pCurrentMapName[0] && V_stricmp( pCurrentMapName, pDestMapName );
-
-	bool bIsDestMapBlacklisted = false;
-	for ( int i = 0; i < ARRAYSIZE( mapBlackList ); i++ )
-	{
-		if ( pDestMapName && !V_stricmp( pDestMapName, mapBlackList[i] ) )
-		{
-			bIsDestMapBlacklisted = true;
-		}
-	}
-
-	DevMsg( "---CURRENT(%s), NEXT(%s)\n", (pCurrentMapName[0] ? pCurrentMapName : "----"), (pDestMapName[0] ? pDestMapName : "----") );
-	if ( bIsMapChanging )
-	{
-		DevMsg( "---CHANGING MAPS!\n" );
-	}
-	if ( bIsDestMapBlacklisted )
-	{
-		DevMsg( "---BLACKLISTED!\n" );
-	}
-
-	MEMORYSTATUS stat;
-	GlobalMemoryStatus( &stat );
-	if ( ( stat.dwAvailPhys < host_flush_threshold.GetInt() * 1024 * 1024 ) ||
-		 ( bIsDestMapBlacklisted && bIsMapChanging ) )
-	{
-		// Flush everything; ALL data is reloaded from scratch
-		SV_FlushMemoryOnNextServer();
-		g_pDataCache->Flush();
-		DevWarning( "---FULL FLUSH\n" );
-	}
-	else if ( bIsMapChanging )
-	{
-		// Flush temporary data (async anim, non-locked async audio)
-		g_pMDLCache->Flush( MDLCACHE_FLUSH_ANIMBLOCK );
-		wavedatacache->Flush();
-		DevWarning( "---PARTIAL FLUSH\n" );
-	}
-	DevMsg( "---- --- ----\n" );
-#endif
 }
 
 void Host_AbortServer()
@@ -1153,45 +1049,7 @@ static bool g_bConfigCfgExecuted = false;
 // Purpose: Write out our 360 exclusive settings to internal storage
 //-----------------------------------------------------------------------------
 void Host_WriteConfiguration_360( void )
-{
-#ifdef _X360
-	if ( XBX_GetStorageDeviceId() == XBX_INVALID_STORAGE_ID || XBX_GetStorageDeviceId() == XBX_STORAGE_DECLINED )
-		return;
-
-	// Construct the name for our config settings for this mod
-	char strFilename[MAX_PATH];
-	Q_snprintf( strFilename, sizeof(strFilename), "cfg:/%s_config.cfg", GetCurrentMod() );
-
-	// Always throw away all keys that are left over.
-	CUtlBuffer	configBuff( 0, 0, CUtlBuffer::TEXT_BUFFER);
-	configBuff.Printf( "unbindall\n" );
-
-	Key_WriteBindings( configBuff );
-	cv->WriteVariables( configBuff );
-
-	ConVarRef mat_monitorgamma( "mat_monitorgamma" );
-	ConVarRef mat_monitorgamma_tv_enabled( "mat_monitorgamma_tv_enabled" );
-
-	char strVideoFilename[MAX_PATH];
-	CUtlBuffer videoBuff( 0, 0, CUtlBuffer::TEXT_BUFFER);
-	Q_snprintf( strVideoFilename, sizeof(strVideoFilename), "cfg:/video_config.cfg" );
-	videoBuff.Printf( "mat_monitorgamma %f\n", mat_monitorgamma.GetFloat() );
-	videoBuff.Printf( "mat_monitorgamma_tv_enabled %d\n", mat_monitorgamma_tv_enabled.GetBool() );
-
-	// Anything to write?
-	if ( configBuff.TellMaxPut() )
-	{
-		g_pFileSystem->WriteFile( strFilename, NULL, configBuff );
-	}
-
-	if ( videoBuff.TellMaxPut() )
-	{
-		g_pFileSystem->WriteFile( strVideoFilename, NULL, videoBuff );
-	}
-
-	g_pXboxSystem->FinishContainerWrites();
-#endif // #ifdef _X360
-}
+{}
 
 /*
 ===============
@@ -1382,137 +1240,6 @@ void Host_WriteConfiguration( const char *filename, bool bAllVars )
 //-----------------------------------------------------------------------------
 bool XBX_SetProfileDefaultSettings( void )
 {
-	// These defined values can't play nicely with the PC, so we need to ignore them for that build target
-#ifdef _X360
-	// These will act as indices into the array that is returned by the API
-	enum
-	{
-		XPS_GAMER_DIFFICULTY,
-		XPS_GAMER_ACTION_MOVEMENT_CONTROL,
-		XPS_GAMER_YAXIS_INVERSION,
-		XPS_OPTION_CONTROLLER_VIBRATION,
-		NUM_PROFILE_SETTINGS
-	};
-
-	// These are the values we're interested in having returned (must match the indices above)
-	const DWORD dwSettingIds[ NUM_PROFILE_SETTINGS ] =
-	{
-		XPROFILE_GAMER_DIFFICULTY,
-		XPROFILE_GAMER_ACTION_MOVEMENT_CONTROL,
-		XPROFILE_GAMER_YAXIS_INVERSION,
-		XPROFILE_OPTION_CONTROLLER_VIBRATION
-	};
-
-	// Must have a valid primary user by this point
-	int nPrimaryID = XBX_GetPrimaryUserId();
-
-	// First, we call with a NULL pointer and zero size to retrieve the buffer size we'll get back
-	DWORD dwResultSize = 0;	// Must be zero to get the correct size back
-	XUSER_READ_PROFILE_SETTING_RESULT *pResults = NULL;
-	DWORD dwError = XUserReadProfileSettings(	0,			// Family ID (current title)
-												nPrimaryID,	// User ID
-												NUM_PROFILE_SETTINGS,
-												dwSettingIds,
-												&dwResultSize,
-												pResults,
-												NULL );
-
-	// We need this to inform us that it's given us a size back for the buffer
-	if ( dwError != ERROR_INSUFFICIENT_BUFFER )
-		return false;
-
-	// Now we allocate that buffer and supply it to the call
-	BYTE *pData = (BYTE *) stackalloc( dwResultSize );
-	ZeroMemory( pData, dwResultSize );
-
-	pResults = (XUSER_READ_PROFILE_SETTING_RESULT *) pData;
-
-	dwError = XUserReadProfileSettings(	0,			// Family ID (current title)
-										nPrimaryID,	// User ID
-										NUM_PROFILE_SETTINGS,
-										dwSettingIds,
-										&dwResultSize,
-										pResults,
-										NULL );	// Not overlapped, must be synchronous
-
-	// We now have a raw buffer of results
-	if ( dwError != ERROR_SUCCESS )
-		return false;
-
-	//
-	// Skill
-	//
-
-	XUSER_PROFILE_SETTING *pSetting = pResults->pSettings + XPS_GAMER_DIFFICULTY;
-	Assert( pSetting->data.type == XUSER_DATA_TYPE_INT32 );
-	
-	int nSkillSetting = pSetting->data.nData;
-	int nResultSkill = 0;
-	switch( nSkillSetting )
-	{
-	case XPROFILE_GAMER_DIFFICULTY_NORMAL:
-		nResultSkill = 2;
-		break;
-	
-	case XPROFILE_GAMER_DIFFICULTY_HARD:
-		nResultSkill = 3;
-		break;
-	
-	case XPROFILE_GAMER_DIFFICULTY_EASY:
-	default:
-		nResultSkill = 1;
-		break;
-	}
-
-	// If the mod has no difficulty setting, only easy is allowed
-	KeyValues *modinfo = new KeyValues("ModInfo");
-	if ( modinfo->LoadFromFile( g_pFileSystem, "gameinfo.txt" ) )
-	{
-		if ( stricmp(modinfo->GetString("nodifficulty", "0"), "1") == 0 )
-			nResultSkill = 1;
-	}
-	modinfo->deleteThis();
-
-	char szScratch[MAX_PATH];
-	Q_snprintf( szScratch, sizeof(szScratch), "skill %d", nResultSkill );
-	Cbuf_AddText( szScratch );
-
-	// 
-	// Movement control
-	//
-
-	pSetting = pResults->pSettings + XPS_GAMER_ACTION_MOVEMENT_CONTROL;
-	Assert( pSetting->data.type == XUSER_DATA_TYPE_INT32 );
-	Q_snprintf( szScratch, sizeof(szScratch), "joy_movement_stick %d", ( pSetting->data.nData == XPROFILE_ACTION_MOVEMENT_CONTROL_L_THUMBSTICK ) ? 0 : 1 );
-	Cbuf_AddText( szScratch );
-	Q_snprintf( szScratch, sizeof(szScratch), "joy_movement_stick_default %d", ( pSetting->data.nData == XPROFILE_ACTION_MOVEMENT_CONTROL_L_THUMBSTICK ) ? 0 : 1 );
-	Cbuf_AddText( szScratch );
-	Cbuf_AddText( "joyadvancedupdate" );
-
-	// 
-	// Y-Inversion
-	//
-
-	pSetting = pResults->pSettings + XPS_GAMER_YAXIS_INVERSION;
-	Assert( pSetting->data.type == XUSER_DATA_TYPE_INT32 );
-	Q_snprintf( szScratch, sizeof(szScratch), "joy_inverty %d", pSetting->data.nData );
-	Cbuf_AddText( szScratch );
-	Q_snprintf( szScratch, sizeof(szScratch), "joy_inverty_default %d", pSetting->data.nData );
-	Cbuf_AddText( szScratch );
-	
-	//
-	// Vibration control
-	//
-
-	pSetting = pResults->pSettings + XPS_OPTION_CONTROLLER_VIBRATION;
-	Assert( pSetting->data.type == XUSER_DATA_TYPE_INT32 );
-	Q_snprintf( szScratch, sizeof(szScratch), "cl_rumblescale %d", ( pSetting->data.nData != 0 ) ? 1 : 0 );
-	Cbuf_AddText( szScratch );
-
-	// Execute all commands we've queued up
-	Cbuf_Execute();
-#endif // _X360
-
 	return true;
 }
 
@@ -1520,67 +1247,7 @@ bool XBX_SetProfileDefaultSettings( void )
 // Purpose: Read our configuration from the 360, filling in defaults on our first run
 //-----------------------------------------------------------------------------
 void Host_ReadConfiguration_360( void )
-{
-#ifdef _X360
-	
-	// Exec our defaults on the first pass
-	if ( g_bConfigCfgExecuted == false )
-	{
-		// First, we exec our default configuration for the 360
-		Cbuf_AddText( "exec config.360.cfg game\n" );
-		Cbuf_Execute();
-	}
-
-	// Can't do any more in this function if we don't have a valid user id
-	if ( XBX_GetPrimaryUserId() == INVALID_USER_ID )
-		return;
-
-	// Build the config name we're looking for
-	char strFileName[MAX_PATH];
-	Q_snprintf( strFileName, sizeof(strFileName), "cfg:/%s_config.cfg", GetCurrentMod() );
-
-	bool bStorageDeviceValid = ( XBX_GetStorageDeviceId() != XBX_INVALID_STORAGE_ID && XBX_GetStorageDeviceId() != XBX_STORAGE_DECLINED );
-	bool bSaveConfig = false;
-
-	// Call through normal API function once the content container is opened
-	if ( CommandLine()->CheckParm( "-forcexboxreconfig" ) || bStorageDeviceValid == false || g_pFileSystem->FileExists( strFileName ) == false )
-	{
-		// If we've already done this in this session, never do it again (we don't want to stomp their settings under any circumstances)
-		if ( g_bConfigCfgExecuted == false )
-		{
-			// Get and set all our default setting we care about from the Xbox
-			XBX_SetProfileDefaultSettings();
-		}
-		
-		// Save out what we have
-		bSaveConfig = true;
-	}
-	else
-	{
-		// Otherwise, exec the user settings stored on the 360
-		char szCommand[MAX_PATH];
-		Q_snprintf( szCommand, sizeof( szCommand ), "exec %s_config.cfg x360\n", GetCurrentMod() );
-		Cbuf_AddText( szCommand );
-		
-		// Exec the video config as well
-		Q_snprintf( szCommand, sizeof( szCommand ), "exec video_config.cfg x360\n", GetCurrentMod() );
-		Cbuf_AddText( szCommand );
-		Cbuf_Execute();
-	}
-
-	// Mark that we've loaded a config and can now save it
-	g_bConfigCfgExecuted = true;
-
-	if ( bSaveConfig )
-	{
-		// An ugly hack, but we can probably save this safely
-		bool saveinit = host_initialized;
-		host_initialized = true;
-		Host_WriteConfiguration_360();
-		host_initialized = saveinit;
-	}
-#endif // _X360
-}
+{}
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -2185,25 +1852,6 @@ void CL_SendVoicePacket(bool bFinal)
 #endif
 }
 
-#if defined ( _X360 )
-
-
-void CL_ProcessXboxVoiceData()
-{
-	if ( Audio_GetXVoice() == NULL )
-		return;
-
-	if ( Audio_GetXVoice()->VoiceUpdateData() == true )
-	{
-		if ( cl.IsActive() )
-		{
-			Audio_GetXVoice()->VoiceSendData( cl.m_NetChannel );
-		}
-	}
-}
-
-#endif
-
 void CL_ProcessVoiceData()
 {
 	VPROF_BUDGET( "CL_ProcessVoiceData", VPROF_BUDGETGROUP_OTHER_NETWORKING );
@@ -2212,12 +1860,6 @@ void CL_ProcessVoiceData()
 	Voice_Idle(host_frametime);
 	CL_SendVoicePacket(false);
 #endif
-
-#if defined ( _X360 )
-
-	CL_ProcessXboxVoiceData();
-#endif
-
 }
 #endif
 
@@ -2974,11 +2616,7 @@ CON_COMMAND( host_runofftime, "Run off some time without rendering/updating soun
 	SCR_UpdateScreen ();
 }
 
-#if !defined( _X360 )
 S_API int SteamGameServer_GetIPCCallCount();
-#else
-S_API int SteamGameServer_GetIPCCallCount() { return 0; }
-#endif
 void Host_ShowIPCCallCount()
 {
 	// If set to 0 then get out.
@@ -3949,7 +3587,7 @@ void HLTV_Shutdown()
 // Check with steam to see if the requested file (requires full path) is a valid, signed binary
 bool DLL_LOCAL Host_IsValidSignature( const char *pFilename, bool bAllowUnknown )
 {
-#if defined( SWDS ) || defined(_X360)
+#if defined( SWDS )
 	return true;
 #else
 	if ( sv.IsDedicated() || IsOSX() || IsLinux() || IsBSD() )
@@ -4965,7 +4603,7 @@ void Host_Shutdown(void)
 
 #ifndef SWDS
 	TRACESHUTDOWN( Key_Shutdown() );
-#if !defined _X360 && !defined ANDROID
+#if !defined ANDROID
 	TRACESHUTDOWN( ShutdownMixerControls() );
 #endif
 #endif

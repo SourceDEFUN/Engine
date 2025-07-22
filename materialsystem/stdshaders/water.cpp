@@ -17,9 +17,7 @@
 #include "Water_ps20.inc"
 #include "water_ps20b.inc"
 
-#ifndef _X360
 static ConVar r_waterforceexpensive( "r_waterforceexpensive", "0", FCVAR_ARCHIVE );
-#endif
 
 DEFINE_FALLBACK_SHADER( Water, Water_DX9_HDR )
 
@@ -103,11 +101,7 @@ BEGIN_VS_SHADER( Water_DX90,
 		// By default, we're force expensive on dx9.  NO WE DON'T!!!!
 		if( !params[FORCEEXPENSIVE]->IsDefined() )
 		{
-#ifdef _X360
-			params[FORCEEXPENSIVE]->SetIntValue( 0 );
-#else
 			params[FORCEEXPENSIVE]->SetIntValue( 1 );
-#endif
 		}
 		if( params[FORCEEXPENSIVE]->GetIntValue() && params[FORCECHEAP]->GetIntValue() )
 		{
@@ -524,11 +518,7 @@ BEGIN_VS_SHADER( Water_DX90,
 	{
 		// TODO: fit the cheap water stuff into the water shader so that we don't have to do
 		// 2 passes.
-#ifdef _X360
-		bool bForceExpensive = false;
-#else
 		bool bForceExpensive = r_waterforceexpensive.GetBool();
-#endif
 		bool bForceCheap = (params[FORCECHEAP]->GetIntValue() != 0) || UsingEditor( params );
 		if ( bForceCheap )
 		{
@@ -541,11 +531,7 @@ BEGIN_VS_SHADER( Water_DX90,
 		Assert( !( bForceCheap && bForceExpensive ) );
 
 		bool bRefraction = params[REFRACTTEXTURE]->IsTexture();
-#ifdef _X360
-		bool bReflection = params[REFLECTTEXTURE]->IsTexture();
-#else
 		bool bReflection = bForceExpensive && params[REFLECTTEXTURE]->IsTexture();
-#endif
 		bool bDrewSomething = false;
 		if ( !bForceCheap && ( bReflection || bRefraction ) )
 		{
@@ -555,11 +541,7 @@ BEGIN_VS_SHADER( Water_DX90,
 
 		// Use $decal to see if we are a decal or not. . if we are, then don't bother
 		// drawing the cheap version for now since we don't have access to env_cubemap
-#ifdef _X360
-		if( params[ENVMAP]->IsTexture() && !IS_FLAG_SET( MATERIAL_VAR_DECAL ) && !bForceExpensive )
-#else
 		if( !bReflection && params[ENVMAP]->IsTexture() && !IS_FLAG_SET( MATERIAL_VAR_DECAL ) )
-#endif
 		{
 			bDrewSomething = true;
 			DrawCheapWater( params, pShaderShadow, pShaderAPI, !bForceCheap, bRefraction );

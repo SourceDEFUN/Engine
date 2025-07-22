@@ -1118,7 +1118,6 @@ void R_BuildCubemapSamples( int numIterations )
 	reload_materials.SetValue( 1 );
 }
 
-#if !defined( _X360 )
 CON_COMMAND( buildcubemaps, "Rebuild cubemaps." )
 {
 	extern void V_RenderVGuiOnly();
@@ -1141,6 +1140,5 @@ CON_COMMAND( buildcubemaps, "Rebuild cubemaps." )
 	}
 	Host_AllowQueuedMaterialSystem(bAllow);
 }
-#endif // SWDS
 
-#endif
+#endif // SWDS

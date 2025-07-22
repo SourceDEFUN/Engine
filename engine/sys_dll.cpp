@@ -7,7 +7,7 @@
 //=============================================================================//
 
 
-#if defined(_WIN32) && !defined(_X360)
+#if defined(_WIN32)
 #include "winlite.h"
 #elif defined(OSX)
 #include <Carbon/Carbon.h>
@@ -64,14 +64,9 @@
 #include "vgui_baseui_interface.h"
 #include "tier0/systeminformation.h"
 #ifdef _WIN32
-#if !defined( _X360 )
 #include <io.h>
 #endif
-#endif
 #include "toolframework/itoolframework.h"
-#if defined( _X360 )
-#include "xbox/xbox_win32stubs.h"
-#endif
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -430,9 +425,6 @@ void Sys_Error_Internal( bool bMinidump, const char *error, va_list argsList )
 	{
 		DebuggerBreak(); 
 	}
-
-#if !defined( _X360 )
-
 	BuildMinidumpComment( text, true );
 	g_bUpdateMinidumpComment = false;
 
@@ -473,10 +465,8 @@ void Sys_Error_Internal( bool bMinidump, const char *error, va_list argsList )
 #endif
 	}
 
-#endif // _X360
-
 	host_initialized = false;
-#if defined(_WIN32) && !defined( _X360 )
+#if defined(_WIN32)
 	// We don't want global destructors in our process OR in any DLL to get executed.
 	// _exit() avoids calling global destructors in our module, but not in other DLLs.
 	TerminateProcess( GetCurrentProcess(), 100 );
@@ -545,7 +535,7 @@ void Sys_Sleep( int msec )
 //			lpReserved - 
 // Output : BOOL WINAPI   DllMain
 //-----------------------------------------------------------------------------
-#if defined(_WIN32) && !defined( _X360 )
+#if defined(_WIN32)
 BOOL WINAPI DllMain(HANDLE hInst, ULONG ulInit, LPVOID lpReserved)
 {
 	InitCRTMemDebug();
@@ -806,7 +796,6 @@ static CThreadFastMutex g_SpewMutex;
 
 static void AddSpewRecord( char const *pMsg )
 {
-#if !defined( _X360 )
 	AUTO_LOCK( g_SpewMutex );
 
 	static bool s_bReentrancyGuard = false;
@@ -823,7 +812,6 @@ static void AddSpewRecord( char const *pMsg )
 	g_SpewHistory[ i ].Format( "%d(%f):  %s", g_nSpewLines++, Plat_FloatTime(), pMsg );
 
 	s_bReentrancyGuard = false;
-#endif
 }
 
 void GetSpew( char *buf, size_t buflen )
@@ -1041,7 +1029,6 @@ int Sys_InitGame( CreateInterfaceFn appSystemFactory, const char* pBaseDir, void
 	Q_FixSlashes( s_pBaseDir );
 	host_parms.basedir = s_pBaseDir;
 
-#ifndef _X360
 	if ( CommandLine()->FindParm ( "-pidfile" ) )
 	{	
 		FileHandle_t pidFile = g_pFileSystem->Open( CommandLine()->ParmValue ( "-pidfile", "srcds.pid" ), "w+" );
@@ -1055,7 +1042,6 @@ int Sys_InitGame( CreateInterfaceFn appSystemFactory, const char* pBaseDir, void
 			Warning("Unable to open pidfile (%s)\n", CommandLine()->CheckParm ( "-pidfile" ));
 		}
 	}
-#endif
 
 	// Initialize clock
 	TRACEINIT( Sys_Init(), Sys_Shutdown() );

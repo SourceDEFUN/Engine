@@ -291,13 +291,6 @@ void CSessionBrowserDialog::OnKeyCodePressed( vgui::KeyCode code )
 		matchmaking->KickPlayerFromSession( 0 );
 		break;
 	case KEY_XBUTTON_X:
-#ifdef _X360
-		int idx = m_Menu.GetActiveItemIndex();
-		if ( m_XUIDs.IsValidIndex( idx ) )
-		{
-			XShowGamerCardUI( XBX_GetPrimaryUserId(), m_XUIDs[idx] );
-		}
-#endif
 		break;
 	}
 

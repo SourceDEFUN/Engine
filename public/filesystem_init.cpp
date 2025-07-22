@@ -10,7 +10,7 @@
 #undef fopen
 #endif
 
-#if defined( _WIN32 ) && !defined( _X360 )
+#if defined( _WIN32 )
 #include <windows.h>
 #include <direct.h>
 #include <io.h>
@@ -29,23 +29,11 @@
 #include "KeyValues.h"
 #include "appframework/IAppSystemGroup.h"
 #include "tier1/smartptr.h"
-#if defined( _X360 )
-#include "xbox\xbox_win32stubs.h"
-#endif
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
 
-#if !defined( _X360 )
 #define GAMEINFO_FILENAME			"gameinfo.txt"
-#else
-// The .xtx file is a TCR requirement, as .txt files cannot live on the DVD.
-// The .xtx file only exists outside the zips (same as .txt and is made during the image build) and is read to setup the search paths.
-// So all other code should be able to safely expect gameinfo.txt after the zip is mounted as the .txt file exists inside the zips.
-// The .xtx concept is private and should only have to occurr here. As a safety measure, if the .xtx file is not found
-// a retry is made with the original .txt name
-#define GAMEINFO_FILENAME			"gameinfo.xtx"
-#endif
 #define GAMEINFO_FILENAME_ALTERNATE	"gameinfo.txt"
 
 static char g_FileSystemError[256];
@@ -379,7 +367,7 @@ static bool FileSystem_GetBaseDir( char *baseDir, int baseDirLen )
 
 void LaunchVConfig()
 {
-#if defined( _WIN32 ) && !defined( _X360 )
+#if defined( _WIN32 )
 	char vconfigExe[MAX_PATH];
 	FileSystem_GetExecutableDir( vconfigExe, sizeof( vconfigExe ) );
 	Q_AppendSlash( vconfigExe, sizeof( vconfigExe ) );
@@ -393,8 +381,6 @@ void LaunchVConfig()
 	};
 
 	_spawnv( _P_NOWAIT, vconfigExe, argv );
-#elif defined( _X360 )
-	Msg( "Launching vconfig.exe not supported\n" );
 #endif
 }
 
@@ -1125,7 +1111,6 @@ FSReturnCode_t FileSystem_GetFileSystemDLLName( char *pFileSystemDLL, int nMaxLe
 	// Assume we'll use local files
 	Q_snprintf( pFileSystemDLL, nMaxLen, "%s%cfilesystem_stdio" DLL_EXT_STRING, executablePath, CORRECT_PATH_SEPARATOR );
 
-	#if !defined( _X360 )
 
 		// Use filsystem_steam if it exists?
 		#if defined( OSX ) || defined( LINUX )
@@ -1141,7 +1126,6 @@ FSReturnCode_t FileSystem_GetFileSystemDLLName( char *pFileSystemDLL, int nMaxLe
 			Q_snprintf( pFileSystemDLL, nMaxLen, "%s%cfilesystem_steam" DLL_EXT_STRING, executablePath, CORRECT_PATH_SEPARATOR );
 			bSteam = true;
 		}
-	#endif
 #else
 	char executablePath[MAX_PATH];
 	if ( !FileSystem_GetExecutableDir( executablePath, sizeof( executablePath ) )	)
@@ -1150,7 +1134,6 @@ FSReturnCode_t FileSystem_GetFileSystemDLLName( char *pFileSystemDLL, int nMaxLe
 	// Assume we'll use local files
 	Q_snprintf( pFileSystemDLL, nMaxLen, "%s%clibfilesystem_stdio" DLL_EXT_STRING, executablePath, CORRECT_PATH_SEPARATOR );
 
-	#if !defined( _X360 )
 		// Use filsystem_steam if it exists?
 		#if defined( OSX ) || defined( LINUX )
 			struct stat statBuf;
@@ -1164,7 +1147,6 @@ FSReturnCode_t FileSystem_GetFileSystemDLLName( char *pFileSystemDLL, int nMaxLe
 		) {
 			Q_snprintf( pFileSystemDLL, nMaxLen, "%s%cfilesystem_stdio" DLL_EXT_STRING, executablePath, CORRECT_PATH_SEPARATOR );
 		}
-	#endif
 
 #endif
 

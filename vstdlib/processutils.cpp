@@ -4,9 +4,7 @@
 //
 //===========================================================================//
 
-#if !defined( _X360 )
 #include <windows.h>
-#endif
 #include "vstdlib/iprocessutils.h"
 #include "tier1/utllinkedlist.h"
 #include "tier1/utlstring.h"

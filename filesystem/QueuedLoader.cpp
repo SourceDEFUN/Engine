@@ -52,9 +52,7 @@
 #include "filesystem/IQueuedLoader.h"
 #include "tier2/tier2.h"
 #include "characterset.h"
-#if !defined( _X360 )
 #include "xbox/xboxstubs.h"
-#endif
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

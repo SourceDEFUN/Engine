@@ -6,10 +6,8 @@
 // $NoKeywords: $
 //===========================================================================//
 
-#if !defined( _X360 )
-	#define OEMRESOURCE //for OCR_* cursor junk
-	#include "winlite.h"
-#endif
+#define OEMRESOURCE //for OCR_* cursor junk
+#include "winlite.h"
 #include <appframework/ilaunchermgr.h>
 
 #if defined( USE_SDL )
@@ -25,9 +23,6 @@
 #include "vguimatsurface.h"
 #include "MatSystemSurface.h"
 #include "filesystem.h"
-#if defined( _X360 )
-#include "xbox/xbox_win32stubs.h"
-#endif
 
 #if defined( USE_SDL ) 
 #include "materialsystem/imaterialsystem.h"

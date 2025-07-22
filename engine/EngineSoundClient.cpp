@@ -14,9 +14,6 @@
 #include "icliententitylist.h"
 #include "enginesingleuserfilter.h"
 #include "snd_audio_source.h"
-#if defined(_X360)
-#include "xmp.h"
-#endif
 #include "tier0/vprof.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -496,15 +493,7 @@ void CEngineSoundClient::PrecacheSentenceGroup( const char *pGroupName )
 void CEngineSoundClient::NotifyBeginMoviePlayback()
 {
 	StopAllSounds(true);
-#if _X360
-	XMPOverrideBackgroundMusic();
-#endif
 }
 
 void CEngineSoundClient::NotifyEndMoviePlayback()
-{
-#if _X360
-	XMPRestoreBackgroundMusic();
-#endif
-}
-
+{}

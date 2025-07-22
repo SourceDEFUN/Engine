@@ -12,11 +12,7 @@
 #include "net_ws_headers.h"
 #define WSAGetLastError() errno
 #else
-#if !defined( _X360 )
 #include <winsock.h>
-#else
-#include "winsockx.h"
-#endif
 #undef SetPort // winsock screws with the SetPort string... *sigh*8
 #endif
 
@@ -28,11 +24,6 @@
 #include "cmd.h"
 #include "tier2/fileutils.h"
 #include "zip/XUnzip.h"
-
-
-#if defined( _X360 )
-#include "xbox/xbox_win32stubs.h"
-#endif
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

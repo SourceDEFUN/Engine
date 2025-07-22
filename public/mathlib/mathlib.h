@@ -403,9 +403,7 @@ int Q_log2(int val);
 // Math routines done in optimized assembly math package routines
 void inline SinCos( float radians, float *sine, float *cosine )
 {
-#if defined( _X360 )
-	XMScalarSinCos( sine, cosine, radians );
-#elif defined( PLATFORM_WINDOWS_PC32 )
+#if defined( PLATFORM_WINDOWS_PC32 )
 	_asm
 	{
 		fld		DWORD PTR [radians]
@@ -1190,17 +1188,6 @@ FORCEINLINE int RoundFloatToInt(float f)
 {
 #if defined(__i386__) || defined(_M_IX86) || defined( PLATFORM_WINDOWS_PC64 ) || defined(__x86_64__)
 	return _mm_cvtss_si32(_mm_load_ss(&f));
-#elif defined( _X360 )
-#ifdef Assert
-	Assert( IsFPUControlWordSet() );
-#endif
-	union
-	{
-		double flResult;
-		int pResult[2];
-	};
-	flResult = __fctiw( f );
-	return pResult[1];
 #elif defined (__arm__) ||  defined (__aarch64__)
         return (int)(f + 0.5f);
 #else
@@ -1219,20 +1206,6 @@ FORCEINLINE unsigned char RoundFloatToByte(float f)
 
 FORCEINLINE unsigned long RoundFloatToUnsignedLong(float f)
 {
-#if defined( _X360 )
-#ifdef Assert
-	Assert( IsFPUControlWordSet() );
-#endif
-	union
-	{
-		double flResult;
-		int pIntResult[2];
-		unsigned long pResult[2];
-	};
-	flResult = __fctiw( f );
-	Assert( pIntResult[1] >= 0 );
-	return pResult[1];
-#else  // !X360
 #if defined(__arm__) || defined(__aarch64__)
         return (unsigned long)(f + 0.5f);
 #elif defined( PLATFORM_WINDOWS_PC64 )
@@ -1269,7 +1242,6 @@ FORCEINLINE unsigned long RoundFloatToUnsignedLong(float f)
 
 		return *((unsigned long*)nResult);
 #endif // PLATFORM_WINDOWS_PC64
-#endif // !X360
 }
 
 FORCEINLINE bool IsIntegralValue( float flValue, float flTolerance = 0.001f )
@@ -1280,18 +1252,8 @@ FORCEINLINE bool IsIntegralValue( float flValue, float flTolerance = 0.001f )
 // Fast, accurate ftol:
 FORCEINLINE int Float2Int( float a )
 {
-#if defined( _X360 )
-	union
-	{
-		double flResult;
-		int pResult[2];
-	};
-	flResult = __fctiwz( a );
-	return pResult[1];
-#else  // !X360
 	// Rely on compiler to generate CVTTSS2SI on x86
 	return (int) a;
-#endif
 }
 
 // Over 15x faster than: (int)floor(value)

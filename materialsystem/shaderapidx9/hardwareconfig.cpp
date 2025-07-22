@@ -873,13 +873,6 @@ int CHardwareConfig::GetShadowFilterMode() const
 
 			return ATI_NOPCF;									// ATI vanilla depth texture sampling
 
-#if defined( _X360 )
-		case IMAGE_FORMAT_X360_DST16:
-		case IMAGE_FORMAT_X360_DST24:
-		case IMAGE_FORMAT_X360_DST24F:
-			return 0;
-#endif
-
 		default:
 			return 0;
 	}

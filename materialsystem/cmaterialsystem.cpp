@@ -25,11 +25,6 @@
 #include "vstdlib/IKeyValuesSystem.h"
 #include "ctexturecompositor.h"
 
-#if defined( _X360 )
-#include "xbox/xbox_console.h"
-#include "xbox/xbox_win32stubs.h"
-#endif
-
 // NOTE: This must be the last file included!!!
 #include "tier0/memdbgon.h"
 
@@ -97,13 +92,11 @@ CThreadFastMutex g_MatSysMutex;
 //-----------------------------------------------------------------------------
 // Purpose: additional materialsystem information, internal use only
 //-----------------------------------------------------------------------------
-#ifndef _X360
 struct MaterialSystem_Config_Internal_t
 {
 	int r_waterforceexpensive;
 };
 MaterialSystem_Config_Internal_t g_config_internal;
-#endif
 
 //-----------------------------------------------------------------------------
 // Necessary to allow the shader DLLs to get ahold of IMaterialSystemHardwareConfig
@@ -801,7 +794,7 @@ InitReturnVal_t CMaterialSystem::Init()
 	// Shader system!
 	ShaderSystem()->Init();
 
-#if defined( WIN32 ) && !defined( _X360 )
+#if defined( WIN32 )
 	// HACKHACK: <sigh> This horrible hack is possibly the only way to reliably detect an old
 	// version of hammer initializing the material system. We need to know this so that we set
 	// up the editor materials properly. If we don't do this, we never allocate the white lightmap,
@@ -1707,11 +1700,6 @@ void CMaterialSystem::GenerateConfigFromConfigKeyValues( MaterialSystem_Config_t
 		pConfig->m_VideoMode.m_Height = nRecommendedHeight;
 	}
 
-#if defined( _X360 )
-	pConfig->m_VideoMode.m_Width = GetSystemMetrics( SM_CXSCREEN );
-	pConfig->m_VideoMode.m_Height = GetSystemMetrics( SM_CYSCREEN );
-#endif
-
 	pKeyValues->deleteThis();
 
 #endif // LINUX
@@ -1743,9 +1731,7 @@ static ConVar mat_forcehardwaresync( "mat_forcehardwaresync", IsPC() ? "1" : "0"
 
 // Texture-related
 static ConVar mat_trilinear(		"mat_trilinear", "0", FCVAR_ALLOWED_IN_COMPETITIVE );
-#ifdef _X360 // The code that reads this out of moddefaults.txt is #if'd out for the 360, so force aniso to 2 here.
-	static ConVar mat_forceaniso( "mat_forceaniso", "2", FCVAR_ARCHIVE ); // 0 = Bilinear, 1 = Trilinear, 2+ = Aniso
-#elif defined ( OSX )
+#ifdef OSX
 	static ConVar mat_forceaniso( "mat_forceaniso", "1", FCVAR_ARCHIVE, "Filtering level", true, 0, true, 8 ); // 0 = Bilinear, 1 = Trilinear, 2+ = Aniso
 #else
 	static ConVar mat_forceaniso( "mat_forceaniso", "1", FCVAR_ARCHIVE ); // 0 = Bilinear, 1 = Trilinear, 2+ = Aniso
@@ -1783,11 +1769,7 @@ static ConVar mat_monitorgamma_tv_range_min( "mat_monitorgamma_tv_range_min", "1
 static ConVar mat_monitorgamma_tv_range_max( "mat_monitorgamma_tv_range_max", "255" );
 // TV's generally have a 2.5 gamma, so we need to convert our 2.2 frame buffer into a 2.5 frame buffer for display on a TV
 static ConVar mat_monitorgamma_tv_exp( "mat_monitorgamma_tv_exp", "2.5", 0, "", true, 1.0f, true, 4.0f );
-#ifdef _X360
-static ConVar mat_monitorgamma_tv_enabled( "mat_monitorgamma_tv_enabled", "1", FCVAR_ARCHIVE, "" );
-#else
 static ConVar mat_monitorgamma_tv_enabled( "mat_monitorgamma_tv_enabled", "0", FCVAR_ARCHIVE, "" );
-#endif
 
 static ConVar mat_antialias(		"mat_antialias", "0", FCVAR_ARCHIVE );
 static ConVar mat_aaquality(		"mat_aaquality", "0", FCVAR_ARCHIVE );
@@ -1818,9 +1800,7 @@ static ConVar mat_fastnobump(		"mat_fastnobump", "0", FCVAR_CHEAT ); // Binds 1-
 // These are not controlled by the material system, but are limited by settings in the material system
 static ConVar r_shadowrendertotexture(		"r_shadowrendertotexture", "0", FCVAR_ARCHIVE );
 static ConVar r_flashlightdepthtexture(		"r_flashlightdepthtexture", "1" );
-#ifndef _X360
 static ConVar r_waterforceexpensive(		"r_waterforceexpensive", "0", FCVAR_ARCHIVE );
-#endif
 static ConVar r_waterforcereflectentities(	"r_waterforcereflectentities", "0", FCVAR_ALLOWED_IN_COMPETITIVE );
 static ConVar mat_motion_blur_enabled( "mat_motion_blur_enabled", "0", FCVAR_ARCHIVE );
 
@@ -1906,9 +1886,7 @@ void CMaterialSystem::ReadConfigFromConVars( MaterialSystem_Config_t *pConfig )
 	if ( pConfig->dxSupportLevel < 80 )
 	{
 		r_shadowrendertotexture.SetValue( 0 );
-#ifndef _X360
 		r_waterforceexpensive.SetValue( 0 );
-#endif
 		r_waterforcereflectentities.SetValue( 0 );
 	}
 	if ( pConfig->dxSupportLevel < 90 )
@@ -2176,17 +2154,13 @@ bool CMaterialSystem::OverrideConfig( const MaterialSystem_Config_t &_config, bo
 	bool bForceAltTab = false;
 
 	// internal config settings
-#ifndef _X360
 	MaterialSystem_Config_Internal_t config_internal;
 	config_internal.r_waterforceexpensive = r_waterforceexpensive.GetInt();
-#endif
 
 	if ( !g_pShaderDevice->IsUsingGraphics() )
 	{
 		g_config = config;
-#ifndef _X360
 		g_config_internal = config_internal;
-#endif
 
 		// Shouldn't call this more than once.
 		ColorSpace::SetGamma( 2.2f, 2.2f, OVERBRIGHT, g_config.bAllowCheats, false );
@@ -2366,7 +2340,6 @@ bool CMaterialSystem::OverrideConfig( const MaterialSystem_Config_t &_config, bo
 		bReloadMaterials = true;
 	}
 
-#ifndef _X360
 	if ( config_internal.r_waterforceexpensive != g_config_internal.r_waterforceexpensive )
 	{
 		if ( mat_debugalttab.GetBool() )
@@ -2376,7 +2349,6 @@ bool CMaterialSystem::OverrideConfig( const MaterialSystem_Config_t &_config, bo
 		}
 		bReloadMaterials = true;
 	}
-#endif
 
 	// generic things that cause us to redownload lightmaps
 	if ( config.bAllowCheats != g_config.bAllowCheats )
@@ -2459,7 +2431,6 @@ bool CMaterialSystem::OverrideConfig( const MaterialSystem_Config_t &_config, bo
 #if !defined( DX_TO_GL_ABSTRACTION )
 	if ( (IsX360() || !config.Windowed()) && (config.WaitForVSync() != g_config.WaitForVSync()) )
 	{
-#		if ( !defined( _X360 ) )
 		{
 			if ( mat_debugalttab.GetBool() )
 			{
@@ -2467,18 +2438,11 @@ bool CMaterialSystem::OverrideConfig( const MaterialSystem_Config_t &_config, bo
 			}
 			bVideoModeChange = true;
 		}
-#		else
-		{
-			g_pShaderAPI->EnableVSync_360( config.WaitForVSync() );
-		}
-#		endif
 	}
 #endif
 
 	g_config = config;
-#ifndef _X360
 	g_config_internal = config_internal;
-#endif
 
 	if ( dxSupportLevelChanged )
 	{
@@ -3273,33 +3237,24 @@ void CMaterialSystem::AllocateStandardTextures()
 	g_pShaderAPI->TexImage2D( 0, 0, IMAGE_FORMAT_BGRX8888, 0, 1, 1, IMAGE_FORMAT_BGRX8888, false, texel );
 
 	// allocate a black single texel texture
-#if !defined( _X360 )
 	m_BlackTextureHandle = g_pShaderAPI->CreateTexture( 1, 1, 1, IMAGE_FORMAT_BGRX8888, 1, 1, tcFlagsSRGB, "[BLACK_TEXID]", TEXTURE_GROUP_OTHER );
 	g_pShaderAPI->ModifyTexture( m_BlackTextureHandle );
 	g_pShaderAPI->TexMinFilter( SHADER_TEXFILTERMODE_LINEAR );
 	g_pShaderAPI->TexMagFilter( SHADER_TEXFILTERMODE_LINEAR );
 	texel[0] = texel[1] = texel[2] = 0;
 	g_pShaderAPI->TexImage2D( 0, 0, IMAGE_FORMAT_BGRX8888, 0, 1, 1, IMAGE_FORMAT_BGRX8888, false, texel );
-#else
-	m_BlackTextureHandle = ((ITextureInternal*)FindTexture( "black", TEXTURE_GROUP_OTHER, true ))->GetTextureHandle( 0 );
-#endif
 	g_pShaderAPI->SetStandardTextureHandle( TEXTURE_BLACK, m_BlackTextureHandle );
 
 	// allocate a fully white single texel texture
-#if !defined( _X360 )
 	m_WhiteTextureHandle = g_pShaderAPI->CreateTexture( 1, 1, 1, IMAGE_FORMAT_BGRX8888, 1, 1, tcFlagsSRGB, "[WHITE_TEXID]", TEXTURE_GROUP_OTHER );
 	g_pShaderAPI->ModifyTexture( m_WhiteTextureHandle );
 	g_pShaderAPI->TexMinFilter( SHADER_TEXFILTERMODE_LINEAR );
 	g_pShaderAPI->TexMagFilter( SHADER_TEXFILTERMODE_LINEAR );
 	texel[0] = texel[1] = texel[2] = 255;
 	g_pShaderAPI->TexImage2D( 0, 0, IMAGE_FORMAT_BGRX8888, 0, 1, 1, IMAGE_FORMAT_BGRX8888, false, texel );
-#else
-	m_WhiteTextureHandle = ((ITextureInternal*)FindTexture( "white", TEXTURE_GROUP_OTHER, true ))->GetTextureHandle( 0 );
-#endif
 	g_pShaderAPI->SetStandardTextureHandle( TEXTURE_WHITE, m_WhiteTextureHandle );
 
 	// allocate a grey single texel texture with an alpha of zero (for mat_fullbright 2)
-#if !defined( _X360 )
 	m_GreyTextureHandle = g_pShaderAPI->CreateTexture( 1, 1, 1, IMAGE_FORMAT_BGRX8888, 1, 1, tcFlagsSRGB, "[GREY_TEXID]", TEXTURE_GROUP_OTHER );
 	g_pShaderAPI->ModifyTexture( m_GreyTextureHandle );
 	g_pShaderAPI->TexMinFilter( SHADER_TEXFILTERMODE_LINEAR );
@@ -3307,13 +3262,9 @@ void CMaterialSystem::AllocateStandardTextures()
 	texel[0] = texel[1] = texel[2] = 128;
 	texel[3] = 255; // needs to be 255 so that mat_fullbright 2 stuff isn't translucent.
 	g_pShaderAPI->TexImage2D( 0, 0, IMAGE_FORMAT_BGRX8888, 0, 1, 1, IMAGE_FORMAT_BGRX8888, false, texel );
-#else
-	m_GreyTextureHandle = ((ITextureInternal*)FindTexture( "grey", TEXTURE_GROUP_OTHER, true ))->GetTextureHandle( 0 );
-#endif
 	g_pShaderAPI->SetStandardTextureHandle( TEXTURE_GREY, m_GreyTextureHandle );
 
 	// allocate a grey single texel texture with an alpha of zero (for mat_fullbright 2)
-#if !defined( _X360 )
 	m_GreyAlphaZeroTextureHandle = g_pShaderAPI->CreateTexture( 1, 1, 1, IMAGE_FORMAT_RGBA8888, 1, 1, tcFlagsSRGB, "[GREYALPHAZERO_TEXID]", TEXTURE_GROUP_OTHER );
 	g_pShaderAPI->ModifyTexture( m_GreyAlphaZeroTextureHandle );
 	g_pShaderAPI->TexMinFilter( SHADER_TEXFILTERMODE_LINEAR );
@@ -3322,9 +3273,6 @@ void CMaterialSystem::AllocateStandardTextures()
 	texel[3] = 0; // needs to be 0 so that self-illum doens't affect mat_fullbright 2
 	g_pShaderAPI->TexImage2D( 0, 0, IMAGE_FORMAT_RGBA8888, 0, 1, 1, IMAGE_FORMAT_RGBA8888, false, texel );
 	texel[3] = 255; // set back to default value so we don't affect the rest of this code.'
-#else
-	m_GreyAlphaZeroTextureHandle = ((ITextureInternal*)FindTexture( "greyalphazero", TEXTURE_GROUP_OTHER, true ))->GetTextureHandle( 0 );
-#endif
 	g_pShaderAPI->SetStandardTextureHandle( TEXTURE_GREY_ALPHA_ZERO, m_GreyAlphaZeroTextureHandle );
 
 	// allocate a single texel flat normal texture lightmap
@@ -4048,26 +3996,6 @@ void CMaterialSystem::DebugPrintUsedTextures( void )
 	TextureManager()->DebugPrintUsedTextures();
 }
 
-#if defined( _X360 )
-void CMaterialSystem::ListUsedMaterials( void )
-{	
-	int numMaterials = GetNumMaterials();
-	xMaterialList_t* pMaterialList = (xMaterialList_t *)stackalloc( numMaterials * sizeof( xMaterialList_t ) );
-
-	numMaterials = 0;
-	for ( MaterialHandle_t hMaterial = FirstMaterial(); hMaterial != InvalidMaterial(); hMaterial = NextMaterial( hMaterial ) )
-	{
-		IMaterialInternal *pMaterial = GetMaterialInternal( hMaterial );
-		pMaterialList[numMaterials].pName = pMaterial->GetName();
-		pMaterialList[numMaterials].pShaderName = pMaterial->GetShader() ? pMaterial->GetShader()->GetName() : "???";
-		pMaterialList[numMaterials].refCount = pMaterial->GetReferenceCount();
-		numMaterials++;
-	}
-
-	XBX_rMaterialList( numMaterials, pMaterialList );
-}
-#endif
-
 void CMaterialSystem::ToggleSuppressMaterial( char const* pMaterialName )
 {
 	/*
@@ -4454,14 +4382,6 @@ ITexture* CMaterialSystem::CreateNamedRenderTargetTextureEx(
 	ITextureInternal* pTex = TextureManager()->CreateRenderTargetTexture( pRTName, w, h, sizeMode, format, rtType, textureFlags, renderTargetFlags );
 	pTex->IncrementReferenceCount();
 
-#if defined( _X360 )
-	if ( !( renderTargetFlags & CREATERENDERTARGETFLAGS_NOEDRAM ) )
-	{
-		// create the EDRAM surface that is bound to the RT Texture
-		pTex->CreateRenderTargetSurface( 0, 0, IMAGE_FORMAT_UNKNOWN, true );
-	}
-#endif
-
 	// If we're not in a BeginRenderTargetAllocation-EndRenderTargetAllocation block
 	// because we're being called by a legacy path (i.e. a mod), force an Alt-Tab after every
 	// RT allocation to ensure that all RTs get priority during allocation
@@ -4703,134 +4623,6 @@ void CMaterialSystem::UpdateLightmap( int lightmapPageID, int lightmapSize[2],
 		ExecuteOnce( DebuggerBreakIfDebugging() );
 	}
 }
-
-//-----------------------------------------------------------------------------------------------------
-// 360 TTF Font Support
-//-----------------------------------------------------------------------------------------------------
-#if defined( _X360 )
-HXUIFONT CMaterialSystem::OpenTrueTypeFont( const char *pFontname, int tall, int style )
-{
-	MaterialLock_t hLock = Lock();
-	HXUIFONT result = g_pShaderAPI->OpenTrueTypeFont( pFontname, tall, style );
-	Unlock( hLock );
-	return result;
-}
-void CMaterialSystem::CloseTrueTypeFont( HXUIFONT hFont )
-{
-	MaterialLock_t hLock = Lock();
-	g_pShaderAPI->CloseTrueTypeFont( hFont );
-	Unlock( hLock );
-}
-bool CMaterialSystem::GetTrueTypeFontMetrics( HXUIFONT hFont, XUIFontMetrics *pFontMetrics, XUICharMetrics charMetrics[256] )
-{
-	MaterialLock_t hLock = Lock();
-	bool result = g_pShaderAPI->GetTrueTypeFontMetrics( hFont, pFontMetrics, charMetrics );
-	Unlock( hLock );
-	return result;
-}
-bool CMaterialSystem::GetTrueTypeGlyphs( HXUIFONT hFont, int numChars, wchar_t *pWch, int *pOffsetX, int *pOffsetY, int *pWidth, int *pHeight, unsigned char *pRGBA, int *pRGBAOffset )
-{
-	MaterialLock_t hLock = Lock();
-	bool result = g_pShaderAPI->GetTrueTypeGlyphs( hFont, numChars, pWch, pOffsetX, pOffsetY, pWidth, pHeight, pRGBA, pRGBAOffset );
-	Unlock( hLock );
-	return result;
-}
-#endif
-
-//-----------------------------------------------------------------------------------------------------
-// 360 Back Buffer access. Due to hardware, RT data must be blitted from EDRAM
-// and converted.
-//-----------------------------------------------------------------------------------------------------
-#if defined( _X360 )
-void CMaterialSystem::ReadBackBuffer( Rect_t *pSrcRect, Rect_t *pDstRect, unsigned char *pDstData, ImageFormat dstFormat, int dstStride ) 
-{
-	Assert( pSrcRect && pDstRect && pDstData );
-
-	int fbWidth, fbHeight;
-	g_pShaderAPI->GetBackBufferDimensions( fbWidth, fbHeight ); 
-
-	if ( pDstRect->width > fbWidth || pDstRect->height > fbHeight )
-	{
-		Assert( 0 );
-		return;
-	}
-
-	// intermediate results will be placed at (0,0)
-	Rect_t	rect;
-	rect.x = 0;
-	rect.y = 0;
-	rect.width = pDstRect->width;
-	rect.height = pDstRect->height;
-
-	ITexture *pTempRT;
-	bool bStretch = ( pSrcRect->width != pDstRect->width || pSrcRect->height != pDstRect->height );
-	if ( !bStretch )
-	{
-		// hijack an unused RT (no surface required) for 1:1 resolve work, fastest path
-		pTempRT = FindTexture( "_rt_FullFrameFB", TEXTURE_GROUP_RENDER_TARGET );
-	}
-	else
-	{
-		// hijack an unused RT (with surface abilities) for stretch work, slower path
-		pTempRT = FindTexture( "_rt_WaterReflection", TEXTURE_GROUP_RENDER_TARGET );
-	}
-
-	Assert( !pTempRT->IsError() && pDstRect->width <= pTempRT->GetActualWidth() && pDstRect->height <= pTempRT->GetActualHeight() );
-	GetRenderContextInternal()->CopyRenderTargetToTextureEx( pTempRT, 0, pSrcRect, &rect );
-
-	// access the RT bits
-	CPixelWriter writer;
-	g_pShaderAPI->ModifyTexture( ((ITextureInternal*)pTempRT)->GetTextureHandle( 0 ) );
-	if ( !g_pShaderAPI->TexLock( 0, 0, 0, 0, pTempRT->GetActualWidth(), pTempRT->GetActualHeight(), writer ) )
-		return;
-
-	// this will be adequate for non-block formats
-	int srcStride = pTempRT->GetActualWidth() * ImageLoader::SizeInBytes( pTempRT->GetImageFormat() );
-
-	// untile intermediate RT in place to achieve linear access
-	XGUntileTextureLevel(
-		pTempRT->GetActualWidth(),
-		pTempRT->GetActualHeight(),
-		0,
-		XGGetGpuFormat( ImageLoader::ImageFormatToD3DFormat( pTempRT->GetImageFormat() ) ),
-		0,
-		(char*)writer.GetPixelMemory(),
-		srcStride,
-		NULL,
-		writer.GetPixelMemory(),
-		NULL );
-
-	// swap back to x86 order as expected by image conversion
-	ImageLoader::ByteSwapImageData( (unsigned char*)writer.GetPixelMemory(), srcStride*pTempRT->GetActualHeight(), pTempRT->GetImageFormat() );
-
-	// convert to callers format
-	Assert( dstFormat == IMAGE_FORMAT_RGB888 );
-	ImageLoader::ConvertImageFormat( (unsigned char*)writer.GetPixelMemory(), pTempRT->GetImageFormat(), pDstData, dstFormat, pDstRect->width, pDstRect->height, srcStride, dstStride );
-
-	g_pShaderAPI->TexUnlock();
-}
-#endif
-
-#if defined( _X360 )
-void CMaterialSystem::PersistDisplay() 
-{
-	g_pShaderAPI->PersistDisplay();
-}
-#endif
-
-#if defined( _X360 )
-void *CMaterialSystem::GetD3DDevice() 
-{
-	return g_pShaderAPI->GetD3DDevice();
-}
-#endif
-
-#if defined( _X360 )
-bool CMaterialSystem::OwnGPUResources( bool bEnable ) 
-{
-	return g_pShaderAPI->OwnGPUResources( bEnable );
-}
-#endif
 
 //-----------------------------------------------------------------------------------------------------
 //
@@ -5474,13 +5266,6 @@ void CMaterialSystem::DebugPrintUsedTextures( const CCommand &args )
 {
 	DebugPrintUsedTextures();
 }
-
-#if defined( _X360 )
-void CMaterialSystem::ListUsedMaterials( const CCommand &args )
-{
-	ListUsedMaterials();
-}
-#endif // !_X360
 
 void CMaterialSystem::ReloadAllMaterials( const CCommand &args )
 {

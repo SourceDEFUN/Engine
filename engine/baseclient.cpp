@@ -706,14 +706,6 @@ bool CBaseClient::SendServerInfo( void )
 	
 	serverinfo.WriteToBuffer( msg );
 
-#ifdef _X360
-	if ( serverinfo.m_nMaxClients > 1 )
-	{
-		Msg( "Telling clients to connect" );
-		g_pMatchmaking->TellClientsToConnect();
-	}
-#endif
-
 	// send first tick
 	m_nSignonTick = m_Server->m_nTickCount;
 	

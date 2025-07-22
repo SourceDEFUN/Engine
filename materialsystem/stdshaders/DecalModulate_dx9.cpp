@@ -13,10 +13,8 @@
 #include "decalmodulate_ps20.inc"
 #include "decalmodulate_ps20b.inc"
 
-#ifndef _X360
 #include "vertexlit_and_unlit_generic_vs30.inc"
 #include "decalmodulate_ps30.inc"
-#endif
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -42,14 +40,12 @@ BEGIN_VS_SHADER( DecalModulate_dx9,
 	{
 		SET_FLAGS( MATERIAL_VAR_NO_DEBUG_OVERRIDE );
 
-#ifndef _X360
 		if ( g_pHardwareConfig->HasFastVertexTextures() )
 		{
 			// The vertex shader uses the vertex id stream
 			SET_FLAGS2( MATERIAL_VAR2_USES_VERTEXID );
 			SET_FLAGS2( MATERIAL_VAR2_SUPPORTS_HW_SKINNING );
 		}
-#endif
 	}
 
 	SHADER_INIT
@@ -79,9 +75,7 @@ BEGIN_VS_SHADER( DecalModulate_dx9,
 			pShaderShadow->DisableFogGammaCorrection( true ); //fog should stay exactly middle grey
 			FogToGrey();
 
-#ifndef _X360
 			if ( !g_pHardwareConfig->HasFastVertexTextures() )
-#endif
 			{
 				bool bUseStaticControlFlow = g_pHardwareConfig->SupportsStaticControlFlow();
 
@@ -108,7 +102,6 @@ BEGIN_VS_SHADER( DecalModulate_dx9,
 					SET_STATIC_PIXEL_SHADER( decalmodulate_ps20 );
 				}
 			}
-#ifndef _X360
 			else
 			{
 				DECLARE_STATIC_VERTEX_SHADER( vertexlit_and_unlit_generic_vs30 );
@@ -126,24 +119,19 @@ BEGIN_VS_SHADER( DecalModulate_dx9,
 				DECLARE_STATIC_PIXEL_SHADER( decalmodulate_ps30 );
 				SET_STATIC_PIXEL_SHADER( decalmodulate_ps30 );
 			}
-#endif
 
 			// Set stream format (note that this shader supports compression)
 			unsigned int flags = VERTEX_POSITION | VERTEX_FORMAT_COMPRESSED;
-#ifndef _X360
 			// The VS30 shader offsets decals along the normal (for morphed geom)
 			flags |= g_pHardwareConfig->HasFastVertexTextures() ? VERTEX_NORMAL : 0;
-#endif
 			int pTexCoordDim[3] = { 2, 0, 3 };
 			int nTexCoordCount = 1;
 			int userDataSize = 0;
 
-#ifndef _X360
 			if ( g_pHardwareConfig->HasFastVertexTextures() )
 			{
 				nTexCoordCount = 3;
 			}
-#endif
 
 			pShaderShadow->VertexShaderVertexFormat( flags, nTexCoordCount, pTexCoordDim, userDataSize );
 		}
@@ -174,9 +162,7 @@ BEGIN_VS_SHADER( DecalModulate_dx9,
 			vEyePos_SpecExponent[3] = 0.0f;
 			pShaderAPI->SetPixelShaderConstant( PSREG_EYEPOS_SPEC_EXPONENT, vEyePos_SpecExponent, 1 );
 
-#ifndef _X360
 			if ( !g_pHardwareConfig->HasFastVertexTextures() )
-#endif
 			{
 				DECLARE_DYNAMIC_VERTEX_SHADER( vertexlit_and_unlit_generic_vs20 );
 				SET_DYNAMIC_VERTEX_SHADER_COMBO( DYNAMIC_LIGHT, 0 );	// Use simplest possible vertex lighting, since ps is so simple
@@ -201,7 +187,6 @@ BEGIN_VS_SHADER( DecalModulate_dx9,
 					SET_DYNAMIC_PIXEL_SHADER( decalmodulate_ps20 );
 				}
 			}
-#ifndef _X360
 			else
 			{
 				SetHWMorphVertexShaderState( VERTEX_SHADER_SHADER_SPECIFIC_CONST_6, VERTEX_SHADER_SHADER_SPECIFIC_CONST_7, SHADER_VERTEXTEXTURE_SAMPLER0 );
@@ -223,7 +208,6 @@ BEGIN_VS_SHADER( DecalModulate_dx9,
 				bool bUnusedTexCoords[3] = { false, false, !pShaderAPI->IsHWMorphingEnabled() };
 				pShaderAPI->MarkUnusedVertexFields( 0, 3, bUnusedTexCoords );
 			}
-#endif
 		}
 		Draw( );
 	}

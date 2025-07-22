@@ -15,15 +15,13 @@
 
 #endif
 
-#if defined( WIN32 ) && !defined( _X360 ) && !defined( DX_TO_GL_ABSTRACTION )
+#if defined( WIN32 ) && !defined( DX_TO_GL_ABSTRACTION )
 #include "winlite.h"
 #include "xbox/xboxstubs.h"
 #endif
 
 #if defined( IS_WINDOWS_PC ) && !defined( USE_SDL )
 	#include <winsock.h>
-#elif defined(_X360)
-	// nothing to include for 360
 #elif defined(OSX)
 #elif defined(LINUX) || defined(PLATFORM_BSD)
 	#include "tier0/dynfunction.h"
@@ -64,12 +62,6 @@
 #include "video/ivideoservices.h"
 #include "sys.h"
 #include "materialsystem/imaterial.h"
-
-
-#if defined( _X360 )
-  #include "xbox/xbox_win32stubs.h"
-  #include "hl2orange.spa.h"
-#endif
 
 #if defined( LINUX )
   #include "snd_dev_sdl.h"
@@ -189,11 +181,7 @@ private:
 	void AttachToWindow();
 	void DetachFromWindow();
 
-#ifndef _X360
 	static const wchar_t CLASSNAME[];
-#else
-	static const char CLASSNAME[];
-#endif
 
 	bool			m_bExternallySuppliedWindow;
 
@@ -231,11 +219,7 @@ private:
 static CGame g_Game;
 IGame *game = ( IGame * )&g_Game;
 
-#if !defined( _X360 )
 const wchar_t CGame::CLASSNAME[] = L"Valve001";
-#else
-const char CGame::CLASSNAME[] = "Valve001";
-#endif
 
 // In VCR playback mode, it sleeps this amount each frame.
 int g_iVCRPlaybackSleepInterval = 0;
@@ -536,49 +520,7 @@ static LRESULT WINAPI CallDefaultWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam
 //			it's TF2 and restart properly if it is
 //-----------------------------------------------------------------------------
 void XBX_HandleInvite( DWORD nUserId )
-{
-#ifdef _X360
-	// Grab our invite info
-	XINVITE_INFO inviteInfo;
-	DWORD dwError = XInviteGetAcceptedInfo( nUserId, &inviteInfo );
-	if ( dwError != ERROR_SUCCESS )
-		return;
-
-	// We only care if we're asked to join an Orange Box session
-	if ( inviteInfo.dwTitleID != TITLEID_THE_ORANGE_BOX )
-	{
-		// Do the normal "we've been invited to a game" behavior
-		return;
-	}
-
-	// Otherwise, launch depending on our current MOD
-	if ( !Q_stricmp( GetCurrentMod(), "tf" ) )
-	{
-		// We're already running TF2, so just join the session
-		if ( nUserId != XBX_GetPrimaryUserId() )
-		{
-			// Switch users, the other had the invite
-			XBX_SetPrimaryUserId( nUserId );
-		}
-
-		// Kick off our join
-		g_pMatchmaking->JoinInviteSession( &(inviteInfo.hostInfo) );
-	}
-	else
-	{
-		// Save off our session ID for later retrieval
-		// NOTE: We may need to actually save off the inviter's XID and search for them later on if we took too long or the
-		//		 session they were a part of went away
-		
-		XBX_SetInviteSessionId( inviteInfo.hostInfo.sessionID );
-		XBX_SetInvitedUserId( nUserId );
-
-		// Quit via the menu path "QuitNoConfirm"
-		EngineVGui()->SystemNotification( SYSTEMNOTIFY_INVITE_SHUTDOWN );
-
-	}
-#endif //_X360
-}
+{}
 
 #if defined( WIN32 ) && !defined( USE_SDL )
 //-----------------------------------------------------------------------------
@@ -706,7 +648,6 @@ LRESULT CGame::WindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		}
 		else
 		{
-#ifndef _X360
 			// Fix the window rect to have same client area as it used to have
 			// before it got minimized
 			RECT rcWindow;
@@ -718,7 +659,6 @@ LRESULT CGame::WindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			::AdjustWindowRect( &rcWindow, ::GetWindowLong( hWnd, GWL_STYLE ), FALSE );
 			::MoveWindow( hWnd, rcWindow.left, rcWindow.top,
 				rcWindow.right - rcWindow.left, rcWindow.bottom - rcWindow.top, FALSE );
-#endif
 		}
 		break;
 
@@ -734,68 +674,6 @@ LRESULT CGame::WindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		lRet = 1;
 		break;
 
-#if defined( _X360 )
-	case WM_XREMOTECOMMAND:
-		Cbuf_AddText( (const char*)lParam );
-		Cbuf_AddText( "\n" );
-		break;
-
-	case WM_SYS_STORAGEDEVICESCHANGED:
-		if ( !EngineVGui()->IsGameUIVisible() )
-		{
-			EngineVGui()->ActivateGameUI();
-		}
-		EngineVGui()->SystemNotification( SYSTEMNOTIFY_STORAGEDEVICES_CHANGED );	
-		break;
-
-	case WM_XMP_PLAYBACKCONTROLLERCHANGED:
-		S_EnableMusic( lParam != 0 );
-		break;
-
-	case WM_LIVE_INVITE_ACCEPTED:
-		XBX_HandleInvite( LOWORD( lParam ) );
-		break;
-
-	case WM_SYS_SIGNINCHANGED:
-		if ( XUserGetSigninState( XBX_GetPrimaryUserId() ) == eXUserSigninState_NotSignedIn )
-		{
-			// X360TBD: User signed out - pause the game?
-		}
-		EngineVGui()->SystemNotification( lParam ? SYSTEMNOTIFY_USER_SIGNEDIN : SYSTEMNOTIFY_USER_SIGNEDOUT );	
-		break;
-
-	case WM_SYS_UI:
-		if ( lParam )
-		{
-			// Don't activate it if it's already active (a sub window may be active)
-			// Multiplayer doesn't want the UI to appear, since it can't pause anyway
-			if ( !EngineVGui()->IsGameUIVisible() && g_ServerGlobalVariables.maxClients == 1 )
-			{
-				Cbuf_AddText( "gameui_activate" );
-			}
-		}
-		EngineVGui()->SystemNotification( lParam ? SYSTEMNOTIFY_XUIOPENING : SYSTEMNOTIFY_XUICLOSED );
-		break;
-
-	case WM_SYS_MUTELISTCHANGED:
-		g_pMatchmaking->UpdateMuteList();
-		break;
-
-	case WM_SYS_INPUTDEVICESCHANGED:
-		{
-			XINPUT_CAPABILITIES caps;
-			if ( XInputGetCapabilities( XBX_GetPrimaryUserId(), XINPUT_FLAG_GAMEPAD, &caps ) == ERROR_DEVICE_NOT_CONNECTED )
-			{
-				if ( EngineVGui()->IsGameUIVisible() == false )
-				{
-					EngineVGui()->ActivateGameUI();
-				}
-			}
-		}
-		break;
-
-#endif
-
 	case WM_PAINT:
 		hdc = BeginPaint(hWnd, &ps);
 		RECT rcClient;
@@ -810,14 +688,12 @@ LRESULT CGame::WindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		EndPaint(hWnd, &ps);
 		break;
 
-#ifndef _X360
 	case WM_DISPLAYCHANGE:
 		if ( !m_iDesktopHeight || !m_iDesktopWidth )
 		{
 			UpdateDesktopInformation( wParam, lParam );
 		}
 		break;
-#endif
 
 	case WM_IME_NOTIFY:
 		switch ( wParam )
@@ -949,11 +825,7 @@ bool CGame::CreateGameWindow( void )
 		}
 	}
 
-#if !defined( _X360 )
 	WNDCLASSW wc;
-#else
-	WNDCLASS wc;
-#endif
 	memset( &wc, 0, sizeof( wc ) );
 
     wc.style         = CS_OWNDC | CS_DBLCLKS;
@@ -993,13 +865,9 @@ bool CGame::CreateGameWindow( void )
 	modinfo = NULL;
 	// Oops, we didn't clean up the class registration from last cycle which
 	// might mean that the wndproc pointer is bogus
-#ifndef _X360
 	unicode->UnregisterClassW( CLASSNAME, m_hInstance );
 	// Register it again
     unicode->RegisterClassW( &wc );
-#else
-	RegisterClass( &wc );
-#endif
 
 	// Note, it's hidden
 	DWORD style = WS_POPUP | WS_CLIPSIBLINGS;
@@ -1031,15 +899,10 @@ bool CGame::CreateGameWindow( void )
 		exFlags |= WS_EX_TOOLWINDOW; // So it doesn't show up in the taskbar.
 	}
 
-#if !defined( _X360 )
 	HWND hwnd = unicode->CreateWindowExW( exFlags, CLASSNAME, uc, style, 
 		0, 0, w, h, NULL, NULL, m_hInstance, NULL );
 	// NOTE: On some cards, CreateWindowExW slams the FPU control word
 	SetupFPUControlWord();
-#else
-	HWND hwnd = CreateWindowEx( exFlags, CLASSNAME, windowName, style, 
-			0, 0, w, h, NULL, NULL, m_hInstance, NULL );
-#endif
 
 	if ( !hwnd )
 	{
@@ -1103,12 +966,8 @@ void CGame::DestroyGameWindow()
 			m_hWindow = (HWND)0;
 		}
 
-#if !defined( _X360 )
 		unicode->UnregisterClassW( CLASSNAME, m_hInstance );
 		UnloadUnicode();
-#else
-		UnregisterClass( CLASSNAME, m_hInstance );
-#endif
 	}
 	else
 	{
@@ -1377,7 +1236,7 @@ void CGame::PlayVideoAndWait( const char *filename, bool bNeedHealthWarning )
 	//Chinese health messages appears for 11 seconds, so we force a minimum delay time for those
 	float forcedMinTime = ( bIsValveLogo && bNeedHealthWarning ) ? 11.0f : -1.0f;
 
-#if defined( WIN32 ) && !defined ( _X360 )	&& !defined( USE_SDL )
+#if defined( WIN32 ) && !defined( USE_SDL )
 	// Black out the back of the screen once at the beginning of each video (since we're not scaling to fit)
 	HDC dc = ::GetDC( m_hWindow );
 

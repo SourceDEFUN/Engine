@@ -32,15 +32,12 @@
 #include <set>
 #include <limits.h>
 #include "tier0/threadtools.h"
-#ifdef _X360
-#include "xbox/xbox_console.h"
-#endif
 #if ( !defined(_DEBUG) && defined(USE_MEM_DEBUG) )
 #pragma message ("USE_MEM_DEBUG is enabled in a release build. Don't check this in!")
 #endif
 #if (defined(_DEBUG) || defined(USE_MEM_DEBUG))
 
-#if defined(_WIN32) && ( !defined(_X360) && !defined(_WIN64) )
+#if defined(_WIN32) && !defined(_WIN64)
 // #define USE_STACK_WALK
 // or:
 // #define USE_STACK_WALK_DETAILED
@@ -48,13 +45,8 @@
 
 //-----------------------------------------------------------------------------
 
-#ifndef _X360
 #define DebugAlloc	malloc
 #define DebugFree	free
-#else
-#define DebugAlloc	DmAllocatePool
-#define DebugFree	DmFreePool
-#endif
 
 #ifdef WIN32
 int g_DefaultHeapFlags = _CrtSetDbgFlag( _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) | _CRTDBG_ALLOC_MEM_DF );
@@ -534,9 +526,6 @@ public:
 
 	virtual void CompactHeap() 
 	{
-#if defined( _X360 ) && defined( _DEBUG )
-		HeapCompact( GetProcessHeap(), 0 );
-#endif
 	}
 
 	virtual MemAllocFailHandler_t SetAllocFailHandler( MemAllocFailHandler_t pfnMemAllocFailHandler ) { return NULL; } // debug heap doesn't attempt retries
@@ -1468,23 +1457,7 @@ void CDbgMemAlloc::DumpStatsFileBase( char const *pchFileBase )
 			pPath = "D:\\";
 		}
 
-#if defined( _MEMTEST ) && defined( _X360 )
-		char szXboxName[32];
-		strcpy( szXboxName, "xbox" );
-		DWORD numChars = sizeof( szXboxName );
-		DmGetXboxName( szXboxName, &numChars ); 
-		char *pXboxName = strstr( szXboxName, "_360" );
-		if ( pXboxName )
-		{
-			*pXboxName = '\0';
-		}
-
-		SYSTEMTIME systemTime;
-		GetLocalTime( &systemTime );
-		_snprintf( szFileName, sizeof( szFileName ), "%s%s_%2.2d%2.2d_%2.2d%2.2d%2.2d_%d.txt", pPath, s_szStatsMapName, systemTime.wMonth, systemTime.wDay, systemTime.wHour, systemTime.wMinute, systemTime.wSecond, s_FileCount );
-#else
 		_snprintf( szFileName, sizeof( szFileName ), "%s%s%d.txt", pPath, pchFileBase, s_FileCount );
-#endif
 		szFileName[ ARRAYSIZE(szFileName) - 1 ] = 0;
 
 		++s_FileCount;
@@ -1524,9 +1497,6 @@ void CDbgMemAlloc::DumpStatsFileBase( char const *pchFileBase )
 	{
 		fclose(s_DbgFile);
 
-#if defined( _X360 ) && !defined( _RETAIL )
-		XBX_rMemDump( szFileName );
-#endif
 	}
 }
 
@@ -1535,23 +1505,11 @@ void CDbgMemAlloc::GlobalMemoryStatus( size_t *pUsedMemory, size_t *pFreeMemory 
 	if ( !pUsedMemory || !pFreeMemory )
 		return;
 
-#if defined ( _X360 )
-
-	// GlobalMemoryStatus tells us how much physical memory is free
-	MEMORYSTATUS stat;
-	::GlobalMemoryStatus( &stat );
-	*pFreeMemory = stat.dwAvailPhys;
-
-	// Used is total minus free (discount the 32MB system reservation)
-	*pUsedMemory = ( stat.dwTotalPhys - 32*1024*1024 ) - *pFreeMemory;
-
-#else
 
 	// no data
 	*pFreeMemory = 0;
 	*pUsedMemory = 0;
 
-#endif
 }
 
 //-----------------------------------------------------------------------------

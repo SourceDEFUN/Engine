@@ -73,12 +73,10 @@ void TL_Error(char* error, ...)
 	
 	printf("\n");
 
-#if !defined( _X360 )
 	__asm 
 	{
 		int 3; 
 	}
-#endif
 
 	if (g_tl_abort)
 		abort();

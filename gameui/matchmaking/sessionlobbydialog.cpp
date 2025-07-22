@@ -554,22 +554,9 @@ void CSessionLobbyDialog::OnKeyCodePressed( vgui::KeyCode code )
 
 	case KEY_XBUTTON_A:
 	case STEAMCONTROLLER_A:
-#ifdef _X360
-		XShowGamerCardUI( XBX_GetPrimaryUserId(), pItem->m_nId );
-#endif
 		break;
 
 	case KEY_XBUTTON_RIGHT_SHOULDER:
-#ifdef _X360
-		{
-			// Don't allow player reviews in system link games
-			CMatchmakingBasePanel *pBase = dynamic_cast< CMatchmakingBasePanel* >( m_pParent );
-			if ( pBase && pBase->GetGameType() == GAMETYPE_SYSTEMLINK_MATCH )
-				break;
-		}
-
-		XShowPlayerReviewUI( XBX_GetPrimaryUserId(), pItem->m_nId );
-#endif
 		break;
 
 	case KEY_XBUTTON_LEFT_SHOULDER:

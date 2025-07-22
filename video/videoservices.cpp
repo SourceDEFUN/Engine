@@ -54,8 +54,6 @@ DEFINE_ENUM_BITWISE_OPERATORS( EPlatform_t );
 	const EPlatform_t	thisPlatform = PLATFORM_WIN32;
 #elif defined( OSX )
 	const EPlatform_t	thisPlatform = PLATFORM_OSX;
-#elif defined( _X360 )
-	const EPlatform_t	thisPlatform = PLATFORM_XBOX_360;
 #elif defined( _PS3 )
 	const EPlatform_t	thisPlatform = PLATFORM_PS3;
 #elif defined ( _LINUX ) || defined(PLATFORM_BSD)

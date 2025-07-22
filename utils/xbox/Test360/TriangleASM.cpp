@@ -6,9 +6,7 @@
 //--------------------------------------------------------------------------------------
 
 #include "tier0\platform.h"
-#if !defined( _X360 )
 #include <windows.h>
-#endif
 #include "appframework\iappsystemgroup.h"
 #include "appframework\appframework.h"
 #include "tier0\dbg.h"
@@ -37,18 +35,12 @@
 #include "vgui\ILocalize.h"
 #include "vgui_controls\panel.h"
 #include "vgui_controls\label.h"
-#if defined( _X360 )
-#include "xbox\xbox_console.h"
-#include "xbox\xbox_win32stubs.h"
-#endif
 #include "materialsystem\imaterialsystem.h"
 #include "materialsystem\imesh.h"
 #include "materialsystem\materialsystem_config.h"
 #include "materialsystem\MaterialSystemUtil.h"
 #include "materialsystem\ishaderapi.h"
-#if !defined( _X360 )
 #include "xbox\xboxstubs.h"
-#endif
 #include "bone_setup.h"
 #include "tier0\memdbgon.h"
 
@@ -742,10 +734,6 @@ bool CTest360App::Create()
 	AddSystem( cvarModule, VENGINE_CVAR_INTERFACE_VERSION );
 #endif
 
-#if defined( _X360 )
-	// vxconsole - true will block (legacy behavior)
-	XBX_InitConsoleMonitor( false );
-#endif
 
 	if ( !AddSystems( appSystems ) ) 
 		return false;
@@ -775,9 +763,6 @@ bool CTest360App::Create()
 		Error( "Failed to find %s\n", MATERIAL_SYSTEM_INTERFACE_VERSION );
 		return false;
 	}
-#if defined( _X360 )
-	m_pFileSystem->LoadModule( "shaderapidx9.dll" );
-#endif
 	m_pMaterialSystem->SetShaderAPI( "shaderapidx9.dll" );
 #endif
 

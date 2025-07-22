@@ -22,9 +22,6 @@
 #include "tier2/tier2.h"
 #include "zip_utils.h"
 #include "packfile.h"
-#ifdef _X360
-#include "xbox/xbox_launch.h"
-#endif
 
 #ifndef DEDICATED
 #include "keyvaluescompiler.h"
@@ -35,11 +32,6 @@
 // Needed for getting file type string
 #define WIN32_LEAN_AND_MEAN
 #include <shellapi.h>
-#endif
-
-#if defined( _X360 )
-#include "xbox\xbox_win32stubs.h"
-#undef GetCurrentDirectory
 #endif
 
 #include <time.h>
@@ -465,7 +457,6 @@ void CBaseFileSystem::Shutdown()
 	ShutdownAsync();
 	m_FileTracker2.ShutdownAsync();
 
-#ifndef _X360
 	if( m_pLogFile )
 	{
 		if( CommandLine()->FindParm( "-fs_logbins" ) >= 0 )
@@ -506,7 +497,6 @@ void CBaseFileSystem::Shutdown()
 		fprintf( m_pLogFile, ":done\n" );
 		fclose( m_pLogFile ); // STEAM OK
 	}
-#endif
 
 	UnloadCompiledKeyValues();
 
@@ -946,12 +936,7 @@ bool CBaseFileSystem::AddPackFileFromPath( const char *pPath, const char *pakfil
 // Purpose: Search pPath for pak?.pak files and add to search path if found
 // Input  : *pPath - 
 //-----------------------------------------------------------------------------
-#if !defined( _X360 )
 #define PACK_NAME_FORMAT "zip%i.zip"
-#else
-#define PACK_NAME_FORMAT "zip%i.360.zip"
-#define PACK_LOCALIZED_NAME_FORMAT "zip%i_%s.360.zip"
-#endif
 
 void CBaseFileSystem::AddPackFiles( const char *pPath, const CUtlSymbol &pathID, SearchPathAdd_t addType )
 {
@@ -978,32 +963,6 @@ void CBaseFileSystem::AddPackFiles( const char *pPath, const CUtlSymbol &pathID,
 		pakNames.AddToTail( pakfile );
 		pakSizes.AddToTail( (int64)((unsigned int)buf.st_size) );
 	}
-
-#if defined( _X360 )
-	// localized zips are added last to ensure they appear first in the search path construction
-	// localized zips can only appear in the game or mod directories
-	bool bUseEnglishAudio = XboxLaunch()->GetForceEnglish();
-
-	if ( XBX_IsLocalized() && ( bUseEnglishAudio == false ) && 
-		 ( V_stricmp( g_PathIDTable.String( pathID ), "game" ) == 0 || V_stricmp( g_PathIDTable.String( pathID ), "mod" ) == 0 ) )
-	{
-		// determine localized pak files, [zip0_language..zipN_language]
-		for ( int i = 0; ; i++ )
-		{
-			char pakfile[MAX_PATH];
-			char fullpath[MAX_PATH];
-			V_snprintf( pakfile, sizeof( pakfile ), PACK_LOCALIZED_NAME_FORMAT, i, XBX_GetLanguageString() );
-			V_ComposeFileName( pPath, pakfile, fullpath, sizeof( fullpath ) );
-
-			struct _stat buf;
-			if ( FS_stat( fullpath, &buf ) == -1 )
-				break;
-
-			pakNames.AddToTail( pakfile );
-			pakSizes.AddToTail( (int64)((unsigned int)buf.st_size) );
-		}
-	}
-#endif
 
 	// Add any zip files in the format zip1.zip ... zip0.zip
 	// Add them backwards so zip(N) is higher priority than zip(N-1), etc.
@@ -4734,9 +4693,9 @@ bool CBaseFileSystem::RenameFile( char const *pOldPath, char const *pNewPath, co
 //-----------------------------------------------------------------------------
 bool CBaseFileSystem::GetCurrentDirectory( char* pDirectory, int maxlen )
 {
-#if defined( _WIN32 ) && !defined( _X360 )
+#if defined( _WIN32 )
 	if ( !::GetCurrentDirectoryA( maxlen, pDirectory ) )
-#elif defined( POSIX ) || defined( _X360 )
+#elif defined( POSIX )
 	if ( !getcwd( pDirectory, maxlen ) )
 #endif
 		return false;
@@ -5241,7 +5200,7 @@ void CBaseFileSystem::BlockingFileAccess_LeaveCriticalSection()
 
 bool CBaseFileSystem::GetFileTypeForFullPath( char const *pFullPath, wchar_t *buf, size_t bufSizeInBytes )
 {
-#if !defined( _X360 ) && !defined( POSIX )
+#if !defined( POSIX )
 	wchar_t wcharpath[512];
 	::MultiByteToWideChar( CP_UTF8, 0, pFullPath, -1, wcharpath, sizeof( wcharpath ) / sizeof(wchar_t) );
 	wcharpath[(sizeof( wcharpath ) / sizeof(wchar_t)) - 1] = L'\0';

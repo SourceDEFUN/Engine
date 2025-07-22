@@ -1453,11 +1453,7 @@ static void FASTCALL CM_TestBoxInBrush( TraceInfo_t *pTraceInfo, const cbrush_t 
 	trace->contents = brush->contents;
 }
 
-#if defined(_X360)
-#define PREFETCH_ELEMENT(ofs,base) __dcbt(ofs,(void*)base)
-#else
 #define PREFETCH_ELEMENT(a,b)
-#endif
 /*
 ================
 CM_TraceToLeaf
@@ -2799,11 +2795,6 @@ bool FASTCALL IsBoxIntersectingRayNoLowest( fltx4 boxMin, fltx4  boxMax,
 	Assert( boxMin[1] <= boxMax[1] );
 	Assert( boxMin[2] <= boxMax[2] );
 	*/
-#if defined(_X360) && defined(DBGFLAG_ASSERT)
-	unsigned int r;
-	AssertMsg( (XMVectorGreaterOrEqualR(&r, SetWToZeroSIMD(boxMax),SetWToZeroSIMD(boxMin)), XMComparisonAllTrue(r)), "IsBoxIntersectingRay : boxmax < boxmin" );
-#endif
-
 	// test if delta is tiny along any dimension
 	fltx4 bvDeltaTinyComponents = CmpInBoundsSIMD( delta, Four_Epsilons );
 

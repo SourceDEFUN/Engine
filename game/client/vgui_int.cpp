@@ -218,10 +218,8 @@ void VGui_CreateGlobalPanels( void )
 	netgraphpanel->Create( toolParent );
 	debugoverlaypanel->Create( gameToolParent );
 
-#ifndef _X360
 	// Create mp3 player off of tool parent panel
 	MP3Player_Create( toolParent );
-#endif
 #ifdef SIXENSE
 	g_pSixenseInput->CreateGUI( gameToolParent );
 #endif
@@ -230,10 +228,7 @@ void VGui_CreateGlobalPanels( void )
 void VGui_Shutdown()
 {
 	VGUI_DestroyClientDLLRootPanel();
-
-#ifndef _X360
 	MP3Player_Destroy();
-#endif
 
 	netgraphpanel->Destroy();
 	debugoverlaypanel->Destroy();

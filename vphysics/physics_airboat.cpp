@@ -13,15 +13,9 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-#ifdef _X360 
-	#define AIRBOAT_STEERING_RATE_MIN			0.000225f
-	#define AIRBOAT_STEERING_RATE_MAX			(10.0f * AIRBOAT_STEERING_RATE_MIN)
-	#define AIRBOAT_STEERING_INTERVAL			1.5f
-#else
 	#define AIRBOAT_STEERING_RATE_MIN			0.00045f
 	#define AIRBOAT_STEERING_RATE_MAX			(5.0f * AIRBOAT_STEERING_RATE_MIN)
 	#define AIRBOAT_STEERING_INTERVAL			0.5f
-#endif //_X360
 
 #define AIRBOAT_ROT_DRAG					0.00004f
 #define AIRBOAT_ROT_DAMPING					0.001f

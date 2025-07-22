@@ -18,9 +18,6 @@
 static void initKeymap(void);
 #endif
 
-#ifdef _X360
-#include "xbox/xbox_win32stubs.h"
-#endif
 ConVar joy_xcontroller_found( "joy_xcontroller_found", "1", FCVAR_HIDDEN, "Automatically set to 1 if an xcontroller has been detected." );
 
 //-----------------------------------------------------------------------------
@@ -31,7 +28,7 @@ EXPOSE_SINGLE_INTERFACE_GLOBALVAR( CInputSystem, IInputSystem,
 						INPUTSYSTEM_INTERFACE_VERSION, g_InputSystem );
 
 
-#if defined( WIN32 ) && !defined( _X360 )
+#if defined( WIN32 )
 typedef BOOL (WINAPI *RegisterRawInputDevices_t)
 (
 	PCRAWINPUTDEVICE pRawInputDevices,
@@ -84,7 +81,7 @@ CInputSystem::CInputSystem()
 	m_pXInputDLL = NULL;
 	m_pRawInputDLL = NULL;
 
-#if defined ( _WIN32 ) && !defined ( _X360 )
+#if defined ( _WIN32 )
 	// NVNT DLL
 	m_pNovintDLL = NULL;
 #endif
@@ -112,7 +109,7 @@ CInputSystem::~CInputSystem()
 		m_pRawInputDLL = NULL;
 	}
 
-#if defined ( _WIN32 ) && !defined ( _X360 )
+#if defined ( _WIN32 )
 	// NVNT DLL unload
 	if ( m_pNovintDLL )
 	{
@@ -193,18 +190,12 @@ InitReturnVal_t CInputSystem::Init()
 #endif
 	}
 
-#if defined( _X360 )
-		SetPrimaryUserId( XBX_GetPrimaryUserId() );
-		InitializeXDevices();
-		m_bXController = true;
-#endif
-
 #if defined( USE_SDL )
 
 	m_bRawInputSupported = true;
 	initKeymap();
 
-#elif defined( WIN32 ) && !defined( _X360 )
+#elif defined( WIN32 )
 
 	// Check if this version of windows supports raw mouse input (later than win2k)
 	m_bRawInputSupported = false;
@@ -501,14 +492,6 @@ void CInputSystem::PostButtonPressedEvent( InputEventType_t nType, int nTick, Bu
 
 		// Add this event to the app-visible event queue
 		PostEvent( nType, nTick, scanCode, virtualCode );
-
-#if defined( _X360 )
-		// FIXME: Remove! Fake a windows message for vguimatsurface's input handler
-		if ( IsJoystickCode( scanCode ) )
-		{
-			ProcessEvent( WM_XCONTROLLER_KEY, scanCode, 1 );
-		}
-#endif
 	}
 }
 
@@ -527,14 +510,6 @@ void CInputSystem::PostButtonReleasedEvent( InputEventType_t nType, int nTick, B
 
 		// Add this event to the app-visible event queue
 		PostEvent( nType, nTick, scanCode, virtualCode );
-
-#if defined( _X360 )
-		// FIXME: Remove! Fake a windows message for vguimatsurface's input handler
-		if ( IsJoystickCode( scanCode ) )
-		{
-			ProcessEvent( WM_XCONTROLLER_KEY, scanCode, 0 );
-		}
-#endif
 	}
 }
 
@@ -984,25 +959,10 @@ void CInputSystem::SetRumble( float fLeftMotor, float fRightMotor, int userId )
 //-----------------------------------------------------------------------------
 void CInputSystem::StopRumble( void )
 {
-#ifdef _X360
-	xdevice_t* pXDevice = &m_XDevices[0];
-
-	for ( int i = 0; i < XUSER_MAX_COUNT; ++i, ++pXDevice )
-	{
-		if ( pXDevice->active )
-		{
-			pXDevice->vibration.wLeftMotorSpeed = 0;
-			pXDevice->vibration.wRightMotorSpeed = 0;
-			pXDevice->pendingRumbleUpdate = true;
-			WriteToXDevice( pXDevice );
-		}
-	}
-#else
 	for ( int i = 0; i < XUSER_MAX_COUNT; ++i )
 	{
 		SetRumble(0.0, 0.0, i);
 	}
-#endif
 }
 
 

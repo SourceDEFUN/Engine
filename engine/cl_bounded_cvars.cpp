@@ -34,11 +34,7 @@ public:
 	CBoundedCvar_Rate() :
 	  ConVar_ServerBounded( 
 		  "rate",
-#if defined( _X360 )
-		  "6000",
-#else
 		  V_STRINGIFY(DEFAULT_RATE),
-#endif
 		  FCVAR_ARCHIVE | FCVAR_USERINFO, 
 		  "Max bytes/sec the host can receive data" )
 	  {

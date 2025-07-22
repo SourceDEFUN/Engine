@@ -15,9 +15,7 @@
 #define SND_AUDIO_SOURCE_H
 #pragma once
 
-#if !defined( _X360 )
 #define MP3_SUPPORT	1
-#endif
 
 #define AUDIOSOURCE_COPYBUF_SIZE	4096
 

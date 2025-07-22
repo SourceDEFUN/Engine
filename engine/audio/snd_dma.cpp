@@ -37,10 +37,6 @@
 #include "pure_server.h"
 #include "filesystem/IQueuedLoader.h"
 #include "voice.h"
-#if defined( _X360 )
-#include "xbox/xbox_console.h"
-#include "xmp.h"
-#endif
 
 #include "replay/iclientreplaycontext.h"
 #include "replay/ireplaymovierenderer.h"
@@ -724,25 +720,6 @@ void S_Init( void )
 	}
 
 	DevMsg( "Sound Initialization: Finish, Sampling Rate: %i\n", g_AudioDevice->DeviceDmaSpeed() );
-
-#ifdef _X360
-	BOOL bPlaybackControl;
-	// get initial state of the x360 media player
-	if ( XMPTitleHasPlaybackControl( &bPlaybackControl ) == ERROR_SUCCESS )
-	{
-		S_EnableMusic(bPlaybackControl!=0);
-	}
-
-	Assert( g_pVideo != NULL );
-	
-	if ( g_pVideo != NULL )
-	{
-		if ( g_pVideo->SoundDeviceCommand( VideoSoundDeviceOperation::HOOK_X_AUDIO, NULL ) != VideoResult::SUCCESS )
-		{
-			Assert( 0 );
-		}
-	}
-#endif
 }
 
 
@@ -751,12 +728,10 @@ void S_Init( void )
 // =======================================================================
 void S_Shutdown(void)
 {
-#if !defined( _X360 )
 	if ( VoiceTweak_IsStillTweaking() )
 	{
 		VoiceTweak_EndVoiceTweakMode();
 	}
-#endif
 
 	S_StopAllSounds( true );
 	S_ShutdownMixThread();
@@ -802,9 +777,7 @@ void S_Shutdown(void)
 	s_buffers = 0;
 	s_oldsampleOutCount = 0;
 	s_lastsoundtime = 0.0f;
-#if !defined( _X360 )
 	Voice_Deinit();
-#endif
 }
 
 bool S_IsInitted()
@@ -4350,14 +4323,12 @@ void SND_Spatialize(channel_t *ch)
 	ch->dspmix = 0;					// default mix 0% dsp_room fx
 	ch->distmix = 0;				// default 100% left (near) wav
 
-#if !defined( _X360 )
 	if ( ch->sfx && 
 		ch->sfx->pSource && 
 		ch->sfx->pSource->GetType() == CAudioSource::AUDIO_SOURCE_VOICE )
 	{
 		Voice_Spatialize( ch );
 	}
-#endif
 
 	if ( IsSoundSourceLocalPlayer( ch->soundsource ) && !toolframework->InToolMode() )
 	{
@@ -6546,11 +6517,7 @@ void S_Update_Guts( float mixAheadTime )
 	DEBUG_StopSoundMeasure( 4, samples );
 }
 
-#if !defined( _X360 )
 #define THREADED_MIX_TIME 33
-#else
-#define THREADED_MIX_TIME XMA_POLL_RATE
-#endif
 
 ConVar snd_ShowThreadFrameTime( "snd_ShowThreadFrameTime", "0" );
 
@@ -6831,80 +6798,6 @@ void S_SoundList(void)
 	}
 	Msg( "Total resident: %i\n", total );
 }
-
-#if defined( _X360 )
-CON_COMMAND( vx_soundlist, "Dump sounds to VXConsole" )
-{
-	CSfxTable		*sfx;
-	CAudioSource	*pSource;
-	int				dataSize;
-	char			*pFormatStr;
-	int				sampleRate;
-	int				sampleBits;
-	int				streamed;
-	int				looped;
-	int				channels;
-	int				numSamples;
-
-	int numSounds = s_Sounds.Count();
-	xSoundList_t* pSoundList = new xSoundList_t[numSounds];
-
-	int i = 0;
-	for ( int iSrcSound=s_Sounds.FirstInorder(); iSrcSound != s_Sounds.InvalidIndex(); iSrcSound = s_Sounds.NextInorder( iSrcSound ) )
-	{
-		dataSize = -1;
-		sampleRate = -1;
-		sampleBits = -1;
-		pFormatStr = "???";
-		streamed = -1;
-		looped = -1;
-		channels = -1;
-		numSamples = -1;
-
-		sfx     = s_Sounds[iSrcSound].pSfx;
-		pSource = sfx->pSource;
-		if ( pSource && pSource->IsCached() )
-		{
-			numSamples = pSource->SampleCount();
-			dataSize = pSource->DataSize();
-			sampleRate = pSource->SampleRate();
-			streamed = pSource->IsStreaming();
-			looped = pSource->IsLooped();
-			channels = pSource->IsStereoWav() ? 2 : 1;
-
-			if ( pSource->Format() == WAVE_FORMAT_ADPCM )
-			{
-				pFormatStr = "ADPCM";
-				sampleBits = 16;
-			}
-			else if ( pSource->Format() == WAVE_FORMAT_PCM )
-			{
-				pFormatStr = "PCM";
-				sampleBits = (pSource->SampleSize() * 8)/channels;
-			}
-			else if ( pSource->Format() == WAVE_FORMAT_XMA )
-			{
-				pFormatStr = "XMA";
-				sampleBits = 16;
-			}
-		}
-
-		V_strncpy( pSoundList[i].name, sfx->getname(), sizeof( pSoundList[i].name ) );
-		V_strncpy( pSoundList[i].formatName, pFormatStr, sizeof( pSoundList[i].formatName ) );
-		pSoundList[i].rate = sampleRate;
-		pSoundList[i].bits = sampleBits;
-		pSoundList[i].channels = channels;
-		pSoundList[i].looped = looped;
-		pSoundList[i].dataSize = dataSize;
-		pSoundList[i].numSamples = numSamples;
-		pSoundList[i].streamed = streamed;
-		++i;
-	}
-
-	XBX_rSoundList( numSounds, pSoundList );
-	delete [] pSoundList;
-}
-#endif
 
 extern unsigned g_snd_time_debug;
 extern unsigned g_snd_call_time_debug;

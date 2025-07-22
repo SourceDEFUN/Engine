@@ -5,14 +5,11 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#if defined ( WIN32 ) && !defined( _X360 )
+#if defined ( WIN32 )
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #elif defined( OSX )
 #include <Carbon/Carbon.h>
-#elif defined( LINUX ) || defined(PLATFORM_BSD)
-//#error
-#elif defined( _X360 )
 #else
 #error
 #endif
@@ -270,32 +267,6 @@ bool CFontTextureCache::GetTextureForChars( vgui::HFont font, vgui::FontDrawType
 		if ( numNewChars > 0 )
 		{
 
-#ifdef _X360
-			if ( numNewChars > 1 )
-			{
-				MEM_ALLOC_CREDIT();
-
-				// Use the 360 fast path that generates multiple characters at once
-				int newCharDataSize = totalNewCharTexels*4;
-				CUtlBuffer newCharData( newCharDataSize, newCharDataSize, 0 );
-				unsigned char *pRGBA = (unsigned char *)newCharData.Base();
-				winFont->GetCharsRGBA( newChars, numNewChars, pRGBA );
-
-				// Copy the data into our font pages
-				for ( int i = 0; i < numNewChars; i++ )
-				{
-					newChar_t		& newChar	= newChars[i];
-					newPageEntry_t	& newEntry	= newEntries[i];
-
-					// upload the new sub texture 
-					// NOTE: both textureIDs reference the same ITexture, so we're ok
-					g_MatSystemSurface.DrawSetTexture( m_PageList[newEntry.page].textureID[typePage] );
-					unsigned char *characterRGBA = pRGBA + newChar.offset;
-					g_MatSystemSurface.DrawSetSubTextureRGBA( m_PageList[newEntry.page].textureID[typePage], newEntry.drawX, newEntry.drawY, characterRGBA, newChar.fontWide, newChar.fontTall );
-				}
-			}
-			else
-#endif
 			{
 				// create a buffer for new characters to be rendered into
 				int nByteCount = maxNewCharTexels * 4;

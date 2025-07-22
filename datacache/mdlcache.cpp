@@ -36,7 +36,7 @@
 #include "functors.h"
 
 // XXX remove this later. (henryg)
-#if 0 && defined(_DEBUG) && defined(_WIN32) && !defined(_X360)
+#if 0 && defined(_DEBUG) && defined(_WIN32)
 typedef struct LARGE_INTEGER { unsigned long long QuadPart; } LARGE_INTEGER;
 extern "C" void __stdcall OutputDebugStringA( const char *lpOutputString );
 extern "C" long __stdcall QueryPerformanceCounter( LARGE_INTEGER *lpPerformanceCount );
@@ -78,11 +78,7 @@ namespace {
 #define MdlCacheMsg		if ( !LogMdlCache() ) ; else Msg
 #define MdlCacheWarning if ( !LogMdlCache() ) ; else Warning
 
-#if defined( _X360 )
-#define AsyncMdlCache() 0	// Explicitly OFF for 360 (incompatible)
-#else
 #define AsyncMdlCache() 0
-#endif
 
 #define ERROR_MODEL		"models/error.mdl"
 #define IDSTUDIOHEADER	(('T'<<24)+('S'<<16)+('D'<<8)+'I')

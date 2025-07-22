@@ -161,13 +161,7 @@ static D3DDECLTYPE VertexElementToDeclType( VertexElement_t element, VertexCompr
 			// Wrinkle is packed into Position.W, it is not specified as a separate vertex element
 			Assert( 0 );
 			return D3DDECLTYPE_UNUSED;
-#if !defined( _X360 )
 		case VERTEX_ELEMENT_BONEINDEX:		return D3DDECLTYPE_D3DCOLOR;
-#else
-		// UBYTE4 comes in as [0,255] in the shader, which is ideal for bone indices
-		// (unfortunately, UBYTE4 is not universally supported on PC DX8 GPUs)
-		case VERTEX_ELEMENT_BONEINDEX:		return D3DDECLTYPE_UBYTE4;
-#endif
 		case VERTEX_ELEMENT_BONEWEIGHTS1:	return D3DDECLTYPE_FLOAT1;
 		case VERTEX_ELEMENT_BONEWEIGHTS2:	return D3DDECLTYPE_FLOAT2;
 		case VERTEX_ELEMENT_BONEWEIGHTS3:	return D3DDECLTYPE_FLOAT3;

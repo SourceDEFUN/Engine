@@ -5,7 +5,7 @@
 //
 //=============================================================================//
 
-#if defined( WIN32) && !defined( _X360 )
+#if defined(WIN32)
 #include <windows.h>
 #endif
 #ifdef OSX
@@ -55,9 +55,6 @@ ILauncherMgr *g_pLauncherMgr = NULL;
 #endif
 #include "../vgui2/src/VPanel.h"
 #include <vgui/IInputInternal.h>
-#if defined( _X360 )
-#include "xbox/xbox_win32stubs.h"
-#endif
 #include "xbox/xboxstubs.h"
 #include "../vgui2/src/Memorybitmap.h"
 
@@ -156,11 +153,6 @@ CUtlDict< CMatSystemSurface::font_entry, unsigned short > CMatSystemSurface::m_F
 CMatEmbeddedPanel::CMatEmbeddedPanel() : BaseClass( NULL, "MatSystemTopPanel" )
 {
 	SetPaintBackgroundEnabled( false );
-
-#if defined( _X360 )
-	SetPos( 0, 0 );
-	SetSize( GetSystemMetrics( SM_CXSCREEN ), GetSystemMetrics( SM_CYSCREEN ) );
-#endif
 }
 
 void CMatEmbeddedPanel::OnThink()
@@ -443,7 +435,7 @@ void CMatSystemSurface::Shutdown( void )
 	m_Titles.Purge();
 	m_PaintStateStack.Purge();
 
-#if defined( WIN32 ) && !defined( _X360 )
+#if defined( WIN32 )
  	// release any custom font files
 	// use newer function if possible
 	HMODULE gdiModule = ::LoadLibrary( "gdi32.dll" );
@@ -489,7 +481,7 @@ void CMatSystemSurface::Shutdown( void )
 
 	Cursor_ClearUserCursors();
 
-#if defined( WIN32 ) && !defined( _X360 )
+#if defined( WIN32 )
 	if ( gdiModule )
 	{
 		::FreeLibrary(gdiModule);
@@ -1472,15 +1464,6 @@ bool CMatSystemSurface::DeleteTextureByID(int id)
 	return false;
 }
 
-#ifdef _X360
-void CMatSystemSurface::UncacheUnusedMaterials()
-{
-	// unbind any currently set texture (which may be uncached)
-	DrawSetTexture( -1 );
-
-	// X360TBD: Need to only destroy "marked" textures
-}
-#endif
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -1881,7 +1864,7 @@ bool CMatSystemSurface::AddCustomFontFile( const char *fontName, const char *fon
 
 	// try and use the optimal custom font loader, will makes sure fonts are unloaded properly
 	// this function is in a newer version of the gdi library (win2k+), so need to try get it directly
-#if defined( WIN32 ) && !defined( _X360 )
+#if defined( WIN32 )
 	bool successfullyAdded = false;
 	HMODULE gdiModule = ::LoadLibrary("gdi32.dll");
 	if (gdiModule)
@@ -1914,8 +1897,6 @@ bool CMatSystemSurface::AddCustomFontFile( const char *fontName, const char *fon
 		return true;
 	return false;
 
-#elif defined( _X360 )
-#include "xbox/xbox_win32stubs.h"
 #else
 #error	
 #endif
@@ -4219,7 +4200,7 @@ void CMatSystemSurface::SetPanelForInput( VPANEL vpanel )
 	}
 }
 
-#if defined( WIN32 ) && !defined( _X360 )
+#if defined( WIN32 )
 static bool GetIconSize( ICONINFO& iconInfo, int& w, int& h )
 {
 	w = h = 0;
@@ -4319,13 +4300,13 @@ static bool ShouldMakeUnique( char const *extension )
 		return true;
 	return false;
 }
-#endif // !_X360
+#endif // ?
 
 vgui::IImage *CMatSystemSurface::GetIconImageForFullPath( char const *pFullPath )
 {
 	vgui::IImage *newIcon = NULL;
 
-#if defined( WIN32 ) && !defined( _X360 )
+#if defined( WIN32 )
 	SHFILEINFO info = { 0 };
 	DWORD_PTR dwResult = SHGetFileInfo( 
 		pFullPath,

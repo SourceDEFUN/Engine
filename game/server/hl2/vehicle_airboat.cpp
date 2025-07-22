@@ -1600,7 +1600,7 @@ void CPropAirboat::FireGun( )
 	CAmmoDef *pAmmoDef = GetAmmoDef();
 	int ammoType = pAmmoDef->Index( "AirboatGun" );
 
-#if defined( WIN32 ) && !defined( _X360 ) 
+#if defined( WIN32 )
 	// NVNT punch the players haptics by the magnitude cvar each round fired
 	HapticPunch(m_hPlayer,0,0,hap_airboat_gun_mag.GetFloat());
 #endif

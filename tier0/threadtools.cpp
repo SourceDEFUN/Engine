@@ -52,9 +52,6 @@
 #include "tier0/threadtools.h"
 #include "tier0/dynfunction.h"
 
-#ifdef _X360
-#include "xbox/xbox_win32stubs.h"
-#endif
 
 #include <map>
 
@@ -617,7 +614,6 @@ void ThreadSetAffinity( ThreadHandle_t hThread, int nAffinityMask )
 
 //-----------------------------------------------------------------------------
 
-#ifndef _X360
 ThreadId_t InitMainThread()
 {
 	ThreadSetDebugName( "MainThrd" );
@@ -637,17 +633,6 @@ void DeclareCurrentThreadIsMainThread()
 	g_ThreadMainThreadID = ThreadGetCurrentId();
 }
 
-#else
-byte *InitMainThread()
-{
-	byte b;
-
-	return  AlignValue( &b, 64*1024 );
-}
-#define STACK_SIZE_360 327680
-byte *g_pBaseMainStack = InitMainThread();
-byte *g_pLimitMainStack = InitMainThread() - STACK_SIZE_360;
-#endif
 
 //-----------------------------------------------------------------------------
 bool ThreadJoin( ThreadHandle_t hThread, unsigned timeout )
@@ -1696,66 +1681,6 @@ void CThreadLocalBase::Set( void *value )
 
 //-----------------------------------------------------------------------------
 
-#ifdef MSVC
-//#ifdef _X360
-#define TO_INTERLOCK_PARAM(p)		((volatile long *)p)
-#define TO_INTERLOCK_PTR_PARAM(p)	((void **)p)
-//#else
-//#define TO_INTERLOCK_PARAM(p)		(p)
-//#define TO_INTERLOCK_PTR_PARAM(p)	(p)
-//#endif
-
-#if !defined(USE_INTRINSIC_INTERLOCKED) && !defined(_X360)
-int32 ThreadInterlockedIncrement( int32 volatile *pDest )
-{
-	Assert( (size_t)pDest % 4 == 0 );
-	return InterlockedIncrement( TO_INTERLOCK_PARAM(pDest) );
-}
-
-int32 ThreadInterlockedDecrement( int32 volatile *pDest )
-{
-	Assert( (size_t)pDest % 4 == 0 );
-	return InterlockedDecrement( TO_INTERLOCK_PARAM(pDest) );
-}
-
-int32 ThreadInterlockedExchange( int32 volatile *pDest, int32 value )
-{
-	Assert( (size_t)pDest % 4 == 0 );
-	return InterlockedExchange( TO_INTERLOCK_PARAM(pDest), value );
-}
-
-int32 ThreadInterlockedExchangeAdd( int32 volatile *pDest, int32 value )
-{
-	Assert( (size_t)pDest % 4 == 0 );
-	return InterlockedExchangeAdd( TO_INTERLOCK_PARAM(pDest), value );
-}
-
-int32 ThreadInterlockedCompareExchange( int32 volatile *pDest, int32 value, int32 comperand )
-{
-	Assert( (size_t)pDest % 4 == 0 );
-	return InterlockedCompareExchange( TO_INTERLOCK_PARAM(pDest), value, comperand );
-}
-
-bool ThreadInterlockedAssignIf( int32 volatile *pDest, int32 value, int32 comperand )
-{
-	Assert( (size_t)pDest % 4 == 0 );
-
-#if !(defined(_WIN64) || defined (_X360))
-	__asm 
-	{
-		mov	eax,comperand
-		mov	ecx,pDest
-		mov edx,value
-		lock cmpxchg [ecx],edx 
-		mov eax,0
-		setz al
-	}
-#else
-	return ( InterlockedCompareExchange( TO_INTERLOCK_PARAM(pDest), value, comperand ) == comperand );
-#endif
-}
-
-#endif
 
 #if !defined( USE_INTRINSIC_INTERLOCKED ) || defined( _WIN64 )
 void *ThreadInterlockedExchangePointer( void * volatile *pDest, void *value )
@@ -1773,7 +1698,7 @@ void *ThreadInterlockedCompareExchangePointer( void * volatile *pDest, void *val
 bool ThreadInterlockedAssignPointerIf( void * volatile *pDest, void *value, void *comperand )
 {
 	Assert( (size_t)pDest % 4 == 0 );
-#if !(defined(_WIN64) || defined (_X360))
+#if !defined(_WIN64)
 	__asm 
 	{
 		mov	eax,comperand
@@ -1813,7 +1738,7 @@ bool ThreadInterlockedAssignIf64(volatile int64 *pDest, int64 value, int64 compe
 {
 	Assert( (size_t)pDest % 8 == 0 );
 
-#if defined(_X360) || defined(_WIN64)
+#if defined(_WIN64)
 	return ( ThreadInterlockedCompareExchange64( pDest, value, comperand ) == comperand ); 
 #else
 	__asm
@@ -2143,8 +2068,6 @@ CThreadMutex::~CThreadMutex()
 #ifdef IS_WINDOWS_PC
 typedef BOOL (WINAPI*TryEnterCriticalSectionFunc_t)(LPCRITICAL_SECTION);
 static CDynamicFunction<TryEnterCriticalSectionFunc_t> DynTryEnterCriticalSection( "Kernel32.dll", "TryEnterCriticalSection" );
-#elif defined( _X360 )
-#define DynTryEnterCriticalSection TryEnterCriticalSection
 #endif
 
 bool CThreadMutex::TryLock()

@@ -13,10 +13,8 @@
 #include "vortwarp_ps20b.inc"
 #include "convar.h"
 
-#ifndef _X360
 #include "vortwarp_vs30.inc"
 #include "vortwarp_ps30.inc"
-#endif
 
 DEFINE_FALLBACK_SHADER( VortWarp, VortWarp_dx9 )
 
@@ -185,9 +183,7 @@ void DrawVortWarp_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderDyn
 
 		Assert( hasBump );
 	
-#ifndef _X360
 		if ( !g_pHardwareConfig->HasFastVertexTextures() )
-#endif
 		{
 			bool bUseStaticControlFlow = g_pHardwareConfig->SupportsStaticControlFlow();
 
@@ -221,7 +217,6 @@ void DrawVortWarp_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderDyn
 				SET_STATIC_PIXEL_SHADER( vortwarp_ps20 );
 			}
 		}
-#ifndef _X360
 		else
 		{
 			// The vertex shader uses the vertex id stream
@@ -241,7 +236,6 @@ void DrawVortWarp_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderDyn
 			SET_STATIC_PIXEL_SHADER_COMBO( TRANSLUCENT, blendType == BT_BLEND );
 			SET_STATIC_PIXEL_SHADER( vortwarp_ps30 );
 		}
-#endif
 
 		if( hasFlashlight )
 		{
@@ -322,9 +316,7 @@ void DrawVortWarp_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderDyn
 
 		Assert( hasBump );
 
-#ifndef _X360
 		if ( !g_pHardwareConfig->HasFastVertexTextures() )
-#endif
 		{
 			bool bUseStaticControlFlow = g_pHardwareConfig->SupportsStaticControlFlow();
 
@@ -364,7 +356,6 @@ void DrawVortWarp_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderDyn
 				SET_DYNAMIC_PIXEL_SHADER( vortwarp_ps20 );
 			}
 		}
-#ifndef _X360
 		else
 		{
 			pShader->SetHWMorphVertexShaderState( VERTEX_SHADER_SHADER_SPECIFIC_CONST_6, VERTEX_SHADER_SHADER_SPECIFIC_CONST_7, SHADER_VERTEXTEXTURE_SAMPLER0 );
@@ -388,7 +379,6 @@ void DrawVortWarp_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderDyn
 			SET_DYNAMIC_PIXEL_SHADER_COMBO( WARPINGIN, warpParam > 0.0f && warpParam < 1.0f );
 			SET_DYNAMIC_PIXEL_SHADER( vortwarp_ps30 );
 		}
-#endif
 
 		pShader->SetVertexShaderTextureTransform( VERTEX_SHADER_SHADER_SPECIFIC_CONST_0, info.m_nBaseTextureTransform );
 

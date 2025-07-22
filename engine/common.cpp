@@ -97,9 +97,6 @@ COM_ExplainDisconnection
 */
 void COM_ExplainDisconnection( bool bPrint, const char *fmt, ... )
 {
-#ifdef _X360
-	g_pMatchmaking->SessionNotification( SESSION_NOTIFY_LOST_SERVER );
-#else
 	va_list		argptr;
 	char		string[1024];
 
@@ -109,7 +106,6 @@ void COM_ExplainDisconnection( bool bPrint, const char *fmt, ... )
 
 	Q_strncpy( gszDisconnectReason, string, 256 );
 	gfExtendedError = true;
-#endif
 
 	if ( bPrint )
 	{
@@ -143,9 +139,6 @@ COM_ExtendedExplainDisconnection
 */
 void COM_ExtendedExplainDisconnection( bool bPrint, const char *fmt, ... )
 {
-#ifdef _X360
-	g_pMatchmaking->SessionNotification( SESSION_NOTIFY_LOST_SERVER );
-#else
 	va_list		argptr;
 	char		string[1024];
 
@@ -154,7 +147,6 @@ void COM_ExtendedExplainDisconnection( bool bPrint, const char *fmt, ... )
 	va_end (argptr);
 
 	Q_strncpy( gszExtendedDisconnectReason, string, 256 );
-#endif
 
 	if ( bPrint )
 	{

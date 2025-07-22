@@ -2184,38 +2184,6 @@ public:
 	virtual bool			IsRenderData( const void *pData ) const { return false; }
 	virtual void			AddRefRenderData() {}
 	virtual void			ReleaseRenderData() {}
-#if defined( _X360 )
-	virtual void				ListUsedMaterials( void ) {}
-	virtual HXUIFONT			OpenTrueTypeFont( const char *pFontname, int tall, int style )
-	{
-		return (HXUIFONT)0;
-	}
-	virtual void				CloseTrueTypeFont( HXUIFONT hFont ) {}
-	virtual bool				GetTrueTypeFontMetrics( HXUIFONT hFont, XUIFontMetrics *pFontMetrics, XUICharMetrics charMetrics[256] ) 
-	{
-		pFontMetrics->fLineHeight = 0.0f;
-		pFontMetrics->fMaxAscent = 0.0f;
-		pFontMetrics->fMaxDescent = 0.0f;
-		pFontMetrics->fMaxWidth = 0.0f;
-		pFontMetrics->fMaxHeight = 0.0f;
-		pFontMetrics->fMaxAdvance = 0.0f;
-		return true;
-	}
-
-	virtual bool				GetTrueTypeGlyphs( HXUIFONT hFont, int numChars, wchar_t *pWch, int *pOffsetX, int *pOffsetY, int *pWidth, int *pHeight, unsigned char *pRGBA, int *pRGBAOffset )
-	{
-		return false;
-	}
-
-	virtual void				PersistDisplay() {}
-	virtual void				*GetD3DDevice() { return NULL; }
-
-	virtual void				PushVertexShaderGPRAllocation( int iVertexShaderCount = 64 ) { };
-	virtual void				PopVertexShaderGPRAllocation( void ) { };
-
-	virtual bool				OwnGPUResources( bool bEnable ) { return false; }
-#endif
-
 	virtual void				CompactMemory() {}
 
 	// For sv_pure mode. The filesystem figures out which files the client needs to reload to be "pure" ala the server's preferences.

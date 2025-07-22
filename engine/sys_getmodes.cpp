@@ -10,7 +10,7 @@
 #include "SDL_syswm.h"
 #endif
 
-#if defined( _WIN32 ) && !defined( _X360 )
+#if defined( _WIN32 )
 #include "winlite.h"
 #elif defined(POSIX)
 typedef void *HDC;
@@ -52,11 +52,7 @@ typedef void *HDC;
 #include "tier2/tier2.h"
 #include "tier2/renderutils.h"
 #include "tier0/etwprof.h"
-#if defined( _X360 )
-#include "xbox/xbox_win32stubs.h"
-#else
 #include "xbox/xboxstubs.h"
-#endif
 #include "video/ivideoservices.h"
 #if !defined(NO_STEAM)
 #include "cl_steamauth.h"
@@ -176,11 +172,7 @@ private:
 protected:
     enum
     {
-#if !defined( _X360 )
         MAX_MODE_LIST = 512
-#else
-        MAX_MODE_LIST = 2
-#endif
     };
 
     enum
@@ -1376,7 +1368,6 @@ void CVideoMode_Common::AdjustWindow( int nWidth, int nHeight, int nBPP, bool bW
 	WindowRect.bottom   = nHeight;
 
 #ifndef USE_SDL
-#ifndef _X360
 	// Get window style
 	DWORD style = GetWindowLong( (HWND)game->GetMainWindow(), GWL_STYLE );
 	DWORD exStyle = GetWindowLong( (HWND)game->GetMainWindow(), GWL_EXSTYLE );
@@ -1408,12 +1399,10 @@ void CVideoMode_Common::AdjustWindow( int nWidth, int nHeight, int nBPP, bool bW
 
 	// Compute rect needed for that size client area based on window style
 	AdjustWindowRectEx( &WindowRect, style, FALSE, exStyle );
-#endif
 
 	// Prepare to set window pos, which is required when toggling between topmost and not window flags
 	HWND hWndAfter = NULL;
 	DWORD dwSwpFlags = 0;
-#ifndef _X360
 	{
 		if ( bWindowed )
 		{
@@ -1425,11 +1414,6 @@ void CVideoMode_Common::AdjustWindow( int nWidth, int nHeight, int nBPP, bool bW
 		}
 		dwSwpFlags = SWP_FRAMECHANGED;
 	}
-#else
-	{
-		dwSwpFlags = SWP_NOZORDER;
-	}
-#endif
 
 	// Move the window to 0, 0 and the new true size
 	SetWindowPos( (HWND)game->GetMainWindow(),
@@ -2117,7 +2101,7 @@ GLOBAL(void) jpeg_UtlBuffer_dest (j_compress_ptr cinfo, CUtlBuffer *pBuffer )
 
 bool CVideoMode_Common::TakeSnapshotJPEGToBuffer( CUtlBuffer& buf, int quality )
 {
-#if !defined( _X360 ) && HAVE_JPEG
+#if HAVE_JPEG
     if ( g_LostVideoMemory )
         return false;
 
@@ -2198,7 +2182,6 @@ bool CVideoMode_Common::TakeSnapshotJPEGToBuffer( CUtlBuffer& buf, int quality )
 //-----------------------------------------------------------------------------
 void CVideoMode_Common::TakeSnapshotJPEG( const char *pFilename, int quality )
 {
-#if !defined( _X360 )
     Assert( pFilename );
 
     // Output buffer
@@ -2232,10 +2215,6 @@ void CVideoMode_Common::TakeSnapshotJPEG( const char *pFilename, int quality )
 			AddScreenshotToSteam( szPath, GetModeStereoWidth(), GetModeStereoHeight() );
 		}
 	}
-
-#else
-    Assert( 0 );
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -2418,25 +2397,6 @@ bool CVideoMode_MaterialSystem::SetMode( int nWidth, int nHeight, bool bWindowed
 #endif
     
     config.SetFlag( MATSYS_VIDCFG_FLAGS_WINDOWED, bWindowed );
-
-#if defined( _X360 )
-    XVIDEO_MODE videoMode;
-    XGetVideoMode( &videoMode );
-    if ( videoMode.fIsWideScreen )
-    {
-        extern ConVar r_aspectratio;
-        r_aspectratio.SetValue( 16.0f/9.0f );
-    }
-    config.SetFlag( MATSYS_VIDCFG_FLAGS_SCALE_TO_OUTPUT_RESOLUTION, (DWORD)nWidth != videoMode.dwDisplayWidth || (DWORD)nHeight != videoMode.dwDisplayHeight );
-    if ( nHeight == 480 || nWidth == 576 )
-    {
-        // Use 2xMSAA for standard def (see mat_software_aa_strength for fake hi-def aa)
-        // FIXME: shuffle the EDRAM surfaces to allow 4xMSAA for standard def
-        //        (they would overlap & trash each other with the current arrangement)
-        // NOTE: This should affect 640x480 and 848x480 (which is also used for 640x480 widescreen), and PAL 640x576
-        config.m_nAASamples = 2;
-    }
-#endif
 
     // FIXME: This is trash. We have to do *different* things depending on how we're setting the mode!
     if ( !m_bSetModeOnce )

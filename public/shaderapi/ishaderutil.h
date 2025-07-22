@@ -94,9 +94,6 @@ public:
 	// Tells the material system to draw a buffer clearing quad
 	virtual void DrawClearBufferQuad( unsigned char r, unsigned char g, unsigned char b, unsigned char a, bool bClearColor, bool bClearAlpha, bool bClearDepth ) = 0;
 
-#if defined( _X360 )
-	virtual void ReadBackBuffer( Rect_t *pSrcRect, Rect_t *pDstRect, unsigned char *pData, ImageFormat dstFormat, int nDstStride ) = 0;
-#endif
 
 	// Calls from meshes to material system to handle queing/threading
 	virtual bool OnDrawMesh( IMesh *pMesh, int firstIndex, int numIndices ) = 0;

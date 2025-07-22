@@ -169,7 +169,7 @@ typedef float vec_t;
 #if defined(__GNUC__)
 #define fpmin __builtin_fminf
 #define fpmax __builtin_fmaxf
-#elif !defined(_X360)
+#else
 #define fpmin min
 #define fpmax max
 #endif

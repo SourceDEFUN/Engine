@@ -9,7 +9,7 @@
 #include "pch_tier0.h"
 #include "tier0/minidump.h"
 
-#if defined( _WIN32 ) && !defined( _X360 )
+#if defined( _WIN32 )
 #include "tier0/valve_off.h"
 #define WIN_32_LEAN_AND_MEAN
 #include <windows.h>				// Currently needed for IsBadReadPtr and IsBadWritePtr
@@ -32,9 +32,6 @@
 #include "tier0/threadtools.h"
 #include "tier0/icommandline.h"
 #include <math.h>
-#if defined( _X360 )
-#include "xbox/xbox_console.h"
-#endif
 
 #ifdef ANDROID
 #include <android/log.h>
@@ -209,14 +206,6 @@ static const char *SkipToFname( const tchar* pFile )
 //-----------------------------------------------------------------------------
 DBG_INTERFACE SpewRetval_t DefaultSpewFunc( SpewType_t type, const tchar *pMsg )
 {
-#ifdef _X360
-	if ( XBX_IsConsoleConnected() )
-	{
-		// send to console
-		XBX_DebugString( XMAKECOLOR( 0,0,0 ), pMsg );
-	}
-	else
-#endif
 	{
 		_tprintf( _T("%s"), pMsg );
 #ifdef _WIN32
@@ -268,11 +257,7 @@ static SpewType_t	s_SpewType;
 static SpewGroup_t* s_pSpewGroups = 0;
 static int			s_GroupCount = 0;
 static int			s_DefaultLevel = 0;
-#if !defined( _X360 )
 static Color		s_DefaultOutputColor( 255, 255, 255, 255 );
-#else
-static Color		s_DefaultOutputColor( 0, 0, 0, 255 );
-#endif
 
 // Only useable from within a spew function
 struct SpewInfo_t
@@ -1042,9 +1027,6 @@ void COM_TimestampedLog( char const *fmt, ... )
 
 	float curStamp = Plat_FloatTime();
 
-#if defined( _X360 )
-	XBX_rTimeStampLog( curStamp, string );
-#endif
 
 	if ( IsPC() )
 	{

@@ -12,7 +12,7 @@
 #endif // POSIX
 #endif
 
-#if defined( WIN32 ) && !defined( _X360 )
+#if defined( WIN32 )
 #include <windows.h> // SRC only!!
 #elif defined( POSIX )
 #include <stdio.h>
@@ -99,9 +99,6 @@ extern void longjmp( jmp_buf, int ) __attribute__((noreturn));
 #define DeleteFile(s)	remove(s)
 #endif
 
-#if defined( _X360 )
-#include "xbox/xbox_win32stubs.h"
-#endif
 
 
 
@@ -154,7 +151,7 @@ static void ValveJpegErrorHandler( j_common_ptr cinfo )
 // convert the JPEG file given to a TGA file at the given output path.
 ConversionErrorType ImgUtl_ConvertJPEGToTGA( const char *jpegpath, const char *tgaPath, bool bRequirePowerOfTwo )
 {
-#if !defined( _X360 ) && HAVE_JPEG
+#if HAVE_JPEG
 
 	//
 	// !FIXME! This really probably should use ImgUtl_ReadJPEGAsRGBA, to avoid duplicated code.
@@ -274,7 +271,6 @@ ConversionErrorType ImgUtl_ConvertJPEGToTGA( const char *jpegpath, const char *t
 
 	free(buf);
 	return bRetVal ? CE_SUCCESS : CE_ERROR_WRITING_OUTPUT_FILE;
-
 #else
 	return CE_SOURCE_FILE_FORMAT_NOT_SUPPORTED;
 #endif
@@ -505,7 +501,7 @@ unsigned char * ImgUtl_ReadTGAAsRGBA(const char *tgaPath, int &width, int &heigh
 
 unsigned char *ImgUtl_ReadJPEGAsRGBA( const char *jpegPath, int &width, int &height, ConversionErrorType &errcode )
 {
-#if !defined( _X360 ) && HAVE_JPEG
+#if HAVE_JPEG
 	struct jpeg_decompress_struct jpegInfo;
 	struct ValveJpegErrorHandler_t jerr;
 	JSAMPROW row_pointer[1];
@@ -679,7 +675,7 @@ static void ReadPNGData( png_structp png_ptr, png_bytep outBytes, png_size_t byt
 
 unsigned char *ImgUtl_ReadPNGAsRGBA( const char *pngPath, int &width, int &height, ConversionErrorType &errcode )
 {
-#if !defined( _X360 ) && HAVE_PNG
+#if HAVE_PNG
 
 	// Just load the whole file into a memory buffer
 	CUtlBuffer bufFileContents;
@@ -718,7 +714,7 @@ unsigned char *ImgUtl_ReadPNGAsRGBA( const char *pngPath, int &width, int &heigh
 
 unsigned char		*ImgUtl_ReadPNGAsRGBAFromBuffer( CUtlBuffer &buffer, int &width, int &height, ConversionErrorType &errcode )
 {
-#if !defined( _X360 ) && HAVE_PNG
+#if HAVE_PNG
 
 	png_const_bytep pngData = (png_const_bytep)buffer.Base();
 	if (png_sig_cmp( pngData, 0, 8))
@@ -1897,7 +1893,6 @@ static void FlushPNGData( png_structp png_ptr )
 
 ConversionErrorType ImgUtl_WriteRGBAAsPNGToBuffer( const unsigned char *pRGBAData, int nWidth, int nHeight, CUtlBuffer &bufOutData, int nStride )
 {
-#if !defined( _X360 )
 	// Auto detect image stride
 	if ( nStride <= 0 )
 	{
@@ -1955,13 +1950,13 @@ fail:
 	row_pointers = (png_bytepp)malloc( nHeight*sizeof(png_bytep) );
 	if ( row_pointers == NULL  ) 
 	{
-        errcode = CE_MEMORY_ERROR;
-        goto fail;
-    }
+		errcode = CE_MEMORY_ERROR;
+		goto fail;
+	}
 
-    /* set the individual row_pointers to point at the correct offsets */
-    for ( int i = 0;  i < nHeight;  ++i)
-        row_pointers[i] = const_cast<unsigned char *>(pRGBAData + i*nStride);
+	/* set the individual row_pointers to point at the correct offsets */
+	for ( int i = 0;  i < nHeight;  ++i)
+		row_pointers[i] = const_cast<unsigned char *>(pRGBAData + i*nStride);
 
 	// Write the image
 	png_write_image(png_ptr, row_pointers);
@@ -1974,9 +1969,6 @@ fail:
 	row_pointers = NULL;
 	png_destroy_write_struct(&png_ptr, &info_ptr);
 	return CE_SUCCESS;
-#else
-	return CE_SOURCE_FILE_FORMAT_NOT_SUPPORTED;
-#endif
 }
 #endif
 
@@ -2131,7 +2123,7 @@ bool ImgUtl_WriteRGBToJPEG( unsigned char *pSrcBuf, unsigned int nSrcWidth, unsi
 
 ConversionErrorType ImgUtl_WriteRGBAAsJPEGToBuffer( const unsigned char *pRGBAData, int nWidth, int nHeight, CUtlBuffer &bufOutData, int nStride )
 {
-#if !defined( _X360 ) && HAVE_JPEG
+#if HAVE_JPEG
 
 	JSAMPROW row_pointer[1];     // pointer to JSAMPLE row[s]
 	int row_stride;              // physical row width in image buffer

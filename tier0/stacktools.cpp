@@ -162,7 +162,7 @@ inline bool ValidStackAddress( void *pAddress, const void *pNoLessThan, const vo
 	if( pAddress > pNoGreaterThan ) //never traverse outside the stack (Oh 0xCCCCCCCC, how I hate you)
 		return false;
 
-#if defined( WIN32 ) && !defined( _X360 ) && 1
+#if defined( WIN32 )
 	if( IsBadReadPtr( pAddress, (sizeof( void * ) * 2) ) ) //safety net, but also throws an exception (handled internally) to stop bad access
 		return false;
 #endif
@@ -175,7 +175,7 @@ int GetCallStack_Fast( void **pReturnAddressesOut, int iArrayCount, int iSkipCou
 {
 	//Only tested in windows. This function won't work with frame pointer omission enabled. "vpc /nofpo" all projects
 #if (defined( TIER0_FPO_DISABLED ) || defined( _DEBUG )) &&\
-	(defined( WIN32 ) && !defined( _X360 ) && !defined(_M_X64))
+	(defined( WIN32 ) && !defined(_M_X64))
 	void *pStackCrawlEBP;
 	__asm
 	{
@@ -259,7 +259,7 @@ int GetCallStack_Fast( void **pReturnAddressesOut, int iArrayCount, int iSkipCou
 
 
 
-#if defined( WIN32 ) && !defined( _X360 )
+#if defined( WIN32 )
 //===============================================================================================================
 // Windows version of the toolset
 //===============================================================================================================
@@ -1000,7 +1000,7 @@ bool GetModuleNameFromAddress( const void *pAddress, tchar *pModuleNameOut, int 
 	return s_HelperFunctions.GetModuleNameFromAddress( pAddress, pModuleNameOut, iMaxModuleNameLength );
 }
 
-#else //#if defined( WIN32 ) && !defined( _X360 )
+#else //#if defined( WIN32 )
 
 //===============================================================================================================
 // X360 version of the toolset
@@ -1448,7 +1448,7 @@ bool GetModuleNameFromAddress( const void *pAddress, tchar *pModuleNameOut, int 
 	return s_360StackTranslator.GetModuleNameFromAddress( pAddress, pModuleNameOut, iMaxModuleNameLength );
 }
 
-#endif //#else //#if defined( WIN32 ) && !defined( _X360 )
+#endif //#else //#if defined( WIN32 )
 
 #endif //#if !defined( ENABLE_RUNTIME_STACK_TRANSLATION )
 
@@ -1467,7 +1467,7 @@ CStackTop_CopyParentStack::CStackTop_CopyParentStack( void * const *pParentStack
 #if defined( ENABLE_RUNTIME_STACK_TRANSLATION )
 	//miniature version of GetCallStack_Fast()
 #if (defined( TIER0_FPO_DISABLED ) || defined( _DEBUG )) &&\
-	(defined( WIN32 ) && !defined( _X360 ) && !defined(_M_X64))
+	(defined( WIN32 ) && !defined(_M_X64))
 	void *pStackCrawlEBP;
 	__asm
 	{
@@ -1525,7 +1525,7 @@ CStackTop_ReferenceParentStack::CStackTop_ReferenceParentStack( void * const *pP
 #if defined( ENABLE_RUNTIME_STACK_TRANSLATION )
 	//miniature version of GetCallStack_Fast()
 #if (defined( TIER0_FPO_DISABLED ) || defined( _DEBUG )) &&\
-	(defined( WIN32 ) && !defined( _X360 ) && !defined(_M_X64))
+	(defined( WIN32 ) && !defined(_M_X64))
 	void *pStackCrawlEBP;
 	__asm
 	{

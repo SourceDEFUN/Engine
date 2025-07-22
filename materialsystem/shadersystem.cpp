@@ -437,7 +437,7 @@ bool CShaderSystem::LoadShaderDLL( const char *pFullPath )
 }
 
 // HACKHACK: remove me when VAC2 is online.
-#if defined( _WIN32 ) && !defined( _X360 )
+#if defined( _WIN32 )
 // Instead of including windows.h
 extern "C"
 {
@@ -447,7 +447,7 @@ extern "C"
 
 void CShaderSystem::VerifyBaseShaderDLL( CSysModule *pModule )
 {
-//#if defined( _WIN32 ) && !defined( _X360 )
+//#if defined( _WIN32 )
 #if 0
 	const char *pErrorStr = "Corrupt save data settings.";
 

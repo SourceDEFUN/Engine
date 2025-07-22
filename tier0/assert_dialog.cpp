@@ -7,10 +7,7 @@
 #include "pch_tier0.h"
 
 #include "tier0/valve_off.h"
-#ifdef _X360
-#include "xbox/xbox_console.h"
-#include "xbox/xbox_vxconsole.h"
-#elif defined( _WIN32 )
+#if defined( _WIN32 )
 #include <windows.h>
 #elif defined( POSIX )
 #include <stdlib.h>
@@ -67,12 +64,9 @@ static bool g_bAssertsEnabled = true;
 
 static CAssertDisable *g_pAssertDisables = NULL;
 
-#if ( defined( _WIN32 ) && !defined( _X360 ) )
+#if defined( _WIN32 )
 static int g_iLastLineRange = 5;
 static int g_nLastIgnoreNumTimes = 1;
-#endif
-#if defined( _X360 )
-static int g_VXConsoleAssertReturnValue = -1;
 #endif
 
 // Set to true if they want to break in the debugger.
@@ -192,7 +186,7 @@ CAssertDisable* IgnoreAssertsNearby( int nRange )
 }
 
 
-#if ( defined( _WIN32 ) && !defined( _X360 ) )
+#if defined( _WIN32 )
 INT_PTR CALLBACK AssertDialogProc(
   HWND hDlg,  // handle to dialog box
   UINT uMsg,     // message
@@ -340,7 +334,7 @@ static HWND FindLikelyParentWindow()
 	EnumWindows( ParentWindowEnumProc, GetCurrentProcessId() );
 	return g_hBestParentWindow;
 }
-#endif // ( defined( _WIN32 ) && !defined( _X360 ) )
+#endif // defined( _WIN32 )
 
 // -------------------------------------------------------------------------------- //
 // Interface functions.
@@ -462,57 +456,7 @@ DBG_INTERFACE bool DoNewAssertDialog( const tchar *pFilename, int line, const tc
 
 	g_bBreak = false;
 
-#if defined( _X360 )
-
-	char cmdString[XBX_MAX_RCMDLENGTH];
-
-	// Before calling VXConsole, init the global variable that receives the result
-	g_VXConsoleAssertReturnValue = -1;
-
-	// Message VXConsole to pop up a PC-side Assert dialog
-	_snprintf( cmdString, sizeof(cmdString), "Assert() 0x%.8x File: %s\tLine: %d\t%s",
-				&g_VXConsoleAssertReturnValue, pFilename, line, pExpression );
-	XBX_SendRemoteCommand( cmdString, false );
-
-	// We sent a synchronous message, so g_xbx_dbgVXConsoleAssertReturnValue should have been overwritten by now
-	if ( g_VXConsoleAssertReturnValue == -1 )
-	{
-		// VXConsole isn't connected/running - default to the old behaviour (break)
-		g_bBreak = true;
-	}
-	else
-	{
-		// Respond to what the user selected
-		switch( g_VXConsoleAssertReturnValue )
-		{
-		case ASSERT_ACTION_IGNORE_FILE:
-			IgnoreAssertsInCurrentFile();
-			break;
-		case ASSERT_ACTION_IGNORE_THIS:
-			// Ignore this Assert once
-			break;
-		case ASSERT_ACTION_BREAK:
-			// Break on this Assert
-			g_bBreak = true;
-			break;
-		case ASSERT_ACTION_IGNORE_ALL:
-			// Ignore all Asserts from now on
-			g_bAssertsEnabled = false;
-			break;
-		case ASSERT_ACTION_IGNORE_ALWAYS:
-			// Ignore this Assert from now on
-			IgnoreAssertsNearby( 0 );
-			break;
-		case ASSERT_ACTION_OTHER:
-		default:
-			// Error... just break
-			XBX_Error( "DoNewAssertDialog: invalid Assert response returned from VXConsole - breaking to debugger" );
-			g_bBreak = true;
-			break;
-		}
-	}
-
-#elif defined( _WIN32 )
+#if defined( _WIN32 )
 
 	if ( !ThreadInMainThread() )
 	{

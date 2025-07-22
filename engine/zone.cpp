@@ -25,10 +25,6 @@
 
 #define MINIMUM_WIN_MEMORY			0x03000000	// FIXME: copy from sys_dll.cpp, find a common header at some point
 
-#ifdef _X360
-#define HUNK_USE_16MB_PAGE
-#endif
-
 CMemoryStack g_HunkMemoryStack;
 #ifdef HUNK_USE_16MB_PAGE
 CMemoryStack g_HunkOverflow;

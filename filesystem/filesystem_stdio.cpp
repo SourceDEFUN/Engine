@@ -28,10 +28,6 @@
 #include "tier1/utlrbtree.h"
 #include "vstdlib/osversion.h"
 
-#ifdef _X360
-#undef WaitForSingleObject
-#endif
-
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -1144,7 +1140,7 @@ int GetSectorSize( const char *pszFilename )
 		return XBOX_DVD_SECTORSIZE;
 	}
 
-#if defined( _WIN32 ) && !defined( FILESYSTEM_STEAM ) && !defined( _X360 )
+#if defined( _WIN32 ) && !defined( FILESYSTEM_STEAM )
 	char szAbsoluteFilename[MAX_FILEPATH];
 	if ( pszFilename[1] != ':' )
 	{
@@ -1376,11 +1372,7 @@ int CWin32ReadOnlyFile::FS_feof()
 
 // ends up on a thread's stack, don't blindly increase without awareness of that implication
 // 360 threads have small stacks, using small buffer of the worst case quantum sector size
-#if !defined( _X360 )
 #define READ_TEMP_BUFFER	( 32*1024 )
-#else
-#define READ_TEMP_BUFFER	( 2*XBOX_DVD_SECTORSIZE )
-#endif
 
 //-----------------------------------------------------------------------------
 // Purpose: low-level filesystem wrapper

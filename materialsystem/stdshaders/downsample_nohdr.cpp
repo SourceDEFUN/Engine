@@ -70,9 +70,7 @@ BEGIN_VS_SHADER_FLAGS( Downsample_nohdr, "Help for Downsample_nohdr", SHADER_NOT
 			{
 				DECLARE_STATIC_PIXEL_SHADER( downsample_nohdr_ps20b );
 				SET_STATIC_PIXEL_SHADER_COMBO( CSTRIKE, params[CSTRIKE]->GetIntValue() ? 1 : 0 );
-#ifndef _X360
 				SET_STATIC_PIXEL_SHADER_COMBO( SRGB_ADAPTER, bForceSRGBReadAndWrite );
-#endif
 				SET_STATIC_PIXEL_SHADER( downsample_nohdr_ps20b );
 			}
 			else

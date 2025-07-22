@@ -136,11 +136,6 @@ public:
 	virtual unsigned int GetFlags( void ) const { return 0; }
 	virtual void ForceLODOverride( int iNumLodsOverrideUpOrDown ) { NULL; }
 
-#if defined( _X360 )
-	virtual bool ClearTexture( int r, int g, int b, int a ) { return true; }
-	virtual bool CreateRenderTargetSurface( int width, int height, ImageFormat format, bool bSameAsTexture ) { return true; }
-#endif
-
 	// Save texture to a file.
 	virtual bool SaveToFile( const char *fileName ) { return false; }
 
@@ -218,11 +213,6 @@ public:
 
 	virtual unsigned int GetFlags( void ) const { return 0; }
 	virtual void ForceLODOverride( int iNumLodsOverrideUpOrDown ) { NULL; }
-
-#if defined( _X360 )
-	virtual bool ClearTexture( int r, int g, int b, int a ) { return true; }
-	virtual bool CreateRenderTargetSurface( int width, int height, ImageFormat format, bool bSameAsTexture ) { return true; }
-#endif
 
 	// Save texture to a file.
 	virtual bool SaveToFile( const char *fileName ) { return false; }

@@ -5,10 +5,8 @@
 //===========================================================================//
 
 #ifdef _WIN32
-#if !defined( _X360 )
 #include "winlite.h"
 #include <winsock2.h> // INADDR_ANY defn
-#endif
 #elif POSIX
 #include <netinet/in.h>
 #endif
@@ -43,10 +41,6 @@ static void sv_setsteamblockingcheck_f( IConVar *pConVar, const char *pOldString
 ConVar  sv_steamblockingcheck( "sv_steamblockingcheck", "0", 0, 
 							  "Check each new player for Steam blocking compatibility, 1 = message only, 2 >= drop if any member of owning clan blocks,"
 							  "3 >= drop if any player has blocked, 4 >= drop if player has blocked anyone on server", sv_setsteamblockingcheck_f );
-
-#if defined( _X360 )
-#include "xbox/xbox_win32stubs.h"
-#endif
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -214,8 +208,6 @@ void CSteam3Server::Activate( EServerType serverType )
 		usMasterServerUpdaterPort = m_usPort;
 		m_QueryPort = m_usPort;
 	}
-#ifndef _X360
-
 	switch ( m_eServerMode )
 	{
 		case eServerModeNoAuthentication:
@@ -289,9 +281,6 @@ steam_no_good:
 		// TODO: Change this to use just the token when the SDK is updated
 		SteamGameServer()->LogOn( m_sAccountToken );
 	}
-
-#endif
-
 	SendUpdatedServerDetails();
 }
 

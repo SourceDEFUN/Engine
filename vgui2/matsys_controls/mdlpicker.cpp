@@ -697,16 +697,6 @@ void CMDLPicker::CaptureScreenCaps( void )
 }
 
 
-//-----------------------------------------------------------------------------
-// Stub for XBox360 compiles
-//-----------------------------------------------------------------------------
-#if defined( _X360 )
-const char *getenv( const char *varname )
-{
-	return NULL;
-}
-#endif
-
 
 //-----------------------------------------------------------------------------
 // Writes two very simple .vmt file, one for the passed in asset, 

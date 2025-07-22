@@ -1175,11 +1175,7 @@ void UTIL_BoundToWorldSize( Vector *pVecPos )
 	}
 }
 
-#ifdef _X360
-#define MAP_KEY_FILE_DIR	"cfg"
-#else
 #define MAP_KEY_FILE_DIR	"media"
-#endif
 
 //-----------------------------------------------------------------------------
 // Purpose: Returns the filename to count map loads in
@@ -1188,10 +1184,6 @@ bool UTIL_GetMapLoadCountFileName( const char *pszFilePrependName, char *pszBuff
 {
 	if ( IsX360() )
 	{
-#ifdef _X360
-		if ( XBX_GetStorageDeviceId() == XBX_INVALID_STORAGE_ID || XBX_GetStorageDeviceId() == XBX_STORAGE_DECLINED )
-			return false;
-#endif
 	}
 
 	if ( IsX360() )
@@ -1263,9 +1255,6 @@ void UTIL_IncrementMapKey( const char *pszCustomKey )
 
 	if ( IsX360() )
 	{
-#ifdef _X360
-		xboxsystem->FinishContainerWrites();
-#endif
 	}
 }
 

@@ -6,7 +6,7 @@
 //=============================================================================//
 #include "pch_tier0.h"
 
-#if defined(_WIN32) && !defined(_X360)
+#if defined(_WIN32)
 #define WINDOWS_LEAN_AND_MEAN
 #include <windows.h>
 #elif defined(_LINUX)
@@ -22,7 +22,7 @@ const tchar* GetProcessorVendorId();
 
 static bool cpuid(uint32 function, uint32& out_eax, uint32& out_ebx, uint32& out_ecx, uint32& out_edx)
 {
-#if defined (__arm__) || defined (__aarch64__) || defined( _X360 )
+#if defined (__arm__) || defined (__aarch64__)
 	return false;
 #elif defined(GNUC)
 
@@ -94,7 +94,7 @@ static bool cpuid(uint32 function, uint32& out_eax, uint32& out_ebx, uint32& out
 
 static bool CheckMMXTechnology(void)
 {
-#if defined( _X360 ) || defined( _PS3 ) 
+#if defined( _PS3 ) 
 	return true;
 #else
     uint32 eax,ebx,edx,unused;
@@ -111,7 +111,7 @@ static bool CheckMMXTechnology(void)
 //-----------------------------------------------------------------------------
 static bool IsWin98OrOlder()
 {
-#if defined( _X360 ) || defined( _PS3 ) || defined( POSIX )
+#if defined( _PS3 ) || defined( POSIX )
 	return false;
 #else
 	bool retval = false;
@@ -158,7 +158,7 @@ static bool CheckSSETechnology(void)
 {
 #if defined(__SANITIZE_ADDRESS__) || defined (__arm__)
 	return false;
-#elif defined( _X360 ) || defined( _PS3 )
+#elif defined( _PS3 )
 	return true;
 #else
 	if ( IsWin98OrOlder() ) {
@@ -176,7 +176,7 @@ static bool CheckSSETechnology(void)
 
 static bool CheckSSE2Technology(void)
 {
-#if defined( _X360 ) || defined( _PS3 ) || defined(__SANITIZE_ADDRESS__) || defined (__arm__)
+#if defined( _PS3 ) || defined(__SANITIZE_ADDRESS__) || defined (__arm__)
 	return false;
 #else
 	uint32 eax,ebx,edx,unused;
@@ -189,7 +189,7 @@ static bool CheckSSE2Technology(void)
 
 bool CheckSSE3Technology(void)
 {
-#if defined( _X360 ) || defined( _PS3 ) || defined(__SANITIZE_ADDRESS__) || defined (__arm__)
+#if defined( _PS3 ) || defined(__SANITIZE_ADDRESS__) || defined (__arm__)
 	return false;
 #else
 	uint32 eax,ebx,edx,ecx;
@@ -202,7 +202,7 @@ bool CheckSSE3Technology(void)
 
 bool CheckSSSE3Technology(void)
 {
-#if defined( _X360 ) || defined( _PS3 ) || defined(__SANITIZE_ADDRESS__) || defined (__arm__)
+#if defined( _PS3 ) || defined(__SANITIZE_ADDRESS__) || defined (__arm__)
 	return false;
 #else
 	// SSSE 3 is implemented by both Intel and AMD
@@ -217,7 +217,7 @@ bool CheckSSSE3Technology(void)
 
 bool CheckSSE41Technology(void)
 {
-#if defined( _X360 ) || defined( _PS3 ) || defined(__SANITIZE_ADDRESS__) || defined (__arm__)
+#if defined( _PS3 ) || defined(__SANITIZE_ADDRESS__) || defined (__arm__)
 	return false;
 #else
 	// SSE 4.1 is implemented by both Intel and AMD
@@ -233,7 +233,7 @@ bool CheckSSE41Technology(void)
 
 bool CheckSSE42Technology(void)
 {
-#if defined( _X360 ) || defined( _PS3 ) || defined(__SANITIZE_ADDRESS__) || defined (__arm__)
+#if defined( _PS3 ) || defined(__SANITIZE_ADDRESS__) || defined (__arm__)
 	return false;
 #else
 	// SSE4.2 is an Intel-only feature
@@ -253,7 +253,7 @@ bool CheckSSE42Technology(void)
 
 bool CheckSSE4aTechnology( void )
 {
-#if defined( _X360 ) || defined( _PS3 ) || defined(__SANITIZE_ADDRESS__) || defined (__arm__)
+#if defined( _PS3 ) || defined(__SANITIZE_ADDRESS__) || defined (__arm__)
 	return false;
 #else
 	// SSE 4a is an AMD-only feature
@@ -273,7 +273,7 @@ bool CheckSSE4aTechnology( void )
 
 static bool Check3DNowTechnology(void)
 {
-#if defined( _X360 ) || defined( _PS3 ) || defined (__arm__) || defined(__SANITIZE_ADDRESS__) || (defined(PLATFORM_BSD) && defined(COMPILER_CLANG))
+#if defined( _PS3 ) || defined (__arm__) || defined(__SANITIZE_ADDRESS__) || (defined(PLATFORM_BSD) && defined(COMPILER_CLANG))
 	return false;
 #else
 	uint32 eax, unused;
@@ -293,7 +293,7 @@ static bool Check3DNowTechnology(void)
 
 static bool CheckCMOVTechnology()
 {
-#if defined( _X360 ) || defined( _PS3 ) || defined (__arm__) || defined(__SANITIZE_ADDRESS__)
+#if defined( _PS3 ) || defined (__arm__) || defined(__SANITIZE_ADDRESS__)
 	return false;
 #else
 	uint32 eax,ebx,edx,unused;
@@ -306,7 +306,7 @@ static bool CheckCMOVTechnology()
 
 static bool CheckFCMOVTechnology(void)
 {
-#if defined( _X360 ) || defined( _PS3 ) || defined (__arm__) || defined(__SANITIZE_ADDRESS__)
+#if defined( _PS3 ) || defined (__arm__) || defined(__SANITIZE_ADDRESS__)
 	return false;
 #else
     uint32 eax,ebx,edx,unused;
@@ -319,7 +319,7 @@ static bool CheckFCMOVTechnology(void)
 
 static bool CheckRDTSCTechnology(void)
 {
-#if defined( _X360 ) || defined( _PS3 ) || defined (__arm__) || defined(__SANITIZE_ADDRESS__)
+#if defined( _PS3 ) || defined (__arm__) || defined(__SANITIZE_ADDRESS__)
 	return false;
 #else
 	uint32 eax,ebx,edx,unused;
@@ -333,7 +333,7 @@ static bool CheckRDTSCTechnology(void)
 // Return the Processor's vendor identification string, or "Generic_x86" if it doesn't exist on this CPU
 const tchar* GetProcessorVendorId()
 {
-#if defined( _X360 ) || defined( _PS3 )
+#if defined( _PS3 )
 	return "PPC";
 #elif defined ( __arm__ )
 	return "ARM";
@@ -386,11 +386,6 @@ const tchar* GetProcessorArchName()
 // Hyper-Threading Technology is necessarily enabled.
 static bool HTSupported(void)
 {
-#if defined( _X360 )
-	// not entirtely sure about the semantic of HT support, it being an intel name
-	// are we asking about HW threads or HT?
-	return true;
-#else
 	const unsigned int HT_BIT		 = 0x10000000;  // EDX[28] - Bit 28 set indicates Hyper-Threading Technology is supported in hardware.
 	const unsigned int FAMILY_ID     = 0x0f00;      // EAX[11:8] - Bit 11 thru 8 contains family processor id
 	const unsigned int EXT_FAMILY_ID = 0x0f00000;	// EAX[23:20] - Bit 23 thru 20 contains extended family  processor id
@@ -412,15 +407,11 @@ static bool HTSupported(void)
 			return (reg_edx & HT_BIT) != 0;	// Genuine Intel Processor with Hyper-Threading Technology
 
 	return false;  // This is not a genuine Intel processor.
-#endif
 }
 
 // Returns the number of logical processors per physical processors.
 static uint8 LogicalProcessorsPerPackage(void)
 {
-#if defined( _X360 )
-	return 2;
-#else
 	// EBX[23:16] indicate number of logical processors per package
 	const unsigned NUM_LOGICAL_BITS = 0x00FF0000;
 
@@ -433,7 +424,6 @@ static uint8 LogicalProcessorsPerPackage(void)
 		return 1;
 
 	return (uint8) ((reg_ebx & NUM_LOGICAL_BITS) >> 16);
-#endif
 }
 
 #if defined(POSIX)
@@ -448,9 +438,6 @@ uint64 CalculateCPUFreq(); // from cpu_linux.cpp
 static int64 CalculateClockSpeed()
 {
 #if defined( _WIN32 )
-#if defined( _X360 )
-	return 3200000000LL;
-#else
 	LARGE_INTEGER waitTime, startCount, curCount;
 	CCycleCount start, end;
 
@@ -478,7 +465,6 @@ static int64 CalculateClockSpeed()
 		freq = 2000000000;
 	}
 	return freq;
-#endif
 #elif defined(PLATFORM_BSD)
 	return CalculateCPUFreq() * 1000000.0f;
 #elif defined(POSIX)
@@ -508,7 +494,7 @@ const CPUInformation* GetCPUInformation()
 	// Get the logical and physical processor counts:
 	pi.m_nLogicalProcessors = LogicalProcessorsPerPackage();
 
-#if defined(_WIN32) && !defined( _X360 )
+#if defined(_WIN32)
 	SYSTEM_INFO si;
 	ZeroMemory( &si, sizeof(si) );
 
@@ -524,9 +510,6 @@ const CPUInformation* GetCPUInformation()
 		pi.m_nPhysicalProcessors = 1;
 		pi.m_nLogicalProcessors  = 1;
 	}
-#elif defined( _X360 )
-	pi.m_nPhysicalProcessors = 3;
-	pi.m_nLogicalProcessors  = 6;
 #elif defined(_LINUX)
 	// TODO: poll /dev/cpuinfo when we have some benefits from multithreading
 	FILE *fpCpuInfo = fopen( "/proc/cpuinfo", "r" );

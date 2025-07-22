@@ -6,7 +6,7 @@
 // $Date:         $
 // $NoKeywords: $
 //===========================================================================//
-#if defined( WIN32 ) && !defined( _X360 )
+#if defined( WIN32 )
 #define _WIN32_WINNT 0x0502
 #include <windows.h>
 #endif

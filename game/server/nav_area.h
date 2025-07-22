@@ -40,12 +40,7 @@ private:
 	static int m_nBytesCurrent;
 };
 
-#if !defined(_X360)
 typedef CUtlVectorUltraConservativeAllocator CNavVectorAllocator;
-#else
-typedef CNavVectorNoEditAllocator CNavVectorAllocator;
-#endif
-
 
 //-------------------------------------------------------------------------------------------------------------------
 /**
@@ -740,11 +735,7 @@ private:
 	void ResetPotentiallyVisibleAreas();
 	static void ComputeVisToArea( CNavArea *&pOtherArea );
 
-#ifndef _X360
 	typedef CUtlVectorConservative<AreaBindInfo> CAreaBindInfoArray; // shaves 8 bytes off structure caused by need to support editing
-#else
-	typedef CUtlVector<AreaBindInfo> CAreaBindInfoArray; // Need to use this on 360 to support external allocation pattern
-#endif
 
 	AreaBindInfo m_inheritVisibilityFrom;						// if non-NULL, m_potentiallyVisibleAreas becomes a list of additions and deletions (NOT_VISIBLE) to the list of this area
 	CAreaBindInfoArray m_potentiallyVisibleAreas;				// list of areas potentially visible from inside this area (after PostLoad(), use area portion of union)

@@ -1123,15 +1123,3 @@ CON_COMMAND( toggle, "Toggles a convar on or off, or cycles through a set of val
 {
 	cv->CvarToggle( args );
 }
-
-
-//-----------------------------------------------------------------------------
-// Purpose: Send the cvars to VXConsole
-//-----------------------------------------------------------------------------
-#if defined( _X360 )
-CON_COMMAND( getcvars, "" )
-{
-	g_pCVar->PublishToVXConsole();
-}
-#endif
-
