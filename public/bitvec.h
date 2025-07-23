@@ -49,7 +49,6 @@ inline int FirstBitInWord( unsigned int elem, int offset )
 	unsigned long out;
 	_BitScanForward(&out, elem);
 	return out + offset;
-#endif
 
 #else
 	static unsigned firstBitLUT[256] = 

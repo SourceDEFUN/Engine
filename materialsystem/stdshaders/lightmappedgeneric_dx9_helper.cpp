@@ -540,7 +540,6 @@ void DrawLightmappedGeneric_DX9_Internal(CBaseVSShader *pShader, IMaterialVar** 
 				bool bReliefMapping = false; //( bumpmap_variant == 2 ) && ( ! bSeamlessMapping );
 				SET_STATIC_VERTEX_SHADER_COMBO( RELIEF_MAPPING, false );//bReliefMapping );
 				SET_STATIC_VERTEX_SHADER_COMBO( SEAMLESS, bSeamlessMapping );
-				SET_STATIC_VERTEX_SHADER_COMBO( FLASHLIGHT, hasFlashlight);
 				SET_STATIC_VERTEX_SHADER( lightmappedgeneric_vs20 );
 
 				if ( g_pHardwareConfig->SupportsPixelShaders_2_b() )

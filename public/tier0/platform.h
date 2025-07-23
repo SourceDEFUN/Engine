@@ -630,17 +630,16 @@ typedef void * HINSTANCE;
 	// GCC 3.4.1 has a bug in supporting forced inline of templated functions
 	// this macro lets us not force inlining in that case
 	#define  FORCEINLINE_TEMPLATE		__forceinline
-#endif 
 	#define  FORCEINLINE			__forceinline
 	#define  FORCEINLINE_TEMPLATE		__forceinline
-	#else
-		#define  STDCALL
+#else
+	#define  STDCALL
 	#define  FASTCALL
 	#ifdef _LINUX_DEBUGGABLE
 		#define  FORCEINLINE
 	#else
-			#define  FORCEINLINE inline __attribute__ ((always_inline))
-		#endif
+		#define  FORCEINLINE inline __attribute__ ((always_inline))
+	#endif
 	// GCC 3.4.1 has a bug in supporting forced inline of templated functions
 	// this macro lets us not force inlining in that case
 	#define FORCEINLINE_TEMPLATE	inline
@@ -916,8 +915,40 @@ inline T QWordSwapC( T dw )
 //-------------------------------------
 // Fast swaps
 //-------------------------------------
+#if defined( _MSC_VER ) && !defined( PLATFORM_WINDOWS_PC64 )
+
+	#define WordSwap  WordSwapAsm
+	#define DWordSwap DWordSwapAsm
+
+	#pragma warning(push)
+	#pragma warning (disable:4035) // no return value
+
+	template <typename T>
+	inline T WordSwapAsm( T w )
+	{
+	   __asm
+	   {
+		  mov ax, w
+		  xchg al, ah
+	   }
+	}
+
+	template <typename T>
+	inline T DWordSwapAsm( T dw )
+	{
+	   __asm
+	   {
+		  mov eax, dw
+		  bswap eax
+	   }
+	}
+
+	#pragma warning(pop)
+
+#else
 #define WordSwap  WordSwapC
 #define DWordSwap DWordSwapC
+#endif
 
 // No ASM implementation for this yet
 #define QWordSwap QWordSwapC

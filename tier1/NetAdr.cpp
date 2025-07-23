@@ -17,6 +17,10 @@
 #define WIN32_LEAN_AND_MEAN
 #include <winsock.h>
 typedef int socklen_t;
+#else
+#include <netinet/in.h> // ntohs()
+#include <netdb.h>		// gethostbyname()
+#include <sys/socket.h>	// getsockname()
 #endif
 
 // memdbgon must be the last include file in a .cpp file!!!

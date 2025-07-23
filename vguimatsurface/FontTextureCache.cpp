@@ -10,7 +10,7 @@
 #include <windows.h>
 #elif defined( OSX )
 #include <Carbon/Carbon.h>
-#else
+#elif !( defined( LINUX ) || defined(PLATFORM_BSD) )
 #error
 #endif
 #include "FontTextureCache.h"

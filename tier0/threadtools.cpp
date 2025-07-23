@@ -1734,6 +1734,8 @@ int64 ThreadInterlockedCompareExchange64( int64 volatile *pDest, int64 value, in
 }
 #endif
 
+// Secton TODO: conflict victim
+#ifndef LINUX
 bool ThreadInterlockedAssignIf64(volatile int64 *pDest, int64 value, int64 comperand ) 
 {
 	Assert( (size_t)pDest % 8 == 0 );
@@ -1757,6 +1759,7 @@ bool ThreadInterlockedAssignIf64(volatile int64 *pDest, int64 value, int64 compe
 	}
 #endif
 }
+#endif
 
 #ifdef _WIN64
 bool ThreadInterlockedAssignIf128( volatile int128 *pDest, const int128 &value, const int128 &comperand )
@@ -1778,7 +1781,7 @@ bool ThreadInterlockedAssignIf128( volatile int128 *pDest, const int128 &value, 
 }
 #endif
 
-#elif defined(GNUC)
+#if defined(GNUC)
 
 #ifdef OSX
 #include <libkern/OSAtomic.h>
@@ -1844,10 +1847,13 @@ int64 ThreadInterlockedCompareExchange64( int64 volatile *pDest, int64 value, in
 	return __sync_val_compare_and_swap( pDest, comperand, value  );
 }
 
+// Secton TODO: conflict happened when removing xbox support.
+#ifdef LINUX
 bool ThreadInterlockedAssignIf64( int64 volatile * pDest, int64 value, int64 comperand ) 
 {
 	return __sync_bool_compare_and_swap( pDest, comperand, value );
 }
+#endif
 
 
 #elif defined( _PS3 )
