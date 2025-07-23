@@ -43,11 +43,11 @@ extern IFileSystem *filesystem;
 #define tickcount USE_PLAYER_CURRENT_COMMAND_NUMBER__INSTEAD_OF_TICKCOUNT
 
 #if defined( HL2_DLL )
-ConVar xc_uncrouch_on_jump( "xc_uncrouch_on_jump", "1", FCVAR_ARCHIVE, "Uncrouch when jump occurs" );
+ConVar xc_uncrouch_on_jump( "xc_uncrouch_on_jump", "0", FCVAR_ARCHIVE, "Uncrouch when jump occurs" );
 #endif
 
 #if defined( HL2_DLL ) || defined( HL2_CLIENT_DLL )
-ConVar player_limit_jump_speed( "player_limit_jump_speed", "1", FCVAR_REPLICATED );
+ConVar player_limit_jump_speed( "player_limit_jump_speed", "0", FCVAR_REPLICATED );
 #endif
 
 // option_duck_method is a carrier convar. Its sole purpose is to serve an easy-to-flip
@@ -78,7 +78,7 @@ bool g_bMovementOptimizations = true;
 #define CHECK_LADDER_INTERVAL			0.2f
 #define CHECK_LADDER_TICK_INTERVAL		( (int)( CHECK_LADDER_INTERVAL / TICK_INTERVAL ) )
 
-#define	NUM_CROUCH_HINTS	3
+#define	NUM_CROUCH_HINTS	 3
 
 extern IGameMovement *g_pGameMovement;
 
@@ -773,7 +773,6 @@ Vector CGameMovement::GetPlayerViewOffset( bool ducked ) const
 //-----------------------------------------------------------------------------
 inline void CGameMovement::TracePlayerBBox( const Vector& start, const Vector& end, unsigned int fMask, int collisionGroup, trace_t& pm )
 {
-	VPROF( "CGameMovement::TracePlayerBBox" );
 
 	Ray_t ray;
 	ray.Init( start, end, GetPlayerMins(), GetPlayerMaxs() );
@@ -2417,11 +2416,12 @@ bool CGameMovement::CheckJumpButton( void )
 
 
 	// In the air now.
-    SetGroundEntity( NULL );
+	SetGroundEntity( NULL );
 	
 	player->PlayStepSound( (Vector &)mv->GetAbsOrigin(), player->m_pSurfaceData, 1.0, true );
 	
 	MoveHelper()->PlayerSetAnimation( PLAYER_JUMP );
+	player->ViewPunch(QAngle(-3,0,0));
 
 	float flGroundFactor = 1.0f;
 	if (player->m_pSurfaceData)
@@ -3641,7 +3641,6 @@ void TracePlayerBBoxForGround( const Vector& start, const Vector& end, const Vec
 							  const Vector& maxsSrc, IHandleEntity *player, unsigned int fMask,
 							  int collisionGroup, trace_t& pm )
 {
-	VPROF( "TracePlayerBBoxForGround" );
 
 	Ray_t ray;
 	Vector mins, maxs;
@@ -3710,7 +3709,6 @@ void TracePlayerBBoxForGround( const Vector& start, const Vector& end, const Vec
 //-----------------------------------------------------------------------------
 void CGameMovement::TryTouchGroundInQuadrants( const Vector& start, const Vector& end, unsigned int fMask, int collisionGroup, trace_t& pm )
 {
-	VPROF( "CGameMovement::TryTouchGroundInQuadrants" );
 
 	Vector mins, maxs;
 	Vector minsSrc = GetPlayerMins();
@@ -3968,16 +3966,13 @@ void CGameMovement::PlayerRoughLandingEffects( float fvol )
 {
 	if ( fvol > 0.0 )
 	{
-		//
-		// Play landing sound right away.
-		player->m_flStepSoundTime = 400;
+		player->m_flStepSoundTime = 400; // Play landing sound right away.
 
 		// Play step sound for current texture.
 		player->PlayStepSound( (Vector &)mv->GetAbsOrigin(), player->m_pSurfaceData, fvol, true );
 
-		//
-		// Knock the screen around a little bit, temporary effect.
-		//
+		// Knock the screen around a little bit.
+		player->m_Local.m_vecPunchAngle.Set(PITCH, player->m_Local.m_flFallVelocity * 0.13 );
 		player->m_Local.m_vecPunchAngle.Set( ROLL, player->m_Local.m_flFallVelocity * 0.013 );
 
 		if ( player->m_Local.m_vecPunchAngle[PITCH] > 8 )
@@ -4333,7 +4328,7 @@ bool CGameMovement::CanUnDuckJump( trace_t &trace )
 void CGameMovement::Duck( void )
 {
 	int buttonsChanged	= ( mv->m_nOldButtons ^ mv->m_nButtons );	// These buttons have changed this frame
-	int buttonsPressed	=  buttonsChanged & mv->m_nButtons;			// The changed ones still down are "pressed"
+	int buttonsPressed	=  buttonsChanged & mv->m_nButtons;		// The changed ones still down are "pressed"
 	int buttonsReleased	=  buttonsChanged & mv->m_nOldButtons;		// The changed ones which were previously down are "released"
 
 	// Check to see if we are in the air.
@@ -4364,23 +4359,13 @@ void CGameMovement::Duck( void )
 		// DUCK
 		if ( ( mv->m_nButtons & IN_DUCK ) || bDuckJump )
 		{
-// XBOX SERVER ONLY
-#if !defined(CLIENT_DLL)
-			if ( IsX360() && buttonsPressed & IN_DUCK )
-			{
-				// Hinting logic
-				if ( player->GetToggledDuckState() && player->m_nNumCrouches < NUM_CROUCH_HINTS )
-				{
-					UTIL_HudHintText( player, "#Valve_Hint_Crouch" );
-					player->m_nNumCrouches++;
-				}
-			}
-#endif
 			// Have the duck button pressed, but the player currently isn't in the duck position.
 			if ( ( buttonsPressed & IN_DUCK ) && !bInDuck && !bDuckJump && !bDuckJumpTime )
 			{
 				player->m_Local.m_flDucktime = GAMEMOVEMENT_DUCK_TIME;
 				player->m_Local.m_bDucking = true;
+
+				if (!bInAir) player->ViewPunch(QAngle(0,0,3));
 			}
 			
 			// The player is in duck transition and not duck-jumping.
@@ -4459,6 +4444,7 @@ void CGameMovement::Duck( void )
 				// We released the duck button, we aren't in "duck" and we are not in the air - start unduck transition.
 				if ( ( buttonsReleased & IN_DUCK ) )
 				{
+					if (!bInAir && CanUnduck()) player->ViewPunch(QAngle(0,0,-3));
 					if ( bInDuck && !bDuckJump )
 					{
 						player->m_Local.m_flDucktime = GAMEMOVEMENT_DUCK_TIME;
@@ -4547,8 +4533,6 @@ static ConVar sv_optimizedmovement( "sv_optimizedmovement", "1", FCVAR_REPLICATE
 //-----------------------------------------------------------------------------
 void CGameMovement::PlayerMove( void )
 {
-	VPROF( "CGameMovement::PlayerMove" );
-
 	CheckParameters();
 	
 	// clear output applied velocity
@@ -4904,7 +4888,6 @@ bool CGameMovement::GameHasLadders() const
 //-----------------------------------------------------------------------------
 void CGameMovement::TracePlayerBBox( const Vector& start, const Vector& end, unsigned int fMask, int collisionGroup, trace_t& pm )
 {
-	VPROF( "CGameMovement::TracePlayerBBox" );
 
 	Ray_t ray;
 	ray.Init( start, end, GetPlayerMins(), GetPlayerMaxs() );
@@ -4919,7 +4902,6 @@ void CGameMovement::TracePlayerBBox( const Vector& start, const Vector& end, uns
 //-----------------------------------------------------------------------------
 void  CGameMovement::TryTouchGround( const Vector& start, const Vector& end, const Vector& mins, const Vector& maxs, unsigned int fMask, int collisionGroup, trace_t& pm )
 {
-	VPROF( "CGameMovement::TryTouchGround" );
 
 	Ray_t ray;
 	ray.Init( start, end, mins, maxs );

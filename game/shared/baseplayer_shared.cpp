@@ -51,6 +51,8 @@
 #include "sixense/in_sixense.h"
 #endif
 
+#include "convar.h"
+
 // NVNT haptic utils
 #include "haptics/haptic_utils.h"
 // memdbgon must be the last include file in a .cpp file!!!
@@ -89,6 +91,7 @@
 
 #ifdef CLIENT_DLL
 ConVar mp_usehwmmodels( "mp_usehwmmodels", "0", NULL, "Enable the use of the hw morph models. (-1 = never, 1 = always, 0 = based upon GPU)" ); // -1 = never, 0 = if hasfastvertextextures, 1 = always
+ConVar cl_viewbob( "cl_viewbob", "0.02", FCVAR_ARCHIVE, "Viewbob multiplier: set to 0 if you wish to disable it." );
 #endif
 
 bool UseHWMorphModels()
@@ -1580,6 +1583,11 @@ void CBasePlayer::CalcViewModelView( const Vector& eyeOrigin, const QAngle& eyeA
 	}
 }
 
+#ifdef CLIENT_DLL
+float	p_verticalBob;
+#define HL2_BOB_UP 0.5f
+#define HL2_BOB_CYCLE_MAX 0.45f
+#endif
 void CBasePlayer::CalcPlayerView( Vector& eyeOrigin, QAngle& eyeAngles, float& fov )
 {
 #if defined( CLIENT_DLL )
@@ -1638,6 +1646,52 @@ void CBasePlayer::CalcPlayerView( Vector& eyeOrigin, QAngle& eyeAngles, float& f
 
 	// calc current FOV
 	fov = GetFOV();
+	#ifdef CLIENT_DLL
+	if (cl_viewbob.GetFloat() != 0.f && GetGroundEntity()) {
+		static	float bobtime;
+		static	float lastbobtime;
+		float	cycle;
+
+		//NOTENOTE: For now, let this cycle continue when in the air, because it snaps badly without it
+
+		if ( !gpGlobals->frametime )
+		{
+			return;
+		}
+
+		//Find the speed of the player
+		float speed = GetLocalVelocity().Length2D();
+
+		//FIXME: This maximum speed value must come from the server.
+		//		 MaxSpeed() is not sufficient for dealing with sprinting - jdw
+
+		speed = clamp( speed, -320, 320 );
+
+		float bob_offset = RemapVal( speed, 0, 320, 0.0f, 1.0f );
+		
+		bobtime += ( gpGlobals->curtime - lastbobtime ) * bob_offset;
+		lastbobtime = gpGlobals->curtime;
+
+		//Calculate the vertical bob
+		cycle = bobtime - (int)(bobtime/HL2_BOB_CYCLE_MAX)*HL2_BOB_CYCLE_MAX;
+		cycle /= HL2_BOB_CYCLE_MAX;
+
+		if ( cycle < HL2_BOB_UP )
+		{
+			cycle = M_PI * cycle / HL2_BOB_UP;
+		}
+		else
+		{
+			cycle = M_PI + M_PI*(cycle-HL2_BOB_UP)/(1.0 - HL2_BOB_UP);
+		}
+		
+		p_verticalBob = speed * cl_viewbob.GetFloat();
+		p_verticalBob = p_verticalBob*0.3 + p_verticalBob*0.7*sin(cycle);
+
+		p_verticalBob = clamp( p_verticalBob, -7.0f, 4.0f );
+		eyeOrigin[2] += p_verticalBob;
+	}
+#endif
 }
 
 //-----------------------------------------------------------------------------

@@ -228,6 +228,7 @@ void CBaseHLCombatWeapon::WeaponIdle( void )
 
 float	g_lateralBob;
 float	g_verticalBob;
+float	g_horizontalBob;
 
 #if defined( CLIENT_DLL ) && ( !defined( HL2MP ) && !defined( PORTAL ) )
 
@@ -298,10 +299,8 @@ float CBaseHLCombatWeapon::CalcViewmodelBob( void )
 	
 	g_verticalBob = speed*0.005f;
 	g_verticalBob = g_verticalBob*0.3 + g_verticalBob*0.7*sin(cycle);
-
 	g_verticalBob = clamp( g_verticalBob, -7.0f, 4.0f );
 
-	//Calculate the lateral bob
 	cycle = bobtime - (int)(bobtime/HL2_BOB_CYCLE_MAX*2)*HL2_BOB_CYCLE_MAX*2;
 	cycle /= HL2_BOB_CYCLE_MAX*2;
 
@@ -314,9 +313,9 @@ float CBaseHLCombatWeapon::CalcViewmodelBob( void )
 		cycle = M_PI + M_PI*(cycle-HL2_BOB_UP)/(1.0 - HL2_BOB_UP);
 	}
 
-	g_lateralBob = speed*0.005f;
-	g_lateralBob = g_lateralBob*0.3 + g_lateralBob*0.7*sin(cycle);
-	g_lateralBob = clamp( g_lateralBob, -7.0f, 4.0f );
+	g_horizontalBob = speed*0.005f;
+	g_horizontalBob = g_horizontalBob*0.3 + g_horizontalBob*0.7*sin(cycle);
+	g_horizontalBob = clamp( g_horizontalBob, -7.0f, 4.0f );
 	
 	//NOTENOTE: We don't use this return value in our case (need to restructure the calculation function setup!)
 	return 0.0f;
@@ -330,24 +329,31 @@ float CBaseHLCombatWeapon::CalcViewmodelBob( void )
 //-----------------------------------------------------------------------------
 void CBaseHLCombatWeapon::AddViewmodelBob( CBaseViewModel *viewmodel, Vector &origin, QAngle &angles )
 {
-	Vector	forward, right;
-	AngleVectors( angles, &forward, &right, NULL );
+	// Vector	forward, right;
+	// AngleVectors( angles, &forward, &right, NULL );
+	
+	CBasePlayer *player = ToBasePlayer( GetOwner() );
+	if (!player) {return;}
+	Vector speed = player->GetLocalVelocity();
 
-	CalcViewmodelBob();
+	if (player->GetGroundEntity()) {
+		CalcViewmodelBob();
+	}
 
 	// Apply bob, but scaled down to 40%
-	VectorMA( origin, g_verticalBob * 0.1f, forward, origin );
+	// VectorMA( origin, g_verticalBob * 0.1f, forward, origin );
 	
-	// Z bob a bit more
-	origin[2] += g_verticalBob * 0.1f;
+	origin[0] -= clamp(speed[0] / 100, -10, 10);
+	origin[1] -= clamp(speed[1] / 100 + g_horizontalBob / 2, -10, 10);
+	origin[2] -= clamp(speed[2] / 100 - g_verticalBob / 2, -10, 10);
 	
 	// bob the angles
-	angles[ ROLL ]	+= g_verticalBob * 0.5f;
-	angles[ PITCH ]	-= g_verticalBob * 0.4f;
+	// angles[ ROLL ] += g_verticalBob * 0.5f;
+	// angles[ PITCH ] -= g_verticalBob * 0.4f;
 
-	angles[ YAW ]	-= g_lateralBob  * 0.3f;
+	// angles[ YAW ]	 -= g_lateralBob  * 0.3f;
 
-	VectorMA( origin, g_lateralBob * 0.8f, right, origin );
+	// VectorMA( origin, g_lateralBob * 0.8f, right, origin );
 }
 
 //-----------------------------------------------------------------------------
