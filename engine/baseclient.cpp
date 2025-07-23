@@ -441,58 +441,55 @@ void CBaseClient::SetName(const char * playerName)
 
 	// Don't care about duplicate names on the xbox. It can only occur when a player
 	// is reconnecting after crashing, and we don't want to ever show the (X) then.
-	if ( !IsX360() )
+	// Check to see if another user by the same name exists
+	while ( true )
 	{
-		// Check to see if another user by the same name exists
-		while ( true )
+		for ( i = 0; i < m_Server->GetClientCount(); i++ )
 		{
-			for ( i = 0; i < m_Server->GetClientCount(); i++ )
-			{
-				IClient *client = m_Server->GetClient( i );
+			IClient *client = m_Server->GetClient( i );
 
-				if( !client->IsConnected() || client == this )
-					continue;
-				
-				// If it's 2 bots they're allowed to have matching names, otherwise there's a conflict
-				if( !Q_stricmp( client->GetClientName(), val ) && !( IsFakeClient() && client->IsFakeClient() ) )
-				{
-					CBaseClient *pClient = dynamic_cast< CBaseClient* >( client );
-					if ( IsFakeClient() && pClient )
-					{
-						// We're a bot so we get to keep the name... change the other guy
-						pClient->m_Name[ 0 ] = '\0';
-						pClient->SetName( val );
-					}
-					else
-					{
-						break;
-					}
-				}
-			}
-
-			if (i >= m_Server->GetClientCount())
-				break;
-
-			p = val;
-
-			if (val[0] == '(')
-			{
-				if (val[2] == ')')
-				{
-					p = val + 3;
-				}
-				else if (val[3] == ')')	//assumes max players is < 100
-				{
-					p = val + 4;
-				}
-			}
-
-			Q_snprintf(newname, sizeof(newname), "(%d)%-.*s", dupc++, MAX_PLAYER_NAME_LENGTH - 4, p );
-			Q_strncpy(m_Name, newname, sizeof(m_Name));
+			if( !client->IsConnected() || client == this )
+				continue;
 			
-			val = m_Name;		
-		}	
-	}
+			// If it's 2 bots they're allowed to have matching names, otherwise there's a conflict
+			if( !Q_stricmp( client->GetClientName(), val ) && !( IsFakeClient() && client->IsFakeClient() ) )
+			{
+				CBaseClient *pClient = dynamic_cast< CBaseClient* >( client );
+				if ( IsFakeClient() && pClient )
+				{
+					// We're a bot so we get to keep the name... change the other guy
+					pClient->m_Name[ 0 ] = '\0';
+					pClient->SetName( val );
+				}
+				else
+				{
+					break;
+				}
+			}
+		}
+
+		if (i >= m_Server->GetClientCount())
+			break;
+
+		p = val;
+
+		if (val[0] == '(')
+		{
+			if (val[2] == ')')
+			{
+				p = val + 3;
+			}
+			else if (val[3] == ')')	//assumes max players is < 100
+			{
+				p = val + 4;
+			}
+		}
+
+		Q_snprintf(newname, sizeof(newname), "(%d)%-.*s", dupc++, MAX_PLAYER_NAME_LENGTH - 4, p );
+		Q_strncpy(m_Name, newname, sizeof(m_Name));
+		
+		val = m_Name;		
+		}
 
 	m_ConVars->SetString( "name", m_Name );
 	m_bConVarsChanged = true;

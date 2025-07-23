@@ -487,16 +487,13 @@ int NET_OpenSocket ( const char *net_interface, int& port, int protocol )
 	
 	if ( protocol == IPPROTO_TCP )
 	{
-		if ( !IsX360() ) // SO_KEEPALIVE unsupported on the 360
+		opt = 1; // set TCP options: keep TCP connection alive
+		VCR_NONPLAYBACKFN( setsockopt(newsocket, SOL_SOCKET, SO_KEEPALIVE, (char *)&opt, sizeof(opt)), ret, "setsockopt" );
+		if (ret == -1)
 		{
-			opt = 1; // set TCP options: keep TCP connection alive
-			VCR_NONPLAYBACKFN( setsockopt(newsocket, SOL_SOCKET, SO_KEEPALIVE, (char *)&opt, sizeof(opt)), ret, "setsockopt" );
-			if (ret == -1)
-			{
-				NET_GetLastError();		
-				Msg ("WARNING: NET_OpenSocket: setsockopt SO_KEEPALIVE: %s\n", NET_ErrorString(net_error));
-				return 0;
-			}
+			NET_GetLastError();		
+			Msg ("WARNING: NET_OpenSocket: setsockopt SO_KEEPALIVE: %s\n", NET_ErrorString(net_error));
+			return 0;
 		}
 
 		linger optlinger;	// set TCP options: Does not block close waiting for unsent data to be sent
@@ -2618,13 +2615,6 @@ void NET_OpenSockets (void)
 	{
 		OpenSocketInternal( NS_HLTV, hltvport.GetInt(), PORT_HLTV, "hltv", nProtocol, false );
 	}
-
-	if ( IsX360() )
-	{
-		OpenSocketInternal( NS_MATCHMAKING, matchmakingport.GetInt(), PORT_MATCHMAKING, "matchmaking", nProtocol, false );
-		OpenSocketInternal( NS_SYSTEMLINK, systemlinkport.GetInt(), PORT_SYSTEMLINK, "systemlink", IPPROTO_UDP, false );
-	}
-
 #ifdef LINUX
 	// On Linux, if you bind to a specific address then you will NOT receive broadcast messages.
 	// This means that if you do a +ip X.X.X.X, your game will not show up on the LAN server browser page.

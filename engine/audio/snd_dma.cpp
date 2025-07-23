@@ -394,13 +394,6 @@ FileNameHandle_t CSfxTable::GetFileNameHandle()
 
 const char *CSfxTable::GetFileName()
 {
-	if ( IsX360() && m_bUseErrorFilename )
-	{
-		// Redirecting error sounds to a valid empty wave, prevents a bad loading retry pattern during gameplay
-		// which may event sounds skipped by preload, because they don't exist.
-		return "common/null.wav";
-	}
-
 	const char *pName = getname();
 	return pName ? PSkipSoundChars( pName ) : NULL;	
 }
@@ -603,20 +596,6 @@ void S_SoundInfo_f(void)
     Msg( "  Bits/Sample:  %d\n", g_AudioDevice->DeviceSampleBits() );
     Msg( "  Rate:         %d\n", g_AudioDevice->DeviceDmaSpeed() );
 	Msg( "total_channels: %d\n", total_channels);
-
-	if ( IsX360() )
-	{
-		// dump a glimpse of the mixing state
-		CChannelList list;
-		g_ActiveChannels.GetActiveChannels( list );
-
-		Msg( "\nActive Channels: (%d)\n", list.Count() );
-		for ( int i = 0; i < list.Count(); i++ )
-		{
-			channel_t *pChannel = list.GetChannel(i);
-			Msg( "%s (Mixer: 0x%p)\n", pChannel->sfx->GetFileName(), pChannel->pMixer );
-		}
-	}
 }
 
 
@@ -714,11 +693,6 @@ void S_Init( void )
 
 	AllocDsps( true );
 
-	if ( IsX360() )
-	{
-		g_pQueuedLoader->InstallLoader( RESOURCEPRELOAD_SOUND, &s_ResourcePreloadSound );
-	}
-
 	DevMsg( "Sound Initialization: Finish, Sampling Rate: %i\n", g_AudioDevice->DeviceDmaSpeed() );
 }
 
@@ -808,24 +782,6 @@ CSfxTable *S_FindName( const char *szName, int *pfInCache )
 	}
 
 	pName = szName;
-	if ( IsX360() )
-	{
-		Q_strncpy( szBuff, pName, sizeof( szBuff ) );
-		int len = Q_strlen( szBuff )-4;
-		if ( len > 0 && !Q_strnicmp( szBuff+len, ".mp3", 4 ) )
-		{
-			// convert unsupported .mp3 to .wav
-			Q_strcpy( szBuff+len, ".wav" );
-		}
-		pName = szBuff;
-
-		if ( pName[0] == CHAR_STREAM )
-		{
-			// streaming (or not) is hardcoded to alternate criteria
-			// prevent the same sound from creating disparate instances
-			pName++;
-		}
-	}
 
 	// see if already loaded
 	FileNameHandle_t fnHandle = g_pFileSystem->FindOrAddFileName( pName );
@@ -877,56 +833,6 @@ CAudioSource *S_LoadSound( CSfxTable *pSfx, channel_t *ch )
 	VPROF("S_LoadSound");
 	if ( !pSfx->pSource )
 	{
-		if ( IsX360() )
-		{
-			if ( SND_IsInGame() && !g_pQueuedLoader->IsMapLoading() )
-			{
-				// sound should be present (due to reslists), but NOT allowing a load hitch during gameplay 
-				// loading a sound during gameplay is a bad experience, causes a very expensive sync i/o to fetch the header
-				// and in the case of a memory wave, the actual audio data
-				bool bFound = false;
-				if ( !pSfx->m_bIsLateLoad )
-				{
-					if ( pSfx->getname() != PSkipSoundChars( pSfx->getname() ) )
-					{
-						// the sound might already exist as an undecorated audio source
-						FileNameHandle_t fnHandle = g_pFileSystem->FindOrAddFileName( pSfx->GetFileName() );
-						int i = s_Sounds.Find( fnHandle );
-						if ( i != s_Sounds.InvalidIndex() )
-						{
-							CSfxTable *pOtherSfx = s_Sounds[i].pSfx;
-							Assert( pOtherSfx );
-							CAudioSource *pOtherSource = pOtherSfx->pSource;
-							if ( pOtherSource && pOtherSource->IsCached() )
-							{
-								// Can safely let the "load" continue because the headers are expected to be in the preload
-								// that are now persisted and the wave data cache will find an existing audio buffer match,
-								// so no sync i/o should occur from either.
-								bFound = true;
-							}
-						}
-					}
-
-					if ( !bFound )
-					{
-						// warn once
-						DevWarning( "S_LoadSound: Late load '%s', skipping.\n", pSfx->getname() ); 
-						pSfx->m_bIsLateLoad = true;
-					}
-				}
-
-				if ( !bFound )
-				{
-					return NULL;
-				}
-			}
-			else if ( pSfx->m_bIsLateLoad )
-			{
-				// outside of gameplay, let the load happen
-				pSfx->m_bIsLateLoad = false;
-			}
-		}
-
 		double st = Plat_FloatTime();
 
 		bool bStream = false;
@@ -939,34 +845,6 @@ CAudioSource *S_LoadSound( CSfxTable *pSfx, channel_t *ch )
 			bUserVox = TestSoundChar( pSfx->getname(), CHAR_USERVOX );
 		}
 
-		// override streaming
-		if ( IsX360() )
-		{
-			const char *s_CriticalSounds[] = 
-			{
-				"common",
-				"items",
-				"physics",
-				"player",
-				"ui",
-				"weapons",
-			};
-
-			// stream everything but critical sounds
-			bStream = true;
-			const char *pFileName = pSfx->GetFileName();
-			for ( int i = 0; i<ARRAYSIZE( s_CriticalSounds ); i++ )
-			{
-				size_t len = strlen( s_CriticalSounds[i] );
-				if ( !Q_strnicmp( pFileName, s_CriticalSounds[i], len ) && ( pFileName[len] == '\\' || pFileName[len] == '/' ) )
-				{
-					// never stream these, regardless of sound chars
-					bStream = false;
-					break;
-				}
-			}
-		}
-
 		if ( bStream )
 		{
 			// setup as a streaming resource
@@ -976,15 +854,7 @@ CAudioSource *S_LoadSound( CSfxTable *pSfx, channel_t *ch )
 		{
 			if ( bUserVox )
 			{
-				if ( !IsX360() )
-				{
-					pSfx->pSource = Voice_SetupAudioSource( ch->soundsource, ch->entchannel );
-				}
-				else
-				{
-					// not supporting
-					Assert( 0 );
-				}
+				pSfx->pSource = Voice_SetupAudioSource( ch->soundsource, ch->entchannel );
 			}
 			else
 			{
@@ -1074,13 +944,6 @@ void S_InternalReloadSound( CSfxTable *sfx )
 //-----------------------------------------------------------------------------
 void S_ReloadSound( const char *name )
 {
-	if ( IsX360() )
-	{
-		// not supporting
-		Assert( 0 );
-		return;
-	}
-
 	if ( !g_AudioDevice )
 		return;
 
@@ -5242,12 +5105,6 @@ int S_StartDynamicSound( StartSoundParams_t& params )
 	target_chan->flags.m_bIgnorePhonemes = ( params.flags & SND_IGNORE_PHONEMES ) != 0;
 	SND_InitMouth(target_chan);
 
-	if ( IsX360() && params.delay < 0 )
-	{
-		params.delay = 0;
-		target_chan->flags.delayed_start = true;
-	}
-
 	// Pre-startup delay.  Compute # of samples over which to mix in zeros from data source before
 	//  actually reading first set of samples
 	if ( params.delay != 0.0f )
@@ -5531,12 +5388,6 @@ int S_StartStaticSound( StartSoundParams_t& params )
 	ch->flags.m_bIgnorePhonemes = ( params.flags & SND_IGNORE_PHONEMES ) != 0;
 	SND_InitMouth( ch );
 
-	if ( IsX360() && params.delay < 0 )
-	{
-		// X360TEMP: Can't support yet, but going to.
-		params.delay = 0;
-	}
-
 	// Pre-startup delay.  Compute # of samples over which to mix in zeros from data source before
 	// actually reading first set of samples
 	if ( params.delay != 0.0f )
@@ -5649,14 +5500,6 @@ int S_StartSound( StartSoundParams_t& params )
 		return 0;
 	}
 #endif // STAGING_ONLY
-
-	if ( IsX360() && params.delay < 0 && !params.initialStreamPosition && params.pSfx )
-	{
-		// calculate an initial stream position from the expected sample position
-		float rate = params.pSfx->pSource->SampleRate();
-		int samplePosition = (int)( -params.delay * rate * params.pitch * 0.01f );
-		params.initialStreamPosition = params.pSfx->pSource->SampleToStreamPosition( samplePosition );
-	}
 
 	if ( params.staticsound )
 	{
@@ -6580,10 +6423,6 @@ void S_Update_( float mixAheadTime )
 		{
 			g_bMixThreadExit = false;
 			g_hMixThread = ThreadExecuteSolo( "SndMix", S_Update_Thread );
-			if ( IsX360() )
-			{
-				ThreadSetAffinity( g_hMixThread, XBOX_PROCESSOR_5 );
-			}
 		}
 	}
 }

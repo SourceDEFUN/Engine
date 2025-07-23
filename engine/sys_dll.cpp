@@ -598,62 +598,55 @@ void Sys_InitMemory( void )
 	}
 #endif // (_MSC_VER > 1200)
 
-	if ( !IsX360() )
+	if ( host_parms.memsize == 0 )
 	{
-		if ( host_parms.memsize == 0 )
-		{
-			MEMORYSTATUS lpBuffer;
-			// Get OS Memory status
-			lpBuffer.dwLength = sizeof(MEMORYSTATUS);
-			GlobalMemoryStatus( &lpBuffer );
+		MEMORYSTATUS lpBuffer;
+		// Get OS Memory status
+		lpBuffer.dwLength = sizeof(MEMORYSTATUS);
+		GlobalMemoryStatus( &lpBuffer );
 
-			if ( lpBuffer.dwTotalPhys <= 0 )
-			{
-				host_parms.memsize = MAXIMUM_WIN_MEMORY;
-			}
-			else
-			{
-				host_parms.memsize = lpBuffer.dwTotalPhys;
-			}	
-		}
-		if ( host_parms.memsize < ONE_HUNDRED_TWENTY_EIGHT_MB )
+		if ( lpBuffer.dwTotalPhys <= 0 )
 		{
-			Sys_Error( "Available memory less than 128MB!!! %i\n", host_parms.memsize );
-		}
-
-		// take one quarter the physical memory
-		if ( host_parms.memsize <= 512*1024*1024)
-		{
-			host_parms.memsize >>= 2;
-			// Apply cap of 64MB for 512MB systems
-			// this keeps the code the same as HL2 gold
-			// but allows us to use more memory on 1GB+ systems
-			if (host_parms.memsize > MAXIMUM_DEDICATED_MEMORY)
-			{
-				host_parms.memsize = MAXIMUM_DEDICATED_MEMORY;
-			}
+			host_parms.memsize = MAXIMUM_WIN_MEMORY;
 		}
 		else
 		{
-			// just take one quarter, no cap
-			host_parms.memsize >>= 2;
-		}
+			host_parms.memsize = lpBuffer.dwTotalPhys;
+		}	
+	}
+	if ( host_parms.memsize < ONE_HUNDRED_TWENTY_EIGHT_MB )
+	{
+		Sys_Error( "Available memory less than 128MB!!! %i\n", host_parms.memsize );
+	}
 
-		// At least MINIMUM_WIN_MEMORY mb, even if we have to swap a lot.
-		if (host_parms.memsize < MINIMUM_WIN_MEMORY)
+	// take one quarter the physical memory
+	if ( host_parms.memsize <= 512*1024*1024)
+	{
+		host_parms.memsize >>= 2;
+		// Apply cap of 64MB for 512MB systems
+		// this keeps the code the same as HL2 gold
+		// but allows us to use more memory on 1GB+ systems
+		if (host_parms.memsize > MAXIMUM_DEDICATED_MEMORY)
 		{
-			host_parms.memsize = MINIMUM_WIN_MEMORY;
-		}
-
-		// Apply cap
-		if (host_parms.memsize > MAXIMUM_WIN_MEMORY)
-		{
-			host_parms.memsize = MAXIMUM_WIN_MEMORY;
+			host_parms.memsize = MAXIMUM_DEDICATED_MEMORY;
 		}
 	}
 	else
 	{
-		host_parms.memsize = 128*1024*1024;
+		// just take one quarter, no cap
+		host_parms.memsize >>= 2;
+	}
+
+	// At least MINIMUM_WIN_MEMORY mb, even if we have to swap a lot.
+	if (host_parms.memsize < MINIMUM_WIN_MEMORY)
+	{
+		host_parms.memsize = MINIMUM_WIN_MEMORY;
+	}
+
+	// Apply cap
+	if (host_parms.memsize > MAXIMUM_WIN_MEMORY)
+	{
+		host_parms.memsize = MAXIMUM_WIN_MEMORY;
 	}
 #elif defined(POSIX)
 	uint64_t memsize = ONE_HUNDRED_TWENTY_EIGHT_MB;
@@ -1475,9 +1468,6 @@ void Sys_SetRegKeyValue( const char *pszSubKey, const char *pszElement,	const ch
 void Sys_CreateFileAssociations( int count, FileAssociationInfo *list )
 {
 #if defined(_WIN32)
-	if ( IsX360() )
-		return;
-
 	char appname[ 512 ];
 
 	GetModuleFileName( 0, appname, sizeof( appname ) );

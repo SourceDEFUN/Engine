@@ -162,39 +162,8 @@ void CAsyncWaveData::DestroyResource()
 		}
 	}
 
-	if ( IsX360() )
-	{
-		if ( m_hAsyncControl )
-		{
-			if ( !m_bLoaded && !m_bMissing )
-			{
-				// force an abort
-				int errStatus = g_pFileSystem->AsyncAbort( m_hAsyncControl );
-				if ( errStatus != FSASYNC_ERR_UNKNOWNID )
-				{
-					// must wait for abort to finish before deallocating data
-					g_pFileSystem->AsyncFinish( m_hAsyncControl, true );
-				}
-			}
-			g_pFileSystem->AsyncRelease( m_hAsyncControl );
-			m_hAsyncControl = NULL;
-		}
-		if ( m_hBuffer != INVALID_BUFFER_HANDLE )
-		{
-			// hint the manager that this tracked buffer is invalid
-			wavedatacache->MarkBufferDiscarded( m_hBuffer );
-		}
-	}
-
 	// delete buffers
-	if ( IsPC() || !IsX360() )
-	{
-		g_pFileSystem->FreeOptimalReadBuffer( m_pAlloc );
-	}
-	else
-	{
-		delete [] m_pAlloc;
-	}
+	g_pFileSystem->FreeOptimalReadBuffer( m_pAlloc );
 
 	delete this;
 }
@@ -240,14 +209,6 @@ unsigned int CAsyncWaveData::Size()
 	{
 		size += m_nDataSize;
 	}
-
-	if ( IsX360() )
-	{
-		// the data size can shrink during streaming near end of file
-		// need the real contant size of this object's allocations
-		size += m_nBufferBytes;
-	}
-
 	return size;
 }
 
@@ -262,13 +223,6 @@ CAsyncWaveData *CAsyncWaveData::CreateResource( const asyncwaveparams_t &params 
 	Assert( pData );
 	if ( pData )
 	{
-		if ( IsX360() )
-		{
-			// create buffer now for re-use during streaming process
-			pData->m_nBufferBytes = AlignValue( params.datasize, params.alignment );
-			pData->m_pAlloc = new byte[pData->m_nBufferBytes];
-			pData->m_pvData = pData->m_pAlloc;
-		}
 		pData->StartAsyncLoading( params );
 	}
 
@@ -288,12 +242,6 @@ unsigned int CAsyncWaveData::EstimatedSize( const asyncwaveparams_t &params )
 	{
 		size += params.datasize;
 	}
-	if ( IsX360() )
-	{
-		// the expected size of this object's allocations
-		size += AlignValue( params.datasize, params.alignment );
-	}
-
 	return size;
 }
 
@@ -368,31 +316,6 @@ void CAsyncWaveData::OnAsyncCompleted( const FileAsyncRequest_t *asyncFilePtr, i
 			// Because this api gets called from the other thread, don't spew warning here as it can
 			//  cause a crash in searching CUtlSymbolTables since they use a global var for a LessFunc context!!!
 			m_bMissing = true;
-		}
-	}
-
-	if ( IsX360() )
-	{
-		m_arrival = (float)Plat_FloatTime();
-
-		// possibly reading more than intended due to alignment restriction
-		m_nReadSize = numReadBytes;
-		if ( m_nReadSize > m_nDataSize )
-		{
-			// clamp to expected, extra data is unreliable
-			m_nReadSize = m_nDataSize;
-		}
-
-		if ( err != FSASYNC_OK )
-		{
-			// track as any error
-			m_bMissing = true;
-		}
-
-		if ( err != FSASYNC_ERR_FILEOPEN )
-		{
-			// some data got loaded
-			m_bLoaded = true;
 		}
 	}
 }
@@ -554,7 +477,7 @@ void CAsyncWaveData::SetAsyncPriority( int priority )
 //-----------------------------------------------------------------------------
 void CAsyncWaveData::StartAsyncLoading( const asyncwaveparams_t& params )
 {
-	Assert( IsX360() || ( IsPC() && !m_bLoaded ) );
+	Assert( IsPC() && !m_bLoaded );
 
 	// expected to be relative to the sound\ dir
 	m_hFileNameHandle = params.hFilename;
@@ -570,34 +493,22 @@ void CAsyncWaveData::StartAsyncLoading( const asyncwaveparams_t& params )
 		nPriority = 0;
 	}
 
-	if ( !IsX360() )
+	m_async.pData = NULL;
+	if ( SndAlignReads() )
 	{
-		m_async.pData = NULL;
-		if ( SndAlignReads() )
-		{
-			m_async.nOffset = 0;
-			m_async.nBytes = params.seekpos + params.datasize;
-		}
-		else
-		{
-			m_async.nOffset = params.seekpos;
-			m_async.nBytes = params.datasize;
-		}
+		m_async.nOffset = 0;
+		m_async.nBytes = params.seekpos + params.datasize;
 	}
 	else
 	{
-		Assert( params.datasize > 0 );
-
-		// using explicit allocated buffer on xbox
-		m_async.pData = m_pvData;
 		m_async.nOffset = params.seekpos;
-		m_async.nBytes = AlignValue( params.datasize, params.alignment ); 
+		m_async.nBytes = params.datasize;
 	}
 
 	m_async.pfnCallback	= AsyncCallback;	// optional completion callback
 	m_async.pContext = (void *)this;		// caller's unique context
 	m_async.priority = nPriority;			// inter list priority, 0=lowest
-	m_async.flags = IsX360() ? 0 : FSASYNC_FLAGS_ALLOCNOFREE;
+	m_async.flags = FSASYNC_FLAGS_ALLOCNOFREE;
 	m_async.pszPathID = "GAME";
 
 	m_bLoaded = false;
@@ -612,37 +523,6 @@ void CAsyncWaveData::StartAsyncLoading( const asyncwaveparams_t& params )
 	m_async.pszFilename	= szFilename;
 
 	char szFullName[MAX_PATH];
-	if ( IsX360() && ( g_pFileSystem->GetDVDMode() == DVDMODE_STRICT ) )
-	{
-		// all audio is expected be in zips
-		// resolve to absolute name now, where path can be filtered to just the zips (fast find, no real i/o)
-		// otherwise the dvd will do a costly seek for each zip miss due to search path fall through
-		PathTypeQuery_t pathType;
-		if ( !g_pFileSystem->RelativePathToFullPath( m_async.pszFilename, m_async.pszPathID, szFullName, sizeof( szFullName ), FILTER_CULLNONPACK, &pathType ) )
-		{
-			// not found, do callback now to handle error
-			m_async.pfnCallback( m_async, 0, FSASYNC_ERR_FILEOPEN );
-			return;
-		}
-		m_async.pszFilename	= szFullName;
-	}
-
-	if ( IsX360() && params.bCanBeQueued )
-	{
-		// queued loader takes over
-		LoaderJob_t loaderJob;
-		loaderJob.m_pFilename = m_async.pszFilename;
-		loaderJob.m_pPathID = m_async.pszPathID;
-		loaderJob.m_pCallback = QueuedLoaderCallback;
-		loaderJob.m_pContext = (void *)this;
-		loaderJob.m_Priority = LOADERPRIORITY_DURINGPRELOAD;
-		loaderJob.m_pTargetData = m_async.pData;
-		loaderJob.m_nBytesToRead = m_async.nBytes;
-		loaderJob.m_nStartOffset = m_async.nOffset;
-		g_pQueuedLoader->AddJob( &loaderJob );
-		return;
-	}
-
 	MEM_ALLOC_CREDIT();
 	
 	// Commence async I/O
@@ -800,24 +680,9 @@ bool CAsyncWavDataCache::Init( unsigned int memSize )
 	if ( m_bInitialized )
 		return true;
 	
-	if ( IsX360() )
-	{			
-		const char *pGame = engineClient->GetGameDirectory();
-		if ( !Q_stricmp( Q_UnqualifiedFileName( pGame ), "tf" ) )
-		{
-			memSize = TF_XBOX_WAV_MEMORY_CACHE;
-		}
-		else
-		{
-			memSize = DEFAULT_XBOX_WAV_MEMORY_CACHE;
-		}
-	}
-	else
+	if ( memSize < DEFAULT_WAV_MEMORY_CACHE )
 	{
-		if ( memSize < DEFAULT_WAV_MEMORY_CACHE )
-		{
-			memSize = DEFAULT_WAV_MEMORY_CACHE;
-		}
+		memSize = DEFAULT_WAV_MEMORY_CACHE;
 	}
 
 #if FORCE_SMALL_MEMORY_CACHE_SIZE
@@ -980,7 +845,7 @@ StreamHandle_t CAsyncWavDataCache::OpenStreamedLoad( char const *pFileName, int 
 	streamedEntry.m_BufferSize = bufferSize;
 	streamedEntry.m_numBuffers = numBuffers;
 	streamedEntry.m_bSinglePlay = ( flags & STREAMED_SINGLEPLAY ) != 0;
-	streamedEntry.m_SectorSize = ( IsX360() && ( flags & STREAMED_FROMDVD ) ) ? XBOX_DVD_SECTORSIZE : 1;
+	streamedEntry.m_SectorSize = 1;
 
 	// single play streams expect to uniquely own and thus recycle their buffers though the data
 	// single play streams are guaranteed that their buffers are private and cannot be shared
@@ -1712,47 +1577,6 @@ void CAsyncWavDataCache::SpewMemoryUsage( int level )
 			Msg( "CAsyncWavDataCache:  %i .wavs total %s, %.2f %% of capacity\n", m_CacheHandles.Count(), Q_pretifymem( bytesUsed, 2 ), percent );
 		}
 	}
-	
-	if ( IsX360() )
-	{
-		CAsyncWaveData	*pData;
-		BufferEntry_t	*pBuffer;
-		BufferHandle_t	h;
-		float			percent;
-		int				lockCount;
-		
-		if ( bytesTotal <= 0 )
-		{
-			// unbounded, indeterminate
-			percent = 0;
-			bytesTotal = 0;
-		}
-		else
-		{
-			percent = 100.0f*(float)bytesUsed/(float)bytesTotal;
-		}
-
-		if ( level >= 1 )
-		{
-			// detail buffers
-			ConMsg( "Streaming Buffer List:\n" );
-			for ( h = m_BufferList.FirstInorder(); h != m_BufferList.InvalidIndex(); h = m_BufferList.NextInorder( h ) )
-			{
-				pBuffer = &m_BufferList[h];
-				pData = CacheGetNoTouch( pBuffer->m_hWaveData );
-				lockCount = GetCacheSection()->GetLockCount( pBuffer->m_hWaveData );
-
-				CacheLockMutex();
-				if ( pData )
-				{
-					ConMsg( "Start:%7d Length:%7d Lock:%3d %s\n", pData->m_async.nOffset, pData->m_nDataSize, lockCount, pData->GetFileName() );
-				}
-				CacheUnlockMutex();
-			}
-		}
-
-		ConMsg( "CAsyncWavDataCache: %.2f MB used of %.2f MB, %.2f%% of capacity", (float)bytesUsed/(1024.0f*1024.0f), (float)bytesTotal/(1024.0f*1024.0f), percent );
-	}
 }
 
 //-----------------------------------------------------------------------------
@@ -1802,12 +1626,6 @@ CON_COMMAND( snd_async_showmem, "Show async memory stats" )
 //-----------------------------------------------------------------------------
 void PrefetchDataStream( const char *pFileName, int dataOffset, int dataSize )
 {
-	if ( IsX360() )
-	{
-		// Xbox streaming buffer implementation does not support this "hinting"
-		return;
-	}
-
 	wavedatacache->PrefetchCache( pFileName, dataSize, dataOffset );
 }
 
@@ -1929,98 +1747,6 @@ CWaveDataStreamAsync::CWaveDataStreamAsync
 
 		m_AudioCacheHandle.Get( CAudioSource::AUDIO_SOURCE_WAV, m_pSfx->IsPrecachedSound(), m_pSfx, &m_nCachedDataSize );
 	}
-	
-	if ( IsX360() )
-	{
-		// size of a sample
-		m_sampleSize = source.SampleSize();
-		// size in samples (not bytes) of the wave itself
-		m_waveSize = fileSize / m_sampleSize;
-
-		streamFlags_t flags = STREAMED_FROMDVD;
-
-		if ( !Q_strnicmp( pFileName, "music", 5 ) && ( pFileName[5] == '\\' || pFileName[5] == '/') )
-		{
-			// music discards and cycles its buffers
-			flags |= STREAMED_SINGLEPLAY;
-		}
-		else if ( !Q_strnicmp( pFileName, "vo", 2 ) && ( pFileName[2] == '\\' || pFileName[2] == '/' ) && !source.IsSentenceWord() )
-		{
-			// vo discards and cycles its buffers, except for sentence sources, which do recur
-			flags |= STREAMED_SINGLEPLAY;
-		}
-
-		int bufferSize;
-		if ( source.Format() == WAVE_FORMAT_XMA )
-		{
-			// each xma block has its own compression rate
-			// the buffer must be large enough to cover worst case delivery i/o latency
-			// the xma mixer expects quantum xma blocks
-			COMPILE_TIME_ASSERT( ( STREAM_BUFFER_DATASIZE % XMA_BLOCK_SIZE ) == 0 );
-			bufferSize = STREAM_BUFFER_DATASIZE;
-		}
-		else
-		{
-			// calculate a worst case buffer size based on rate
-			bufferSize = STREAM_BUFFER_TIME*source.SampleRate()*m_sampleSize;
-			if ( source.Format() == WAVE_FORMAT_ADPCM )
-			{
-				// consider adpcm as 4 bit samples
-				bufferSize /= 2;
-			}
-
-			if ( source.IsLooped() )
-			{
-				// lighten the streaming load for looping samples
-				// doubling the buffer halves the buffer search/load requests
-				bufferSize *= 2;
-			}
-		}
-
-		// streaming buffers obey alignments
-		bufferSize = AlignValue( bufferSize, XBOX_DVD_SECTORSIZE );
-
-		// use double buffering
-		int numBuffers = 2;
-
-		if ( m_dataSize <= STREAM_BUFFER_DATASIZE || m_dataSize <= numBuffers*bufferSize )
-		{
-			// no gain for buffering a small file or multiple buffering
-			// match the expected transfer with a single buffer
-			bufferSize = m_dataSize;
-			numBuffers = 1;
-		}
-
-		// size in samples of the transfer buffer
-		m_bufferSize = bufferSize / m_sampleSize;
-
-		// allocate a transfer buffer
-		// matches the size of the streaming buffer exactly
-		// ensures that buffers can be filled and then consumed/requeued at the same time
-		m_buffer = new char[bufferSize];
-
-		int loopStart;
-		if ( source.IsLooped() )
-		{
-			int loopBlock;
-			loopStart = m_pStreamSource->GetLoopingInfo( &loopBlock, NULL, NULL ) * m_sampleSize;
-			if ( source.Format() == WAVE_FORMAT_XMA )
-			{
-				// xma works in blocks, mixer handles inter-block accurate loop positioning
-				// block streaming will cycle from the block where the loop occurs
-				loopStart = loopBlock * XMA_BLOCK_SIZE;
-			}
-		}
-		else
-		{
-			// sample not looped
-			loopStart = -1;
-		}
-
-		// load the file piecewise through a buffering implementation
-		m_hStream = wavedatacache->OpenStreamedLoad( pFileName, m_dataSize, m_dataStart, startOffset, loopStart, bufferSize, numBuffers, flags );
-	}
-
 	m_bValid = true;
 }
 
@@ -2034,12 +1760,6 @@ CWaveDataStreamAsync::~CWaveDataStreamAsync( void )
 		m_source.SetPlayOnce( false ); // in case it gets used again
 		wavedatacache->Unload( m_hCache );
 	}
-
-	if ( IsX360() )
-	{
-		wavedatacache->CloseStreamedLoad( m_hStream ); 
-	}
-
 	delete [] m_buffer;
 }
 
@@ -2085,12 +1805,6 @@ bool CWaveDataStreamAsync::IsReadyToMix()
 		}
 		return bLoaded;
 	}
-
-	if ( IsX360() )
-	{
-		return wavedatacache->IsStreamedDataReady( m_hStream );
-	}
-
 	return false;
 }
 
@@ -2240,30 +1954,6 @@ int CWaveDataStreamAsync::ReadSourceData( void **pData, int sampleIndex, int sam
 				}
 			}
 		}
-
-		if ( IsX360() )
-		{
-			if ( m_hStream != INVALID_STREAM_HANDLE )
-			{
-				// request available data, may get less
-				// drives the buffering
-				m_bufferCount = wavedatacache->CopyStreamedDataIntoMemory( 
-									m_hStream, 
-									m_buffer, 
-									m_bufferSize * m_sampleSize,
-									seekpos, 
-									m_bufferCount * m_sampleSize );
-				// convert to number of samples in the buffer
-				m_bufferCount /= m_sampleSize;
-			}
-			else
-			{
-				return 0;
-			}
-
-			// do any conversion now the source needs (mixer will decode/decompress) on this buffer
-			m_pStreamSource->UpdateSamples( m_buffer, m_bufferCount );
-		}
 	}
 
 	// If we have some samples in the buffer that are within range of the request
@@ -2351,13 +2041,6 @@ bool CWaveDataMemoryAsync::IsReadyToMix()
 		// Msg( "Waiting for data '%s'\n", m_source.GetFileName() );
 		m_source.CacheLoad();
 	}
-
-	if ( IsX360() )
-	{
-		// expected to be resident and valid, otherwise being called prior to load
-		Assert( 0 );
-	}
-
 	return false;
 }
 

@@ -456,7 +456,7 @@ enum HostThreadMode
 	HTM_FORCED,
 };
 
-ConVar host_thread_mode( "host_thread_mode", ( IsX360() ) ? "1" : "0", 0, "Run the host in threaded mode, (0 == off, 1 == if multicore, 2 == force)" );
+ConVar host_thread_mode( "host_thread_mode", "0", 0, "Run the host in threaded mode, (0 == off, 1 == if multicore, 2 == force)" );
 extern ConVar threadpool_affinity;
 void OnChangeThreadAffinity( IConVar *var, const char *pOldValue, float flOldValue )
 {
@@ -696,15 +696,7 @@ void CCommonHostState::SetWorldModel( model_t *pModel )
 
 void Host_DefaultMapFileName( const char *pFullMapName, /* out */ char *pDiskName, unsigned int nDiskNameSize )
 {
-	if ( IsPC() || !IsX360() )
-	{
-		// pc names are as is
-		Q_snprintf( pDiskName, nDiskNameSize, "maps/%s.bsp", pFullMapName );
-	}
-	else if ( IsX360() )
-	{
-		Q_snprintf( pDiskName, nDiskNameSize, "maps/%s.360.bsp", pFullMapName );
-	}
+	Q_snprintf( pDiskName, nDiskNameSize, "maps/%s.bsp", pFullMapName );
 }
 
 void Host_SetAudioState( const AudioState_t &audioState )
@@ -1077,13 +1069,6 @@ void Host_WriteConfiguration( const char *filename, bool bAllVars )
 	if ( !cbIsUserRequested && ( CommandLine()->CheckParm( "-default" ) || host_competitive_ever_enabled.GetBool() ) )
 		return;
 	
-	// Write to internal storage on the 360
-	if ( IsX360() )
-	{
-		Host_WriteConfiguration_360();
-		return;
-	}
-
 	// If in map editing mode don't save configuration
 	if (g_bInEditMode)
 	{
@@ -1264,13 +1249,6 @@ void Host_ReadConfiguration()
 		Sys_Error( "Host_ReadConfiguration:  g_pFileSystem == NULL\n" );
 	}
 
-	// Handle the 360 case
-	if ( IsX360() )
-	{
-		Host_ReadConfiguration_360();
-		return;
-	}
-
 	bool saveconfig = false;
 
 	ISteamRemoteStorage *pRemoteStorage = SteamClient()?(ISteamRemoteStorage *)SteamClient()->GetISteamGenericInterface(
@@ -1404,15 +1382,7 @@ CON_COMMAND( host_writeconfig, "Store current settings to config.cfg (or specifi
 void Host_ReadPreStartupConfiguration()
 {
 	FileHandle_t f = NULL;
-	if ( IsX360() )
-	{
-		// 360 config is less restrictive and can be anywhere in the game path
-		f = g_pFileSystem->Open( "//game/cfg/config.360.cfg", "rt" );
-	}
-	else
-	{
-		f = g_pFileSystem->Open( "//mod/cfg/config.cfg", "rt" );
-	}
+	f = g_pFileSystem->Open( "//mod/cfg/config.cfg", "rt" );
 
 	if ( !f )
 		return;
@@ -3100,10 +3070,6 @@ void _Host_RunFrame (float time)
 			// set net_time once before running the server
 			NET_SetTime( Plat_FloatTime() );
 			pGameJob = new CFunctorJob( CreateFunctor( _Host_RunFrame_Server_Async, serverticks ) );
-			if ( IsX360() )
-			{
-				pGameJob->SetServiceThread( g_nServerThread );
-			}
 			g_pThreadPool->AddJob( pGameJob );
 #if LOG_FRAME_OUTPUT
 			if ( !cl.IsPaused() || !sv.IsPaused() )
@@ -3289,23 +3255,12 @@ void Host_RunFrame( float time )
 bool IsLowViolence_Secure()
 {
 #ifndef DEDICATED
-	if ( !IsX360() && Steam3Client().SteamApps() )
+	if ( Steam3Client().SteamApps() )
 	{
 		// let Steam determine current violence settings 		
 		return Steam3Client().SteamApps()->BIsLowViolence();
 	}
-	else if ( IsX360() )
-	{
-		// Low violence for the 360 is enabled by the presence of a file.
-		if ( g_pFileSystem->FileExists( "cfg/violence.cfg" ) )
-		{
-			return true;
-		}
-		
-		return false;
-	}
 #endif
-		
 	return false;
 }
 
@@ -3735,17 +3690,6 @@ void Host_Init( bool bDedicated )
 	}
 
 	ThreadPoolStartParams_t startParams;
-	if ( IsX360() )
-	{
-		// 360 overrides defaults, 2 computation threads distributed to core 1 and 2
-		startParams.nThreads = 2;
-		startParams.nStackSize = 256*1024;
-		startParams.fDistribute = TRS_TRUE;
-		startParams.bUseAffinityTable = true;
-		startParams.iAffinityTable[0] = XBOX_PROCESSOR_2;
-		startParams.iAffinityTable[1] = XBOX_PROCESSOR_4;
-		ThreadSetAffinity( NULL, 1 );
-	}
 	if ( g_pThreadPool )
 		g_pThreadPool->Start( startParams, "CmpJob" );
 
@@ -3987,7 +3931,7 @@ void Host_Init( bool bDedicated )
 //-----------------------------------------------------------------------------
 void AddTransitionResources( CSaveRestoreData *pSaveData, const char *pLevelName, const char *pLandmarkName )
 {
-	if ( !IsX360() || ( g_pFileSystem->GetDVDMode() != DVDMODE_STRICT ) )
+	if ( g_pFileSystem->GetDVDMode() != DVDMODE_STRICT )
 	{
 		return;
 	}
@@ -4140,7 +4084,7 @@ bool Host_Changelevel( bool loadfromsavedgame, const char *mapname, const char *
 
 #if !defined( SWDS )
 	// Always save as an xsave if we're on the X360
-	saverestore->SetIsXSave( IsX360() );
+	saverestore->SetIsXSave( false );
 
 	// Add on time passed since the last time we kept track till this transition
 	int iAdditionalSeconds = g_ServerGlobalVariables.curtime - saverestore->GetMostRecentElapsedTimeSet();

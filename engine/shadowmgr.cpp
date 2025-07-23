@@ -706,7 +706,7 @@ ShadowHandle_t CShadowMgr::CreateShadowEx( IMaterial* pMaterial, IMaterial* pMod
 	{
 		shadow.m_FlashlightHandle = m_FlashlightStates.AddToTail();
 		m_FlashlightStates[shadow.m_FlashlightHandle].m_Shadow = h;
-		if ( !IsX360() && !r_flashlight_version2.GetInt() )
+		if ( !r_flashlight_version2.GetInt() )
 		{
 			AllocFlashlightMaterialBuckets( shadow.m_FlashlightHandle );
 		}
@@ -1592,7 +1592,7 @@ void CShadowMgr::ProjectFlashlight( ShadowHandle_t handle, const VMatrix& worldT
 
 	Shadow_t& shadow = m_Shadows[handle];
 
-	if ( !IsX360() && !r_flashlight_version2.GetInt() )
+	if ( !r_flashlight_version2.GetInt() )
 	{
 		// First, we need to remove the shadow from all surfaces it may
 		// currently be in; in other words we're invalidating the shadow surface cache
@@ -2820,7 +2820,7 @@ void CShadowMgr::SetNumWorldMaterialBuckets( int numMaterialSortBins )
 //-----------------------------------------------------------------------------
 void CShadowMgr::ClearAllFlashlightMaterialBuckets( void )
 {
-	if ( IsX360() || r_flashlight_version2.GetInt() )
+	if ( r_flashlight_version2.GetInt() )
 		return;
 
 	FlashlightHandle_t flashlightID;
@@ -3287,7 +3287,7 @@ void CShadowMgr::SetFlashlightStencilMasks( bool bDoMasking )
 {
 	VPROF_BUDGET( "CShadowMgr::RenderFlashlights", VPROF_BUDGETGROUP_SHADOW_RENDERING );
 
-	if ( IsX360() || r_flashlight_version2.GetInt() )
+	if ( r_flashlight_version2.GetInt() )
 		return;
 
 	// Bail out if we're not doing any of these optimizations
@@ -3395,7 +3395,7 @@ void CShadowMgr::RenderFlashlights( bool bDoMasking, const VMatrix* pModelToWorl
 #ifndef SWDS
 	VPROF_BUDGET( "CShadowMgr::RenderFlashlights", VPROF_BUDGETGROUP_SHADOW_RENDERING );
 
-	if ( IsX360() || r_flashlight_version2.GetInt() )
+	if ( r_flashlight_version2.GetInt() )
 		return;
 
 	if( r_flashlightrender.GetBool()==false )
@@ -3549,7 +3549,7 @@ void CShadowMgr::DrawFlashlightDecals( int sortGroup, bool bDoMasking )
 {
 	VPROF_BUDGET( "CShadowMgr::DrawFlashlightDecals", VPROF_BUDGETGROUP_SHADOW_RENDERING );
 
-	if ( IsX360() || r_flashlight_version2.GetInt() )
+	if ( r_flashlight_version2.GetInt() )
 		return;
 
 	FlashlightHandle_t flashlightID = m_FlashlightStates.Head();
@@ -3583,7 +3583,7 @@ void CShadowMgr::DrawFlashlightDecalsOnDisplacements( int sortGroup, CDispInfo *
 {
 	VPROF_BUDGET( "CShadowMgr::DrawFlashlightDecalsOnDisplacements", VPROF_BUDGETGROUP_SHADOW_RENDERING );
 
-	if ( IsX360() || r_flashlight_version2.GetInt() )
+	if ( r_flashlight_version2.GetInt() )
 		return;
 
 	FlashlightHandle_t flashlightID = m_FlashlightStates.Head();
@@ -3619,7 +3619,7 @@ void CShadowMgr::DrawFlashlightDecalsOnSingleSurface( SurfaceHandle_t surfID, bo
 {
 	VPROF_BUDGET( "CShadowMgr::DrawFlashlightDecalsOnSingleSurface", VPROF_BUDGETGROUP_SHADOW_RENDERING );
 
-	if ( IsX360() || r_flashlight_version2.GetInt() )
+	if ( r_flashlight_version2.GetInt() )
 		return;
 
 	FlashlightHandle_t flashlightID = m_FlashlightStates.Head();
@@ -3653,7 +3653,7 @@ void CShadowMgr::DrawFlashlightOverlays( int nSortGroup, bool bDoMasking )
 {
 	VPROF_BUDGET( "CShadowMgr::DrawFlashlightOverlays", VPROF_BUDGETGROUP_SHADOW_RENDERING );
 
-	if ( IsX360() || r_flashlight_version2.GetInt() )
+	if ( r_flashlight_version2.GetInt() )
 		return;
 
 	FlashlightHandle_t flashlightID = m_FlashlightStates.Head();

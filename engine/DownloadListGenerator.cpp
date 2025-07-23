@@ -30,7 +30,7 @@ CDownloadListGenerator &DownloadListGenerator()
 	return g_DownloadListGenerator;
 }
 
-ConVar	sv_logdownloadlist( "sv_logdownloadlist", IsX360() ? "0" : "1" );
+ConVar	sv_logdownloadlist( "sv_logdownloadlist", "1" );
 
 extern int GetSvPureMode();
 
@@ -49,12 +49,6 @@ CDownloadListGenerator::CDownloadListGenerator()
 //-----------------------------------------------------------------------------
 void CDownloadListGenerator::SetStringTable( INetworkStringTable *pStringTable )
 {
-	if ( IsX360() )
-	{
-		// not supporting
-		return;
-	}
-
 	m_pStringTable = pStringTable;
 
 	// reset the duplication list
@@ -104,12 +98,6 @@ void CDownloadListGenerator::SetStringTable( INetworkStringTable *pStringTable )
 //-----------------------------------------------------------------------------
 void CDownloadListGenerator::OnLevelLoadStart(const char *levelName)
 {
-	if ( IsX360() )
-	{
-		// not supporting
-		return;
-	}
-
 	// close the previous level reslist, if any
 	if (m_hReslistFile != FILESYSTEM_INVALID_HANDLE)
 	{
@@ -142,12 +130,6 @@ void CDownloadListGenerator::OnLevelLoadStart(const char *levelName)
 //-----------------------------------------------------------------------------
 void CDownloadListGenerator::OnLevelLoadEnd()
 {
-	if ( IsX360() )
-	{
-		// not supporting
-		return;
-	}
-
 	if ( m_hReslistFile != FILESYSTEM_INVALID_HANDLE )
 	{
 		g_pFileSystem->Close(m_hReslistFile);
@@ -161,12 +143,6 @@ void CDownloadListGenerator::OnLevelLoadEnd()
 //-----------------------------------------------------------------------------
 void CDownloadListGenerator::OnModelPrecached(const char *relativePathFileName)
 {
-	if ( IsX360() )
-	{
-		// not supporting
-		return;
-	}
-
 	if (Q_strstr(relativePathFileName, ".vmt"))
 	{
 		// it's a materials file, make sure that it starts in the materials directory, and we get the .vtf
@@ -203,12 +179,6 @@ void CDownloadListGenerator::OnModelPrecached(const char *relativePathFileName)
 //-----------------------------------------------------------------------------
 void CDownloadListGenerator::OnSoundPrecached(const char *relativePathFileName)
 {
-	if ( IsX360() )
-	{
-		// not supporting
-		return;
-	}
-
 	// skip any special characters
 	if (!V_isalnum(relativePathFileName[0]))
 	{
@@ -235,12 +205,6 @@ void CDownloadListGenerator::OnSoundPrecached(const char *relativePathFileName)
 //-----------------------------------------------------------------------------
 void CDownloadListGenerator::OnResourcePrecached(const char *relativePathFileName)
 {
-	if ( IsX360() )
-	{
-		// not supporting
-		return;
-	}
-
 	// ignore empty string
 	if (relativePathFileName[0] == 0)
 	{
@@ -265,12 +229,6 @@ void CDownloadListGenerator::OnResourcePrecached(const char *relativePathFileNam
 //-----------------------------------------------------------------------------
 void CDownloadListGenerator::ForceSimpleMaterial( const char *relativePathFileName )
 {
-	if ( IsX360() )
-	{
-		// not supporting
-		return;
-	}
-
 	if ( !m_pStringTable )
 		return;
 
@@ -327,12 +285,6 @@ void CDownloadListGenerator::ForceSimpleMaterial( const char *relativePathFileNa
 //-----------------------------------------------------------------------------
 void CDownloadListGenerator::ForceModelBounds( const char *relativePathFileName, const Vector &mins, const Vector &maxs )
 {
-	if ( IsX360() )
-	{
-		// not supporting
-		return;
-	}
-
 	if ( !m_pStringTable )
 		return;
 
@@ -378,12 +330,6 @@ void CDownloadListGenerator::ForceModelBounds( const char *relativePathFileName,
 //-----------------------------------------------------------------------------
 void CDownloadListGenerator::OnResourcePrecachedFullPath( char *fullPathFileName, const char *relativeFileName )
 {
-	if ( IsX360() )
-	{
-		// not supporting
-		return;
-	}
-
 	Q_FixSlashes( fullPathFileName );
 
 	if ( !g_pFileSystem->FileExists( fullPathFileName ) )

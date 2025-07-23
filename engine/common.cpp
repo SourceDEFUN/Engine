@@ -504,9 +504,6 @@ Copies a file from pSourcePath to pDestPath.
 */
 bool COM_CopyFile ( const char *pSourcePath, const char *pDestPath )
 {
-	if ( IsX360() )
-		return false;
-
 	int             remaining, count;
 	char			buf[4096];
 	FileHandle_t in, out;
@@ -636,11 +633,6 @@ byte *COM_LoadFile (const char *path, int usehunk, int *pLength)
 	Q_FileBase( path, base, sizeof( base ) );
 
 	unsigned bufSize = len + 1;
-	if ( IsX360() )
-	{
-		bufSize = g_pFileSystem->GetOptimalReadSize( hFile, bufSize ); // align to sector
-	}
-
 	switch ( usehunk )
 	{
 	case 1:

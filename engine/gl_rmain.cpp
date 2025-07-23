@@ -606,7 +606,7 @@ void ComputeWorldToScreenMatrix( VMatrix *pWorldToScreen, const VMatrix &worldTo
 // Push, pop views
 //-----------------------------------------------------------------------------
 void CRender::Push3DView( const CViewSetup &view, int nFlags, ITexture* pRenderTarget, Frustum frustumPlanes, ITexture* pDepthTexture )
-{
+{ // Secton TODO: Deal with it! Important!
 	Assert( !IsX360() || (pDepthTexture == NULL) ); //Don't render to a depth texture on the 360. Instead, render using a normal depth buffer and use IDirect3DDevice9::Resolve()
 
 	int i = m_ViewStack.Push( );

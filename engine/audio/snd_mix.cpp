@@ -284,14 +284,6 @@ double MIX_GetMaxRate( double rate, int sampleCount )
 void S_TransferStereo16( void *pOutput, const portable_samplepair_t *pfront, int lpaintedtime, int endtime )
 {
 	int		lpos;
-	
-	if ( IsX360() )
-	{
-		// not the right path for 360
-		Assert( 0 );
-		return;
-	}
-
 	Assert( pOutput );
 
 	snd_vol = S_GetMasterVolume()*256;
@@ -356,13 +348,6 @@ void S_TransferPaintBuffer(void *pOutput, const portable_samplepair_t *pfront, i
 	int			nSoundVol;
 	const int 	*p;
  
-	if ( IsX360() )
-	{
-		// not the right path for 360
-		Assert( 0 );
-		return;
-	}
-
 	Assert( pOutput );
 
 	p = (const int *) pfront;
@@ -537,7 +522,7 @@ void MIX_MixChannelsToPaintbuffer( CChannelList &list, int endtime, int flags, i
 		//  for the "soundsource" but we still need the lipsync to pause if the game is paused.  Therefore
 		//  I changed SND_IsMouth to look for any .wav on any channels which has sentence data
 		bool bIsMouth = SND_IsMouth(ch);
-		bool bShouldPause = IsX360() ? !ch->sfx->m_bIsUISound : bIsMouth; 
+		bool bShouldPause = bIsMouth; 
 
 		// Tracker 14637:  Pausing the game pauses voice sounds, but not other sounds...
 		if ( bShouldPause && g_pSoundServices->IsGamePaused() )
@@ -4077,12 +4062,6 @@ void SND_MoveMouth8( channel_t *ch, CAudioSource *pSource, int count )
 		}
 	}
 
-	if ( IsX360() )
-	{
-		// not supporting because data is assumed to be 8 bit and bypasses mixer (decoding)
-		return;
-	}
-
 	if ( pMouth->NeedsEnvelope() )
 	{
 		int availableSamples = pSource->GetOutputData((void**)&pdata, ch->pMixer->GetSamplePosition(), count, NULL );
@@ -4206,9 +4185,6 @@ void SND_RecordInit()
 
 void SND_MovieStart( void )
 {
-	if ( IsX360() )
-		return;
-
 	if ( !cl_movieinfo.IsRecording() )
 		return;
 
@@ -4223,9 +4199,6 @@ void SND_MovieStart( void )
 
 void SND_MovieEnd( void )
 {
-	if ( IsX360() )
-		return;
-
 	if ( !cl_movieinfo.IsRecording() )
 	{
 		return;
@@ -4247,9 +4220,6 @@ bool SND_IsRecording()
 extern IVideoRecorder *g_pVideoRecorder;
 void SND_RecordBuffer( void )
 {
-	if ( IsX360() )
-		return;
-
 	if ( !SND_IsRecording() )
 		return;
 

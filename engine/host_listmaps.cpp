@@ -273,12 +273,6 @@ void CMapListManager::RefreshList( void )
 			findfn = Sys_FindNext( NULL, 0 );
 			continue;
 		}
-		else if ( IsX360() && !V_stristr( findfn, ".360.bsp" ) )
-		{
-			// ignore pc bsp
-			findfn = Sys_FindNext( NULL, 0 );
-			continue;
-		}
 
 		// Make full fileame (maps/foo.bsp) and map name (foo)
 		char szFileName[ MAX_QPATH ] = { 0 };
@@ -389,12 +383,6 @@ void CMapListManager::BuildList( void )
 		if ( IsPC() && V_stristr( findfn, ".360.bsp" ) )
 		{
 			// ignore 360 bsp
-			findfn = Sys_FindNext( NULL, 0 );
-			continue;
-		}
-		else if ( IsX360() && !V_stristr( findfn, ".360.bsp" ) )
-		{
-			// ignore pc bsp
 			findfn = Sys_FindNext( NULL, 0 );
 			continue;
 		}

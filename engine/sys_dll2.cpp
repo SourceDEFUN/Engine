@@ -1326,12 +1326,6 @@ void CEngineAPI::PumpMessages()
 	// Get input from attached devices
 	g_pInputSystem->PollInputState();
 
-	if ( IsX360() )
-	{
-		// handle Xbox system messages
-		XBX_ProcessEvents();
-	}
-
 	// NOTE: Under some implementations of Win9x, 
 	// dispatching messages can cause the FPU control word to change
 	if ( IsPC() )

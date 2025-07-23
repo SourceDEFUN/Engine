@@ -473,12 +473,6 @@ bool CBaseClientState::SetSignonState ( int state, int count )
 			g_pClientReplayContext->OnSignonStateFull();
 		}
 #endif
-
-		if ( IsX360() && 
-			g_pMatchmaking->PreventFullServerStartup() )
-		{
-			return true;
-		}
 	}
 
 	m_nSignonState = state;
@@ -565,12 +559,6 @@ void CBaseClientState::SendConnectPacket (int challengeNr, int authProtocol, uin
 //-----------------------------------------------------------------------------
 bool CBaseClientState::PrepareSteamConnectResponse( uint64 unGSSteamID, bool bGSSecure, const netadr_t &adr, bf_write &msg )
 {
-	// X360TBD: Network - Steam Dedicated Server hack
-	if ( IsX360() )
-	{
-		return true;
-	}
-
 #if 0 //!defined( NO_STEAM ) && !defined( SWDS  ) 
 	if ( !Steam3Client().SteamUser() )
 	{

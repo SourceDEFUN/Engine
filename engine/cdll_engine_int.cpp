@@ -950,10 +950,6 @@ float CEngineClient::Time()
 
 void CEngineClient::Sound_ExtraUpdate( void )
 {
-	// On xbox this is not necessary except for long pauses, so unhook this one
-	if ( IsX360() )
-		return;
-
 	VPROF_BUDGET( "CEngineClient::Sound_ExtraUpdate()", VPROF_BUDGETGROUP_OTHER_SOUND );
 
 	S_ExtraUpdate();
@@ -1354,14 +1350,7 @@ void CEngineClient::GetVideoModes( int &nCount, vmode_s *&pModes )
 void CEngineClient::GetUILanguage( char *dest, int destlen )
 {
 	const char *pStr = cl_language.GetString();
-	if ( pStr )
-	{
-		V_strncpy( dest, pStr, destlen );
-	}
-	else if ( IsX360() )
-	{
-		dest[0] = 0;
-	}
+	if ( pStr ) V_strncpy( dest, pStr, destlen );
 }
 
 //-----------------------------------------------------------------------------
@@ -1420,13 +1409,10 @@ void CEngineClient::ChangeTeam( const char *pTeamName )
 // Returns true if copy occured
 //-----------------------------------------------------------------------------
 bool CEngineClient::CopyFrameBufferToMaterial( const char *pMaterialName )
-{
-	if ( !IsX360() )
-	{
-		// not for PC
-		Assert( 0 );
-		return false;
-	}
+{ // Secton TODO: Deal with it!
+	// not for PC
+	Assert( 0 );
+	return false;
 
 	IMaterial *pMaterial = materials->FindMaterial( pMaterialName, TEXTURE_GROUP_OTHER );
 	if ( pMaterial->IsErrorMaterial() )

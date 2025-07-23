@@ -1562,98 +1562,39 @@ void FASTCALL CM_TraceToLeaf( TraceInfo_t * RESTRICT pTraceInfo, int ndxLeaf, fl
 		pCounters = pTraceInfo->GetDispCounters();
 		count = pTraceInfo->GetCount();
 
-		if (IsX360())
+		// utterly nonoptimal FPU pathway
+		for( int i = 0; i < pLeaf->dispCount; i++ )
 		{
-			// set up some relatively constant variables we'll use in the loop below
-			fltx4 traceStart = LoadAlignedSIMD(pTraceInfo->m_start.Base());
-			fltx4 traceDelta = LoadAlignedSIMD(pTraceInfo->m_delta.Base());
-			fltx4 traceInvDelta = LoadAlignedSIMD(pTraceInfo->m_invDelta.Base());
-			static const fltx4 vecEpsilon = {DISPCOLL_DIST_EPSILON,DISPCOLL_DIST_EPSILON,DISPCOLL_DIST_EPSILON,DISPCOLL_DIST_EPSILON};
-			// only used in !IS_POINT version:
-			fltx4 extents;
-			if (!IS_POINT)
-			{
-				extents = LoadAlignedSIMD(pTraceInfo->m_extents.Base());
-			}
+			int dispIndex = pTraceInfo->m_pBSPData->map_dispList[pLeaf->dispListStart + i];
+			alignedbbox_t * RESTRICT pDispBounds = &g_pDispBounds[dispIndex];
 
-			// TODO: this loop probably ought to be unrolled so that we can make a more efficient
-			// job of intersecting rays against boxes. The simple SIMD version used here,
-			// though about 6x faster than the fpu version, is slower still than intersecting
-			// against four boxes simultaneously.
-			for( int i = 0; i < pLeaf->dispCount; i++ )
-			{
-				int dispIndex = pTraceInfo->m_pBSPData->map_dispList[pLeaf->dispListStart + i];
-				alignedbbox_t * RESTRICT pDispBounds = &g_pDispBounds[dispIndex];
+			// only collide with objects you are interested in
+			if( !( pDispBounds->GetContents() & pTraceInfo->m_contents ) )
+				continue;
 
-				// only collide with objects you are interested in
-				if( !( pDispBounds->GetContents() & pTraceInfo->m_contents ) )
+			if( pTraceInfo->m_isswept )
+			{
+				// make sure we only check this brush once per trace/stab
+				if ( !pTraceInfo->Visit( pDispBounds->GetCounter(), count, pCounters ) )
 					continue;
-
-				if( pTraceInfo->m_isswept )
-				{
-					// make sure we only check this brush once per trace/stab
-					if ( !pTraceInfo->Visit( pDispBounds->GetCounter(), count, pCounters ) )
-						continue;
-				}
-
-				if ( IS_POINT )
-				{
-					if (!IsBoxIntersectingRay( LoadAlignedSIMD(pDispBounds->mins.Base()), LoadAlignedSIMD(pDispBounds->maxs.Base()), 
-											   traceStart, traceDelta, traceInvDelta, vecEpsilon ))
-						continue;
-				}
-				else
-				{
-					fltx4 mins = SubSIMD(LoadAlignedSIMD(pDispBounds->mins.Base()),extents);
-					fltx4 maxs = AddSIMD(LoadAlignedSIMD(pDispBounds->maxs.Base()),extents);
-					if (!IsBoxIntersectingRay( mins, maxs, 
-											   traceStart, traceDelta, traceInvDelta, vecEpsilon ))
-						continue;
-				}
-
-				CDispCollTree * RESTRICT pDispTree = &g_pDispCollTrees[dispIndex];
-				CM_TraceToDispTree<IS_POINT>( pTraceInfo, pDispTree, startFrac, endFrac );
-				if( !pTraceInfo->m_trace.fraction )
-					break;
 			}
-		}
-		else
-		{
-			// utterly nonoptimal FPU pathway
-			for( int i = 0; i < pLeaf->dispCount; i++ )
-			{
-				int dispIndex = pTraceInfo->m_pBSPData->map_dispList[pLeaf->dispListStart + i];
-				alignedbbox_t * RESTRICT pDispBounds = &g_pDispBounds[dispIndex];
-
-				// only collide with objects you are interested in
-				if( !( pDispBounds->GetContents() & pTraceInfo->m_contents ) )
-					continue;
-
-				if( pTraceInfo->m_isswept )
-				{
-					// make sure we only check this brush once per trace/stab
-					if ( !pTraceInfo->Visit( pDispBounds->GetCounter(), count, pCounters ) )
-						continue;
-				}
 		
-				if ( IS_POINT && !IsBoxIntersectingRay( pDispBounds->mins, pDispBounds->maxs, pTraceInfo->m_start, pTraceInfo->m_delta, pTraceInfo->m_invDelta, DISPCOLL_DIST_EPSILON ) )
-				{
-					continue;
-				}
+			if ( IS_POINT && !IsBoxIntersectingRay( pDispBounds->mins, pDispBounds->maxs, pTraceInfo->m_start, pTraceInfo->m_delta, pTraceInfo->m_invDelta, DISPCOLL_DIST_EPSILON ) )
+			{
+				continue;
+			}
 
-				if ( !IS_POINT && !IsBoxIntersectingRay( pDispBounds->mins - pTraceInfo->m_extents, pDispBounds->maxs + pTraceInfo->m_extents, 
-					pTraceInfo->m_start, pTraceInfo->m_delta, pTraceInfo->m_invDelta, DISPCOLL_DIST_EPSILON ) )
-				{
-					continue;
-				}
+			if ( !IS_POINT && !IsBoxIntersectingRay( pDispBounds->mins - pTraceInfo->m_extents, pDispBounds->maxs + pTraceInfo->m_extents, 
+				pTraceInfo->m_start, pTraceInfo->m_delta, pTraceInfo->m_invDelta, DISPCOLL_DIST_EPSILON ) )
+			{
+				continue;
+			}
 				
-				CDispCollTree * RESTRICT pDispTree = &g_pDispCollTrees[dispIndex];
-				CM_TraceToDispTree<IS_POINT>( pTraceInfo, pDispTree, startFrac, endFrac );
-				if( !pTraceInfo->m_trace.fraction )
-					break;
-			}
+			CDispCollTree * RESTRICT pDispTree = &g_pDispCollTrees[dispIndex];
+			CM_TraceToDispTree<IS_POINT>( pTraceInfo, pDispTree, startFrac, endFrac );
+			if( !pTraceInfo->m_trace.fraction )
+				break;
 		}
-		
 		CM_PostTraceToDispTree( pTraceInfo );
 	}
 }

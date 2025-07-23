@@ -836,7 +836,7 @@ bool CSaveRestoreFileSystem::LoadFileFromDisk( const char *pFilename )
 		return false;
 
 	// Open the file off the disk
-	FileHandle_t hDiskFile = g_pFileSystem->OpenEx( pFilename, "rb", ( IsX360() ) ? FSOPEN_NEVERINPACK : 0 );
+	FileHandle_t hDiskFile = g_pFileSystem->OpenEx( pFilename, "rb", 0 );
 	if ( !hDiskFile )
 		return false;
 
@@ -986,112 +986,6 @@ void CSaveRestoreFileSystem::AuditFiles( void )
 
 	Msg("SIM: ------------------------------------------------------------");
 	Msg("SIM: Total files: %d [c: %.02f KB / c: %.02f KB] : Total Size: %.02f KB\n", nTotalFiles, (float)nTotalCompressed/1024.0f, (float)nTotalUncompressed/1024.0f, (float)(nTotalCompressed+nTotalUncompressed)/1024.0f );
-}
-
-CON_COMMAND( audit_save_in_memory, "Audit the memory usage and files in the save-to-memory system" )
-{
-	if ( !IsX360() )
-		return;
-
-	g_pSaveRestoreFileSystem->AuditFiles();
-}
-
-CON_COMMAND( dump_x360_saves, "Dump X360 save games to disk" )
-{
-	if ( !IsX360() )
-	{
-		Warning("dump_x360 only available on X360 platform!\n");
-		return;
-	}
-
-	if ( XBX_GetStorageDeviceId() == XBX_INVALID_STORAGE_ID || XBX_GetStorageDeviceId() == XBX_STORAGE_DECLINED )
-	{
-		Warning( "No storage device attached!\n" );
-		return;
-	}
-
-	char szInName[MAX_PATH]; // Read path from the container
-	char szOutName[MAX_PATH]; // Output path to the disk
-	char szFileNameBase[MAX_PATH]; // Name of the file minus directories or extensions
-	FileFindHandle_t findHandle;
-	
-	char szSearchPath[MAX_PATH];
-	Q_snprintf( szSearchPath, sizeof( szSearchPath ), "%s:\\*.*", GetCurrentMod() );
-	
-	const char *pFileName = g_pFileSystem->FindFirst( szSearchPath, &findHandle );
-	while (pFileName)
-	{		
-		// Create the proper read path
-		Q_snprintf( szInName, sizeof( szInName ), "%s:\\%s", GetCurrentMod(), pFileName );
-		// Read the file and blat it out
-		CUtlBuffer buf( 0, 0, 0 );
-		if ( g_pFileSystem->ReadFile( szInName, NULL, buf ) )
-		{
-			// Strip us down to just our filename
-			Q_FileBase( pFileName, szFileNameBase, sizeof ( szFileNameBase ) );
-			Q_snprintf( szOutName, sizeof( szOutName ), "save/%s.sav", szFileNameBase );
-			g_pFileSystem->WriteFile( szOutName, NULL, buf );
-
-			Msg("Copied file: %s to %s\n", szInName, szOutName );
-		}
-		
-		// Clean up
-		buf.Clear();
-
-		// Any more save files
-		pFileName = g_pFileSystem->FindNext( findHandle );
-	}
-	
-	g_pFileSystem->FindClose( findHandle );
-}
-
-CON_COMMAND( dump_x360_cfg, "Dump X360 config files to disk" )
-{
-	if ( !IsX360() )
-	{
-		Warning("dump_x360 only available on X360 platform!\n");
-		return;
-	}
-
-	if ( XBX_GetStorageDeviceId() == XBX_INVALID_STORAGE_ID || XBX_GetStorageDeviceId() == XBX_STORAGE_DECLINED )
-	{
-		Warning( "No storage device attached!\n" );
-		return;
-	}
-
-	char szInName[MAX_PATH]; // Read path from the container
-	char szOutName[MAX_PATH]; // Output path to the disk
-	char szFileNameBase[MAX_PATH]; // Name of the file minus directories or extensions
-	FileFindHandle_t findHandle;
-
-	char szSearchPath[MAX_PATH];
-	Q_snprintf( szSearchPath, sizeof( szSearchPath ), "cfg:\\*.*" );
-
-	const char *pFileName = g_pFileSystem->FindFirst( szSearchPath, &findHandle );
-	while (pFileName)
-	{		
-		// Create the proper read path
-		Q_snprintf( szInName, sizeof( szInName ), "cfg:\\%s", pFileName );
-		// Read the file and blat it out
-		CUtlBuffer buf( 0, 0, 0 );
-		if ( g_pFileSystem->ReadFile( szInName, NULL, buf ) )
-		{
-			// Strip us down to just our filename
-			Q_FileBase( pFileName, szFileNameBase, sizeof ( szFileNameBase ) );
-			Q_snprintf( szOutName, sizeof( szOutName ), "%s.cfg", szFileNameBase );
-			g_pFileSystem->WriteFile( szOutName, NULL, buf );
-
-			Msg("Copied file: %s to %s\n", szInName, szOutName );
-		}
-
-		// Clean up
-		buf.Clear();
-
-		// Any more save files
-		pFileName = g_pFileSystem->FindNext( findHandle );
-	}
-
-	g_pFileSystem->FindClose( findHandle );
 }
 
 #define FILECOPYBUFSIZE (1024 * 1024)
@@ -1395,43 +1289,7 @@ ISaveRestoreFileSystem *g_pSaveRestoreFileSystem = &s_SaveRestoreFileSystemPasst
 // Purpose: Called when switching between saving in memory and saving to disk.
 //-----------------------------------------------------------------------------
 void SaveInMemoryCallback( IConVar *pConVar, const char *pOldString, float flOldValue )
-{
-	if ( !IsX360() )
-	{
-		Warning( "save_in_memory is compatible with only the Xbox 360!\n" );
-		return;
-	}
-
-	ConVarRef var( pConVar );
-	if ( var.GetFloat() == flOldValue )
-		return;
-
-	// *.hl? files are transferred between disk and memory when this cvar changes
-	char szPath[ MAX_PATH ];
-	Q_snprintf( szPath, sizeof( szPath ), "%s%s", saverestore->GetSaveDir(), "*.hl?" );
-	if ( var.GetBool() )
-	{
-		g_pSaveRestoreFileSystem = &s_SaveRestoreFileSystem;
-
-		// Clear memory and load
-		s_SaveRestoreFileSystem.DirectoryClear( "*.hl?", IsX360() );
-		s_SaveRestoreFileSystem.LoadSaveDirectoryFromDisk( szPath );
-
-		// Clear disk
-		s_SaveRestoreFileSystemPassthrough.DirectoryClear( szPath, IsX360() );
-	}
-	else
-	{
-		g_pSaveRestoreFileSystem = &s_SaveRestoreFileSystemPassthrough;
-
-		// Clear disk and write
-		s_SaveRestoreFileSystemPassthrough.DirectoryClear( szPath, IsX360() );
-		s_SaveRestoreFileSystem.WriteSaveDirectoryToDisk();
-
-		// Clear memory
-		s_SaveRestoreFileSystem.DirectoryClear( "*.hl?", IsX360() );
-	}
-}
+{}
 
 //-----------------------------------------------------------------------------
 // Purpose: Dump a list of the save directory contents (in memory) to the console

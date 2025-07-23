@@ -563,12 +563,6 @@ static bool HandleVGuiKey( const InputEvent_t &event )
 	bool bDown = event.m_nType != IE_ButtonReleased;
 	ButtonCode_t code = (ButtonCode_t)event.m_nData;
 
-	if ( bDown && IsX360() )
-	{
-		LogKeyPress( code );
-		CheckCheatCodes();
-	}
-
 	return EngineVGui()->Key_Event( event );
 }
 //-----------------------------------------------------------------------------

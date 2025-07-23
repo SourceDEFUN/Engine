@@ -206,9 +206,6 @@ Con_HideConsole_f
 */
 void Con_HideConsole_f( void )
 {
-	if ( IsX360() )
-		return;
-
 	if ( EngineVGui()->IsConsoleVisible() )
 	{
 		// hide the console
@@ -223,9 +220,6 @@ Con_ShowConsole_f
 */
 void Con_ShowConsole_f( void )
 {
-	if ( IsX360() )
-		return;
-
 	if ( vgui::input()->GetAppModalSurface() )
 	{
 		// If a dialog has modal, it probably has grabbed keyboard focus, so showing
@@ -252,9 +246,6 @@ void Con_ShowConsole_f( void )
 //-----------------------------------------------------------------------------
 void Con_ToggleConsole_f( void )
 {
-	if ( IsX360() )
-		return;
-
 	if (EngineVGui()->IsConsoleVisible())
 	{
 		Con_HideConsole_f();
@@ -273,9 +264,6 @@ void Con_ToggleConsole_f( void )
 //-----------------------------------------------------------------------------
 void Con_Clear_f( void )
 {	
-	if ( IsX360() )
-		return;
-
 	EngineVGui()->ClearConsole();
 	Con_ClearNotify();
 }

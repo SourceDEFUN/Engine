@@ -101,7 +101,7 @@ static bool g_ConsoleInput = false;
 
 static char g_szMapLoadOverride[32];
 
-#define MOD_DIR ( IsX360() ? "DEFAULT_WRITE_PATH" : "MOD" )
+#define MOD_DIR ( "MOD" )
 
 //-----------------------------------------------------------------------------
 
@@ -278,7 +278,7 @@ public:
 		SetMostRecentElapsedSeconds( 0 );
 		m_szMostRecentSaveLoadGame[0] = 0;
 		m_szSaveGameName[ 0 ] = 0;
-		m_bIsXSave = IsX360();
+		m_bIsXSave = false;
 	}
 
 	void					Init( void );
@@ -523,11 +523,8 @@ void CSaveRestore::AgeSaveList( const char *pName, int count, bool bIsXSave )
 	// age all the previous save files (including screenshots)
 	while ( count > 0 )
 	{
-		AgeSaveFile( pName, IsX360() ? "360.sav" : "sav", count, bIsXSave );
-		if ( !IsX360() )
-		{
-			AgeSaveFile( pName, "tga", count, bIsXSave );
-		}
+		AgeSaveFile( pName, "sav", count, bIsXSave );
+		AgeSaveFile( pName, "tga", count, bIsXSave );
 		count--;
 	}
 }
@@ -780,7 +777,7 @@ int CSaveRestore::SaveGameSlot( const char *pSaveName, const char *pSaveComment,
 
 
 	// open the file to validate it exists, and to clear it
-	if ( bClearFile && !IsX360() )
+	if ( bClearFile )
 	{		
 		FileHandle_t pSaveFile = g_pSaveRestoreFileSystem->Open( name, "wb" );
 		if (!pSaveFile && g_pFileSystem->FileExists( name, "GAME" ) )
@@ -842,7 +839,7 @@ int CSaveRestore::SaveGameSlot( const char *pSaveName, const char *pSaveComment,
 	S_ExtraUpdate();
 
 	// queue up to save a matching screenshot
-	if ( !IsX360() && save_screenshot.GetBool() ) // X360TBD: Faster savegame screenshots
+	if ( save_screenshot.GetBool() ) // X360TBD: Faster savegame screenshots
 	{
 		if ( !( bIsAutosave || bIsAutosaveDangerous ) || save_screenshot.GetInt() == 2 )
 		{
@@ -1016,7 +1013,7 @@ bool CSaveRestore::CalcSaveGameName( const char *pName, char *output, int output
 	{
 		Q_snprintf( output, outputStringLength, "%s%s", GetSaveDir(), pName );
 	}
-	Q_DefaultExtension( output, IsX360() ? ".360.sav" : ".sav", outputStringLength );
+	Q_DefaultExtension( output, ".sav", outputStringLength );
 	Q_FixSlashes( output );
 
 	return true;
@@ -1087,17 +1084,6 @@ bool CSaveRestore::LoadGame( const char *pName )
 	DoClearSaveDir( IsXSave() );
 
 	bool bLoadedToMemory = false;
-	if ( IsX360() )
-	{
-		bool bValidStorageDevice = StorageDeviceValid();
-		if ( bValidStorageDevice )
-		{
-			// Load the file into memory, whole hog
-			bLoadedToMemory = g_pSaveRestoreFileSystem->LoadFileFromDisk( name );
-			if ( bLoadedToMemory == false )
-				return false;
-		}
-	}
 	
 	int iElapsedMinutes = 0;
 	int iElapsedSeconds = 0;
@@ -1202,10 +1188,6 @@ bool CSaveRestore::LoadGame( const char *pName )
 //-----------------------------------------------------------------------------
 void CSaveRestore::SetMostRecentSaveGame( const char *pSaveName )
 {
-	// Only remember xsaves in the x360 case
-	if ( IsX360() && IsXSave() == false )
-		return;
-
 	if ( pSaveName )
 	{
 		Q_strncpy( m_szMostRecentSaveLoadGame, pSaveName, sizeof(m_szMostRecentSaveLoadGame) );
@@ -2466,10 +2448,7 @@ int CSaveRestore::LoadGameState( char const *level, bool createPlayers )
 	ParseSaveTables( pSaveData, &header, 1 );
 	EntityPatchRead( pSaveData, level );
 	
-	if ( !IsX360() )
-	{
-		skill.SetValue( header.skillLevel );
-	}
+	skill.SetValue( header.skillLevel );
 
 	Q_strncpy( sv.m_szMapname, header.mapName, sizeof( sv.m_szMapname ) );
 	ConVarRef skyname( "sv_skyname" );
@@ -2815,39 +2794,27 @@ void CSaveRestore::AutoSaveDangerousIsSafe()
 		AgeSaveList( "autosave", save_history_count.GetInt(), IsXSave() );
 	}
 
-	// Rename the screenshot
-	if ( !IsX360() )
+	Q_snprintf( szOldName, sizeof( szOldName ), "//%s/%sautosavedangerous%s.tga", MOD_DIR, GetSaveDir(), GetPlatformExt() );
+	Q_snprintf( szNewName, sizeof( szNewName ), "//%s/%sautosave%s.tga", MOD_DIR, GetSaveDir(), GetPlatformExt() );
+
+	// there could be an old version, remove it
+	if ( g_pFileSystem->FileExists( szNewName ) )
 	{
-		Q_snprintf( szOldName, sizeof( szOldName ), "//%s/%sautosavedangerous%s.tga", MOD_DIR, GetSaveDir(), GetPlatformExt() );
-		Q_snprintf( szNewName, sizeof( szNewName ), "//%s/%sautosave%s.tga", MOD_DIR, GetSaveDir(), GetPlatformExt() );
+		g_pFileSystem->RemoveFile( szNewName );
+	}
 
-		// there could be an old version, remove it
-		if ( g_pFileSystem->FileExists( szNewName ) )
+	if ( g_pFileSystem->FileExists( szOldName ) )
+	{
+		if ( !g_pFileSystem->RenameFile( szOldName, szNewName ) )
 		{
-			g_pFileSystem->RemoveFile( szNewName );
-		}
-
-		if ( g_pFileSystem->FileExists( szOldName ) )
-		{
-			if ( !g_pFileSystem->RenameFile( szOldName, szNewName ) )
-			{
-				SetMostRecentSaveGame( "autosavedangerous" );
-				return;
-			}
+			SetMostRecentSaveGame( "autosavedangerous" );
+			return;
 		}
 	}
 
 	// Rename the dangerous auto save as a normal auto save
-	if ( !IsXSave() )
-	{
-		Q_snprintf( szOldName, sizeof( szOldName ), "//%s/%sautosavedangerous%s.sav", MOD_DIR, GetSaveDir(), GetPlatformExt() );
-		Q_snprintf( szNewName, sizeof( szNewName ), "//%s/%sautosave%s.sav", MOD_DIR, GetSaveDir(), GetPlatformExt() );
-	}
-	else
-	{
-		Q_snprintf( szOldName, sizeof( szOldName ), "%s:\\autosavedangerous%s.sav", GetCurrentMod(), GetPlatformExt() );
-		Q_snprintf( szNewName, sizeof( szNewName ), "%s:\\autosave%s.sav", GetCurrentMod(), GetPlatformExt() );
-	}
+	Q_snprintf( szOldName, sizeof( szOldName ), "//%s/%sautosavedangerous%s.sav", MOD_DIR, GetSaveDir(), GetPlatformExt() );
+	Q_snprintf( szNewName, sizeof( szNewName ), "//%s/%sautosave%s.sav", MOD_DIR, GetSaveDir(), GetPlatformExt() );
 
 	// there could be an old version, remove it
 	if ( g_pFileSystem->FileExists( szNewName ) )
@@ -2929,7 +2896,7 @@ static void SaveGame( const CCommand &args )
 	}
 
 #if !defined (SWDS)
-	CL_HudMessage( IsX360() ? "GAMESAVED_360" : "GAMESAVED" );
+	CL_HudMessage( "GAMESAVED" );
 #endif
 }
 
@@ -2993,7 +2960,7 @@ CON_COMMAND_F( xsave, "Saves current game to a 360 storage device.", FCVAR_DONTR
 		return;
 	}
 
-	g_SaveRestore.SetIsXSave( IsX360() );
+	g_SaveRestore.SetIsXSave( false );
 	SaveGame( args );
 }
 
@@ -3041,7 +3008,7 @@ static void AutoSave_Silent( bool bDangerous )
 		saverestore->GetMostRecentElapsedMinutes() + iAdditionalMinutes,
 		saverestore->GetMostRecentElapsedSeconds() + iAdditionalSeconds );
 
-	g_SaveRestore.SetIsXSave( IsX360() );
+	g_SaveRestore.SetIsXSave( false );
 	if ( !bDangerous )
 	{
 		saverestore->SaveGameSlot( "autosave", comment, false, true );
@@ -3062,7 +3029,7 @@ CON_COMMAND( _autosave, "Autosave" )
 	if ( bConsole )
 	{
 #if !defined (SWDS)
-		CL_HudMessage( IsX360() ? "GAMESAVED_360" : "GAMESAVED" );
+		CL_HudMessage( "GAMESAVED" );
 #endif
 	}
 }
@@ -3078,7 +3045,7 @@ CON_COMMAND( _autosavedangerous, "AutoSaveDangerous" )
 	if ( bConsole )
 	{
 #if !defined (SWDS)
-		CL_HudMessage( IsX360() ? "GAMESAVED_360" : "GAMESAVED" );
+		CL_HudMessage( "GAMESAVED" );
 #endif
 	}
 }
@@ -3094,7 +3061,7 @@ CON_COMMAND( autosave, "Autosave" )
 		return;
 
 	bool bConsole = save_console.GetBool();
-	char const *pchSaving = IsX360() ? "GAMESAVING_360" : "GAMESAVING";
+	char const *pchSaving = "GAMESAVING";
 
 	if ( bConsole )
 	{
@@ -3125,7 +3092,7 @@ CON_COMMAND( autosavedangerous, "AutoSaveDangerous" )
 
 	//Don't print out "SAVED" unless we're running on an Xbox (in which case it prints "CHECKPOINT").
 	bool bConsole = save_console.GetBool();
-	char const *pchSaving = IsX360() ? "GAMESAVING_360" : "GAMESAVING";
+	char const *pchSaving = "GAMESAVING";
 
 	if ( bConsole )
 	{
@@ -3226,7 +3193,7 @@ CON_COMMAND( xload, "Load a saved game from a 360 storage device." )
 		return;
 	}
 
-	g_SaveRestore.SetIsXSave( IsX360() );
+	g_SaveRestore.SetIsXSave( false );
 	LoadSaveGame( args[1] );
 }
 
@@ -3260,15 +3227,7 @@ void CSaveRestore::Init( void )
 
 		ThreadPoolStartParams_t threadPoolStartParams;
 		threadPoolStartParams.nThreads = 1;
-		if ( !IsX360() )
-		{
-			threadPoolStartParams.fDistribute = TRS_FALSE;
-		}
-		else
-		{
-			threadPoolStartParams.iAffinityTable[0] = XBOX_PROCESSOR_1;
-			threadPoolStartParams.bUseAffinityTable = true;
-		}
+		threadPoolStartParams.fDistribute = TRS_FALSE;
 
 		g_pSaveThread = CreateThreadPool();
 		g_pSaveThread->Start( threadPoolStartParams, "SaveJob" );
@@ -3276,7 +3235,7 @@ void CSaveRestore::Init( void )
 
 	m_nDeferredCommandFrames = 0;
 	m_szSaveGameScreenshotFile[0] = 0;
-	if ( !IsX360() && !CommandLine()->FindParm( "-noclearsave" ) )
+	if ( !CommandLine()->FindParm( "-noclearsave" ) )
 	{
 		ClearSaveDir();
 	}
@@ -3333,15 +3292,7 @@ void CSaveRestore::OnFrameRendered()
 }
 
 bool CSaveRestore::StorageDeviceValid( void )
-{
-	// PC is always valid
-	if ( !IsX360() )
-		return true;
-
-	// Non-XSaves are always valid
-	if ( !IsXSave() )
-		return true;
-
+{ // Secton TODO: Lmao?!? DEAL WITH IT TOO!
 	return true;
 }
 

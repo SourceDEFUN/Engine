@@ -78,11 +78,6 @@ CPlugin::~CPlugin()
 //---------------------------------------------------------------------------------
 bool CPlugin::Load( const char *fileName )
 {
-	if ( IsX360() )
-	{
-		return false;
-	}
-
 	char fixedFileName[ MAX_PATH ];
 	Q_strncpy( fixedFileName, fileName, sizeof(fixedFileName) );
 	Q_FixSlashes( fixedFileName );
@@ -226,11 +221,6 @@ CServerPlugin::~CServerPlugin()
 //---------------------------------------------------------------------------------
 void CServerPlugin::LoadPlugins()
 {
-	if ( IsX360() )
-	{
-		return;
-	}
-
 	m_Plugins.PurgeAndDeleteElements();
 
 	char const *findfn = Sys_FindFirst( "addons/*.vdf", NULL, 0 );

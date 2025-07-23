@@ -323,7 +323,7 @@ char *CAudioMixerWave::LoadMixBuffer( channel_t *pChannel, int sample_load_reque
 		// none available, bail out
 		// 360 might not be able to get samples due to latency of loop seek
 		// could also be the valid EOF for non-loops (caller keeps polling for data, until no more)
-		AssertOnce( IsX360() || !m_pData->Source().IsLooped() );
+		AssertOnce( !m_pData->Source().IsLooped() );
 		*pSamplesLoaded = 0;
 		return NULL;
 	}
@@ -335,9 +335,8 @@ char *CAudioMixerWave::LoadMixBuffer( channel_t *pChannel, int sample_load_reque
 
 
 
-	if ( IsX360() || IsDebug() )
+	if ( IsDebug() )
 	{	
-		// for safety, 360 always validates sample request, due to new xma audio code and possible logic flaws
 		// PC can expect number of requested samples to be within tolerances due to exisiting aged code
 		// otherwise buffer overruns cause hard to track random crashes
 		if ( ( ( sample_load_request + 1 ) * samplesize ) > nTempCopyBufferSize )
@@ -471,7 +470,7 @@ char *CAudioMixerWave::LoadMixBuffer( channel_t *pChannel, int sample_load_reque
 	if ( samples_loaded < sample_load_request )
 	{
 		// should always be able to get as many samples as we request from looping sound sources
-		AssertOnce ( IsX360() || !m_pData->Source().IsLooped() );
+		AssertOnce ( !m_pData->Source().IsLooped() );
 
 		// these samples are filled with 0, not loaded.
 		// non-looping source hit end of data, fill rest of g_temppaintbuffer with 0
