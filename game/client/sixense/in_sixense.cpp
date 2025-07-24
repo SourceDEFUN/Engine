@@ -611,7 +611,7 @@ static void SixenseAutosave( const CCommand &args )
 
 		engine->SaveGame( 
 			szSaveName, 
-			IsX360(), 
+			false, 
 			szFullSaveFileName, 
 			sizeof( szFullSaveFileName ),
 			szComment,

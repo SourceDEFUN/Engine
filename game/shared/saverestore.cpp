@@ -23,7 +23,7 @@
 #include "interval.h"
 #include "vphysics/object_hash.h"
 #include "datacache/imdlcache.h"
-#include "tier0/vprof.h"
+
 
 #if !defined( CLIENT_DLL )
 

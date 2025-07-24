@@ -12,7 +12,7 @@
 #include "NextBotChasePath.h"
 #include "NextBotUtil.h"
 #include "NextBotPathFollow.h"
-#include "tier0/vprof.h"
+
 
 
 //----------------------------------------------------------------------------------------------
@@ -98,8 +98,6 @@ inline void ChasePath::Invalidate( void )
  */
 inline void ChasePath::Update( INextBot *bot, CBaseEntity *subject, const IPathCost &cost, Vector *pPredictedSubjectPos )
 {
-	VPROF_BUDGET( "ChasePath::Update", "NextBot" );
-
 	// maintain the path to the subject
 	RefreshPath( bot, subject, cost, pPredictedSubjectPos );
 
@@ -132,8 +130,6 @@ inline bool ChasePath::IsRepathNeeded( INextBot *bot, CBaseEntity *subject ) con
  */
 inline void ChasePath::RefreshPath( INextBot *bot, CBaseEntity *subject, const IPathCost &cost, Vector *pPredictedSubjectPos )
 {
-	VPROF_BUDGET( "ChasePath::RefreshPath", "NextBot" );
-
 	ILocomotion *mover = bot->GetLocomotionInterface();
 
 	// don't change our path if we're on a ladder

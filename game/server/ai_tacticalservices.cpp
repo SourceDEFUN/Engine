@@ -74,8 +74,6 @@ void CAI_TacticalServices::Init( CAI_Network *pNetwork )
 
 bool CAI_TacticalServices::FindLos(const Vector &threatPos, const Vector &threatEyePos, float minThreatDist, float maxThreatDist, float blockTime, FlankType_t eFlankType, const Vector &vecFlankRefPos, float flFlankParam, Vector *pResult)
 {
-	AI_PROFILE_SCOPE( CAI_TacticalServices_FindLos );
-
 	MARK_TASK_EXPENSIVE();
 
 	int node = FindLosNode( threatPos, threatEyePos, 
@@ -133,8 +131,6 @@ bool CAI_TacticalServices::FindCoverPos( const Vector &vThreatPos, const Vector 
 
 bool CAI_TacticalServices::FindCoverPos( const Vector &vNearPos, const Vector &vThreatPos, const Vector &vThreatEyePos, float flMinDist, float flMaxDist, Vector *pResult )
 {
-	AI_PROFILE_SCOPE( CAI_TacticalServices_FindCoverPos );
-
 	MARK_TASK_EXPENSIVE();
 
 	int node = FindCoverNode( vNearPos, vThreatPos, vThreatEyePos, flMinDist, flMaxDist );
@@ -196,8 +192,6 @@ bool CAI_TacticalServices::FindLateralCover( const Vector &vecThreat, float flMi
 
 bool CAI_TacticalServices::FindLateralCover( const Vector &vNearPos, const Vector &vecThreat, float flMinDist, float distToCheck, int numChecksPerDir, Vector *pResult )
 {
-	AI_PROFILE_SCOPE( CAI_TacticalServices_FindLateralCover );
-
 	MARK_TASK_EXPENSIVE();
 
 	Vector	vecLeftTest;
@@ -342,8 +336,6 @@ int CAI_TacticalServices::FindCoverNode(const Vector &vNearPos, const Vector &vT
 {
 	if ( !CAI_NetworkManager::NetworksLoaded() )
 		return NO_NODE;
-
-	AI_PROFILE_SCOPE( CAI_TacticalServices_FindCoverNode );
 
 	MARK_TASK_EXPENSIVE();
 
@@ -504,8 +496,6 @@ int CAI_TacticalServices::FindLosNode(const Vector &vThreatPos, const Vector &vT
 {
 	if ( !CAI_NetworkManager::NetworksLoaded() )
 		return NO_NODE;
-
-	AI_PROFILE_SCOPE( CAI_TacticalServices_FindLosNode );
 
 	MARK_TASK_EXPENSIVE();
 
@@ -710,8 +700,6 @@ bool CAI_TacticalServices::TestLateralLos( const Vector &vecCheckStart, const Ve
 
 bool CAI_TacticalServices::FindLateralLos( const Vector &vecThreat, Vector *pResult )
 {
-	AI_PROFILE_SCOPE( CAI_TacticalServices_FindLateralLos );
-
 	if( !m_bAllowFindLateralLos )
 	{
 		return false;

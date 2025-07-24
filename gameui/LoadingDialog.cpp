@@ -524,7 +524,7 @@ bool CLoadingDialog::SetProgressPoint( float fraction )
 			m_flProgressFraction = fraction;
 			return true;
 		}
-		return IsX360();
+		return false;
 	}
 
 	if ( !m_bShowingVACInfo && gameuifuncs->IsConnectedToVACSecureServer() )
@@ -535,7 +535,7 @@ bool CLoadingDialog::SetProgressPoint( float fraction )
 	int nOldDrawnSegments = m_pProgress->GetDrawnSegmentCount();
 	m_pProgress->SetProgress( fraction );
 	int nNewDrawSegments = m_pProgress->GetDrawnSegmentCount();
-	return (nOldDrawnSegments != nNewDrawSegments) || IsX360();
+	return nOldDrawnSegments != nNewDrawSegments;
 }
 
 //-----------------------------------------------------------------------------

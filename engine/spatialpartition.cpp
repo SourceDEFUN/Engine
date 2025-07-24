@@ -20,7 +20,7 @@
 #include "sys_dll.h"
 #include "collisionutils.h"
 #include "debugoverlay.h"
-#include "tier0/vprof.h"
+
 #include "tier1/utlbuffer.h"
 #include "filesystem_engine.h"
 #include "filesystem.h"
@@ -1170,8 +1170,6 @@ bool CVoxelHash::EnumerateElementsInSingleVoxel( Voxel_t voxel, const T &interse
 bool CVoxelHash::EnumerateElementsInBox( SpatialPartitionListMask_t listMask, 
 	Voxel_t vmin, Voxel_t vmax, const Vector& mins, const Vector& maxs, IPartitionEnumerator* pIterator )
 {
-	VPROF( "BoxTest/SphereTest" );
-
 	Assert( mins.x <= maxs.x );
 	Assert( mins.y <= maxs.y );
 	Assert( mins.z <= maxs.z );
@@ -2109,8 +2107,6 @@ void CVoxelTree::EnumerateElementsInBox( SpatialPartitionListMask_t listMask,
 										const Vector& vecMins, const Vector& vecMaxs, 
 										bool coarseTest, IPartitionEnumerator* pIterator )
 {
-	VPROF( "BoxTest/SphereTest" );
-
 	// If this assertion fails, you're using a list at a point where the spatial partition elements aren't set up!
 	//	Assert( ( listMask & m_nSuppressedListMask ) == 0 );
 
@@ -2509,7 +2505,6 @@ CTHREADLOCALINT g_DebugTracesRemainingBeforeTrap(0);
 void CVoxelTree::EnumerateElementsAlongRay( SpatialPartitionListMask_t listMask, 
 										   const Ray_t &ray, bool coarseTest, IPartitionEnumerator *pIterator )
 {
-	VPROF("EnumerateElementsAlongRay");
 #ifdef THINK_TRACE_COUNTER_COMPILED
 	if ( DEBUG_THINK_TRACE_COUNTER_ALLOWED() && think_trace_limit.GetInt() != 0 && g_DebugTracesRemainingBeforeTrap > 0 )
 	{

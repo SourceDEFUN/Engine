@@ -828,9 +828,6 @@ CSfxTable *S_FindName( const char *szName, int *pfInCache )
 double g_flAccumulatedSoundLoadTime = 0.0f;
 CAudioSource *S_LoadSound( CSfxTable *pSfx, channel_t *ch )
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
-	VPROF("S_LoadSound");
 	if ( !pSfx->pSource )
 	{
 		double st = Plat_FloatTime();
@@ -898,13 +895,8 @@ CAudioSource *S_LoadSound( CSfxTable *pSfx, channel_t *ch )
 //-----------------------------------------------------------------------------
 CSfxTable *S_PrecacheSound( const char *name )
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
-	if ( !g_AudioDevice )
-		return NULL;
-
-	if ( !g_AudioDevice->IsActive() )
-		return NULL;
+	if ( !g_AudioDevice ) return NULL;
+	if ( !g_AudioDevice->IsActive() ) return NULL;
 
 	CSfxTable *sfx = S_FindName( name, NULL );
 	if ( sfx )
@@ -1853,7 +1845,6 @@ float SND_GetGainFromMult( float gain, float dist_mult, vec_t dist );
 
 float SND_GetGain( channel_t *ch, bool fplayersound, bool fmusicsound, bool flooping, vec_t dist, bool bAttenuated )
 {
-	VPROF_("SND_GetGain",2,VPROF_BUDGETGROUP_OTHER_SOUND,false,BUDGETFLAG_OTHER);
 	if ( ch->flags.m_bCompatibilityAttenuation )
 	{
 		// Convert to the original attenuation value.
@@ -2283,7 +2274,6 @@ void DSP_SetSpatialDelay( int chan, float v )
 
 void SND_SetSpatialDelays()
 {
-	VPROF("SoundSpatialDelays");
 	float dist, v, vp;
 	Vector v_dir, v_dir2;
 	int chan_max = (g_AudioDevice->IsSurround() ? 4 : 2) + (g_AudioDevice->IsSurroundCenter() ? 1 : 0);  // 2, 4, 5 channels
@@ -3917,7 +3907,6 @@ int DAS_GetRoomDSP( das_room_t *proom, int inode )
 
 void DAS_CheckNewRoomDSP( )
 {
-	VPROF("DAS_CheckNewRoomDSP");
 	das_room_t *proom = &g_das_room;
 	int dsp_preset;
 	bool bRoom_ready = false;
@@ -4060,8 +4049,6 @@ check_new_room_exit:
 
 void RemapPlayerOrMusicVols(  channel_t *ch, int volumes[CCHANVOLUMES/2], bool fplayersound, bool fmusicsound, float mono )
 {
-	VPROF_("RemapPlayerOrMusicVols", 2, VPROF_BUDGETGROUP_OTHER_SOUND, false, BUDGETFLAG_OTHER );
-
 	if ( !fplayersound && !fmusicsound )
 		return;	// no remapping
 
@@ -4163,8 +4150,6 @@ SND_Spatialize
 */
 void SND_Spatialize(channel_t *ch)
 {
-	VPROF("SND_Spatialize");
-
     vec_t dist;
     Vector source_vec;
 	Vector source_vec_DL;
@@ -4245,7 +4230,6 @@ void SND_Spatialize(channel_t *ch)
 	}
 
 	{
-		VPROF_("SoundServices->GetSoundSpatializtion", 2, VPROF_BUDGETGROUP_OTHER_SOUND, false, BUDGETFLAG_OTHER );
 		fvalidentity = g_pSoundServices->GetSoundSpatialization( ch->soundsource, si );	
 	}
 
@@ -4283,7 +4267,6 @@ void SND_Spatialize(channel_t *ch)
 	fdopplerwav = ((ch->wavtype == CHAR_DOPPLER) && !fplayersound);
 	if ( fdopplerwav )
 	{
-		VPROF_("SND_Spatialize doppler", 2, VPROF_BUDGETGROUP_OTHER_SOUND, false, BUDGETFLAG_OTHER );
 		Vector vnearpoint;				// point of closest approach to listener, 
 										// along sound source forward direction (doppler wavs)
 
@@ -4415,7 +4398,6 @@ void SND_Spatialize(channel_t *ch)
 
 	if ( fdopplerwav )
 	{
-		VPROF_("SND_Spatialize doppler", 2, VPROF_BUDGETGROUP_OTHER_SOUND, false, BUDGETFLAG_OTHER );
 		// fill out channel volumes for both doppler sound source locations
 		int volumes[CCHANVOLUMES/2];
 
@@ -5502,15 +5484,9 @@ int S_StartSound( StartSoundParams_t& params )
 #endif // STAGING_ONLY
 
 	if ( params.staticsound )
-	{
-		VPROF_( "StartStaticSound", 0, VPROF_BUDGETGROUP_OTHER_SOUND, false, BUDGETFLAG_OTHER );	
 		return S_StartStaticSound( params );
-	}
 	else
-	{
-		VPROF_( "StartDynamicSound", 0, VPROF_BUDGETGROUP_OTHER_SOUND, false, BUDGETFLAG_OTHER );
 		return S_StartDynamicSound( params );
-	}
 }
 
 // Restart all the sounds on the specified channel
@@ -5929,7 +5905,6 @@ Called once each time through the main loop
 */
 void S_Update( const AudioState_t *pAudioState )
 {
-	VPROF("S_Update");
 	channel_t	*ch;
 	channel_t	*combine;
 	static unsigned int s_roundrobin = 0 ; ///< number of times this function is called.
@@ -6311,9 +6286,6 @@ extern void DEBUG_StopSoundMeasure(int type, int samplecount );
 
 void S_Update_Guts( float mixAheadTime )
 {
-	VPROF( "S_Update_Guts" );
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 	DEBUG_StartSoundMeasure(4, 0);
 
 	// Update our perception of audio time.

@@ -265,8 +265,6 @@ int CAI_Network::ListNodesInBox( CNodeList &list, int maxListCount, const Vector
 
 int	CAI_Network::NearestNodeToPoint( CAI_BaseNPC *pNPC, const Vector &vecOrigin, bool bCheckVisibility, INearestNodeFilter *pFilter )
 {
-	AI_PROFILE_SCOPE( CAI_Network_NearestNodeToNPCAtPoint );
-	
 	// --------------------------------
 	//  Check if network has no nodes
 	// --------------------------------

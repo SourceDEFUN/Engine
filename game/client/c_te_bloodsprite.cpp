@@ -11,7 +11,7 @@
 #include "c_te_legacytempents.h"
 #include "fx.h"
 #include "tier1/KeyValues.h"
-#include "tier0/vprof.h"
+
 #include "toolframework_client.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -145,8 +145,6 @@ void TE_BloodSprite( IRecipientFilter& filter, float delay,
 //-----------------------------------------------------------------------------
 void C_TEBloodSprite::PostDataUpdate( DataUpdateType_t updateType )
 {
-	VPROF( "C_TEBloodSprite::PostDataUpdate" );
-
 	Vector	offset = m_vecOrigin + ( m_vecDirection * 4.0f );
 
 	tempents->BloodSprite( offset, r, g, b, a, m_nSprayModel, m_nDropModel, m_nSize );	

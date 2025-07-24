@@ -541,50 +541,7 @@ CAchievementItem::CAchievementItem( CDialogMenu *pParent, const wchar_t *pName, 
 	// Title and description were returned as results of a system query,
 	// and are therefore already localized.
 	m_pTitle->SetText( pName );
-
-	if ( IsX360() )
-	{
-		wchar_t buf[120];
-
-		// Get the screen size
-		int wide, tall;
-		vgui::surface()->GetScreenSize(wide, tall);
-
-		unsigned int iWrapLen;
-
-		if ( tall <= 480 )
-		{
-			iWrapLen = 50;
-		}
-		else
-		{
-			iWrapLen = 65;
-		}
-
-		// let's do some wrapping on this label
-		wcsncpy( buf, pDesc, sizeof(buf) / sizeof( wchar_t ) );
-
-		if ( wcslen(buf) > iWrapLen )
-		{
-			int iPos = iWrapLen;
-
-			while ( iPos > 0 && buf[iPos] != L' ' )
-			{
-				iPos--;
-			}
-
-			if ( iPos > 0 && buf[iPos] == L' ' )
-			{
-				buf[iPos] = L'\n';
-			}				
-		}
-
-		m_pDescription->SetText( buf );
-	}
-	else
-	{
-		m_pDescription->SetText( pDesc );
-	}
+	m_pDescription->SetText( pDesc );
 
 	m_pSourceAchievement = pSourceAchievement;
 
@@ -595,17 +552,6 @@ CAchievementItem::CAchievementItem( CDialogMenu *pParent, const wchar_t *pName, 
 	// Set the status icons
 	m_pLockedIcon = SETUP_PANEL( new vgui::ImagePanel( this, "lockedicon" ) );
 	m_pUnlockedIcon = SETUP_PANEL( new vgui::ImagePanel( this, "unlockedicon" ) );
-
-	// Gamerscore number
-	if ( IsX360() )
-	{
-		wchar_t *wzFormat = g_pVGuiLocalize->Find( "#GameUI_Achievement_Points" );	// "%s1G"
-		wchar_t wzPoints[10];
-		V_snwprintf( wzPoints, ARRAYSIZE( wzPoints ), L"%d", points );
-		wchar_t wzPointsLayout[10];
-		g_pVGuiLocalize->ConstructString( wzPointsLayout, sizeof( wzPointsLayout ), wzFormat, 1, wzPoints );
-		m_pPoints = new vgui::Label( this, "Points", wzPointsLayout );
-	}
 
 	// Achievement image
 	m_pImage = new vgui::ImagePanel( this, "icon" );

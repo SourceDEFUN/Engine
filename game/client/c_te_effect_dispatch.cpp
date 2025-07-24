@@ -13,7 +13,7 @@
 #include "c_te_effect_dispatch.h"
 #include "tier1/KeyValues.h"
 #include "toolframework_client.h"
-#include "tier0/vprof.h"
+
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -145,8 +145,6 @@ static void RecordEffect( const char *pEffectName, const CEffectData &data )
 //-----------------------------------------------------------------------------
 void C_TEEffectDispatch::PostDataUpdate( DataUpdateType_t updateType )
 {
-	VPROF( "C_TEEffectDispatch::PostDataUpdate" );
-
 	// Find the effect name.
 	const char *pEffectName = g_StringTableEffectDispatch->GetString( m_EffectData.GetEffectNameIndex() );
 	if ( pEffectName )

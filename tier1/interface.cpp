@@ -194,20 +194,8 @@ HMODULE Sys_LoadLibrary( const char *pLibraryName, Sys_Flags flags )
 
 	Q_strncpy( str, pLibraryName, sizeof(str) );
 
-	if ( IsX360() )
-	{
-		// old, probably busted, behavior for xbox
-		if ( !Q_stristr( str, pModuleExtension ) )
-		{
-			V_SetExtension( str, pModuleExtension, sizeof(str) );
-		}
-	}
-	else
-	{
-		// always force the final extension to be .dll
-		V_SetExtension( str, pModuleExtension, sizeof(str) );
-	}
-
+	// always force the final extension to be .dll
+	V_SetExtension( str, pModuleExtension, sizeof(str) );
 	Q_FixSlashes( str );
 
 #ifdef _WIN32
@@ -319,14 +307,6 @@ CSysModule *Sys_LoadModule( const char *pModuleName, Sys_Flags flags /* = SYS_NO
 	{
 		// full path wasn't passed in, using the current working dir
 		_getcwd( szCwd, sizeof( szCwd ) );
-		if ( IsX360() )
-		{
-			int i = CommandLine()->FindParm( "-basedir" );
-			if ( i )
-			{
-				V_strcpy_safe( szCwd, CommandLine()->GetParm( i + 1 ) );
-			}
-		}
 
 		if (szCwd[strlen(szCwd) - 1] == '/' || szCwd[strlen(szCwd) - 1] == '\\' )
 		{
@@ -425,9 +405,7 @@ CSysModule *Sys_LoadModule( const char *pModuleName, Sys_Flags flags /* = SYS_NO
 	// If running in the debugger, assume debug binaries are okay, otherwise they must run with -allowdebug
 	if ( Sys_GetProcAddress( hDLL, "BuiltDebug" ) )
 	{
-		if ( !IsX360() && hDLL && 
-			 !CommandLine()->FindParm( "-allowdebug" ) && 
-			 !Sys_IsDebuggerPresent() )
+		if ( hDLL && !CommandLine()->FindParm( "-allowdebug" ) && !Sys_IsDebuggerPresent() )
 		{
 			Error( "Module %s is a debug build\n", pModuleName );
 		}

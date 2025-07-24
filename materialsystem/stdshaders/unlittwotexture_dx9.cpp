@@ -128,7 +128,7 @@ BEGIN_VS_SHADER( UnlitTwoTexture_DX9, "Help for UnlitTwoTexture_DX9" )
 		}
 
 		// Skip flashlight pass for unlit stuff
-		bool bNewFlashlightPath = IsX360() || ( r_flashlight_version2.GetInt() != 0 );
+		bool bNewFlashlightPath = r_flashlight_version2.GetInt() != 0;
 		if ( bDrawStandardPass && ( pShaderShadow == NULL ) && ( pShaderAPI != NULL ) &&
 			!bNewFlashlightPath && ( pShaderAPI->InFlashlightMode() ) ) // not snapshotting && flashlight pass)
 		{

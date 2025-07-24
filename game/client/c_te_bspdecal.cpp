@@ -10,7 +10,7 @@
 #include "c_basetempentity.h"
 #include "iefx.h"
 #include "fx.h"
-#include "tier0/vprof.h"
+
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -86,8 +86,6 @@ void TE_BSPDecal( IRecipientFilter& filter, float delay,
 //-----------------------------------------------------------------------------
 void C_TEBSPDecal::PostDataUpdate( DataUpdateType_t updateType )
 {
-	VPROF( "C_TEBSPDecal::PostDataUpdate" );
-
 	C_BaseEntity *ent;
 	if ( ( ent = cl_entitylist->GetEnt( m_nEntity ) ) == NULL )
 	{

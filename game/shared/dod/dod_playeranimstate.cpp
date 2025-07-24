@@ -7,7 +7,7 @@
 #include "cbase.h"
 #include "dod_playeranimstate.h"
 #include "base_playeranimstate.h"
-#include "tier0/vprof.h"
+
 #include "animation.h"
 #include "studio.h"
 #include "apparent_velocity_helper.h"
@@ -887,9 +887,6 @@ extern ConVar mp_feetyawrate;
 //-----------------------------------------------------------------------------
 void CDODPlayerAnimState::Update( float eyeYaw, float eyePitch )
 {
-	// Profile the animation update.
-	VPROF( "CDODPlayerAnimState::Update" );
-
 	// Get the studio header for the player.
 	CStudioHdr *pStudioHdr = GetOuterDOD()->GetModelPtr();
 	if ( !pStudioHdr )

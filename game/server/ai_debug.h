@@ -15,36 +15,6 @@
 #pragma once
 #endif
 
-// This dumps a summary result on exit
-//#define PROFILE_AI 1
-
-#define AI_PROFILE_SCOPE_BEGIN( tag )	if (0) ; else { AI_PROFILE_SCOPE( tag )
-#define AI_PROFILE_SCOPE_BEGIN_( pszName )	if (0) ; else { AI_PROFILE_SCOPE_( pszName )
-#define AI_PROFILE_SCOPE_END()			} do {} while (0)
-
-#if defined(VPROF_AI)
-#define VProfAI() true
-#else
-#define VProfAI() false
-#endif
-#if defined(VPROF_AI)
-#include "tier0/vprof.h"
-#define AI_PROFILE_SCOPE( tag )			VPROF( #tag )
-#define AI_PROFILE_SCOPE_( pszName )	VPROF( pszName )
-#define AI_PROFILE_MEASURE_SCOPE( tag )	VPROF( #tag )
-#elif defined(PROFILE_AI)
-#include "tier0/fasttimer.h"
-#define AI_PROFILE_SCOPE( tag )			PROFILE_SCOPE( tag )
-#define AI_PROFILE_MEASURE_SCOPE( tag )	PROFILE_SCOPE( tag )
-#else
-#define AI_PROFILE_MEASURE_SCOPE( tag )	((void)0)
-#define AI_PROFILE_SCOPE( tag )			((void)0)
-#endif
-
-#ifndef AI_PROFILE_SCOPE_
-#define AI_PROFILE_SCOPE_( pszName ) 	((void)0)
-#endif
-
 
 enum AIMsgFlags
 {

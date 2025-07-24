@@ -181,7 +181,7 @@ bool CHUDQuickInfo::ShouldDraw( void )
 	if ( player == NULL )
 		return false;
 
-	if ( !crosshair.GetBool() && !IsX360() )
+	if ( !crosshair.GetBool() )
 		return false;
 
 	return ( CHudElement::ShouldDraw() && !engine->IsDrawingLoadingImage() );
@@ -315,13 +315,6 @@ void CHUDQuickInfo::Paint()
 	Color clrNormal = gHUD.m_clrNormal;
 	clrNormal[3] = 255 * scalar;
 	m_icon_c->DrawSelf( xCenter, yCenter, clrNormal );
-
-	if( IsX360() )
-	{
-		// Because the fixed reticle draws on half-texels, this rather unsightly hack really helps
-		// center the appearance of the quickinfo on 360 displays.
-		xCenter += 1;
-	}
 
 	if ( !hud_quickinfo.GetInt() )
 		return;

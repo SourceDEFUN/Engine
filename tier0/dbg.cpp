@@ -1006,7 +1006,7 @@ void COM_TimestampedLog( char const *fmt, ... )
 
 	if ( !s_bChecked )
 	{
-		s_bShouldLog = ( IsX360() || CommandLine()->CheckParm( "-profile" ) ) ? true : false;
+		s_bShouldLog = CommandLine()->CheckParm( "-profile" ) ? true : false;
 		s_bShouldLogToETW = ( CommandLine()->CheckParm( "-etwprofile" ) ) ? true : false;
 		if ( s_bShouldLogToETW )
 		{

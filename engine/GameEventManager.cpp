@@ -13,7 +13,7 @@
 #include "filesystem_engine.h"
 #include "server.h"
 #include "client.h"
-#include "tier0/vprof.h"
+
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -395,9 +395,6 @@ bool CGameEventManager::FireEventIntern( IGameEvent *event, bool bServerOnly, bo
 
 	Assert( !(bServerOnly && bClientOnly) ); // it can't be both
 
-	VPROF_("CGameEventManager::FireEvent", 1, VPROF_BUDGETGROUP_OTHER_UNACCOUNTED, false, 
-		bClientOnly ? BUDGETFLAG_CLIENT : ( bServerOnly ? BUDGETFLAG_SERVER : BUDGETFLAG_OTHER ) );
-
 	CGameEventDescriptor *descriptor = GetEventDescriptor( event );
 
 	if ( descriptor == NULL )
@@ -406,9 +403,6 @@ bool CGameEventManager::FireEventIntern( IGameEvent *event, bool bServerOnly, bo
 		FreeEvent( event );
 		return false;
 	}
-
-	tmZoneFiltered( TELEMETRY_LEVEL0, 50, TMZF_NONE, "%s (name: %s listeners: %d)", __FUNCTION__, tmDynamicString( TELEMETRY_LEVEL0, event->GetName() ), descriptor->listeners.Count() );
-
 	// show game events in console
 	if ( net_showevents.GetInt() > 0 )
 	{
@@ -452,8 +446,6 @@ bool CGameEventManager::FireEventIntern( IGameEvent *event, bool bServerOnly, bo
 		if ( listener->m_nListenerType == CLIENTSIDE_OLD ||
 			 listener->m_nListenerType == SERVERSIDE_OLD )
 		{
-			tmZone( TELEMETRY_LEVEL1, TMZF_NONE, "FireGameEvent (i: %d, listenertype: %d (old))", i, listener->m_nListenerType );
-
 			// legacy support for old system
 			IGameEventListener *pCallback = static_cast<IGameEventListener*>(listener->m_pCallback);
 			CGameEvent *pEvent = static_cast<CGameEvent*>(event);
@@ -462,8 +454,6 @@ bool CGameEventManager::FireEventIntern( IGameEvent *event, bool bServerOnly, bo
 		}
 		else
 		{
-			tmZone( TELEMETRY_LEVEL1, TMZF_NONE, "FireGameEvent (i: %d, listenertype: %d (new))", i, listener->m_nListenerType );
-
 			// new system
 			IGameEventListener2 *pCallback =  static_cast<IGameEventListener2*>(listener->m_pCallback);
 

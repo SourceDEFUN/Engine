@@ -430,10 +430,6 @@ void bf_write::WriteBitLong(unsigned int data, int numbits, bool bSigned)
 
 bool bf_write::WriteBits(const void *pInData, int nBits)
 {
-#if defined( BB_PROFILING )
-	VPROF( "bf_write::WriteBits" );
-#endif
-
 	unsigned char *pOut = (unsigned char*)pInData;
 	int nBitsLeft = nBits;
 
@@ -549,9 +545,6 @@ void bf_write::WriteBitAngle( float fAngle, int numbits )
 
 void bf_write::WriteBitCoordMP( const float f, bool bIntegral, bool bLowPrecision )
 {
-#if defined( BB_PROFILING )
-	VPROF( "bf_write::WriteBitCoordMP" );
-#endif
 	int		signbit = (f <= -( bLowPrecision ? COORD_RESOLUTION_LOWPRECISION : COORD_RESOLUTION ));
 	int		intval = (int)abs(f);
 	int		fractval = bLowPrecision ? 
@@ -602,9 +595,6 @@ void bf_write::WriteBitCoordMP( const float f, bool bIntegral, bool bLowPrecisio
 
 void bf_write::WriteBitCoord (const float f)
 {
-#if defined( BB_PROFILING )
-	VPROF( "bf_write::WriteBitCoord" );
-#endif
 	int		signbit = (f <= -COORD_RESOLUTION);
 	int		intval = (int)abs(f);
 	int		fractval = abs((int)(f*COORD_DENOMINATOR)) & (COORD_DENOMINATOR-1);
@@ -860,10 +850,6 @@ unsigned int bf_read::CheckReadUBitLong(int numbits)
 
 void bf_read::ReadBits(void *pOutData, int nBits)
 {
-#if defined( BB_PROFILING )
-	VPROF( "bf_read::ReadBits" );
-#endif
-
 	unsigned char *pOut = (unsigned char*)pOutData;
 	int nBitsLeft = nBits;
 
@@ -1066,9 +1052,6 @@ unsigned int bf_read::ReadBitLong(int numbits, bool bSigned)
 // Basic Coordinate Routines (these contain bit-field size AND fixed point scaling constants)
 float bf_read::ReadBitCoord (void)
 {
-#if defined( BB_PROFILING )
-	VPROF( "bf_read::ReadBitCoord" );
-#endif
 	int		intval=0,fractval=0,signbit=0;
 	float	value = 0.0;
 
@@ -1109,9 +1092,6 @@ float bf_read::ReadBitCoord (void)
 
 float bf_read::ReadBitCoordMP( bool bIntegral, bool bLowPrecision )
 {
-#if defined( BB_PROFILING )
-	VPROF( "bf_read::ReadBitCoordMP" );
-#endif
 	// BitCoordMP float encoding: inbounds bit, integer bit, sign bit, optional int bits, float bits
 	// BitCoordMP integer encoding: inbounds bit, integer bit, optional sign bit, optional int bits.
 	// int bits are always encoded as (value - 1) since zero is handled by the integer bit
@@ -1195,10 +1175,6 @@ float bf_read::ReadBitCoordMP( bool bIntegral, bool bLowPrecision )
 
 unsigned int bf_read::ReadBitCoordBits (void)
 {
-#if defined( BB_PROFILING )
-	VPROF( "bf_read::ReadBitCoordBits" );
-#endif
-
 	unsigned int flags = ReadUBitLong(2);
 	if ( flags == 0 )
 		return 0;
@@ -1214,10 +1190,6 @@ unsigned int bf_read::ReadBitCoordBits (void)
 
 unsigned int bf_read::ReadBitCoordMPBits( bool bIntegral, bool bLowPrecision )
 {
-#if defined( BB_PROFILING )
-	VPROF( "bf_read::ReadBitCoordMPBits" );
-#endif
-
 	unsigned int flags = ReadUBitLong(2);
 	enum { INBOUNDS=1, INTVAL=2 };
 	int numbits = 0;

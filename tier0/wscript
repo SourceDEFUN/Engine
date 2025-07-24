@@ -35,7 +35,6 @@ def build(bld):
 		'memvalidate.cpp',
 		'minidump.cpp',
 		'pch_tier0.cpp',
-		#'pmc360.cpp',		[$X360]
 		'PMELib.cpp',		#[$WINDOWS||$POSIX]
 		'progressbar.cpp',
 		'security.cpp',
@@ -45,7 +44,6 @@ def build(bld):
 		'threadtools.cpp',
 		'tier0_strtools.cpp',
 		'tslist.cpp',
-		'vprof.cpp',
 		#'../tier1/pathmatch.cpp' # [$LINUXALL]
 	]
 	

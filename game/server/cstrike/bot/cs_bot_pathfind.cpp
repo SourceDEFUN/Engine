@@ -1400,14 +1400,8 @@ bool CCSBot::IsRunning( void ) const
  */
 CCSBot::PathResult CCSBot::UpdatePathMovement( bool allowSpeedChange )
 {
-	VPROF_BUDGET( "CCSBot::UpdatePathMovement", VPROF_BUDGETGROUP_NPCS );
-
-	if (m_pathLength == 0)
-		return PATH_FAILURE;
-
-	if (cv_bot_walk.GetBool())
-		Walk();
-
+	if (m_pathLength == 0) return PATH_FAILURE;
+	if (cv_bot_walk.GetBool()) Walk();
 	//
 	// If we are navigating a ladder, it overrides all other path movement until complete
 	//
@@ -1876,8 +1870,6 @@ void CCSBot::BuildTrivialPath( const Vector &goal )
  */
 bool CCSBot::ComputePath( const Vector &goal, RouteType route )
 {
-	VPROF_BUDGET( "CCSBot::ComputePath", VPROF_BUDGETGROUP_NPCS );
-
 	//
 	// Throttle re-pathing
 	//

@@ -18,7 +18,7 @@
 #include "tier1/refcount.h"
 #include "tier1/callqueue.h"
 #include "cmodel.h"
-#include "tier0/vprof.h"
+
 #include "tier1/memhelpers.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -1073,8 +1073,7 @@ VertexFormat_t CStudioRenderContext::CalculateVertexFormat( const studiohdr_t *p
 		// VBs, not dynamic ones - that would slow down the MeshBuilder in dynamic use cases).
 		// Also inspect the vertex data to see if it's appropriate for the vertex element
 		// compression techniques that we do (e.g. look at UV ranges).
-		if ( //IsX360() && // Disabled until the craziness is banished
-			 bIsHwSkinned &&
+		if ( bIsHwSkinned &&
 			( g_pMaterialSystemHardwareConfig->SupportsCompressedVertices() == VERTEX_COMPRESSION_ON ) )
 		{
 			// this mesh is appropriate for vertex compression
@@ -2271,8 +2270,6 @@ void CStudioRenderContext::DrawModel( DrawModelResults_t *pResults, const DrawMo
 	MaterialLock_t hLock = 0;
 	if ( flags & STUDIORENDER_DRAW_ACCURATETIME )
 	{
-		VPROF("STUDIORENDER_DRAW_ACCURATETIME");
-
 		// Flush the material system before timing this model:
 		hLock = g_pMaterialSystem->Lock();
 		g_pMaterialSystem->Flush(true);
@@ -2319,8 +2316,6 @@ void CStudioRenderContext::DrawModel( DrawModelResults_t *pResults, const DrawMo
 
 	if( flags & STUDIORENDER_DRAW_ACCURATETIME )
 	{
-		VPROF( "STUDIORENDER_DRAW_ACCURATETIME" );
-
 		// Make sure this model is completely drawn before ending the timer:
 		g_pMaterialSystem->Flush(true);
 		g_pMaterialSystem->Flush(true);

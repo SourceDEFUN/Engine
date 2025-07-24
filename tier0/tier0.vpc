@@ -175,7 +175,6 @@ $Project "tier0"
 		$File	"tslist.cpp"
 		$File	"vcrmode.cpp"		[$WINDOWS]
 		$File	"vcrmode_posix.cpp"	[$POSIX]
-		$File	"vprof.cpp"
 		$File	"win32consoleio.cpp"	[$WINDOWS]
 		$File	"../tier1/pathmatch.cpp" [$LINUXALL]
 	}
@@ -219,7 +218,6 @@ $Project "tier0"
 		$File	"$SRCDIR\public\tier0\valve_on.h"
 		$File	"$SRCDIR\public\tier0\vcr_shared.h"
 		$File	"$SRCDIR\public\tier0\vcrmode.h"
-		$File	"$SRCDIR\public\tier0\vprof.h"
 		$File	"$SRCDIR\public\tier0\wchartypes.h"
 		$File	"$SRCDIR\public\tier0\xbox_codeline_defines.h"
 		$File	"mem_helpers.h"

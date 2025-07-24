@@ -1047,7 +1047,7 @@ void Frame::OnThink()
 		if (m_bFadingOut)
 		{
 			// we're fading out, see if we're done so we can fully hide the window
-			if (GetAlpha() < ( IsX360() ? 64 : 1 ))
+			if (GetAlpha() < 1 )
 			{
 				FinishClose();
 			}
@@ -1057,15 +1057,7 @@ void Frame::OnThink()
 			// need to fade-in
 			m_bPreviouslyVisible = true;
 			
-			// fade in
-			if (IsX360())
-			{
-				SetAlpha(64);
-			}
-			else
-			{
-				SetAlpha(0);
-			}
+			SetAlpha(0);
 			GetAnimationController()->RunAnimationCommand(this, "alpha", 255.0f, 0.0f, m_flTransitionEffectTime, AnimationController::INTERPOLATOR_LINEAR);
 		}
 	}
@@ -2124,16 +2116,6 @@ void Frame::OnKeyCodeTyped(KeyCode code)
 	bool ctrl = (input()->IsKeyDown(KEY_LCONTROL) || input()->IsKeyDown(KEY_RCONTROL));
 	bool alt = (input()->IsKeyDown(KEY_LALT) || input()->IsKeyDown(KEY_RALT));
 	
-	if ( IsX360() )
-	{
-		vgui::Panel *pMap = FindChildByName( "ControllerMap" );
-		if ( pMap && pMap->IsKeyBoardInputEnabled() )
-		{
-			pMap->OnKeyCodeTyped( code );
-			return;
-		}
-	}
-
 	if ( ctrl && shift && alt && code == KEY_B)
 	{
 		// enable build mode

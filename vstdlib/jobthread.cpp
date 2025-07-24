@@ -17,7 +17,7 @@
 #include "tier1/fmtstr.h"
 #include "tier1/utlvector.h"
 #include "tier1/generichash.h"
-#include "tier0/vprof.h"
+
 
 
 #include "tier0/memdbgon.h"
@@ -351,7 +351,6 @@ private:
 	unsigned Wait()
 	{
 		unsigned waitResult;
-		tmZone( TELEMETRY_LEVEL0, TMZF_IDLE, "%s", __FUNCTION__ );
 #ifdef WIN32
 		enum Event_t
 		{
@@ -406,8 +405,6 @@ private:
 		unsigned waitResult;
 		bool	 bExit = false;
 
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 		m_pOwner->m_nIdleThreads++;
 		m_IdleEvent.Set();
 		while (!bExit && ( ( waitResult = Wait() ) != WAIT_FAILED ) )
@@ -415,7 +412,6 @@ private:
 			if ( PeekCall() )
 			{
 				CFunctor *pFunctor = NULL;
-				tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s PeekCall():%d", __FUNCTION__, GetCallParam() );
 
 				switch ( GetCallParam() )
 				{
@@ -450,8 +446,6 @@ private:
 			}
 			else
 			{
-				tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s !PeekCall()", __FUNCTION__ );
-
 				CJob *pJob;
 				bool bTookJob = false;
 				do
@@ -605,8 +599,6 @@ int CThreadPool::ResumeExecution()
 
 int CThreadPool::YieldWait( CThreadEvent **pEvents, int nEvents, bool bWaitAll, unsigned timeout )
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_IDLE, "%s(%d) SPINNING %t", __FUNCTION__, timeout, tmSendCallStack( TELEMETRY_LEVEL0, 0 ) );
-
 	Assert( timeout == TT_INFINITE ); // unimplemented
 
 	int result;
@@ -1187,8 +1179,8 @@ void Test( bool bDistribute, bool bSleep = true, bool bFinishExecute = false, bo
 		for ( g_iSleep = -10; g_iSleep <= 10; g_iSleep += 10 )
 		{
 			Msg( "ThreadPoolTest:         Testing! Sleep %d, interleave %d \n", g_iSleep, bInterleavePushPop );
-			int nMaxThreads = ( IsX360() ) ? 6 : 8;
-			int nIncrement = ( IsX360() ) ? 1 : 2;
+			int nMaxThreads = 8;
+			int nIncrement = 2;
 			for ( int i = 1; i <= nMaxThreads; i += nIncrement )
 			{
 				CCountJob::m_nCount = 0;
@@ -1375,11 +1367,8 @@ void RunThreadPoolTests()
 	for ( int i = 0; i < 2; i++ )
 	{
 		bool bToCompletion = ( i % 2 != 0 );
-		if ( !IsX360() )
-		{
-			Msg( "ThreadPoolTest:     Non-distribute\n" );
-			ThreadPoolTest::Test( false, true, bToCompletion );
-		}
+		Msg( "ThreadPoolTest:     Non-distribute\n" );
+		ThreadPoolTest::Test( false, true, bToCompletion );
 
 		Msg( "ThreadPoolTest:     Distribute\n" );
 		ThreadPoolTest::Test( true, true, bToCompletion  );
@@ -1405,11 +1394,8 @@ void RunThreadPoolTests()
 	for ( int i = 0; i < 2; i++ )
 	{
 		bool bToCompletion = true;// = ( i % 2 != 0 );
-		if ( !IsX360() )
-		{
-			Msg( "ThreadPoolTest:     Non-distribute\n" );
-			ThreadPoolTest::Test( false, true, bToCompletion, true );
-		}
+		Msg( "ThreadPoolTest:     Non-distribute\n" );
+		ThreadPoolTest::Test( false, true, bToCompletion, true );
 
 		Msg( "ThreadPoolTest:     Distribute\n" );
 		ThreadPoolTest::Test( true, true, bToCompletion, true );

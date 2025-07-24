@@ -382,9 +382,7 @@ CAI_Schedule *CAI_BaseNPC::GetScheduleOfType( int scheduleType )
 {
 	// allow the derived classes to pick an appropriate version of this schedule or override
 	// base schedule types.
-	AI_PROFILE_SCOPE_BEGIN(CAI_BaseNPC_TranslateSchedule);
 	scheduleType = TranslateSchedule( scheduleType );
-	AI_PROFILE_SCOPE_END();
 
 	// Get a pointer to that schedule
 	CAI_Schedule *schedule = GetSchedule(scheduleType);

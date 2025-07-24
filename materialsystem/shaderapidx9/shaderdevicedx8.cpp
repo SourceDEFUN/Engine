@@ -24,7 +24,7 @@
 #include "vertexshaderdx8.h"
 #include "recording.h"
 #include "winutils.h"
-#include "tier0/vprof_telemetry.h"
+
 
 #if defined ( DX_TO_GL_ABSTRACTION )
 // Placed here so inlines placed in dxabstract.h can access gGL
@@ -342,7 +342,7 @@ void CShaderDeviceMgrDx8::CheckBorderColorSupport( HardwareCaps_t *pCaps, int nA
 #ifdef DX_TO_GL_ABSTRACTION
 	if( true )
 #else
-	if( IsX360() )
+	if( false )
 #endif
 	{
 		pCaps->m_bSupportsBorderColor = true;
@@ -375,84 +375,81 @@ void CShaderDeviceMgrDx8::CheckVendorDependentShadowMappingSupport( HardwareCaps
 	return;
 #endif
 
-	if ( IsPC() || !IsX360() )
+	bool bToolsMode = IsWindows() && ( CommandLine()->CheckParm( "-tools" ) != NULL );
+	bool bFound16Bit = false;
+
+	if ( ( pCaps->m_VendorID == VENDORID_NVIDIA ) && ( pCaps->m_SupportsShaderModel_3_0  ) )	// ps_3_0 parts from nVidia
 	{
-		bool bToolsMode = IsWindows() && ( CommandLine()->CheckParm( "-tools" ) != NULL );
-		bool bFound16Bit = false;
-
-		if ( ( pCaps->m_VendorID == VENDORID_NVIDIA ) && ( pCaps->m_SupportsShaderModel_3_0  ) )	// ps_3_0 parts from nVidia
+		// First, test for null texture support
+		if ( m_pD3D->CheckDeviceFormat( nAdapter, DX8_DEVTYPE, D3DFMT_X8R8G8B8, D3DUSAGE_RENDERTARGET, D3DRTYPE_TEXTURE, NVFMT_NULL ) == S_OK )
 		{
-			// First, test for null texture support
-			if ( m_pD3D->CheckDeviceFormat( nAdapter, DX8_DEVTYPE, D3DFMT_X8R8G8B8, D3DUSAGE_RENDERTARGET, D3DRTYPE_TEXTURE, NVFMT_NULL ) == S_OK )
-			{
-				pCaps->m_NullTextureFormat = IMAGE_FORMAT_NV_NULL;
-			}
+			pCaps->m_NullTextureFormat = IMAGE_FORMAT_NV_NULL;
+		}
 
-			//
-			// NVIDIA has two no-PCF formats (these are not filtering modes, but surface formats
-			//   NVFMT_RAWZ is supported by NV4x (not supported here yet...requires a dp3 to reconstruct in shader code, which doesn't seem to work)
-			//   NVFMT_INTZ is supported on newer chips as of G8x (just read like ATI non-fetch4 mode)
-			//
+		//
+		// NVIDIA has two no-PCF formats (these are not filtering modes, but surface formats
+		//   NVFMT_RAWZ is supported by NV4x (not supported here yet...requires a dp3 to reconstruct in shader code, which doesn't seem to work)
+		//   NVFMT_INTZ is supported on newer chips as of G8x (just read like ATI non-fetch4 mode)
+		//
 /*
-			if ( m_pD3D->CheckDeviceFormat( nAdapter, DX8_DEVTYPE, D3DFMT_X8R8G8B8, D3DUSAGE_RENDERTARGET, D3DRTYPE_TEXTURE, NVFMT_INTZ ) == S_OK )
-			{
-				pCaps->m_ShadowDepthTextureFormat = IMAGE_FORMAT_NV_INTZ;
-				pCaps->m_bSupportsFetch4 = false;
-				pCaps->m_bSupportsShadowDepthTextures = true;
-				return;
-			}
-*/
-			if ( m_pD3D->CheckDeviceFormat( nAdapter, DX8_DEVTYPE, D3DFMT_X8R8G8B8, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_TEXTURE, D3DFMT_D16 ) == S_OK )
-			{
-				pCaps->m_ShadowDepthTextureFormat = IMAGE_FORMAT_NV_DST16;
-				pCaps->m_bSupportsFetch4 = false;
-				pCaps->m_bSupportsShadowDepthTextures = true;
-				bFound16Bit = true;
-
-				if ( !bToolsMode )	// Tools will continue on and try for 24 bit...
-					return;
-			}
-			
-			if ( m_pD3D->CheckDeviceFormat( nAdapter, DX8_DEVTYPE, D3DFMT_X8R8G8B8, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_TEXTURE, D3DFMT_D24S8 ) == S_OK )
-			{
-				pCaps->m_ShadowDepthTextureFormat = IMAGE_FORMAT_NV_DST24;
-				pCaps->m_bSupportsFetch4 = false;
-				pCaps->m_bSupportsShadowDepthTextures = true;
-				return;
-			}
-
-			if ( bFound16Bit )		// Found 16 bit but not 24
-				return;
-		}
-		else if ( ( pCaps->m_VendorID == VENDORID_ATI ) && pCaps->m_SupportsPixelShaders_2_b )		// ps_2_b parts from ATI
+		if ( m_pD3D->CheckDeviceFormat( nAdapter, DX8_DEVTYPE, D3DFMT_X8R8G8B8, D3DUSAGE_RENDERTARGET, D3DRTYPE_TEXTURE, NVFMT_INTZ ) == S_OK )
 		{
-			// Initially, check for Fetch4 (tied to ATIFMT_D24S8 support)
+			pCaps->m_ShadowDepthTextureFormat = IMAGE_FORMAT_NV_INTZ;
 			pCaps->m_bSupportsFetch4 = false;
-			if ( m_pD3D->CheckDeviceFormat( nAdapter, DX8_DEVTYPE, D3DFMT_X8R8G8B8, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_TEXTURE, ATIFMT_D24S8 ) == S_OK )
-			{
-				pCaps->m_bSupportsFetch4 = true;
-			}
+			pCaps->m_bSupportsShadowDepthTextures = true;
+			return;
+		}
+*/
+		if ( m_pD3D->CheckDeviceFormat( nAdapter, DX8_DEVTYPE, D3DFMT_X8R8G8B8, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_TEXTURE, D3DFMT_D16 ) == S_OK )
+		{
+			pCaps->m_ShadowDepthTextureFormat = IMAGE_FORMAT_NV_DST16;
+			pCaps->m_bSupportsFetch4 = false;
+			pCaps->m_bSupportsShadowDepthTextures = true;
+			bFound16Bit = true;
 
-			if ( m_pD3D->CheckDeviceFormat( nAdapter, DX8_DEVTYPE, D3DFMT_X8R8G8B8, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_TEXTURE, ATIFMT_D16 ) == S_OK )	// Prefer 16-bit
-			{
-				pCaps->m_ShadowDepthTextureFormat = IMAGE_FORMAT_ATI_DST16;
-				pCaps->m_bSupportsShadowDepthTextures = true;
-				bFound16Bit = true;
-
-				if ( !bToolsMode )	// Tools will continue on and try for 24 bit...
-					return;
+			if ( !bToolsMode )	// Tools will continue on and try for 24 bit...
+				return;
 			}
 			
-			if ( m_pD3D->CheckDeviceFormat( nAdapter, DX8_DEVTYPE, D3DFMT_X8R8G8B8, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_TEXTURE, ATIFMT_D24S8 ) == S_OK )
-			{
-				pCaps->m_ShadowDepthTextureFormat = IMAGE_FORMAT_ATI_DST24;
-				pCaps->m_bSupportsShadowDepthTextures = true;
-				return;
-			}
+		if ( m_pD3D->CheckDeviceFormat( nAdapter, DX8_DEVTYPE, D3DFMT_X8R8G8B8, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_TEXTURE, D3DFMT_D24S8 ) == S_OK )
+		{
+			pCaps->m_ShadowDepthTextureFormat = IMAGE_FORMAT_NV_DST24;
+			pCaps->m_bSupportsFetch4 = false;
+			pCaps->m_bSupportsShadowDepthTextures = true;
+			return;
+		}
 
-			if ( bFound16Bit )		// Found 16 bit but not 24
+		if ( bFound16Bit )		// Found 16 bit but not 24
+			return;
+	}
+	else if ( ( pCaps->m_VendorID == VENDORID_ATI ) && pCaps->m_SupportsPixelShaders_2_b )		// ps_2_b parts from ATI
+	{
+		// Initially, check for Fetch4 (tied to ATIFMT_D24S8 support)
+		pCaps->m_bSupportsFetch4 = false;
+		if ( m_pD3D->CheckDeviceFormat( nAdapter, DX8_DEVTYPE, D3DFMT_X8R8G8B8, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_TEXTURE, ATIFMT_D24S8 ) == S_OK )
+		{
+			pCaps->m_bSupportsFetch4 = true;
+		}
+
+		if ( m_pD3D->CheckDeviceFormat( nAdapter, DX8_DEVTYPE, D3DFMT_X8R8G8B8, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_TEXTURE, ATIFMT_D16 ) == S_OK )	// Prefer 16-bit
+		{
+			pCaps->m_ShadowDepthTextureFormat = IMAGE_FORMAT_ATI_DST16;
+			pCaps->m_bSupportsShadowDepthTextures = true;
+			bFound16Bit = true;
+
+			if ( !bToolsMode )	// Tools will continue on and try for 24 bit...
 				return;
 		}
+			
+		if ( m_pD3D->CheckDeviceFormat( nAdapter, DX8_DEVTYPE, D3DFMT_X8R8G8B8, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_TEXTURE, ATIFMT_D24S8 ) == S_OK )
+		{
+			pCaps->m_ShadowDepthTextureFormat = IMAGE_FORMAT_ATI_DST24;
+			pCaps->m_bSupportsShadowDepthTextures = true;
+			return;
+		}
+
+		if ( bFound16Bit )		// Found 16 bit but not 24
+			return;
 	}
 
 	// Other vendor or old hardware
@@ -831,11 +828,6 @@ bool CShaderDeviceMgrDx8::ComputeCapsFromD3D( HardwareCaps_t *pCaps, int nAdapte
 	pCaps->m_ZBiasAndSlopeScaledDepthBiasSupported =
 		( ( caps.RasterCaps & D3DPRASTERCAPS_DEPTHBIAS) != 0 ) &&
 		( ( caps.RasterCaps & D3DPRASTERCAPS_SLOPESCALEDEPTHBIAS ) != 0 );
-	if ( IsX360() )
-	{
-		// driver lies, force it
-		pCaps->m_ZBiasAndSlopeScaledDepthBiasSupported = true;
-	}
 
 	// Spheremapping supported?
 	pCaps->m_bSupportsSpheremapping = (caps.VertexProcessingCaps & D3DVTXPCAPS_TEXGEN_SPHEREMAP) != 0;
@@ -868,19 +860,11 @@ bool CShaderDeviceMgrDx8::ComputeCapsFromD3D( HardwareCaps_t *pCaps, int nAdapte
 #endif
 	
 	// Query for SRGB support as needed for our DX 9 stuff
-	if ( IsPC() || !IsX360() )
-	{
-		pCaps->m_SupportsSRGB = ( D3D()->CheckDeviceFormat( nAdapter, DX8_DEVTYPE, D3DFMT_X8R8G8B8, D3DUSAGE_QUERY_SRGBREAD, D3DRTYPE_TEXTURE, D3DFMT_DXT1 ) == S_OK);
+	pCaps->m_SupportsSRGB = ( D3D()->CheckDeviceFormat( nAdapter, DX8_DEVTYPE, D3DFMT_X8R8G8B8, D3DUSAGE_QUERY_SRGBREAD, D3DRTYPE_TEXTURE, D3DFMT_DXT1 ) == S_OK);
 
-		if ( pCaps->m_SupportsSRGB )
-		{
-			pCaps->m_SupportsSRGB = ( D3D()->CheckDeviceFormat( nAdapter, DX8_DEVTYPE, D3DFMT_X8R8G8B8, D3DUSAGE_QUERY_SRGBREAD | D3DUSAGE_QUERY_SRGBWRITE, D3DRTYPE_TEXTURE, D3DFMT_A8R8G8B8 ) == S_OK);
-		}
-	}
-	else
+	if ( pCaps->m_SupportsSRGB )
 	{
-		// 360 does support it, but is queried in the wrong manner, so force it
-		pCaps->m_SupportsSRGB = true;
+		pCaps->m_SupportsSRGB = ( D3D()->CheckDeviceFormat( nAdapter, DX8_DEVTYPE, D3DFMT_X8R8G8B8, D3DUSAGE_QUERY_SRGBREAD | D3DUSAGE_QUERY_SRGBWRITE, D3DRTYPE_TEXTURE, D3DFMT_A8R8G8B8 ) == S_OK);
 	}
 
 	if ( CommandLine()->CheckParm( "-nosrgb" ) )
@@ -1038,8 +1022,7 @@ bool CShaderDeviceMgrDx8::ComputeCapsFromD3D( HardwareCaps_t *pCaps, int nAdapte
 		//		(caps.PrimitiveMiscCaps & D3DPMISCCAPS_SEPARATEALPHABLEND) &&
 		bSupportsFloat16Textures &&
 		bSupportsFloat16RenderTargets &&
-		pCaps->m_SupportsSRGB && 
-		!IsX360();
+		pCaps->m_SupportsSRGB;
 
 	pCaps->m_MaxHDRType = HDR_TYPE_NONE;
 	if ( bSupportsFloatHDR )
@@ -1139,12 +1122,6 @@ void CShaderDeviceMgrDx8::ComputeDXSupportLevel( HardwareCaps_t &caps )
 
 	// FIXME: Improve this!! There should be a whole list of features
 	// we require in order to be considered a DX7 board, DX8 board, etc.
-
-	if ( IsX360() )
-	{
-		caps.m_nMaxDXSupportLevel = 98;
-		return;
-	}
 
 	bool bIsOpenGL = IsOpenGL();
 
@@ -1561,7 +1538,7 @@ void CShaderDeviceDx8::SetPresentParameters( void* hWnd, int nAdapter, const Sha
 	m_PresentParameters.SwapEffect = info.m_bUsingMultipleWindows ? D3DSWAPEFFECT_COPY : D3DSWAPEFFECT_DISCARD;
 
 	// for 360, we want to create it ourselves for hierarchical z support
-	m_PresentParameters.EnableAutoDepthStencil = IsX360() ? FALSE : TRUE; 
+	m_PresentParameters.EnableAutoDepthStencil = TRUE; 
 
 	// What back-buffer format should we use?
 	ImageFormat backBufferFormat = FindNearestSupportedBackBufferFormat( nAdapter,
@@ -1596,7 +1573,7 @@ void CShaderDeviceDx8::SetPresentParameters( void* hWnd, int nAdapter, const Sha
 		m_bUsingStencil = false; //couldn't acquire a stencil buffer
 	};
 
-	if ( IsX360() || !info.m_bWindowed )
+	if ( !info.m_bWindowed )
 	{
 		bool useDefault = ( info.m_DisplayMode.m_nWidth == 0 ) || ( info.m_DisplayMode.m_nHeight == 0 );
 		m_PresentParameters.BackBufferCount = 1;
@@ -2250,9 +2227,6 @@ bool CShaderDeviceDx8::CreateD3DDevice( void* pHWnd, int nAdapter, const ShaderD
 //-----------------------------------------------------------------------------
 void CShaderDeviceDx8::AllocFrameSyncTextureObject()
 {
-	if ( IsX360() )
-		return;
-
 	FreeFrameSyncTextureObject();
 
 	// Create a tiny managed texture.
@@ -2272,9 +2246,6 @@ void CShaderDeviceDx8::AllocFrameSyncTextureObject()
 
 void CShaderDeviceDx8::FreeFrameSyncTextureObject()
 {
-	if ( IsX360() )
-		return;
-
 	if ( m_pFrameSyncTexture )
 	{
 		m_pFrameSyncTexture->Release();
@@ -2284,9 +2255,6 @@ void CShaderDeviceDx8::FreeFrameSyncTextureObject()
 
 void CShaderDeviceDx8::AllocFrameSyncObjects( void )
 {
-	if ( IsX360() )
-		return;
-
 	if ( mat_debugalttab.GetBool() )
 	{
 		Warning( "mat_debugalttab: CShaderAPIDX8::AllocFrameSyncObjects\n" );
@@ -2326,9 +2294,6 @@ void CShaderDeviceDx8::AllocFrameSyncObjects( void )
 
 void CShaderDeviceDx8::FreeFrameSyncObjects( void )
 {
-	if ( IsX360() )
-		return;
-
 	if ( mat_debugalttab.GetBool() )
 	{
 		Warning( "mat_debugalttab: CShaderAPIDX8::FreeFrameSyncObjects\n" );
@@ -2343,8 +2308,6 @@ void CShaderDeviceDx8::FreeFrameSyncObjects( void )
 		{
 			if ( m_bQueryIssued[i] )
 			{
-				tmZone( TELEMETRY_LEVEL1, TMZF_NONE, "D3DQueryGetData %t", tmSendCallStack( TELEMETRY_LEVEL0, 0 ) );
-
 				double flStartTime = Plat_FloatTime();
 				BOOL dummyData = 0;
 				HRESULT hr = S_OK;
@@ -2440,9 +2403,6 @@ void CShaderDeviceDx8::HandleThreadEvent( uint32 threadEvent )
 //-----------------------------------------------------------------------------
 bool CShaderDeviceDx8::TryDeviceReset()
 {
-	if ( IsX360() )
-		return true;
-
 	// Don't try to reset the device until we're sure our resources have been released
 	if ( !m_bResourcesReleased )
 	{
@@ -2585,9 +2545,6 @@ void CShaderDeviceDx8::ReacquireResourcesInternal( bool bResetState, bool bForce
 //-----------------------------------------------------------------------------
 bool CShaderDeviceDx8::ResizeWindow( const ShaderDeviceInfo_t &info ) 
 {
-	if ( IsX360() )
-		return false;
-
 	m_bPendingVideoModeChange = false;
 
 	// We don't need to do crap if the window was set up to set up
@@ -2620,9 +2577,6 @@ bool CShaderDeviceDx8::ResizeWindow( const ShaderDeviceInfo_t &info )
 //-----------------------------------------------------------------------------
 void CShaderDeviceDx8::MarkDeviceLost( )
 {
-	if ( IsX360() )
-		return;
-
 	m_bQueuedDeviceLost = true;
 }
 
@@ -2811,41 +2765,7 @@ bool CShaderDeviceDx8::InNonInteractiveMode() const
 }
 
 void CShaderDeviceDx8::EnableNonInteractiveMode( MaterialNonInteractiveMode_t mode, ShaderNonInteractiveInfo_t *pInfo )
-{
-	if ( !IsX360() )
-		return;
-	if ( pInfo && ( pInfo->m_hTempFullscreenTexture == INVALID_SHADERAPI_TEXTURE_HANDLE ) )
-	{
-		mode = MATERIAL_NON_INTERACTIVE_MODE_NONE;
-	}
-	m_NonInteractiveRefresh.m_Mode = mode;
-	if ( pInfo )
-	{
-		m_NonInteractiveRefresh.m_Info = *pInfo;
-	}
-	m_NonInteractiveRefresh.m_nPacifierFrame = 0;
-
-	if ( mode != MATERIAL_NON_INTERACTIVE_MODE_NONE )
-	{
-		ConVarRef mat_monitorgamma( "mat_monitorgamma" );
-		ConVarRef mat_monitorgamma_tv_range_min( "mat_monitorgamma_tv_range_min" );
-		ConVarRef mat_monitorgamma_tv_range_max( "mat_monitorgamma_tv_range_max" );
-		ConVarRef mat_monitorgamma_tv_exp( "mat_monitorgamma_tv_exp" );
-		ConVarRef mat_monitorgamma_tv_enabled( "mat_monitorgamma_tv_enabled" );
-		SetHardwareGammaRamp( mat_monitorgamma.GetFloat(), mat_monitorgamma_tv_range_min.GetFloat(), mat_monitorgamma_tv_range_max.GetFloat(),
-			mat_monitorgamma_tv_exp.GetFloat(), mat_monitorgamma_tv_enabled.GetBool() );
-	}
-
-//	Msg( "Time elapsed: %.3f Peak %.3f Ave %.5f Count %d Count Above %d\n", Plat_FloatTime() - m_NonInteractiveRefresh.m_flStartTime,
-//		m_NonInteractiveRefresh.m_flPeakDt, m_NonInteractiveRefresh.m_flTotalDt / m_NonInteractiveRefresh.m_nSamples, m_NonInteractiveRefresh.m_nSamples, m_NonInteractiveRefresh.m_nCountAbove66 );
-
-	m_NonInteractiveRefresh.m_flStartTime = m_NonInteractiveRefresh.m_flLastPresentTime = 
-		m_NonInteractiveRefresh.m_flLastPacifierTime = Plat_FloatTime();
-	m_NonInteractiveRefresh.m_flPeakDt = 0.0f;
-	m_NonInteractiveRefresh.m_flTotalDt = 0.0f;
-	m_NonInteractiveRefresh.m_nSamples = 0;
-	m_NonInteractiveRefresh.m_nCountAbove66 = 0;
-}
+{}
 
 void CShaderDeviceDx8::UpdatePresentStats()
 {
@@ -2868,13 +2788,7 @@ void CShaderDeviceDx8::UpdatePresentStats()
 }
 
 void CShaderDeviceDx8::RefreshFrontBufferNonInteractive()
-{
-	if ( !IsX360() || !InNonInteractiveMode() )
-		return;
-
-	// Other code should not be talking to D3D at the same time as this
-	AUTO_LOCK( m_nonInteractiveModeMutex );
-}
+{}
 
 
 //-----------------------------------------------------------------------------
@@ -2919,9 +2833,9 @@ void CShaderDeviceDx8::Present()
 
 	// If we're not iconified, try to present (without this check, we can flicker when Alt-Tabbed away)
 #ifdef _WIN32
-	if ( IsX360() || (IsIconic( ( HWND )m_hWnd ) == 0 && bValidPresent) )
+	if ( IsIconic( ( HWND )m_hWnd ) == 0 && bValidPresent )
 #else
-	if ( IsX360() || (IsIconic( (VD3DHWND)m_hWnd ) == 0 && bValidPresent) )
+	if ( IsIconic( (VD3DHWND)m_hWnd ) == 0 && bValidPresent)
 #endif
 	{
 		if ( IsPC() && ( m_IsResizing || ( m_ViewHWnd != (VD3DHWND)m_hWnd ) ) )
@@ -2985,13 +2899,6 @@ void CShaderDeviceDx8::Present()
 		CheckDeviceLost( m_bOtherAppInitializing );
 	}
 
-	if ( IsX360() )
-	{
-		// according to docs  - "Mandatory Reset of GPU Registers"
-		// 360 must force the cached state to be dirty after any present()
-		g_pShaderAPI->ResetRenderState( false );
-	}
-
 #ifdef RECORD_KEYFRAMES
 	static int frame = 0;
 	++frame;
@@ -3041,25 +2948,8 @@ void CShaderDeviceDx8::SetHardwareGammaRamp( float fGamma, float fGammaTVRangeMi
 	{
 		float flInputValue = float( i ) / 255.0f;
 
-		// Since the 360's sRGB read/write is a piecewise linear approximation, we need to correct for the difference in gamma space here
-		float flSrgbGammaValue;
-		if ( IsX360() ) // Should we also do this for the PS3?
-		{
-			// First undo the 360 broken sRGB curve by bringing the value back into linear space
-			float flLinearValue = X360GammaToLinear( flInputValue );
-			flLinearValue = clamp( flLinearValue, 0.0f, 1.0f );
-
-			// Now apply a true sRGB curve to mimic PC hardware
-			flSrgbGammaValue = SrgbLinearToGamma( flLinearValue ); // ( flLinearValue <= 0.0031308f ) ? ( flLinearValue * 12.92f ) : ( 1.055f * powf( flLinearValue, ( 1.0f / 2.4f ) ) ) - 0.055f;
-			flSrgbGammaValue = clamp( flSrgbGammaValue, 0.0f, 1.0f );
-		}
-		else
-		{
-			flSrgbGammaValue = flInputValue;
-		}
-
 		// Apply the user controlled exponent curve
-		float flCorrection = pow( flSrgbGammaValue, ( fGamma / 2.2f ) );
+		float flCorrection = pow( flInputValue, ( fGamma / 2.2f ) );
 		flCorrection = clamp( flCorrection, 0.0f, 1.0f );
 
 		// TV adjustment - Apply an exp and a scale and bias

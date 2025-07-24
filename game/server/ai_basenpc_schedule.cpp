@@ -474,8 +474,6 @@ CAI_Schedule *CAI_BaseNPC::GetNewSchedule( void )
 			SetState( NPC_STATE_ALERT );
 		}
 
-		AI_PROFILE_SCOPE_BEGIN( CAI_BaseNPC_SelectSchedule);
-
 		if ( m_NPCState == NPC_STATE_SCRIPT || m_NPCState == NPC_STATE_DEAD || m_iInteractionState == NPCINT_MOVING_TO_MARK )
 		{
 			scheduleType = CAI_BaseNPC::SelectSchedule();
@@ -486,8 +484,6 @@ CAI_Schedule *CAI_BaseNPC::GetNewSchedule( void )
 		}
 
 		m_IdealSchedule = GetGlobalScheduleId( scheduleType );
-
-		AI_PROFILE_SCOPE_END();
 	}
 
 	return GetScheduleOfType( scheduleType );
@@ -561,7 +557,6 @@ static bool ShouldStopProcessingTasks( CAI_BaseNPC *pNPC, int taskTime, int time
 
 void CAI_BaseNPC::MaintainSchedule ( void )
 {
-	AI_PROFILE_SCOPE(CAI_BaseNPC_RunAI_MaintainSchedule);
 	extern CFastTimer g_AIMaintainScheduleTimer;
 	CTimeScope timeScope(&g_AIMaintainScheduleTimer);
 
@@ -571,15 +566,7 @@ void CAI_BaseNPC::MaintainSchedule ( void )
 	int			i;
 	bool		runTask = true;
 
-#if defined( VPROF_ENABLED )
-#if defined(DISABLE_DEBUG_HISTORY)
-	bool bDebugTaskNames = ( developer.GetBool() || ( VProfAI() && g_VProfCurrentProfile.IsEnabled() ) );
-#else
-	bool bDebugTaskNames = true;
-#endif
-#else
 	bool bDebugTaskNames = false;
-#endif
 
 	memset( g_AITaskTimings, 0, sizeof(g_AITaskTimings) );
 	
@@ -698,8 +685,6 @@ void CAI_BaseNPC::MaintainSchedule ( void )
 			return;
 		}
 		
-		AI_PROFILE_SCOPE_BEGIN_( CAI_BaseNPC::GetSchedulingSymbols()->ScheduleIdToSymbol( GetCurSchedule()->GetId() ) );
-
 		if ( GetTaskStatus() == TASKSTATUS_NEW )
 		{	
 			if ( GetScheduleCurTaskIndex() == 0 )
@@ -727,13 +712,7 @@ void CAI_BaseNPC::MaintainSchedule ( void )
 			m_ScheduleState.taskFailureCode    = NO_TASK_FAILURE;
 			m_ScheduleState.timeCurTaskStarted = gpGlobals->curtime;
 			
-			AI_PROFILE_SCOPE_BEGIN_( pszTaskName );
-			AI_PROFILE_SCOPE_BEGIN(CAI_BaseNPC_StartTask);
-
 			StartTask( pTask );
-
-			AI_PROFILE_SCOPE_END();
-			AI_PROFILE_SCOPE_END();
 
 			if ( TaskIsRunning() && !HasCondition(COND_TASK_FAILED) )
 				StartTaskOverlay();
@@ -742,13 +721,9 @@ void CAI_BaseNPC::MaintainSchedule ( void )
 			// DevMsg( "%.2f StartTask( %s )\n", gpGlobals->curtime, m_pTaskSR->GetStringText( pTask->iTask ) );
 		}
 
-		AI_PROFILE_SCOPE_END();
-
 		// UNDONE: Twice?!!!
 		MaintainActivity();
 		
-		AI_PROFILE_SCOPE_BEGIN_( CAI_BaseNPC::GetSchedulingSymbols()->ScheduleIdToSymbol( GetCurSchedule()->GetId() ) );
-
 		if ( !TaskIsComplete() && GetTaskStatus() != TASKSTATUS_NEW )
 		{
 			if ( TaskIsRunning() && !HasCondition(COND_TASK_FAILED) && runTask )
@@ -759,9 +734,6 @@ void CAI_BaseNPC::MaintainSchedule ( void )
 				g_AITaskTimings[i].pszTask = pszTaskName;
 				// DevMsg( "%.2f RunTask( %s )\n", gpGlobals->curtime, m_pTaskSR->GetStringText( pTask->iTask ) );
 				g_AITaskTimings[curTiming].runTimer.Start();
-
-				AI_PROFILE_SCOPE_BEGIN_( pszTaskName );
-				AI_PROFILE_SCOPE_BEGIN(CAI_BaseNPC_RunTask);
 
 				int j;
 				for (j = 0; j < 8; j++)
@@ -779,9 +751,6 @@ void CAI_BaseNPC::MaintainSchedule ( void )
 				}
 				AssertMsg( j < 8, "Runaway task interrupt\n" );
 					
-				AI_PROFILE_SCOPE_END();
-				AI_PROFILE_SCOPE_END();
-
 				if ( TaskIsRunning() && !HasCondition(COND_TASK_FAILED) )
 				{
 					if ( IsCurTaskContinuousMove() )
@@ -805,8 +774,6 @@ void CAI_BaseNPC::MaintainSchedule ( void )
 				bStopProcessing = true;
 			}
 		}
-
-		AI_PROFILE_SCOPE_END();
 
 		// Decide if we should continue on this frame
 		if ( !bStopProcessing && ShouldStopProcessingTasks( this, Plat_MSTime() - taskTime, timeLimit ) )
@@ -837,8 +804,6 @@ void CAI_BaseNPC::MaintainSchedule ( void )
 
 bool CAI_BaseNPC::FindCoverPos( CBaseEntity *pEntity, Vector *pResult )
 {
-	AI_PROFILE_SCOPE(CAI_BaseNPC_FindCoverPos);
-
 	if ( !GetTacticalServices()->FindLateralCover( pEntity->EyePosition(), 0, pResult ) )
 	{
 		if ( !GetTacticalServices()->FindCoverPos( pEntity->GetAbsOrigin(), pEntity->EyePosition(), 0, CoverRadius(), pResult ) ) 
@@ -853,8 +818,6 @@ bool CAI_BaseNPC::FindCoverPos( CBaseEntity *pEntity, Vector *pResult )
 
 bool CAI_BaseNPC::FindCoverPosInRadius( CBaseEntity *pEntity, const Vector &goalPos, float coverRadius, Vector *pResult )
 {
-	AI_PROFILE_SCOPE(CAI_BaseNPC_FindCoverPosInRadius);
-
 	if ( pEntity == NULL )
 	{
 		// Find cover from self if no enemy available
@@ -1899,7 +1862,6 @@ void CAI_BaseNPC::StartTask( const Task_t *pTask )
 				return;
 			}
 		
-			AI_PROFILE_SCOPE(CAI_BaseNPC_FindLosToEnemy);
 			float flMaxRange = 2000;
 			float flMinRange = 0;
 			
@@ -3190,7 +3152,6 @@ void CAI_BaseNPC::RunAttackTask( int task )
 //=========================================================
 void CAI_BaseNPC::RunTask( const Task_t *pTask )
 {
-	VPROF_BUDGET( "CAI_BaseNPC::RunTask", VPROF_BUDGETGROUP_NPCS );
 	switch ( pTask->iTask )
 	{
 	case TASK_GET_PATH_TO_RANDOM_NODE:

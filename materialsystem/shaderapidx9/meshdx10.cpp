@@ -18,7 +18,7 @@
 #include "shaderapi/ishaderapi.h"
 #include "shaderdevicedx10.h"
 #include "materialsystem/imesh.h"
-#include "tier0/vprof.h"
+
 #include "tier0/dbg.h"
 #include "materialsystem/idebugtextureinfo.h"
 #include "materialsystem/ivballoctracker.h"
@@ -86,19 +86,6 @@ bool CVertexBufferDx10::Allocate( )
 	{
 		// Track VB allocations
 		g_VBAllocTracker->CountVB( m_pVertexBuffer, m_bIsDynamic, m_nBufferSize, VertexSize(), GetVertexFormat() );
-
-		if ( !m_bIsDynamic )
-		{
-			VPROF_INCREMENT_GROUP_COUNTER( "TexGroup_global_" TEXTURE_GROUP_STATIC_INDEX_BUFFER, 
-				COUNTER_GROUP_TEXTURE_GLOBAL, m_nBufferSize );
-		}
-		else
-		{
-			VPROF_INCREMENT_GROUP_COUNTER( "TexGroup_global_" TEXTURE_GROUP_DYNAMIC_INDEX_BUFFER, 
-				COUNTER_GROUP_TEXTURE_GLOBAL, m_nBufferSize );
-			// Dynamic meshes should never be compressed (slows down writing to them)
-			Assert( CompressionType( GetVertexFormat() ) == VERTEX_COMPRESSION_NONE );
-		}
 #ifdef _DEBUG
 		++s_nBufferCount;
 #endif
@@ -120,17 +107,6 @@ void CVertexBufferDx10::Free()
 
 		m_pVertexBuffer->Release();
 		m_pVertexBuffer = NULL;
-
-		if ( !m_bIsDynamic )
-		{
-			VPROF_INCREMENT_GROUP_COUNTER( "TexGroup_global_" TEXTURE_GROUP_STATIC_INDEX_BUFFER, 
-				COUNTER_GROUP_TEXTURE_GLOBAL, - m_nBufferSize );
-		}
-		else
-		{
-			VPROF_INCREMENT_GROUP_COUNTER( "TexGroup_global_" TEXTURE_GROUP_DYNAMIC_INDEX_BUFFER, 
-				COUNTER_GROUP_TEXTURE_GLOBAL, - m_nBufferSize );
-		}
 	}
 }
 
@@ -387,22 +363,12 @@ bool CIndexBufferDx10::Allocate( )
 	HRESULT hr = D3D10Device()->CreateBuffer( &bd, NULL, &m_pIndexBuffer );
 	bool bOk = !FAILED( hr ) && ( m_pIndexBuffer != NULL );
 
+#ifdef _DEBUG
 	if ( bOk )
 	{
-		if ( !m_bIsDynamic )
-		{
-			VPROF_INCREMENT_GROUP_COUNTER( "TexGroup_global_" TEXTURE_GROUP_STATIC_INDEX_BUFFER, 
-				COUNTER_GROUP_TEXTURE_GLOBAL, m_nBufferSize );
-		}
-		else
-		{
-			VPROF_INCREMENT_GROUP_COUNTER( "TexGroup_global_" TEXTURE_GROUP_DYNAMIC_INDEX_BUFFER, 
-				COUNTER_GROUP_TEXTURE_GLOBAL, m_nBufferSize );
-		}
-#ifdef _DEBUG
 		++s_nBufferCount;
-#endif
 	}
+#endif
 
 	return bOk;
 }
@@ -417,17 +383,6 @@ void CIndexBufferDx10::Free()
 
 		m_pIndexBuffer->Release();
 		m_pIndexBuffer = NULL;
-
-		if ( !m_bIsDynamic )
-		{
-			VPROF_INCREMENT_GROUP_COUNTER( "TexGroup_global_" TEXTURE_GROUP_STATIC_INDEX_BUFFER, 
-				COUNTER_GROUP_TEXTURE_GLOBAL, - m_nBufferSize );
-		}
-		else
-		{
-			VPROF_INCREMENT_GROUP_COUNTER( "TexGroup_global_" TEXTURE_GROUP_DYNAMIC_INDEX_BUFFER, 
-				COUNTER_GROUP_TEXTURE_GLOBAL, - m_nBufferSize );
-		}
 	}
 }
 

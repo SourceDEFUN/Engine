@@ -253,7 +253,6 @@ void HTML::ApplySchemeSettings(IScheme *pScheme)
 //-----------------------------------------------------------------------------
 void HTML::Paint()
 {
-	//VPROF_BUDGET( "HTML::Paint()", VPROF_BUDGETGROUP_OTHER_VGUI );
 	BaseClass::Paint();
 
 	if ( m_iHTMLTextureID != 0 )

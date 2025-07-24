@@ -459,27 +459,6 @@ public:
 
 	virtual void OnKeyCodePressed( KeyCode code )
 	{
-		if ( IsX360() )
-		{
-			if ( GetAlpha() != 255 )
-			{
-				SetEnabled( false );
-				// inhibit key activity during transitions
-				return;
-			}
-
-			SetEnabled( true );
-
-			if ( code == KEY_XBUTTON_B || code == KEY_XBUTTON_START )
-			{
-				if ( GameUI().IsInLevel() )
-				{
-					GetParent()->OnCommand( "ResumeGame" );
-				}
-				return;
-			}
-		}
-
 		m_KeyRepeat.KeyDown( code );
 
 		int nDir = 0;
@@ -865,34 +844,6 @@ CBasePanel::CBasePanel() : Panel(NULL, "BaseGameUIPanel")
 		m_pConsoleAnimationController->StartAnimationSequence( "InitializeUILayout" );
 	}
 
-	// Record data used for rich presence updates
-	if ( IsX360() )
-	{
-		// Get our active mod directory name
-		const char *pGameName = CommandLine()->ParmValue( "-game", "hl2" );;
-
-		// Set the game we're playing
-		m_iGameID = CONTEXT_GAME_GAME_HALF_LIFE_2;
-		m_bSinglePlayer = true;
-		if ( Q_stristr( pGameName, "episodic" ) )
-		{
-			m_iGameID = CONTEXT_GAME_GAME_EPISODE_ONE;
-		}
-		else if ( Q_stristr( pGameName, "ep2" ) )
-		{
-			m_iGameID = CONTEXT_GAME_GAME_EPISODE_TWO;
-		}
-		else if ( Q_stristr( pGameName, "portal" ) )
-		{
-			m_iGameID = CONTEXT_GAME_GAME_PORTAL;
-		}
-		else if ( Q_stristr( pGameName, "tf" ) )
-		{
-			m_iGameID = CONTEXT_GAME_GAME_TEAM_FORTRESS;
-			m_bSinglePlayer = false;
-		}
-	}
-
 	if( IsAndroid() )
 	{
 		AddUrlButton( this, "vgui/\x64\x69\x73\x63\x6f\x72\x64\x5f\x6c\x6f\x67\x6f", "\x68\x74\x74\x70\x73\x3a\x2f\x2f\x64\x69\x73\x63\x6f\x72\x64\x2e\x67\x67\x2f\x68\x5a\x52\x42\x37\x57\x4d\x67\x47\x77" );
@@ -1060,11 +1011,6 @@ void CBasePanel::PaintBackground()
 		// not in the game or loading dialog active or exiting, draw the ui background
 		DrawBackgroundImage();
 	}
-	else if ( IsX360() )
-	{
-		// only valid during loading from level to level
-		m_bUseRenderTargetImage = false;
-	}
 
 	if ( m_flBackgroundFillAlpha )
 	{
@@ -1095,9 +1041,8 @@ void CBasePanel::UpdateBackgroundState()
 	}
 	else if ( GameUI().IsInBackgroundLevel() && !m_bLevelLoading )
 	{
-		// 360 guarantees a progress bar
 		// level loading is truly completed when the progress bar is gone, then transition to main menu
-		if ( IsPC() || ( IsX360() && !g_hLoadingDialog.Get() ) )
+		if ( IsPC() )
 		{
 			SetBackgroundRenderState( BACKGROUND_MAINMENU );
 		}
@@ -1346,13 +1291,6 @@ void CBasePanel::OnLevelLoadingStarted()
 	{
 		m_hMatchmakingBasePanel->OnCommand( "LevelLoadingStarted" );
 	}
-
-	if ( IsX360() && m_eBackgroundState == BACKGROUND_LEVEL )
-	{
-		// already in a level going to another level
-		// frame buffer is about to be cleared, copy it off for ui backing purposes
-		m_bCopyFrameBuffer = true;
-	}
 }
 
 //-----------------------------------------------------------------------------
@@ -1373,16 +1311,6 @@ void CBasePanel::OnLevelLoadingFinished()
 //-----------------------------------------------------------------------------
 void CBasePanel::DrawBackgroundImage()
 {
-	if ( IsX360() && m_bCopyFrameBuffer )
-	{
-		// force the engine to do an image capture ONCE into this image's render target
-		char filename[MAX_PATH];
-		surface()->DrawGetTextureFile( m_iRenderTargetImageID, filename, sizeof( filename ) );
-		engine->CopyFrameBufferToMaterial( filename );
-		m_bCopyFrameBuffer = false;
-		m_bUseRenderTargetImage = true;
-	}
-
 	int wide, tall;
 	GetSize( wide, tall );
 
@@ -1407,45 +1335,11 @@ void CBasePanel::DrawBackgroundImage()
 	}
 
 	int iImageID = m_iBackgroundImageID;
-	if ( IsX360() )
-	{
-		if ( m_ExitingFrameCount )
-		{
-			if ( !m_bRestartSameGame )
-			{
-				iImageID = m_iProductImageID;
-			}
-		}
-		else if ( m_bUseRenderTargetImage )
-		{
-			// the render target image must be opaque, the alpha channel contents are unknown
-			// it is strictly an opaque background image and never used as an overlay
-			iImageID = m_iRenderTargetImageID;
-			alpha = 255;
-		}
-	}
 
 	surface()->DrawSetColor( 255, 255, 255, alpha );
 	surface()->DrawSetTexture( iImageID );
 	surface()->DrawTexturedRect( 0, 0, wide, tall );
 
-	if ( IsX360() && m_ExitingFrameCount )
-	{
-		// Make invisible when going back to appchooser
-		m_pGameMenu->CGameMenu::BaseClass::SetVisible( false );
-
-		IScheme *pScheme = vgui::scheme()->GetIScheme( vgui::scheme()->GetScheme( "SourceScheme" ) );
-		HFont hFont = pScheme->GetFont( "ChapterTitle" );
-		wchar_t *pString = g_pVGuiLocalize->Find( "#GameUI_Loading" );
-		int textWide, textTall;
-		surface()->GetTextSize( hFont, pString, textWide, textTall );
-		surface()->DrawSetTextPos( ( wide - textWide )/2, tall * 0.50f );
-		surface()->DrawSetTextFont( hFont );
-		surface()->DrawSetTextColor( 255, 255, 255, alpha );
-		surface()->DrawPrintText( pString, wcslen( pString ) );
-	}
-
-	// 360 always use the progress bar, TCR Requirement, and never this loading plaque
 	if ( IsPC() && ( m_bRenderingBackgroundTransition || m_eBackgroundState == BACKGROUND_LOADING ) )
 	{
 		// draw the loading image over the top
@@ -1624,32 +1518,6 @@ void CBasePanel::RunFrame()
 	{
 		// run the console ui animations
 		m_pConsoleAnimationController->UpdateAnimations( engine->Time() );
-
-		if ( IsX360() && m_ExitingFrameCount && engine->Time() >= m_flTransitionEndTime )
-		{
-			if ( m_ExitingFrameCount > 1 )
-			{
-				m_ExitingFrameCount--;
-				if ( m_ExitingFrameCount == 1 )
-				{
-					// enough frames have transpired, send the single shot quit command
-					// If we kicked off this event from an invite, we need to properly setup the restart to account for that
-					if ( m_bRestartFromInvite )
-					{
-						engine->ClientCmd_Unrestricted( "quit_x360 invite" );
-					}
-					else if ( m_bRestartSameGame )
-					{
-						engine->ClientCmd_Unrestricted( "quit_x360 restart" );
-					}
-					else
-					{
-						// quits to appchooser
-						engine->ClientCmd_Unrestricted( "quit_x360\n" );
-					}
-				}
-			}
-		}
 	}
 
 	UpdateBackgroundState();
@@ -1657,7 +1525,7 @@ void CBasePanel::RunFrame()
 	if ( !m_bPlatformMenuInitialized )
 	{
 		// check to see if the platform is ready to load yet
-		if ( IsX360() || g_VModuleLoader.IsPlatformReady() )
+		if ( g_VModuleLoader.IsPlatformReady() )
 		{
 			m_bPlatformMenuInitialized = true;
 		}
@@ -1800,55 +1668,22 @@ void CBasePanel::ApplySchemeSettings(IScheme *pScheme)
 	m_BackdropColor = pScheme->GetColor("mainmenu.backdrop", Color(0, 0, 0, 128));
 
 	char filename[MAX_PATH];
-	if ( IsX360() )
-	{
-		// 360 uses FullFrameFB1 RT for map to map transitioning
-		if ( m_iRenderTargetImageID == -1 )
-		{
-			m_iRenderTargetImageID = surface()->CreateNewTextureID();
-			surface()->DrawSetTextureFile( m_iRenderTargetImageID, "console/rt_background", false, false );
-		}
-	}
 
 	int screenWide, screenTall;
 	surface()->GetScreenSize( screenWide, screenTall );
 	float aspectRatio = (float)screenWide/(float)screenTall;
 	bool bIsWidescreen = aspectRatio >= 1.5999f;
 
-	// work out which background image to use
-	if ( IsPC() || !IsX360() )
-	{
-		// pc uses blurry backgrounds based on the background level
-		char background[MAX_PATH];
-		engine->GetMainMenuBackgroundName( background, sizeof(background) );
-		Q_snprintf( filename, sizeof( filename ), "console/%s%s", background, ( bIsWidescreen ? "_widescreen" : "" ) );
-	}
-	else
-	{
-		// 360 uses hi-res game specific backgrounds
-		char gameName[MAX_PATH];
-		const char *pGameDir = engine->GetGameDirectory();
-		V_FileBase( pGameDir, gameName, sizeof( gameName ) );
-		V_snprintf( filename, sizeof( filename ), "vgui/appchooser/background_%s%s", gameName, ( bIsWidescreen ? "_widescreen" : "" ) );
-	}
+	// pc uses blurry backgrounds based on the background level
+	char background[MAX_PATH];
+	engine->GetMainMenuBackgroundName( background, sizeof(background) );
+	Q_snprintf( filename, sizeof( filename ), "console/%s%s", background, ( bIsWidescreen ? "_widescreen" : "" ) );
 
 	if ( m_iBackgroundImageID == -1 )
 	{
 		m_iBackgroundImageID = surface()->CreateNewTextureID();
 	}
 	surface()->DrawSetTextureFile( m_iBackgroundImageID, filename, false, false );
-
-	if ( IsX360() )
-	{
-		// 360 uses a product image during application exit
-		V_snprintf( filename, sizeof( filename ), "vgui/appchooser/background_orange%s", ( bIsWidescreen ? "_widescreen" : "" ) );
-
-		if ( m_iProductImageID == -1 )
-		{
-			m_iProductImageID = surface()->CreateNewTextureID();
-		}
-		surface()->DrawSetTextureFile( m_iProductImageID, filename, false, false );
-	}
 
 	if ( IsPC() )
 	{
@@ -1923,13 +1758,6 @@ void CBasePanel::OnGameUIActivated()
 		{
 			// Achievement dialog refreshes it's data if the player looks at the pause menu
 			m_hAchievementsDialog->OnCommand( "OnGameUIActivated" );
-		}
-	}
-	else // not the pause menu, update presence
-	{
-		if ( IsX360() )
-		{
-			UpdateRichPresenceInfo();
 		}
 	}
 }
@@ -2080,57 +1908,30 @@ void CBasePanel::RunMenuCommand(const char *command)
     // HPE_END
     //=============================================================================
 
-	else if ( !Q_stricmp( command, "AchievementsDialogClosing" ) )
-	{
-		if ( IsX360() )
-		{
-			if ( m_hAchievementsDialog.Get() )
-			{
-				m_hAchievementsDialog->Close();
-			}
-		}
-	}
 	else if ( !Q_stricmp( command, "Quit" ) )
 	{
 		OnOpenQuitConfirmationDialog();
 	}
 	else if ( !Q_stricmp( command, "QuitNoConfirm" ) )
 	{
-		if ( IsX360() )
-		{
-			// start the shutdown process
-			StartExitingProcess();
-		}
-		else
-		{
-            //=============================================================================
-            // HPE_BEGIN:
-            // [dwenger] Shut down achievements panel
-            //=============================================================================
+           //=============================================================================
+           // HPE_BEGIN:
+           // [dwenger] Shut down achievements panel
+           //=============================================================================
 
-            if ( GameClientExports() )
-            {
-                GameClientExports()->ShutdownAchievementPanel();
-            }
+        if ( GameClientExports() )
+        {
+            GameClientExports()->ShutdownAchievementPanel();
+        }
 
-            //=============================================================================
-            // HPE_END
-            //=============================================================================
+        //=============================================================================
+        // HPE_END
+        //=============================================================================
 
-            // hide everything while we quit
-			SetVisible( false );
-			vgui::surface()->RestrictPaintToSinglePanel( GetVPanel() );
-			engine->ClientCmd_Unrestricted( "quit\n" );
-		}
-	}
-	else if ( !Q_stricmp( command, "QuitRestartNoConfirm" ) )
-	{
-		if ( IsX360() )
-		{
-			// start the shutdown process
-			m_bRestartSameGame = true;
-			StartExitingProcess();
-		}
+        // hide everything while we quit
+		SetVisible( false );
+		vgui::surface()->RestrictPaintToSinglePanel( GetVPanel() );
+		engine->ClientCmd_Unrestricted( "quit\n" );
 	}
 	else if ( !Q_stricmp( command, "ResumeGame" ) )
 	{
@@ -2138,14 +1939,7 @@ void CBasePanel::RunMenuCommand(const char *command)
 	}
 	else if ( !Q_stricmp( command, "Disconnect" ) )
 	{
-		if ( IsX360() )
-		{
-			OnOpenDisconnectConfirmationDialog();
-		}
-		else
-		{
-			engine->ClientCmd_Unrestricted( "disconnect" );
-		}
+		engine->ClientCmd_Unrestricted( "disconnect" );
 	}
 	else if ( !Q_stricmp( command, "DisconnectNoConfirm" ) )
 	{
@@ -2227,39 +2021,36 @@ void CBasePanel::RunMenuCommand(const char *command)
 	}
 	else if ( !Q_stricmp( command, "RestartWithNewLanguage" ) )
 	{
-		if ( !IsX360() )
-		{
-			char szSteamURL[50];
+		char szSteamURL[50];
 
-			// hide everything while we quit
-			SetVisible( false );
-			vgui::surface()->RestrictPaintToSinglePanel( GetVPanel() );
-			engine->ClientCmd_Unrestricted( "quit\n" );
+		// hide everything while we quit
+		SetVisible( false );
+		vgui::surface()->RestrictPaintToSinglePanel( GetVPanel() );
+		engine->ClientCmd_Unrestricted( "quit\n" );
 
-			// Construct Steam URL. Pattern is steam://run/<appid>/<language>. (e.g. Ep1 In French ==> steam://run/380/french)
-			V_snprintf( szSteamURL, sizeof(szSteamURL), "steam://run/%d/%s", engine->GetAppID(), COptionsSubAudio::GetUpdatedAudioLanguage() );
+		// Construct Steam URL. Pattern is steam://run/<appid>/<language>. (e.g. Ep1 In French ==> steam://run/380/french)
+		V_snprintf( szSteamURL, sizeof(szSteamURL), "steam://run/%d/%s", engine->GetAppID(), COptionsSubAudio::GetUpdatedAudioLanguage() );
 
-			// Set Steam URL for re-launch in registry. Launcher will check this registry key and exec it in order to re-load the game in the proper language
+		// Set Steam URL for re-launch in registry. Launcher will check this registry key and exec it in order to re-load the game in the proper language
 #if defined( WIN32 )
-			HKEY hKey;
+		HKEY hKey;
 
-			if ( IsPC() && RegOpenKeyEx( HKEY_CURRENT_USER, "Software\\Valve\\Source", NULL, KEY_WRITE, &hKey) == ERROR_SUCCESS )
-			{
-				RegSetValueEx( hKey, "Relaunch URL", 0, REG_SZ, (const unsigned char *)szSteamURL, sizeof( szSteamURL ) );
+		if ( IsPC() && RegOpenKeyEx( HKEY_CURRENT_USER, "Software\\Valve\\Source", NULL, KEY_WRITE, &hKey) == ERROR_SUCCESS )
+		{
+			RegSetValueEx( hKey, "Relaunch URL", 0, REG_SZ, (const unsigned char *)szSteamURL, sizeof( szSteamURL ) );
 
-				RegCloseKey(hKey);
-			}
+			RegCloseKey(hKey);
+		}
 #elif defined( OSX ) || defined( LINUX ) || defined(PLATFORM_BSD)
-			FILE *fp = fopen( "/tmp/hl2_relaunch", "w+" );
-			if ( fp )
-			{
-				fprintf( fp, "%s\n", szSteamURL );
-			}
-			fclose( fp );
+		FILE *fp = fopen( "/tmp/hl2_relaunch", "w+" );
+		if ( fp )
+		{
+			fprintf( fp, "%s\n", szSteamURL );
+		}
+		fclose( fp );
 #else
 #error
 #endif
-		}
 	}
 	else
 	{
@@ -2920,7 +2711,7 @@ void CBasePanel::OnOpenDisconnectConfirmationDialog()
 {
 	// THis is for disconnecting from a multiplayer server
 	Assert( m_bUseMatchmaking );
-	Assert( IsX360() );
+	Assert( false ); // Secton TODO: Deal with it!
 
 	if ( GameUI().IsConsoleUI() && GameUI().IsInLevel() )
 	{
@@ -3523,30 +3314,7 @@ void CBasePanel::OnChangeStorageDevice( void )
 }
 
 void CBasePanel::OnCreditsFinished( void )
-{
-	if ( !IsX360() )
-	{
-		// valid for 360 only
-		Assert( 0 );
-		return;
-	}
-
-	bool bExitToAppChooser = false;
-	if ( bExitToAppChooser )
-	{
-		// unknown state from engine, force to a compliant exiting state
-		// causes an complete exit out of the game back to the app launcher
-		SetVisible( true );
-		m_pGameMenu->SetAlpha( 0 );
-		StartExitingProcess();
-	}
-	else
-	{
-		// expecting to transition from the credits back to the background map
-		// prevent any possibility of using the last transition image
-		m_bUseRenderTargetImage = false;
-	}
-}
+{}
 
 //-----------------------------------------------------------------------------
 // Purpose: 

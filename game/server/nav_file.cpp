@@ -636,18 +636,7 @@ NavErrorType CNavArea::Load( CUtlBuffer &fileBuffer, unsigned int version, unsig
 
 	// load visibility information
 	unsigned int visibleAreaCount = fileBuffer.GetUnsignedInt();
-	if ( !IsX360() )
-	{
-		m_potentiallyVisibleAreas.EnsureCapacity( visibleAreaCount );
-	}
-	else
-	{
-/* TODO: Re-enable when latest 360 code gets integrated (MSB 5/5/09)
-		size_t nBytes = visibleAreaCount * sizeof( AreaBindInfo ); 
-		m_potentiallyVisibleAreas.~CAreaBindInfoArray();
-		new ( &m_potentiallyVisibleAreas ) CAreaBindInfoArray( (AreaBindInfo *)engine->AllocLevelStaticData( nBytes ), visibleAreaCount );
-*/
-	}
+	m_potentiallyVisibleAreas.EnsureCapacity( visibleAreaCount );
 
 	for( unsigned int j=0; j<visibleAreaCount; ++j )
 	{
@@ -1309,19 +1298,6 @@ const CUtlVector< Place > *CNavMesh::GetPlacesFromNavFile( bool *hasUnnamedPlace
 		}
 	}
 	
-	if ( IsX360() )
-	{
-		// 360 has compressed NAVs
-		CLZMA lzma;
-		if ( lzma.IsCompressed( (unsigned char *)fileBuffer.Base() ) )
-		{
-			int originalSize = lzma.GetActualSize( (unsigned char *)fileBuffer.Base() );
-			unsigned char *pOriginalData = new unsigned char[originalSize];
-			lzma.Uncompress( (unsigned char *)fileBuffer.Base(), pOriginalData );
-			fileBuffer.AssumeMemory( pOriginalData, originalSize, originalSize, CUtlBuffer::READ_ONLY );
-		}
-	}
-
 	// check magic number
 	unsigned int magic = fileBuffer.GetUnsignedInt();
 	if ( !fileBuffer.IsValid() || magic != NAV_MAGIC_NUMBER )
@@ -1399,19 +1375,6 @@ NavErrorType CNavMesh::Load( void )
 		if ( !filesystem->ReadFile( filename, "BSP", fileBuffer ) )	// ... and this looks for one if it's the only one around.
 		{
 			return NAV_CANT_ACCESS_FILE;
-		}
-	}
-
-	if ( IsX360() )
-	{
-		// 360 has compressed NAVs
-		CLZMA lzma;
-		if ( lzma.IsCompressed( (unsigned char *)fileBuffer.Base() ) )
-		{
-			int originalSize = lzma.GetActualSize( (unsigned char *)fileBuffer.Base() );
-			unsigned char *pOriginalData = new unsigned char[originalSize];
-			lzma.Uncompress( (unsigned char *)fileBuffer.Base(), pOriginalData );
-			fileBuffer.AssumeMemory( pOriginalData, originalSize, originalSize, CUtlBuffer::READ_ONLY );
 		}
 	}
 

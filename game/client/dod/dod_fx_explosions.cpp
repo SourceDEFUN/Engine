@@ -10,7 +10,7 @@
 #include "dod_shareddefs.h"
 #include "engine/IEngineSound.h"
 #include "c_basetempentity.h"
-#include "tier0/vprof.h"
+
 #include "fx_explosion.h"
 
 //-----------------------------------------------------------------------------
@@ -93,7 +93,6 @@ C_TEDODExplosion::C_TEDODExplosion( void )
 //-----------------------------------------------------------------------------
 void C_TEDODExplosion::PostDataUpdate( DataUpdateType_t updateType )
 {
-	VPROF( "C_TETFExplosion::PostDataUpdate" );
 	DODExplosionCallback( m_vecOrigin, m_vecNormal );
 }
 

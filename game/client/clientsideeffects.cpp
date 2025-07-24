@@ -12,7 +12,7 @@
 //=============================================================================//
 #include "cbase.h"
 #include "clientsideeffects.h"
-#include "tier0/vprof.h"
+
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -189,7 +189,6 @@ void CEffectsList::RemoveEffect( int effectIndex )
 //-----------------------------------------------------------------------------
 void CEffectsList::DrawEffects( double frametime )
 {
-	VPROF_BUDGET( "CEffectsList::DrawEffects", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
 	int i;
 	CClientSideEffect *effect;
 

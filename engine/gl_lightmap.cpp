@@ -21,7 +21,7 @@
 #include "materialsystem/imaterialsystemhardwareconfig.h"
 #include "materialsystem/imesh.h"
 #include "tier0/dbg.h"
-#include "tier0/vprof.h"
+
 #include "tier1/callqueue.h"
 #include "lightcache.h"
 #include "cl_main.h"
@@ -437,7 +437,6 @@ unsigned int R_ComputeDynamicLightMask( dlight_t *pLights, SurfaceHandle_t surfI
 void R_AddDynamicLights( dlight_t *pLights, SurfaceHandle_t surfID, const matrix3x4_t& entityToWorld, bool needsBumpmap, unsigned int lightMask )
 {
 	ASSERT_SURF_VALID( surfID );
-	VPROF( "R_AddDynamicLights" );
 
 	Vector bumpNormals[3];
 	bool computedBumpBasis = false;
@@ -609,8 +608,6 @@ static void AccumulateBumpedLightstyles( ColorRGBExp32* pLightmap, int lightmapS
 static void ComputeLightmapFromLightstyle( msurfacelighting_t *pLighting, bool computeLightmap, 
 				bool computeBumpmap, int lightmapSize, bool hasBumpmapLightmapData )
 {
-	VPROF( "ComputeLightmapFromLightstyle" );
-
 	ColorRGBExp32 *pLightmap = pLighting->m_pSamples;
 
 	// Compute iteration range
@@ -776,7 +773,6 @@ unsigned int R_UpdateDlightState( dlight_t *pLights, SurfaceHandle_t surfID, con
 //-----------------------------------------------------------------------------
 void R_BuildLightMapGuts( dlight_t *pLights, SurfaceHandle_t surfID, const matrix3x4_t& entityToWorld, unsigned int dlightMask, bool needsBumpmap, bool needsLightmap )
 {
-	VPROF_("R_BuildLightMapGuts", 1, VPROF_BUDGETGROUP_DLIGHT_RENDERING, false, 0);
 	int bumpID;
 
 	// Lightmap data can be dumped to save memory - this precludes any dynamic lighting on the world
@@ -1076,7 +1072,6 @@ ConVar mat_updatelightstyleseveryframe( "mat_updatelightstyleseveryframe", "0" )
 #endif
 void FASTCALL R_RenderDynamicLightmaps ( dlight_t *pLights, ICallQueue *pCallQueue, SurfaceHandle_t surfID, const matrix3x4_t &xform )
 {
-	VPROF_BUDGET( "R_RenderDynamicLightmaps", VPROF_BUDGETGROUP_DLIGHT_RENDERING );
 	ASSERT_SURF_VALID( surfID );
 
 	int fSurfFlags = MSurf_Flags( surfID );

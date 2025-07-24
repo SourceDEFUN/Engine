@@ -1262,7 +1262,6 @@ bool CAI_Hint::HintMatchesCriteria( CAI_BaseNPC *pNPC, const CHintCriteria &hint
 	}
 
 	{
-		AI_PROFILE_SCOPE( HINT_FVisible );
 		// See if we're requesting a visible node
 		if ( hintCriteria.HasFlag( bits_HINT_NODE_VISIBLE ) )
 		{

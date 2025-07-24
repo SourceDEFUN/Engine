@@ -262,15 +262,6 @@ void UTIL_ComputeBaseDir()
 {
 	g_szBasedir[0] = 0;
 
-	if ( IsX360() )
-	{
-		char const *pBaseDir = CommandLine()->ParmValue( "-basedir" );
-		if ( pBaseDir )
-		{
-			strcpy( g_szBasedir, pBaseDir );
-		}
-	}
-
 	if ( !g_szBasedir[0] && GetExecutableName( g_szBasedir, sizeof( g_szBasedir ) ) )
 	{
 		char *pBuffer = strrchr( g_szBasedir, '\\' );
@@ -370,11 +361,6 @@ CLogAllFiles::CLogAllFiles() :
 
 void CLogAllFiles::Init()
 {
-	if ( IsX360() )
-	{
-		return;
-	}
-
 	// Can't do this in edit mode
 	if ( CommandLine()->CheckParm( "-edit" ) )
 	{
@@ -781,15 +767,7 @@ bool CSourceAppSystemGroup::PreInit()
 	if ( FileSystem_MountContent( fsInfo ) != FS_OK )
 		return false;
 
-	if ( IsPC() || !IsX360() )
-	{
-		fsInfo.m_pFileSystem->AddSearchPath( "platform", "PLATFORM" );
-	}
-	else
-	{
-		// 360 needs absolute paths
-		FileSystem_AddSearchPath_Platform( g_pFullFileSystem, steamInfo.m_GameInfoPath );
-	}
+	fsInfo.m_pFileSystem->AddSearchPath( "platform", "PLATFORM" );
 
 	if ( IsPC() )
 	{
@@ -1277,7 +1255,7 @@ DLL_EXPORT int LauncherMain( int argc, char **argv )
 
 	// This call is to emulate steam's injection of the GameOverlay DLL into our process if we
 	// are running from the command line directly, this allows the same experience the user gets
-	// to be present when running from perforce, the call has no effect on X360
+	// to be present when running from perforce
 	TryToLoadSteamOverlayDLL();
 
 	// Start VCR mode?

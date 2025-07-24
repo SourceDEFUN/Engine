@@ -325,12 +325,10 @@ public:
 };
 
 static CUtlRBTree<VisibilityCacheEntry_t, unsigned short, CVisibilityCacheEntryLess> g_VisibilityCache;
-const float VIS_CACHE_ENTRY_LIFE = ( !IsXbox() ) ? .090 : .500;
+const float VIS_CACHE_ENTRY_LIFE = .09;
 
 bool CBaseCombatCharacter::FVisible( CBaseEntity *pEntity, int traceMask, CBaseEntity **ppBlocker )
 {
-	VPROF( "CBaseCombatCharacter::FVisible" );
-
 	if ( traceMask != MASK_BLOCKLOS || !ShouldUseVisibilityCache() || pEntity == this
 #if defined(HL2_DLL)
 		 || Classify() == CLASS_BULLSEYE || pEntity->Classify() == CLASS_BULLSEYE 
@@ -417,7 +415,6 @@ bool CBaseCombatCharacter::FVisible( CBaseEntity *pEntity, int traceMask, CBaseE
 
 void CBaseCombatCharacter::ResetVisibilityCache( CBaseCombatCharacter *pBCC )
 {
-	VPROF( "CBaseCombatCharacter::ResetVisibilityCache" );
 	if ( !pBCC )
 	{
 		g_VisibilityCache.RemoveAll();
@@ -444,8 +441,6 @@ void CBaseCombatCharacter::ResetVisibilityCache( CBaseCombatCharacter *pBCC )
 #ifdef PORTAL
 bool CBaseCombatCharacter::FVisibleThroughPortal( const CProp_Portal *pPortal, CBaseEntity *pEntity, int traceMask, CBaseEntity **ppBlocker )
 {
-	VPROF( "CBaseCombatCharacter::FVisible" );
-
 	if ( pEntity->GetFlags() & FL_NOTARGET )
 		return false;
 
@@ -1926,11 +1921,6 @@ void CBaseCombatCharacter::Weapon_Drop( CBaseCombatWeapon *pWeapon, const Vector
 		if ( pWeapon->UsesClipsForAmmo2() )
 		{
 			pWeapon->m_iClip2 = pWeapon->GetDefaultClip2();
-		}
-
-		if ( IsXbox() )
-		{
-			pWeapon->AddEffects( EF_ITEM_BLINK );
 		}
 	}
 

@@ -15,7 +15,7 @@
 #endif
 #include "rope_helpers.h"
 #include "engine/ivmodelinfo.h"
-#include "tier0/vprof.h"
+
 #include "c_te_effect_dispatch.h"
 #include "collisionutils.h"
 #include <KeyValues.h>
@@ -402,7 +402,6 @@ void CRopeManager::AddToRenderCache( C_RopeKeyframe *pRope )
 
 void CRopeManager::DrawRenderCache_NonQueued( bool bShadowDepth, RopeRenderData_t *pRenderCache, int nRenderCacheCount, const Vector &vCurrentViewForward, const Vector &vCurrentViewOrigin, C_RopeKeyframe::BuildRopeQueuedData_t *pBuildRopeQueuedData )
 {
-	VPROF_BUDGET( "CRopeManager::DrawRenderCache", VPROF_BUDGETGROUP_ROPES );
 	AUTO_LOCK( m_RenderCacheMutex ); //contention cases: Toggling from queued mode on to off. Rope deletion from the cache.
 
 	// Check to see if we want to render the ropes.
@@ -938,8 +937,6 @@ void LockNodeDirection(
 
 void C_RopeKeyframe::CPhysicsDelegate::ApplyConstraints( CSimplePhysics::CNode *pNodes, int nNodes )
 {
-	VPROF( "CPhysicsDelegate::ApplyConstraints" );
-
 	CTraceFilterWorldOnly traceFilter;
 
 	// Collide with the world.
@@ -1428,12 +1425,8 @@ void C_RopeKeyframe::ClientThink()
 
 int C_RopeKeyframe::DrawModel( int flags )
 {
-	VPROF_BUDGET( "C_RopeKeyframe::DrawModel", VPROF_BUDGETGROUP_ROPES );
-	if( !InitRopePhysics() )
-		return 0;
-
-	if ( !m_bReadyToDraw )
-		return 0;
+	if( !InitRopePhysics() ) return 0;
+	if ( !m_bReadyToDraw ) return 0;
 
 	// Resize the rope
 	if( m_RopeFlags & ROPE_RESIZE )
@@ -1903,10 +1896,7 @@ bool C_RopeKeyframe::InitRopePhysics()
 
 bool C_RopeKeyframe::CalculateEndPointAttachment( C_BaseEntity *pEnt, int iAttachment, Vector &vPos, QAngle *pAngles )
 {
-	VPROF_BUDGET( "C_RopeKeyframe::CalculateEndPointAttachment", VPROF_BUDGETGROUP_ROPES );
-
-	if( !pEnt )
-		return false;
+	if( !pEnt ) return false;
 
 	if ( m_RopeFlags & ROPE_PLAYER_WPN_ATTACH )
 	{

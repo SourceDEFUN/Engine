@@ -27,7 +27,7 @@ class CAudioSource;
 class IAudioDevice;
 class CUtlBuffer;
 
-#include "tier0/vprof.h"
+
 
 //-----------------------------------------------------------------------------
 // Purpose: This is an instance of an audio source.
@@ -379,8 +379,6 @@ struct CAudioSourceCachedInfoHandle_t
 
 	inline CAudioSourceCachedInfo *Get( int audiosourcetype, bool soundisprecached, CSfxTable *sfx, int *pcacheddatasize )
 	{
-		VPROF("CAudioSourceCachedInfoHandle_t::Get");
-
 		if ( m_FlushCount != s_nCurrentFlushCount )
 		{
 			// Reacquire
@@ -404,8 +402,6 @@ struct CAudioSourceCachedInfoHandle_t
 
 	inline CAudioSourceCachedInfo *FastGet()
 	{
-		VPROF("CAudioSourceCachedInfoHandle_t::FastGet");
-
 		if ( m_FlushCount != s_nCurrentFlushCount )
 		{
 			return NULL;

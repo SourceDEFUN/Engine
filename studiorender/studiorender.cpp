@@ -14,7 +14,7 @@
 #include "materialsystem/imesh.h"
 #include "optimize.h"
 #include "mathlib/vmatrix.h"
-#include "tier0/vprof.h"
+
 #include "tier1/strtools.h"
 #include "tier1/KeyValues.h"
 #include "tier0/memalloc.h"
@@ -432,8 +432,6 @@ void CStudioRender::DrawModel( const DrawModelInfo_t& info, const StudioRenderCo
 		return;
 	}
 
-	VPROF( "CStudioRender::DrawModel");
-
 	m_pRC = const_cast< StudioRenderContext_t* >( &rc );
 	m_pFlexWeights = flex.m_pFlexWeights;
 	m_pFlexDelayedWeights = flex.m_pFlexDelayedWeights;
@@ -528,8 +526,6 @@ void CStudioRender::DrawModel( const DrawModelInfo_t& info, const StudioRenderCo
 void CStudioRender::DrawModelStaticProp( const DrawModelInfo_t& info, 
 	const StudioRenderContext_t &rc, const matrix3x4_t& rootToWorld, int flags )
 {
-	VPROF( "CStudioRender::DrawModelStaticProp");
-
 	m_pRC = const_cast<StudioRenderContext_t*>( &rc );
 
 	CMatRenderContextPtr pRenderContext( g_pMaterialSystem );
@@ -602,8 +598,6 @@ void CStudioRender::DrawModelStaticProp( const DrawModelInfo_t& info,
 // NOTE: This is a fast path for simple models with skeletons but not many other features
 void CStudioRender::DrawModelArray( const DrawModelInfo_t &drawInfo, const StudioRenderContext_t &rc, int arrayCount, model_array_instance_t *pInstanceData, int instanceStride, int flags )
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s %d", __FUNCTION__, arrayCount );
-
 #ifndef SWDS												// no drawing on dedicated server
 #if 0
 	FlexWeights_t flex;

@@ -18,9 +18,8 @@
 #include "mathlib/vmatrix.h"
 #include "studiorendercontext.h"
 #include "tier2/tier2.h"
-#include "tier0/vprof.h"
 
-//#define PROFILE_STUDIO VPROF
+
 #define PROFILE_STUDIO
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -260,8 +259,6 @@ int CStudioRender::R_StudioRenderModel( IMatRenderContext *pRenderContext, int s
 	int body, int hitboxset, void /*IClientEntity*/ *pEntity,
 	IMaterial **ppMaterials, int *pMaterialFlags, int flags, int boneMask, int lod, ColorMeshInfo_t *pColorMeshes )
 {
-	VPROF("CStudioRender::R_StudioRenderModel");
-
 	int nDrawGroup = flags & STUDIORENDER_DRAW_GROUP_MASK;
 
 	if ( m_pRC->m_Config.drawEntities == 2 )
@@ -418,8 +415,6 @@ int CStudioRender::R_StudioRenderFinal( IMatRenderContext *pRenderContext,
 	int skin, int nBodyPartCount, BodyPartInfo_t *pBodyPartInfo, void /*IClientEntity*/ *pClientEntity,
 	IMaterial **ppMaterials, int *pMaterialFlags, int boneMask, int lod, ColorMeshInfo_t *pColorMeshes )
 {
-	VPROF("CStudioRender::R_StudioRenderFinal");
-
 	int numTrianglesRendered = 0;
 
 	for ( int i=0 ; i < nBodyPartCount; i++ ) 
@@ -470,10 +465,7 @@ void CStudioRender::DisableScissor()
 //-----------------------------------------------------------------------------
 void CStudioRender::DrawShadows( const DrawModelInfo_t& info, int flags, int boneMask )
 {
-	if ( !m_ShadowState.Count() )
-		return;
-
-	VPROF("CStudioRender::DrawShadows");
+	if ( !m_ShadowState.Count() ) return;
 
 	IMaterial* pForcedMat = m_pRC->m_pForcedMaterial;
 	OverrideType_t nForcedType = m_pRC->m_nForcedMaterialType;
@@ -1228,7 +1220,7 @@ public:
 
 			dstVertex.m_vecTexCoord = vert.m_vecTexCoord; 
 
-			if ( IsX360() || nDX8VertexFormat )
+			if ( nDX8VertexFormat )
 			{
 				Assert( dstVertex.m_vecUserData.w == -1.0f || dstVertex.m_vecUserData.w == 1.0f );
 
@@ -1824,8 +1816,6 @@ void CCachedRenderData::ComputeFlexedVertex_StreamOffset<mstudiovertanim_t>( stu
 
 void CStudioRender::R_StudioProcessFlexedMesh_StreamOffset( mstudiomesh_t* pmesh, int lod )
 {
-	VPROF_BUDGET( "ProcessFlexedMesh_SO", _T("HW Morphing") );
-
 	if ( m_VertexCache.IsFlexComputationDone() )
 		return;
 
@@ -1896,8 +1886,6 @@ void CStudioRender::R_StudioProcessFlexedMesh_StreamOffset( mstudiomesh_t* pmesh
 //-----------------------------------------------------------------------------
 void CStudioRender::R_StudioFlexMeshGroup( studiomeshgroup_t *pGroup )
 {
-	VPROF_BUDGET( "R_StudioFlexMeshGroup", VPROF_BUDGETGROUP_MODEL_RENDERING );
-
 	CMeshBuilder meshBuilder;
 	int nVertexOffsetInBytes = 0;
 	CMatRenderContextPtr pRenderContext( g_pMaterialSystem );
@@ -2050,9 +2038,6 @@ void CStudioRender::R_StudioProcessFlexedMesh( mstudiomesh_t* pmesh, CMeshBuilde
 template<VertexCompressionType_t T> void CStudioRender::R_StudioRestoreMesh( mstudiomesh_t* pmesh, studiomeshgroup_t* pMeshData )
 {
 	Vector4D *pStudioTangentS;
-
-	if ( IsX360() )
-		return;
 
 	// get at the vertex data
 	const mstudio_meshvertexdata_t *vertData = GetFatVertexData( pmesh, m_pStudioHdr );
@@ -2212,7 +2197,7 @@ void CStudioRender::ComputeFlexWeights( int nFlexCount, mstudioflex_t *pFlex, Mo
 //-----------------------------------------------------------------------------
 inline VertexFormat_t CStudioRender::ComputeSWSkinVertexFormat( IMaterial *pMaterial ) const
 {
-	bool bDX8OrHigherVertex = IsX360() || ( UserDataSize( pMaterial->GetVertexFormat() ) != 0 );
+	bool bDX8OrHigherVertex = UserDataSize( pMaterial->GetVertexFormat() ) != 0;
 	VertexFormat_t fmt = VERTEX_POSITION | VERTEX_NORMAL | VERTEX_COLOR | VERTEX_BONE_INDEX | 
 		VERTEX_BONEWEIGHT( 2 ) | VERTEX_TEXCOORD_SIZE( 0, 2 );
 	if ( bDX8OrHigherVertex )
@@ -2231,7 +2216,6 @@ int CStudioRender::R_StudioDrawStaticMesh( IMatRenderContext *pRenderContext, ms
 				float r_blend, IMaterial* pMaterial, int lod, ColorMeshInfo_t *pColorMeshes  )
 {
 	MatSysQueueMark( g_pMaterialSystem, "R_StudioDrawStaticMesh\n" );
-	VPROF( "R_StudioDrawStaticMesh" );
 
 	int numTrianglesRendered = 0;
 
@@ -2351,8 +2335,6 @@ int CStudioRender::R_StudioDrawDynamicMesh( IMatRenderContext *pRenderContext, m
 				studiomeshgroup_t* pGroup, StudioModelLighting_t lighting, 
 				float r_blend, IMaterial* pMaterial, int lod )
 {
-	VPROF( "R_StudioDrawDynamicMesh" );
-
 	bool doFlex = ((pGroup->m_Flags & MESHGROUP_IS_FLEXED) != 0) && m_pRC->m_Config.bFlex;
 
 	bool doSoftwareLighting = (m_pRC->m_Config.bSoftwareLighting != 0) ||
@@ -2622,7 +2604,6 @@ int CStudioRender::R_StudioDrawEyeball( IMatRenderContext *pRenderContext, mstud
 		// garymcthack!  need to look at the strip flags to figure out what it is.
 		meshBuilder.Begin( pMesh, MATERIAL_TRIANGLES, pmesh->numvertices, 0 );
 //		meshBuilder.Begin( pMesh, MATERIAL_TRIANGLE_STRIP, pmesh->numvertices, 0 );
-		//VPROF_INCREMENT_COUNTER( "TransformFlexVerts", pGroup->m_NumVertices );
 
 		for ( int i=0; i < pGroup->m_NumVertices; ++i)
 		{
@@ -2730,8 +2711,6 @@ int CStudioRender::R_StudioDrawMesh( IMatRenderContext *pRenderContext, mstudiom
 									 StudioModelLighting_t lighting, IMaterial *pMaterial, 
 									 ColorMeshInfo_t *pColorMeshes, int lod )
 {
-	VPROF( "R_StudioDrawMesh" );
-
 	int numTrianglesRendered = 0;
 
 	// Draw all the various mesh groups...
@@ -2864,7 +2843,6 @@ int CStudioRender::SortMeshes( int* pIndices, IMaterial **ppMaterials,
 int CStudioRender::R_StudioDrawPoints( IMatRenderContext *pRenderContext, int skin, void /*IClientEntity*/ *pClientEntity, 
 	IMaterial **ppMaterials, int *pMaterialFlags, int boneMask, int lod, ColorMeshInfo_t *pColorMeshes )
 {
-	VPROF( "R_StudioDrawPoints" );
 	int			i;
 	int numTrianglesRendered = 0;
 

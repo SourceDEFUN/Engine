@@ -359,8 +359,6 @@ $Project "engine"
 		$File	"traceinit.cpp"
 		$File	"$SRCDIR\public\vallocator.cpp"
 		$File	"voiceserver_impl.cpp"
-		$File	"vprof_engine.cpp"
-		$File	"vprof_record.cpp"
 		$File	"world.cpp"
 		$File	"$SRCDIR\public\XZip.cpp"
 		$File	"$SRCDIR\public\XUnzip.cpp"
@@ -530,21 +528,13 @@ $Project "engine"
 	{
 		// public file, no pch
 		$File	"$SRCDIR\public\vgui_controls\vgui_controls.cpp"
-		$File	"$SRCDIR\common\vgui\vgui_basebudgetpanel.cpp"
-		$File	"$SRCDIR\common\vgui\vgui_budgetbargraphpanel.cpp"
-		$File	"$SRCDIR\common\vgui\vgui_budgethistorypanel.cpp"
-		$File	"$SRCDIR\common\vgui\vgui_budgetpanelshared.cpp"
 		
 		$File	"perfuipanel.cpp"										\
 				"vgui_basepanel.cpp"									\
 				"vgui_baseui_interface.cpp"								\
-				"vgui_budgetpanel.cpp"									\
 				"vgui_DebugSystemPanel.cpp"								\
 				"vgui_drawtreepanel.cpp"								\
-				"vgui_helpers.cpp"										\
-				"vgui_texturebudgetpanel.cpp"							\
-				"vgui_vprofgraphpanel.cpp"								\
-				"vgui_vprofpanel.cpp"									
+				"vgui_helpers.cpp"	
 		{
 			$Configuration
 			{
@@ -556,17 +546,7 @@ $Project "engine"
 				}
 			}
 		}
-
-		$File	"vgui_budgetpanel.h"
-		$File	"$SRCDIR\common\vgui\vgui_budgetpanelshared.h"
-		$File	"vgui_texturebudgetpanel.h"
-		$File	"vgui_vprofgraphpanel.h"
-		$File	"vgui_vprofpanel.h"
-
-		$File	"$SRCDIR\common\vgui\vgui_basebudgetpanel.h"
 		$File	"vgui_baseui_interface.h"
-		$File	"$SRCDIR\common\vgui\vgui_budgetbargraphpanel.h"
-		$File	"$SRCDIR\common\vgui\vgui_budgethistorypanel.h"
 
 	}
 
@@ -826,8 +806,6 @@ $Project "engine"
 		$File	"vgui_drawtreepanel.h"
 		$File	"vgui_helpers.h"
 		$File	"view.h"
-		$File	"vprof_engine.h"
-		$File	"vprof_record.h"
 		$File	"world.h"
 		$File	"zone.h"
 		$File	"baseautocompletefilelist.h"
@@ -990,7 +968,6 @@ $Project "engine"
 		$File	"$SRCDIR\public\engine\ivmodelinfo.h"
 		$File	"$SRCDIR\public\engine\ivmodelrender.h"
 		$File	"$SRCDIR\public\ivoiceserver.h"
-		$File	"$SRCDIR\common\ivprofexport.h"
 		$File	"$SRCDIR\public\ivrenderview.h"
 		$File	"$SRCDIR\public\ivtex.h"
 		$File	"$SRCDIR\public\ixboxsystem.h"			[$X360]
@@ -1084,7 +1061,6 @@ $Project "engine"
 		$File	"vmodes.h"
 		$File	"$SRCDIR\public\vphysics_interface.h"
 		$File	"$SRCDIR\public\mathlib\vplane.h"
-		$File	"$SRCDIR\public\tier0\vprof.h"
 		$File	"$SRCDIR\public\vstdlib\vstdlib.h"
 		$File	"$SRCDIR\public\vtf\vtf.h"
 		$File	"$SRCDIR\public\worldsize.h"

@@ -18,7 +18,7 @@
 #include "c_te_legacytempents.h"
 #include "activitylist.h"
 #include "animation.h"
-#include "tier0/vprof.h"
+
 #include "clienteffectprecachesystem.h"
 #include "IEffects.h"
 #include "engine/ivmodelinfo.h"
@@ -378,8 +378,6 @@ void C_ClientRagdoll::OnRestore( void )
 
 void C_ClientRagdoll::ImpactTrace( trace_t *pTrace, int iDamageType, const char *pCustomImpactName )
 {
-	VPROF( "C_ClientRagdoll::ImpactTrace" );
-
 	IPhysicsObject *pPhysicsObject = VPhysicsGetObject();
 
 	if( !pPhysicsObject )
@@ -1416,10 +1414,7 @@ void C_BaseAnimating::GetCachedBoneMatrix( int boneIndex, matrix3x4_t &out )
 //-----------------------------------------------------------------------------
 void C_BaseAnimating::BuildTransformations( CStudioHdr *hdr, Vector *pos, Quaternion *q, const matrix3x4_t &cameraTransform, int boneMask, CBoneBitList &boneComputed )
 {
-	VPROF_BUDGET( "C_BaseAnimating::BuildTransformations", VPROF_BUDGETGROUP_CLIENT_ANIMATION );
-
-	if ( !hdr )
-		return;
+	if ( !hdr ) return;
 
 	matrix3x4_t bonematrix;
 	bool boneSimulated[MAXSTUDIOBONES];
@@ -1761,8 +1756,6 @@ CollideType_t C_BaseAnimating::GetCollideType( void )
 //-----------------------------------------------------------------------------
 void C_BaseAnimating::MaintainSequenceTransitions( IBoneSetup &boneSetup, float flCycle, Vector pos[], Quaternion q[] )
 {
-	VPROF( "C_BaseAnimating::MaintainSequenceTransitions" );
-
 	if ( !boneSetup.GetStudioHdr() )
 		return;
 
@@ -1899,8 +1892,6 @@ void C_BaseAnimating::ChildLayerBlend( Vector pos[], Quaternion q[], float curre
 //-----------------------------------------------------------------------------
 void C_BaseAnimating::StandardBlendingRules( CStudioHdr *hdr, Vector pos[], Quaternion q[], float currentTime, int boneMask )
 {
-	VPROF( "C_BaseAnimating::StandardBlendingRules" );
-
 	float		poseparam[MAXSTUDIOPOSEPARAM];
 
 	if ( !hdr )
@@ -2032,9 +2023,6 @@ void C_BaseAnimating::SetupBones_AttachmentHelper( CStudioHdr *hdr )
 
 bool C_BaseAnimating::CalcAttachments()
 {
-	VPROF( "C_BaseAnimating::CalcAttachments" );
-
-
 	// Make sure m_CachedBones is valid.
 	return SetupBones( NULL, -1, BONE_USED_BY_ATTACHMENT, gpGlobals->curtime );
 }
@@ -2701,8 +2689,6 @@ void C_BaseAnimating::ThreadedBoneSetup()
 
 bool C_BaseAnimating::SetupBones( matrix3x4_t *pBoneToWorldOut, int nMaxBones, int boneMask, float currentTime )
 {
-	VPROF_BUDGET( "C_BaseAnimating::SetupBones", VPROF_BUDGETGROUP_CLIENT_ANIMATION );
-
 	//=============================================================================
 	// HPE_BEGIN:
 	// [pfreese] Added the check for pBoneToWorldOut != NULL in this debug warning
@@ -3059,10 +3045,7 @@ ConVar r_drawothermodels( "r_drawothermodels", "1", FCVAR_CHEAT, "0=Off, 1=Norma
 //-----------------------------------------------------------------------------
 int C_BaseAnimating::DrawModel( int flags )
 {
-	VPROF_BUDGET( "C_BaseAnimating::DrawModel", VPROF_BUDGETGROUP_MODEL_RENDERING );
-	if ( !m_bReadyToDraw )
-		return 0;
-
+	if ( !m_bReadyToDraw ) return 0;
 	int drawn = 0;
 
 #ifdef TF_CLIENT_DLL
@@ -3225,8 +3208,6 @@ void C_BaseAnimating::DoInternalDrawModel( ClientModelRenderInfo_t *pInfo, DrawM
 //-----------------------------------------------------------------------------
 int C_BaseAnimating::InternalDrawModel( int flags )
 {
-	VPROF( "C_BaseAnimating::InternalDrawModel" );
-
 	if ( !GetModel() )
 		return 0;
 
@@ -4223,8 +4204,6 @@ bool C_BaseAnimating::Interpolate( float flCurrentTime )
 	if ( m_pRagdoll )
 		return true;
 
-	VPROF( "C_BaseAnimating::Interpolate" );
-
 	Vector oldOrigin;
 	QAngle oldAngles;
 	Vector oldVel;
@@ -4406,8 +4385,6 @@ void C_BaseAnimating::VPhysicsUpdate( IPhysicsObject *pPhysics )
 //-----------------------------------------------------------------------------
 void C_BaseAnimating::PreDataUpdate( DataUpdateType_t updateType )
 {
-	VPROF( "C_BaseAnimating::PreDataUpdate" );
-
 	m_flOldCycle = GetCycle();
 	m_nOldSequence = GetSequence();
 	m_flOldModelScale = GetModelScale();
@@ -4942,8 +4919,6 @@ bool C_BaseAnimating::TestCollision( const Ray_t &ray, unsigned int fContentsMas
 // Add those and the client hitboxes will be robust
 bool C_BaseAnimating::TestHitboxes( const Ray_t &ray, unsigned int fContentsMask, trace_t& tr )
 {
-	VPROF( "C_BaseAnimating::TestHitboxes" );
-
 	MDLCACHE_CRITICAL_SECTION();
 
 	CStudioHdr *pStudioHdr = GetModelPtr();
@@ -6079,8 +6054,6 @@ void C_BaseAnimating::RemoveFromClientSideAnimationList()
 // static method
 void C_BaseAnimating::UpdateClientSideAnimations()
 {
-	VPROF_BUDGET( "UpdateClientSideAnimations", VPROF_BUDGETGROUP_CLIENT_ANIMATION );
-
 	int c = g_ClientSideAnimationList.Count();
 	for ( int i = 0; i < c ; ++i )
 	{
@@ -6094,10 +6067,7 @@ void C_BaseAnimating::UpdateClientSideAnimations()
 
 CBoneList *C_BaseAnimating::RecordBones( CStudioHdr *hdr, matrix3x4_t *pBoneState )
 {
-	if ( !ToolsEnabled() )
-		return NULL;
-		
-	VPROF_BUDGET( "C_BaseAnimating::RecordBones", VPROF_BUDGETGROUP_TOOLS );
+	if ( !ToolsEnabled() ) return NULL;
 
 	// Possible optimization: Instead of inverting everything while recording, record the pos/q stuff into a structure instead?
 	Assert( hdr );
@@ -6148,10 +6118,7 @@ CBoneList *C_BaseAnimating::RecordBones( CStudioHdr *hdr, matrix3x4_t *pBoneStat
 
 void C_BaseAnimating::GetToolRecordingState( KeyValues *msg )
 {
-	if ( !ToolsEnabled() )
-		return;
-
-	VPROF_BUDGET( "C_BaseAnimating::GetToolRecordingState", VPROF_BUDGETGROUP_TOOLS );
+	if ( !ToolsEnabled() ) return;
 
 	// Force the animation to drive bones
 	CStudioHdr *hdr = GetModelPtr();

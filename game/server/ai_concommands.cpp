@@ -874,17 +874,3 @@ CON_COMMAND( ai_test_los, "Test AI LOS from the player's POV" )
 	NDebugOverlay::Line( UTIL_GetLocalPlayer()->EyePosition(), tr.endpos, 127, 127, 127, true, 5 );
 	NDebugOverlay::Cross3D( tr.endpos, 24, 255, 255, 255, true, 5 );
 }
-
-#ifdef VPROF_ENABLED
-
-CON_COMMAND(ainet_generate_report, "Generate a report to the console.")
-{
-	g_VProfCurrentProfile.OutputReport( VPRT_FULL, "AINet" );
-}
-
-CON_COMMAND(ainet_generate_report_only, "Generate a report to the console.")
-{
-	g_VProfCurrentProfile.OutputReport( VPRT_FULL, "AINet", g_VProfCurrentProfile.BudgetGroupNameToBudgetGroupID( "AINet" ) );
-}
-
-#endif

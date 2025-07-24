@@ -35,7 +35,7 @@ class CWorkThread;
 class CJobMgr;
 
 
-// these functions return pointers to fixed string in the code section. We need this for VPROF nodes
+// these functions return pointers to fixed string in the code section.
 #define DECLARE_WORK_ITEM( classname ) \
 	virtual const char* GetDispatchCompletedName() const { return #classname"::DispatchCompleted"; } \
 	virtual const char* GetThreadProcessName() const { return #classname"::ThreadProcess"; }
@@ -104,9 +104,8 @@ public:
 	void SetResubmit( bool bResubmit )			{ m_bResubmit = bResubmit; }
 
 	// these functions return pointers to fixed string in the code section. 
-	// We need this for VPROF nodes, you must use the DECLARE_WORK_ITEM macro
 	virtual const char* GetDispatchCompletedName() const = 0; 
-	virtual const char* GetThreadProcessName() const = 0;
+	virtual const char* GetThreadProcessName() const = 0; // Secton TODO: Deal with it!
 
 	// Return false if your operation failed in some way that you would want to know about
 	// The CWorkThreadPool will count the failures.

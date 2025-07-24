@@ -51,7 +51,7 @@
 #include "cglmquery.h"
 
 #include "tier0/tslist.h"
-#include "tier0/vprof_telemetry.h"
+
 #include "materialsystem/IShader.h"
 #include "dxabstract_types.h"
 #include "tier0/icommandline.h"
@@ -1919,12 +1919,6 @@ FORCEINLINE void GLMContext::DrawRangeElements(	GLenum mode, GLuint start, GLuin
 	DrawRangeElementsNonInline( mode, start, end, count, type, indices, baseVertex, pIndexBuf );
 #else
 
-#if GLMDEBUG
-	GLM_FUNC;
-#else
-	//tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s %d-%d count:%d mode:%d type:%d", __FUNCTION__, start, end, count, mode, type );
-#endif
-
 	++m_nBatchCounter;
 
 	SetIndexBuffer( pIndexBuf );
@@ -2042,10 +2036,6 @@ FORCEINLINE void GLMContext::SetFragmentProgram( CGLMProgram *pProg )
 // these write into .env parameter space
 FORCEINLINE void GLMContext::SetProgramParametersF( EGLMProgramType type, uint baseSlot, float *slotData, uint slotCount )
 {
-#if GLMDEBUG
-	GLM_FUNC;
-#endif
-
 	Assert( baseSlot < kGLMProgramParamFloat4Limit );
 	Assert( baseSlot+slotCount <= kGLMProgramParamFloat4Limit );
 
@@ -2122,10 +2112,6 @@ FORCEINLINE void GLMContext::SetProgramParametersF( EGLMProgramType type, uint b
 
 FORCEINLINE void GLMContext::SetProgramParametersB( EGLMProgramType type, uint baseSlot, int *slotData, uint boolCount )
 {
-#if GLMDEBUG
-	GLM_FUNC;
-#endif
-
 	Assert( m_drawingLang == kGLMGLSL );
 	Assert( type==kGLMVertexProgram || type==kGLMFragmentProgram );
 
@@ -2151,10 +2137,6 @@ FORCEINLINE void GLMContext::SetProgramParametersB( EGLMProgramType type, uint b
 
 FORCEINLINE void GLMContext::SetProgramParametersI( EGLMProgramType type, uint baseSlot, int *slotData, uint slotCount )	// groups of 4 ints...
 {
-#if GLMDEBUG
-	GLM_FUNC;
-#endif
-
 	Assert( m_drawingLang == kGLMGLSL );
 	Assert( type==kGLMVertexProgram );
 

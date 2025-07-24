@@ -28,7 +28,7 @@
 #include "cs_player.h"
 #include "cs_gamerules.h"
 #include "cs_bot.h"
-#include "tier0/vprof.h"
+
 #include "teamplayroundbased_gamerules.h"
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -188,8 +188,6 @@ void respawn( CBaseEntity *pEdict, bool fCopyCorpse )
 
 void GameStartFrame( void )
 {
-	VPROF( "GameStartFrame" );
-
 	if ( g_fGameOver )
 		return;
 

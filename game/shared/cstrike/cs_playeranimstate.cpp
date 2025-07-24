@@ -7,7 +7,7 @@
 #include "cbase.h"
 #include "cs_playeranimstate.h"
 #include "base_playeranimstate.h"
-#include "tier0/vprof.h"
+
 #include "animation.h"
 #include "weapon_csbase.h"
 #include "studio.h"
@@ -310,8 +310,6 @@ void CCSPlayerAnimState::CheckCachedSequenceValidity( void )
  */
 int CCSPlayerAnimState::SelectWeightedSequence( Activity activity )
 {
-	VPROF( "CCSPlayerAnimState::ComputeMainSequence" );
-
 	if ( activity > ACT_CROUCHIDLE || activity < 1 )
 	{
 		return GetOuter()->SelectWeightedSequence( activity );
@@ -342,8 +340,6 @@ int CCSPlayerAnimState::SelectWeightedSequence( Activity activity )
  */
 int CCSPlayerAnimState::CalcSequenceIndex( const char *pBaseName, ... )
 {
-	VPROF( "CCSPlayerAnimState::CalcSequenceIndex" );
-
 	CheckCachedSequenceValidity();
 
 	char szFullName[512];
@@ -666,8 +662,6 @@ bool CCSPlayerAnimState::IsOuterGrenadePrimed()
 
 void CCSPlayerAnimState::ComputeGrenadeSequence( CStudioHdr *pStudioHdr )
 {
-	VPROF( "CCSPlayerAnimState::ComputeGrenadeSequence" );
-
 	if ( m_bThrowingGrenade )
 	{
 		UpdateLayerSequenceGeneric( pStudioHdr, GRENADESEQUENCE_LAYER, m_bThrowingGrenade, m_flGrenadeCycle, m_iGrenadeSequence, false );
@@ -758,7 +752,6 @@ int CCSPlayerAnimState::GetOuterGrenadeThrowCounter()
 
 void CCSPlayerAnimState::ComputeReloadSequence( CStudioHdr *pStudioHdr )
 {
-	VPROF( "CCSPlayerAnimState::ComputeReloadSequence" );
 	bool hold = m_flReloadHoldEndTime > gpGlobals->curtime;
 	UpdateLayerSequenceGeneric( pStudioHdr, RELOADSEQUENCE_LAYER, m_bReloading, m_flReloadCycle, m_iReloadSequence, hold );
 	if ( !m_bReloading )
@@ -770,8 +763,6 @@ void CCSPlayerAnimState::ComputeReloadSequence( CStudioHdr *pStudioHdr )
 
 int CCSPlayerAnimState::CalcAimLayerSequence( float *flCycle, float *flAimSequenceWeight, bool bForceIdle )
 {
-	VPROF( "CCSPlayerAnimState::CalcAimLayerSequence" );
-
 	const char *pSuffix = GetWeaponSuffix();
 	if ( !pSuffix )
 		return 0;
@@ -816,8 +807,6 @@ int CCSPlayerAnimState::CalcAimLayerSequence( float *flCycle, float *flAimSequen
 
 const char* CCSPlayerAnimState::GetWeaponSuffix()
 {
-	VPROF( "CCSPlayerAnimState::GetWeaponSuffix" );
-
 	// Figure out the weapon suffix.
 	CWeaponCSBase *pWeapon = m_pHelpers->CSAnim_GetActiveWeapon();
 	if ( !pWeapon )
@@ -1018,8 +1007,6 @@ void CCSPlayerAnimState::ComputeSequences( CStudioHdr *pStudioHdr )
 {
 	BaseClass::ComputeSequences( pStudioHdr );
 
-	VPROF( "CCSPlayerAnimState::ComputeSequences" );
-
 	ComputeFireSequence( pStudioHdr );
 	ComputeReloadSequence( pStudioHdr );
 	ComputeGrenadeSequence( pStudioHdr );
@@ -1045,8 +1032,6 @@ void CCSPlayerAnimState::ClearAnimationLayers()
 
 void CCSPlayerAnimState::ComputeFireSequence( CStudioHdr *pStudioHdr )
 {
-	VPROF( "CCSPlayerAnimState::ComputeFireSequence" );
-
 	if ( m_delayedFire != PLAYERANIMEVENT_COUNT )
 	{
 		DoAnimationEvent( m_delayedFire, 0 );

@@ -13,8 +13,7 @@
 #include <memory.h>
 #include "tier0/dbg.h"
 
-#include "tier0/vprof.h"
-//#define _VPROF_MATHLIB
+
 
 #pragma warning(disable:4244)   // "conversion from 'const int' to 'float', possible loss of data"
 #pragma warning(disable:4730)	// "mixing _m64 and floating point expressions may result in incorrect code"
@@ -63,9 +62,6 @@ float _rsqrtf(float x)
 
 float FASTCALL _VectorNormalize (Vector& vec)
 {
-#ifdef _VPROF_MATHLIB
-	VPROF_BUDGET( "_VectorNormalize", "Mathlib" );
-#endif
 	Assert( s_bMathlibInitialized );
 	float radius = sqrtf(vec.x*vec.x + vec.y*vec.y + vec.z*vec.z);
 
@@ -147,14 +143,10 @@ void MatrixAngles( const matrix3x4_t& matrix, RadianEuler &angles, Vector &posit
 
 void MatrixAngles( const matrix3x4_t &matrix, Quaternion &q, Vector &pos )
 {
-#ifdef _VPROF_MATHLIB
-	VPROF_BUDGET( "MatrixQuaternion", "Mathlib" );
-#endif
 	float trace;
 	trace = matrix[0][0] + matrix[1][1] + matrix[2][2] + 1.0f;
 	if( trace > 1.0f + FLT_EPSILON ) 
 	{
-		// VPROF_INCREMENT_COUNTER("MatrixQuaternion A",1);
 		q.x = ( matrix[2][1] - matrix[1][2] );
 		q.y = ( matrix[0][2] - matrix[2][0] );
 		q.z = ( matrix[1][0] - matrix[0][1] );
@@ -162,7 +154,6 @@ void MatrixAngles( const matrix3x4_t &matrix, Quaternion &q, Vector &pos )
 	} 
 	else if ( matrix[0][0] > matrix[1][1] && matrix[0][0] > matrix[2][2] ) 
 	{
-		// VPROF_INCREMENT_COUNTER("MatrixQuaternion B",1);
 		trace = 1.0f + matrix[0][0] - matrix[1][1] - matrix[2][2];
 		q.x = trace;
 		q.y = (matrix[1][0] + matrix[0][1] );
@@ -171,7 +162,6 @@ void MatrixAngles( const matrix3x4_t &matrix, Quaternion &q, Vector &pos )
 	} 
 	else if (matrix[1][1] > matrix[2][2])
 	{
-		// VPROF_INCREMENT_COUNTER("MatrixQuaternion C",1);
 		trace = 1.0f + matrix[1][1] - matrix[0][0] - matrix[2][2];
 		q.x = (matrix[0][1] + matrix[1][0] );
 		q.y = trace;
@@ -180,7 +170,6 @@ void MatrixAngles( const matrix3x4_t &matrix, Quaternion &q, Vector &pos )
 	}
 	else
 	{
-		// VPROF_INCREMENT_COUNTER("MatrixQuaternion D",1);
 		trace = 1.0f + matrix[2][2] - matrix[0][0] - matrix[1][1];
 		q.x = (matrix[0][2] + matrix[2][0] );
 		q.y = (matrix[2][1] + matrix[1][2] );
@@ -205,9 +194,6 @@ void MatrixAngles( const matrix3x4_t &matrix, Quaternion &q, Vector &pos )
 
 void MatrixAngles( const matrix3x4_t& matrix, float *angles )
 { 
-#ifdef _VPROF_MATHLIB
-	VPROF_BUDGET( "MatrixAngles", "Mathlib" );
-#endif
 	Assert( s_bMathlibInitialized );
 	float forward[3];
 	float left[3];
@@ -1123,9 +1109,6 @@ void AngleMatrix( const QAngle &angles, const Vector &position, matrix3x4_t& mat
 
 void AngleMatrix( const QAngle &angles, matrix3x4_t& matrix )
 {
-#ifdef _VPROF_MATHLIB
-	VPROF_BUDGET( "AngleMatrix", "Mathlib" );
-#endif
 	Assert( s_bMathlibInitialized );
 
 	float sr, sp, sy, cr, cp, cy;
@@ -1772,10 +1755,6 @@ void QuaternionMatrix( const Quaternion &q, matrix3x4_t& matrix )
 		Assert( q.IsValid() );
 	}
 
-#ifdef _VPROF_MATHLIB
-	VPROF_BUDGET( "QuaternionMatrix", "Mathlib" );
-#endif
-
 // Original code
 // This should produce the same code as below with optimization, but looking at the assmebly,
 // it doesn't.  There are 7 extra multiplies in the release build of this, go figure.
@@ -1839,10 +1818,6 @@ void QuaternionAngles( const Quaternion &q, QAngle &angles )
 {
 	Assert( s_bMathlibInitialized );
 	Assert( q.IsValid() );
-
-#ifdef _VPROF_MATHLIB
-	VPROF_BUDGET( "QuaternionAngles", "Mathlib" );
-#endif
 
 #if 1
 	// FIXME: doing it this way calculates too much data, needs to do an optimized version...
@@ -1910,10 +1885,6 @@ void AngleQuaternion( const RadianEuler &angles, Quaternion &outQuat )
 	Assert( s_bMathlibInitialized );
 //	Assert( angles.IsValid() );
 
-#ifdef _VPROF_MATHLIB
-	VPROF_BUDGET( "AngleQuaternion", "Mathlib" );
-#endif
-
 	float sr, sp, sy, cr, cp, cy;
 
 	SinCos( angles.z * 0.5f, &sy, &cy );
@@ -1941,10 +1912,6 @@ void AngleQuaternion( const RadianEuler &angles, Quaternion &outQuat )
 //-----------------------------------------------------------------------------
 void AngleQuaternion( const QAngle &angles, Quaternion &outQuat )
 {
-#ifdef _VPROF_MATHLIB
-	VPROF_BUDGET( "AngleQuaternion", "Mathlib" );
-#endif
-
 	float sr, sp, sy, cr, cp, cy;
 
 	SinCos( DEG2RAD( angles.y ) * 0.5f, &sy, &cy );

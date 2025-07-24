@@ -10,7 +10,7 @@
 //===========================================================================//
 
 #include <memory.h>
-#include "tier0/vprof.h"
+
 #include "tier0/icommandline.h"
 #include "tier1/utllinkedlist.h"
 #include "tier1/utlmap.h"
@@ -988,8 +988,6 @@ int CMDLCache::GetRef( MDLHandle_t handle )
 //-----------------------------------------------------------------------------
 void CMDLCache::UnserializeVCollide( MDLHandle_t handle, bool synchronousLoad )
 {
-	VPROF( "CMDLCache::UnserializeVCollide" );
-
 	// FIXME: Should the vcollde be played into cacheable memory?
 	studiodata_t *pStudioData = m_MDLDict[handle];
 
@@ -1189,8 +1187,6 @@ void CMDLCache::FreeAnimBlocks( MDLHandle_t handle )
 //-----------------------------------------------------------------------------
 unsigned char *CMDLCache::UnserializeAnimBlock( MDLHandle_t handle, int nBlock )
 {
-	VPROF( "CMDLCache::UnserializeAnimBlock" );
-
 	// Block 0 is never used!!!
 	Assert( nBlock > 0 );
 
@@ -1971,8 +1967,6 @@ studiohdr_t *CMDLCache::UnserializeMDL( MDLHandle_t handle, void *pData, int nDa
 //-----------------------------------------------------------------------------
 bool CMDLCache::ReadMDLFile( MDLHandle_t handle, const char *pMDLFileName, CUtlBuffer &buf )
 {
-	VPROF( "CMDLCache::ReadMDLFile" );
-
 	char pFileName[ MAX_PATH ];
 	Q_strncpy( pFileName, pMDLFileName, sizeof( pFileName ) );
 	Q_FixSlashes( pFileName );
@@ -2079,12 +2073,7 @@ studiohdr_t *CMDLCache::GetStudioHdr( MDLHandle_t handle )
 
 	studiodata_t *pStudioData = m_MDLDict[handle];
 
-	if( !pStudioData )
-		return NULL;
-
-#if _DEBUG
-	VPROF_INCREMENT_COUNTER( "GetStudioHdr", 1 );
-#endif
+	if( !pStudioData ) return NULL;
 	studiohdr_t *pHdr = (studiohdr_t*)CheckData( m_MDLDict[handle]->m_MDLCache, MDLCACHE_STUDIOHDR );
 	if ( !pHdr )
 	{
@@ -2507,8 +2496,6 @@ const char *CMDLCache::GetVTXExtension()
 //-----------------------------------------------------------------------------
 bool CMDLCache::VerifyHeaders( studiohdr_t *pStudioHdr )
 {
-	VPROF( "CMDLCache::VerifyHeaders" );
-
 	if ( developer.GetInt() < 2 )
 	{
 		return true;
@@ -2576,8 +2563,6 @@ bool CMDLCache::VerifyHeaders( studiohdr_t *pStudioHdr )
 //-----------------------------------------------------------------------------
 vertexFileHeader_t *CMDLCache::CacheVertexData( studiohdr_t *pStudioHdr )
 {
-	VPROF( "CMDLCache::CacheVertexData" );
-
 	vertexFileHeader_t	*pVvdHdr;
 	MDLHandle_t			handle;
 
@@ -3655,7 +3640,7 @@ bool CMDLCache::PreloadModel( MDLHandle_t handle )
 
 	if ( bNeedsMDL )
 	{
-		V_snprintf( szNameOnDisk, sizeof( szNameOnDisk ), "%s%s.mdl", szFilename, GetPlatformExt() );
+		V_snprintf( szNameOnDisk, sizeof( szNameOnDisk ), "%s.mdl", szFilename );
 		loaderJob.m_pFilename = szNameOnDisk;
 		loaderJob.m_pContext2 = (void *)ModelParts_t::BUFFER_MDL;
 		g_pQueuedLoader->AddJob( &loaderJob );
@@ -3668,7 +3653,7 @@ bool CMDLCache::PreloadModel( MDLHandle_t handle )
 		char szTempName[MAX_PATH];
 		V_snprintf( szNameOnDisk, sizeof( szNameOnDisk ), "%s%s", szFilename, GetVTXExtension() );
 		V_StripExtension( szNameOnDisk, szTempName, sizeof( szTempName ) );
-		V_snprintf( szNameOnDisk, sizeof( szNameOnDisk ), "%s%s.vtx", szTempName, GetPlatformExt() );
+		V_snprintf( szNameOnDisk, sizeof( szNameOnDisk ), "%s.vtx", szTempName );
 		loaderJob.m_pFilename = szNameOnDisk;
 		loaderJob.m_pContext2 = (void *)ModelParts_t::BUFFER_VTX;
 		g_pQueuedLoader->AddJob( &loaderJob );
@@ -3677,7 +3662,7 @@ bool CMDLCache::PreloadModel( MDLHandle_t handle )
 
 	if ( bNeedsVVD )
 	{
-		V_snprintf( szNameOnDisk, sizeof( szNameOnDisk ), "%s%s.vvd", szFilename, GetPlatformExt() );
+		V_snprintf( szNameOnDisk, sizeof( szNameOnDisk ), "%s.vvd", szFilename );
 		loaderJob.m_pFilename = szNameOnDisk;
 		loaderJob.m_pContext2 = (void *)ModelParts_t::BUFFER_VVD;
 		g_pQueuedLoader->AddJob( &loaderJob );
@@ -3686,7 +3671,7 @@ bool CMDLCache::PreloadModel( MDLHandle_t handle )
 
 	if ( bNeedsPHY )
 	{
-		V_snprintf( szNameOnDisk, sizeof( szNameOnDisk ), "%s%s.phy", szFilename, GetPlatformExt() );
+		V_snprintf( szNameOnDisk, sizeof( szNameOnDisk ), "%s.phy", szFilename );
 		loaderJob.m_pFilename = szNameOnDisk;
 		loaderJob.m_pContext2 = (void *)ModelParts_t::BUFFER_PHY;
 		g_pQueuedLoader->AddJob( &loaderJob );

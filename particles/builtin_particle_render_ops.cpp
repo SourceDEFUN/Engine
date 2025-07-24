@@ -18,7 +18,7 @@
 #include "materialsystem/imaterial.h"
 #include "materialsystem/imaterialvar.h"
 #include "psheet.h"
-#include "tier0/vprof.h"
+
 
 #ifdef USE_BLOBULATOR
 // TODO: These should be in public by the time the SDK ships
@@ -32,7 +32,7 @@
 #include "tier0/memdbgon.h"
 
 // Vertex instancing (1 vert submitted per particle, duplicated to 4 (a quad) on the GPU) is supported only on 360
-const bool bUseInstancing = IsX360();
+const bool bUseInstancing = false;
 
 
 //-----------------------------------------------------------------------------

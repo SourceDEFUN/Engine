@@ -108,15 +108,7 @@ void UpdateFullScreenDepthTexture( void )
 	ITexture *pDepthTex = GetFullFrameDepthTexture();
 	CMatRenderContextPtr pRenderContext( materials );
 
-	if( IsX360() )
-	{	
-		pRenderContext->CopyRenderTargetToTextureEx( pDepthTex, -1, NULL, NULL );
-	}
-	else
-	{
-		pRenderContext->CopyRenderTargetToTextureEx( pDepthTex, 0, NULL, NULL );
-	}
-
+	pRenderContext->CopyRenderTargetToTextureEx( pDepthTex, 0, NULL, NULL );
 	pRenderContext->SetFullScreenDepthTextureValidityFlag( true );
 
 	if( r_depthoverlay.GetBool() )

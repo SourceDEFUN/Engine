@@ -6,7 +6,7 @@
 
 #include "cbase.h"
 #include "timedeventmgr.h"
-#include "tier0/vprof.h"
+
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -103,7 +103,6 @@ CTimedEventMgr::CTimedEventMgr()
 
 void CTimedEventMgr::FireEvents()
 {
-	VPROF( "CTimedEventMgr::FireEvents" );
 	while ( m_Events.Count() )
 	{
 		// Fire the top element, then break out.

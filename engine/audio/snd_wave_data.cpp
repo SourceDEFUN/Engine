@@ -28,7 +28,7 @@ extern double realtime;
 // the engine then has at least 400ms to deliver a new buffer or pop (assuming 2 buffers)
 #define STREAM_BUFFER_TIME		0.200f
 // force a single buffer when streaming waves smaller than this
-#define STREAM_BUFFER_DATASIZE	XBOX_DVD_ECC_SIZE
+#define STREAM_BUFFER_DATASIZE	32768
 
 // PC single buffering implementation
 // UNDONE: Allocate this in cache instead?
@@ -723,8 +723,6 @@ void CAsyncWavDataCache::Shutdown()
 //-----------------------------------------------------------------------------
 memhandle_t CAsyncWavDataCache::AsyncLoadCache( char const *filename, int datasize, int startpos, bool bIsPrefetch )
 {
-	VPROF( "CAsyncWavDataCache::AsyncLoadCache" );
-
 	FileNameHandle_t fnh = g_pFileSystem->FindOrAddFileName( filename );
 
 	CacheEntry_t search;
@@ -824,8 +822,6 @@ memhandle_t CAsyncWavDataCache::FindOrCreateBuffer( asyncwaveparams_t &params, b
 //-----------------------------------------------------------------------------
 StreamHandle_t CAsyncWavDataCache::OpenStreamedLoad( char const *pFileName, int dataSize, int dataStart, int startPos, int loopPos, int bufferSize, int numBuffers, streamFlags_t flags )
 {
-	VPROF( "CAsyncWavDataCache::OpenStreamedLoad" );
-
 	StreamedEntry_t			streamedEntry;
 	StreamHandle_t			hStream;
 	asyncwaveparams_t		params;
@@ -879,8 +875,6 @@ StreamHandle_t CAsyncWavDataCache::OpenStreamedLoad( char const *pFileName, int 
 //-----------------------------------------------------------------------------
 void CAsyncWavDataCache::CloseStreamedLoad( StreamHandle_t hStream )
 {
-	VPROF( "CAsyncWavDataCache::CloseStreamedLoad" );
-
 	if ( hStream == INVALID_STREAM_HANDLE )
 	{
 		return;
@@ -936,8 +930,6 @@ void CAsyncWavDataCache::PrefetchCache( char const *filename, int datasize, int 
 //-----------------------------------------------------------------------------
 bool CAsyncWavDataCache::CopyDataIntoMemory( char const *filename, int datasize, int startpos, void *buffer, int bufsize, int copystartpos, int bytestocopy, bool *pbPostProcessed )
 {
-	VPROF( "CAsyncWavDataCache::CopyDataIntoMemory" );
-
 	bool bret = false;
 
 	// Add to caching system
@@ -976,8 +968,6 @@ bool CAsyncWavDataCache::CopyDataIntoMemory( char const *filename, int datasize,
 //-----------------------------------------------------------------------------
 bool CAsyncWavDataCache::CopyDataIntoMemory( memhandle_t& handle, char const *filename, int datasize, int startpos, void *buffer, int bufsize, int copystartpos, int bytestocopy, bool *pbPostProcessed )
 {
-	VPROF( "CAsyncWavDataCache::CopyDataIntoMemory" );
-
 	*pbPostProcessed = false;
 
 	bool bret = false;
@@ -1032,8 +1022,6 @@ bool CAsyncWavDataCache::CopyDataIntoMemory( memhandle_t& handle, char const *fi
 //-----------------------------------------------------------------------------
 int CAsyncWavDataCache::CopyStreamedDataIntoMemory( int hStream, void *pBuffer, int bufferSize, int copyStartPos, int bytesToCopy )
 {
-	VPROF( "CAsyncWavDataCache::CopyStreamedDataIntoMemory" );
-
 	int					actualCopied;
 	int					count;
 	int					i;
@@ -1286,8 +1274,6 @@ void *CAsyncWavDataCache::GetStreamedDataPointer( StreamHandle_t hStream, bool b
 //-----------------------------------------------------------------------------
 bool CAsyncWavDataCache::IsStreamedDataReady( int hStream )
 {
-	VPROF( "CAsyncWavDataCache::IsStreamedDataReady" );
-
 	if ( hStream == INVALID_STREAM_HANDLE )
 	{
 		return false;
@@ -1367,8 +1353,6 @@ void CAsyncWavDataCache::Unload( memhandle_t handle )
 //-----------------------------------------------------------------------------
 bool CAsyncWavDataCache::GetDataPointer( memhandle_t& handle, char const *filename, int datasize, int startpos, void **pData, int copystartpos, bool *pbPostProcessed )
 {
-	VPROF( "CAsyncWavDataCache::GetDataPointer" );
-
 	Assert( pbPostProcessed );
 	Assert( pData );
 
@@ -1450,8 +1434,6 @@ bool CAsyncWavDataCache::GetDataPointer( memhandle_t& handle, char const *filena
 //-----------------------------------------------------------------------------
 bool CAsyncWavDataCache::IsDataLoadCompleted( memhandle_t handle, bool *pIsValid )
 {
-	VPROF( "CAsyncWavDataCache::IsDataLoadCompleted" );
-
 	CAsyncWaveData *data = CacheGet( handle );
 	if ( !data )
 	{
@@ -1659,8 +1641,6 @@ private:
 	//-----------------------------------------------------------------------------
 	inline byte *GetCachedDataPointer()
 	{
-		VPROF( "CWaveDataStreamAsync::GetCachedDataPointer" );
-
 		CAudioSourceCachedInfo *info = m_AudioCacheHandle.Get( CAudioSource::AUDIO_SOURCE_WAV, m_pSfx->IsPrecachedSound(), m_pSfx, &m_nCachedDataSize );
 		if ( !info )
 		{

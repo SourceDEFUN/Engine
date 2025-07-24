@@ -799,7 +799,7 @@ bool xZipAddFile( const char* filename, CUtlBuffer &fileBuff, bool bPrecacheEnti
 
 	// Align the data region to a 512 byte boundry:  (has to be on last entry as well to ensure enough space to perform the final read,
 	// and initial alignment is taken careof by assembexzip)
-	int nPadding = ( XBOX_HDD_SECTORSIZE - ( ftell( hTempFileData ) % XBOX_HDD_SECTORSIZE) ) % XBOX_HDD_SECTORSIZE;
+	int nPadding = ( 512 - ( ftell( hTempFileData ) % 512) ) % 512;
 
 	PadFileBytes( hTempFileData, nPadding );
 

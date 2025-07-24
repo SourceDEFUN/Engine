@@ -62,11 +62,6 @@ CHudPosture::CHudPosture( const char *pElementName ) : CHudElement( pElementName
 	SetParent( pParent );
 
 	SetHiddenBits( HIDEHUD_HEALTH | HIDEHUD_PLAYERDEAD | HIDEHUD_NEEDSUIT );
-
-	if( IsX360() )
-	{
-		vgui::ivgui()->AddTickSignal( GetVPanel(), (1000/HUD_POSTURE_UPDATES_PER_SECOND) );
-	}
 }
 
 //-----------------------------------------------------------------------------

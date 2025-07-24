@@ -97,12 +97,6 @@ void Benchmark_PHY( const CPhysCollide *pCollide, benchresults_t *pOut )
 	size[0].Init(0,0,0);
 	size[1].Init(16,16,16);
 
-#if VPROF_LEVEL > 0 
-	g_VProfCurrentProfile.Reset();
-	g_VProfCurrentProfile.ResetPeaks();
-	g_VProfCurrentProfile.Start();
-#endif
-
 #if TEST_BBOX
 	Vector mins, maxs;
 	physcollision->CollideGetAABB( &mins, &maxs, pCollide, Vector(-500, 200, -100), vec3_angle );
@@ -134,13 +128,6 @@ void Benchmark_PHY( const CPhysCollide *pCollide, benchresults_t *pOut )
 	}
 	duration = Plat_FloatTime() - startTime;
 
-#if VPROF_LEVEL > 0 
-	g_VProfCurrentProfile.MarkFrame();
-	g_VProfCurrentProfile.Stop();
-	g_VProfCurrentProfile.Reset();
-	g_VProfCurrentProfile.ResetPeaks();
-	g_VProfCurrentProfile.Start();
-#endif
 	hitCount = 0;
 	startTime = Plat_FloatTime();
 	for ( i = 0; i < NUM_COLLISION_TESTS; i++ )
@@ -157,17 +144,11 @@ void Benchmark_PHY( const CPhysCollide *pCollide, benchresults_t *pOut )
 		{
 			g_Traces[i].hit = false;
 		}
-#if VPROF_LEVEL > 0 
-		g_VProfCurrentProfile.MarkFrame();
-#endif
 	}
 	double midTime = Plat_FloatTime();
 	for ( i = 0; i < NUM_COLLISION_TESTS; i++ )
 	{
 		physcollision->TraceBox( g_Traces[i].start, start, -size[1], size[1], pCollide, vec3_origin, vec3_angle, &tr );
-#if VPROF_LEVEL > 0 
-		g_VProfCurrentProfile.MarkFrame();
-#endif
 	}
 	double endTime = Plat_FloatTime();
 	duration = endTime - startTime;
@@ -177,13 +158,9 @@ void Benchmark_PHY( const CPhysCollide *pCollide, benchresults_t *pOut )
 	pOut->rayTime = (midTime - startTime) * 1000.0f;
 	pOut->boxTime = (endTime - midTime)*1000.0f;
 
-#if VPROF_LEVEL > 0 
-	g_VProfCurrentProfile.Stop();
-	g_VProfCurrentProfile.OutputReport( VPRT_FULL & ~VPRT_HIERARCHY, NULL );
-#endif
 }
 
-//===== Copyright © 1996-2005, Valve Corporation, All rights reserved. ======//
+//===== Copyright ï¿½ 1996-2005, Valve Corporation, All rights reserved. ======//
 //
 // Purpose: 
 //
@@ -368,9 +345,6 @@ int CBenchmarkApp::Main()
 	SetThreadPriority( GetCurrentThread(), THREAD_PRIORITY_HIGHEST );
 	float totalTime = 0.0f;
 	int loopCount = ARRAYSIZE(pFileNames);
-#if VPROF_LEVEL > 0
-//	loopCount = 3;
-#endif
 	for ( int i = 0; i < loopCount; i++ )
 	{
 		if ( testModels[i].solidCount < 1 )
@@ -383,9 +357,6 @@ int CBenchmarkApp::Main()
 		benchresults_t results;
 		memset( &results, 0, sizeof(results));
 		int numRepeats = 3;
-#if VPROF_LEVEL > 0
-		numRepeats = 1;
-#endif
 		for ( int j = 0; j < numRepeats; j++ )
 		{
 			Benchmark_PHY( testModels[i].solids[0], &results );

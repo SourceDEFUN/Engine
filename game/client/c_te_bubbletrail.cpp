@@ -9,7 +9,7 @@
 #include "cbase.h"
 #include "c_basetempentity.h"
 #include "c_te_legacytempents.h"
-#include "tier0/vprof.h"
+
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -69,8 +69,6 @@ void TE_BubbleTrail( IRecipientFilter& filter, float delay,
 //-----------------------------------------------------------------------------
 void C_TEBubbleTrail::PostDataUpdate( DataUpdateType_t updateType )
 {
-	VPROF( "C_TEBubbleTrail::PostDataUpdate" );
-
 	tempents->BubbleTrail( m_vecMins, m_vecMaxs, m_flWaterZ, m_nModelIndex, m_nCount, m_fSpeed );
 }
 

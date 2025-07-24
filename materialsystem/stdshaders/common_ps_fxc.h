@@ -742,7 +742,6 @@ float3 TextureCombinePostLighting( float3 lit_baseColor, float4 detailColor, int
 	return lit_baseColor;
 }
 
-//NOTE: On X360. fProjZ is expected to be pre-reversed for cheaper math here in the pixel shader
 float DepthFeathering( sampler DepthSampler, const float2 vScreenPos, float fProjZ, float fProjW, float4 vDepthBlendConstants )
 {
 #	if ( !(defined(SHADER_MODEL_PS_1_1) || defined(SHADER_MODEL_PS_1_4) || defined(SHADER_MODEL_PS_2_0)) ) //minimum requirement of ps2b

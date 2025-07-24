@@ -1187,7 +1187,7 @@ bool CMaterial::ShouldSkipVar( KeyValues *pVar, bool *pWasConditional )
 		}
 		else if ( ! stricmp( pCond, "360" ) )
 		{
-			bShouldSkip = !IsX360();
+			bShouldSkip = true;
 		}
 		else if ( ! stricmp( pCond, "gameconsole" ) )
 		{
@@ -2669,7 +2669,7 @@ PreviewImageRetVal_t CMaterial::GetPreviewImageProperties( int *width, int *heig
 				 		ImageFormat *imageFormat, bool* isTranslucent ) const
 {	
 	char const* pFileName = GetPreviewImageFileName();
-	if ( IsX360() || !pFileName )
+	if ( !pFileName )
 	{
 		*width = *height = 0;
 		*imageFormat = IMAGE_FORMAT_RGBA8888;
@@ -2710,7 +2710,7 @@ PreviewImageRetVal_t CMaterial::GetPreviewImage( unsigned char *pData, int width
 	int nImageOffset, nImageSize;
 
 	char const* pFileName = GetPreviewImageFileName();
-	if ( IsX360() || !pFileName )
+	if ( !pFileName )
 	{
 		return MATERIAL_NO_PREVIEW_IMAGE;
 	}

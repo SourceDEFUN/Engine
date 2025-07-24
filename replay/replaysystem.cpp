@@ -18,7 +18,7 @@
 #include "netmessages.h"
 #include "thinkmanager.h"
 #include "managertest.h"
-#include "vprof.h"
+
 #include "sv_fileservercleanup.h"
 
 #include "winlite.h"
@@ -162,8 +162,6 @@ public:
 
 	virtual void Think()
 	{
-		VPROF_BUDGET( "CReplaySystem::Think", VPROF_BUDGETGROUP_REPLAY );
-
 		g_pThinkManager->Think();
 	}
 

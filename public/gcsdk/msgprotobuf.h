@@ -1,4 +1,4 @@
-//====== Copyright © 1996-2004, Valve Corporation, All rights reserved. =======
+//====== Copyright ï¿½ 1996-2004, Valve Corporation, All rights reserved. =======
 //
 // Purpose: 
 //
@@ -367,7 +367,6 @@ public:
 		: CProtoBufMsgBase( eMsg )
 		, m_pProtoBufBody( NULL )
 	{ 
-		VPROF_BUDGET( "CProtoBufMsg::CProtoBufMsg( MsgType_t )", VPROF_BUDGETGROUP_OTHER_NETWORKING );
 		m_pProtoBufBody = AllocProto();
 	}
 
@@ -375,9 +374,7 @@ public:
 	CProtoBufMsg( MsgType_t eMsg, CSteamID steamIDClient, int32 nSessionIDClient ) 
 		: CProtoBufMsgBase( eMsg )
 		, m_pProtoBufBody( NULL )
-	{ 
-		VPROF_BUDGET( "CProtoBufMsg::CProtoBufMsg( MsgType_t, CSteamID, int32 )", VPROF_BUDGETGROUP_OTHER_NETWORKING );
-
+	{
 		m_pProtoBufBody = AllocProto();
 		Hdr()->set_client_steam_id( steamIDClient.ConvertToUint64() );
 		Hdr()->set_client_session_id( nSessionIDClient );
@@ -406,7 +403,6 @@ public:
 		: CProtoBufMsgBase( eMsg )
 		, m_pProtoBufBody( NULL )
 	{
-		VPROF_BUDGET( "CProtoBufMsg::CProtoBufMsg( EMsg, CProtoBufMsgMemoryPoolBase )", VPROF_BUDGETGROUP_OTHER_NETWORKING );
 		m_pProtoBufBody = AllocProto();
 
 		// set up the actual reply

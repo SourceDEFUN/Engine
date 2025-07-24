@@ -538,13 +538,6 @@ void CZipPackFile::SetupPreloadData()
 			return;
 		}
 
-		if ( IsX360() )
-		{
-			// 360 XZips are always dvd aligned
-			Assert( ( m_nPreloadSectionSize % XBOX_DVD_SECTORSIZE ) == 0 );
-			Assert( ( m_nPreloadSectionOffset % XBOX_DVD_SECTORSIZE ) == 0 );
-		}
-
 		// preload data is loaded as a single unbuffered i/o operation
 		ReadFromPack( -1, pPreload, -1, m_nPreloadSectionSize, m_nPreloadSectionOffset );
 	}
@@ -585,7 +578,7 @@ bool CZipPackFile::Prepare( int64 fileLen, int64 nFileOfs )
 	}
 
 	// Pack files are always little-endian
-	m_swap.ActivateByteSwapping( IsX360() );
+	m_swap.ActivateByteSwapping( false );
 
 	m_FileLength = fileLen;
 	m_nBaseOffset = nFileOfs;
@@ -598,50 +591,15 @@ bool CZipPackFile::Prepare( int64 fileLen, int64 nFileOfs )
 
 	// 360 can have an incompatible format
 	bool bCompatibleFormat = true;
-	if ( IsX360() )
+	// scan entire file from expected location for central dir
+	for ( ; offset >= 0; offset-- )
 	{
-		// 360 has dependable exact zips, backup to handle possible xzip format
-		if ( offset - XZIP_COMMENT_LENGTH >= 0 )
+		ReadFromPack( -1, (void*)&rec, -1, sizeof( rec ), offset );
+		m_swap.SwapFieldsToTargetEndian( &rec );
+		if ( rec.signature == PKID( 5, 6 ) )
 		{
-			offset -= XZIP_COMMENT_LENGTH;
-		}
-
-		// single i/o operation, scanning forward
-		char *pTemp = (char *)_alloca( fileLen - offset );
-		ReadFromPack( -1, pTemp, -1, fileLen - offset, offset );
-		while ( offset <= (int64)(fileLen - sizeof( ZIP_EndOfCentralDirRecord )) )
-		{
-			memcpy( &rec, pTemp, sizeof( ZIP_EndOfCentralDirRecord ) );
-			m_swap.SwapFieldsToTargetEndian( &rec );
-			if ( rec.signature == PKID( 5, 6 ) )
-			{
-				bCentralDirRecord = true;
-				if ( rec.commentLength >= 4 )
-				{
-					char *pComment = pTemp + sizeof( ZIP_EndOfCentralDirRecord );
-					if ( !V_strnicmp( pComment, "XZP2", 4 ) )
-					{
-						bCompatibleFormat = false;
-					}
-				}
-				break;
-			}
-			offset++;
-			pTemp++;
-		}
-	}
-	else
-	{
-		// scan entire file from expected location for central dir
-		for ( ; offset >= 0; offset-- )
-		{
-			ReadFromPack( -1, (void*)&rec, -1, sizeof( rec ), offset );
-			m_swap.SwapFieldsToTargetEndian( &rec );
-			if ( rec.signature == PKID( 5, 6 ) )
-			{
-				bCentralDirRecord = true;
-				break;
-			}
+			bCentralDirRecord = true;
+			break;
 		}
 	}
 	Assert( bCentralDirRecord );
@@ -665,7 +623,7 @@ bool CZipPackFile::Prepare( int64 fileLen, int64 nFileOfs )
 	// read central directory into memory and parse
 	CUtlBuffer zipDirBuff( 0, rec.centralDirectorySize, 0 );
 	zipDirBuff.EnsureCapacity( rec.centralDirectorySize );
-	zipDirBuff.ActivateByteSwapping( IsX360() );
+	zipDirBuff.ActivateByteSwapping( false );
 	ReadFromPack( -1, zipDirBuff.Base(), -1, rec.centralDirectorySize, rec.startOfCentralDirOffset );
 	zipDirBuff.SeekPut( CUtlBuffer::SEEK_HEAD, rec.centralDirectorySize );
 
@@ -691,16 +649,6 @@ bool CZipPackFile::Prepare( int64 fileLen, int64 nFileOfs )
 	}
 	else
 	{
-		if ( IsX360() )
-		{
-			// all 360 zip files are expected to have preload sections
-			// only during development, maps are allowed to lack them, due to auto-conversion
-			if ( !m_bIsMapPath || g_pFullFileSystem->GetDVDMode() == DVDMODE_STRICT )
-			{
-				Warning( "ZipFile '%s' missing preload section\n", m_ZipName.String() );
-			}
-		}
-
 		// No preload section, reset buffer pointer
 		zipDirBuff.SeekGet( CUtlBuffer::SEEK_HEAD, 0 );
 	}

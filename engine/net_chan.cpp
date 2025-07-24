@@ -17,7 +17,7 @@
 #include "netmessages.h"
 #include "tier0/vcrmode.h"
 #include "tier0/etwprof.h"
-#include "tier0/vprof.h"
+
 #include "net_ws_headers.h"
 #include "net_ws_queued_packet_sender.h"
 #include "filesystem_init.h"
@@ -134,13 +134,8 @@ void CNetChan::CompressFragments()
 	// that the bf_writes that contributed to this message may have uninitialized bits at the end of the buffer
 	// (for example if it uses only the first couple bits of the last byte in the message). If the
 	// last few bits are different, it can produce a different compressed size.
-	if ( !m_bUseCompression )
-		return;
-
-	if ( VCRGetMode() != VCR_Disabled )
-		return;
-
-	VPROF_BUDGET( "CNetChan::CompressFragments", VPROF_BUDGETGROUP_OTHER_NETWORKING );
+	if ( !m_bUseCompression ) return;
+	if ( VCRGetMode() != VCR_Disabled ) return;
 
 	// write fragemnts for both streams
 	for ( int i=0; i<MAX_STREAMS; i++ )
@@ -1006,8 +1001,6 @@ void CNetChan::RemoveHeadInWaitingList( int nList )
 
 bool CNetChan::CreateFragmentsFromBuffer( bf_write *buffer, int stream )
 {
-	VPROF_BUDGET( "CNetChan::CreateFragmentsFromBuffer", VPROF_BUDGETGROUP_OTHER_NETWORKING );
-
 	bf_write bfwrite;
 	dataFragments_t *data = NULL;
 
@@ -1168,8 +1161,6 @@ void CNetChan::SendTCPData( void )
 
 bool CNetChan::SendSubChannelData( bf_write &buf )
 {
-	VPROF_BUDGET( "CNetChan::SendSubChannelData", VPROF_BUDGETGROUP_OTHER_NETWORKING );
-
 	subChannel_s *subChan = NULL;
 	int i;
 
@@ -1863,8 +1854,6 @@ bool CNetChan::ProcessControlMessage( int cmd, bf_read &buf)
 
 bool CNetChan::ProcessMessages( bf_read &buf  )
 {
-	VPROF( "CNetChan::ProcessMessages" );
-
 	const char * showmsgname = net_showmsg.GetString();
 	const char * blockmsgname = net_blockmsg.GetString();
 
@@ -2415,8 +2404,6 @@ and then the netmessages processed
 */
 void CNetChan::ProcessPacket( netpacket_t * packet, bool bHasHeader )
 {
-	VPROF( "CNetChan::ProcessPacket" );
-
 	Assert( packet );
 
 	bf_read &msg = packet->message;	// handy shortcut

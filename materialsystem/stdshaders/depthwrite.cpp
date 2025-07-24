@@ -73,7 +73,7 @@ BEGIN_VS_SHADER_FLAGS( DepthWrite, "Help for Depth Write", SHADER_NOT_EDITABLE )
 			if ( !g_pHardwareConfig->HasFastVertexTextures() )
 			{
 				DECLARE_STATIC_VERTEX_SHADER( depthwrite_vs20 );
-				SET_STATIC_VERTEX_SHADER_COMBO( ONLY_PROJECT_POSITION, !bAlphaClip && IsX360() && !nColorDepth ); //360 needs to know if it *shouldn't* output texture coordinates to avoid shader patches
+				SET_STATIC_VERTEX_SHADER_COMBO( ONLY_PROJECT_POSITION, false );
 				SET_STATIC_VERTEX_SHADER_COMBO( COLOR_DEPTH, nColorDepth );
 				SET_STATIC_VERTEX_SHADER( depthwrite_vs20 );
 				

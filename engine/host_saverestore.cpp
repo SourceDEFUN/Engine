@@ -49,7 +49,7 @@
 #include "gl_matsysiface.h"
 #include "cl_main.h"
 #include "pr_edict.h"
-#include "tier0/vprof.h"
+
 #include <vgui/ILocalize.h>
 #include "vgui_controls/Controls.h"
 #include "tier0/icommandline.h"
@@ -653,7 +653,6 @@ int CSaveRestore::SaveGameSlot( const char *pSaveName, const char *pSaveComment,
 	}
 
 	SaveMsg( "Start save... (%d/%d)\n", ThreadInMainThread(), ThreadGetCurrentId() );
-	VPROF_BUDGET( "SaveGameSlot", "Save" );
 	char			hlPath[256], name[256], *pTokenData;
 	int				tag, i, tokenSize;
 	CSaveRestoreData	*pSaveData;
@@ -843,7 +842,7 @@ int CSaveRestore::SaveGameSlot( const char *pSaveName, const char *pSaveComment,
 	{
 		if ( !( bIsAutosave || bIsAutosaveDangerous ) || save_screenshot.GetInt() == 2 )
 		{
-			Q_snprintf( m_szSaveGameScreenshotFile, sizeof( m_szSaveGameScreenshotFile ), "%s%s%s.tga", GetSaveDir(), pSaveName, GetPlatformExt() );
+			Q_snprintf( m_szSaveGameScreenshotFile, sizeof( m_szSaveGameScreenshotFile ), "%s%s.tga", GetSaveDir(), pSaveName );
 		}
 	}
 
@@ -2435,8 +2434,6 @@ void CSaveRestore::EntityPatchRead( CSaveRestoreData *pSaveData, const char *lev
 //-----------------------------------------------------------------------------
 int CSaveRestore::LoadGameState( char const *level, bool createPlayers )
 {
-	VPROF("CSaveRestore::LoadGameState");
-
 	SAVE_HEADER		header;
 	CSaveRestoreData *pSaveData;
 	pSaveData = LoadSaveData( GetSaveGameMapName( level ) );
@@ -2794,8 +2791,8 @@ void CSaveRestore::AutoSaveDangerousIsSafe()
 		AgeSaveList( "autosave", save_history_count.GetInt(), IsXSave() );
 	}
 
-	Q_snprintf( szOldName, sizeof( szOldName ), "//%s/%sautosavedangerous%s.tga", MOD_DIR, GetSaveDir(), GetPlatformExt() );
-	Q_snprintf( szNewName, sizeof( szNewName ), "//%s/%sautosave%s.tga", MOD_DIR, GetSaveDir(), GetPlatformExt() );
+	Q_snprintf( szOldName, sizeof( szOldName ), "//%s/%sautosavedangerous.tga", MOD_DIR, GetSaveDir() );
+	Q_snprintf( szNewName, sizeof( szNewName ), "//%s/%sautosave.tga", MOD_DIR, GetSaveDir() );
 
 	// there could be an old version, remove it
 	if ( g_pFileSystem->FileExists( szNewName ) )
@@ -2813,8 +2810,8 @@ void CSaveRestore::AutoSaveDangerousIsSafe()
 	}
 
 	// Rename the dangerous auto save as a normal auto save
-	Q_snprintf( szOldName, sizeof( szOldName ), "//%s/%sautosavedangerous%s.sav", MOD_DIR, GetSaveDir(), GetPlatformExt() );
-	Q_snprintf( szNewName, sizeof( szNewName ), "//%s/%sautosave%s.sav", MOD_DIR, GetSaveDir(), GetPlatformExt() );
+	Q_snprintf( szOldName, sizeof( szOldName ), "//%s/%sautosavedangerous.sav", MOD_DIR, GetSaveDir() );
+	Q_snprintf( szNewName, sizeof( szNewName ), "//%s/%sautosave.sav", MOD_DIR, GetSaveDir() );
 
 	// there could be an old version, remove it
 	if ( g_pFileSystem->FileExists( szNewName ) )

@@ -7,7 +7,7 @@
 #include "cbase.h"
 #include "gamerules.h"
 #include "ammodef.h"
-#include "tier0/vprof.h"
+
 #include "KeyValues.h"
 #include "iachievementmgr.h"
 
@@ -566,7 +566,6 @@ bool CGameRules::ClientCommand( CBaseEntity *pEdict, const CCommand &args )
 
 void CGameRules::FrameUpdatePostEntityThink()
 {
-	VPROF( "CGameRules::FrameUpdatePostEntityThink" );
 	Think();
 }
 

@@ -40,7 +40,7 @@
 #include "utllinkedlist.h"
 #include "utlpriorityqueue.h"
 #include "utlvector.h"
-#include "tier0/vprof.h"
+
 #include "tier0/icommandline.h"
 
 
@@ -429,20 +429,17 @@ void CVGui::RunFrame()
 
 	// this will generate all key and mouse events as well as make a real repaint
 	{
-		VPROF( "surface()->RunFrame()" );
 		g_pSurface->RunFrame();
 	}
 
 	// give the system a chance to process
 	{
-		VPROF( "system()->RunFrame()" );
 		g_pSystem->RunFrame();
 	}
 
 	// update cursor positions
 	if ( IsPC() && !IsReentrant() )
 	{
-		VPROF( "update cursor positions" );
 		int cursorX, cursorY;
 		g_pInput->GetCursorPosition(cursorX, cursorY);
 
@@ -453,14 +450,12 @@ void CVGui::RunFrame()
 
 	if ( !bIsReentrant )
 	{
-		VPROF( "input()->RunFrame()" );
 		g_pInput->RunFrame();
 	}
 
 	// messenging
 	if ( !bIsReentrant )
 	{
-		VPROF( "messaging" );
 
 		// send all the messages waiting in the queue
 		DispatchMessages();
@@ -471,7 +466,6 @@ void CVGui::RunFrame()
 
 		m_bCanRemoveTickSignal = false;
 
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - Ticks", __FUNCTION__ );
 		// directly invoke tick all who asked to be ticked
 		int count = m_TickSignalVec.Count();
 		for (int i = count - 1; i >= 0; i-- )
@@ -489,7 +483,6 @@ void CVGui::RunFrame()
 			}
 			
 			t->panel->Client()->OnTick();
-			tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - Ticks: %s", __FUNCTION__, t->panel->Client()->GetName() );
 		}
 
 		m_bCanRemoveTickSignal = true;
@@ -510,12 +503,11 @@ void CVGui::RunFrame()
 	}
 
 	{
-		VPROF( "SolveTraverse" );
 		// make sure the hierarchy is up to date
 		g_pSurface->SolveTraverse(g_pSurface->GetEmbeddedPanel());
 		g_pSurface->ApplyChanges();
 #ifdef WIN32
-		Assert( IsX360() || ( IsPC() && _heapchk() == _HEAPOK ) );
+		Assert( IsPC() && _heapchk() == _HEAPOK );
 #endif
 	}
 

@@ -19,7 +19,7 @@
 #include "cdll_client_int.h"
 #include "vgui/IVGui.h"
 #include "vgui_controls/Controls.h"
-#include "tier0/vprof_telemetry.h"
+
 #include <time.h>
 #include "steam/steam_api.h"
 
@@ -357,8 +357,6 @@ void CClientVirtualReality::DrawMainMenu()
 	// clear the render target 
 	pRenderContext->ClearColor4ub( 0, 0, 0, 0 );
 	pRenderContext->ClearBuffers( true, false );
-
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "VGui_DrawHud", __FUNCTION__ );
 
 	// Make sure the client .dll root panel is at the proper point before doing the "SolveTraverse" calls
 	vgui::VPANEL root = enginevgui->GetPanel( PANEL_CLIENTDLL );

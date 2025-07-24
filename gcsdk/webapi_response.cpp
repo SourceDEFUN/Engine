@@ -1,4 +1,4 @@
-//========= Copyright © 1996-2010, Valve LLC, All rights reserved. ============
+//========= Copyright ï¿½ 1996-2010, Valve LLC, All rights reserved. ============
 //
 // Purpose: Implementation for CWebAPIResponse objects
 //
@@ -382,7 +382,6 @@ CWebAPIResponse::~CWebAPIResponse()
 //-----------------------------------------------------------------------------
 bool CWebAPIResponse::BEmitFormattedOutput( EWebAPIOutputFormat eFormat, CUtlBuffer &outputBuffer, size_t unMaxResultSize )
 {
-	VPROF_BUDGET( "CWebAPIResponse::BEmitFormattedOutput", VPROF_BUDGETGROUP_STEAM );
 	outputBuffer.Clear();
 
 	switch( eFormat )

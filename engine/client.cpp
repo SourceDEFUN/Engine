@@ -1312,7 +1312,6 @@ void CClientState::DumpPrecacheStats( const char * name )
 
 void CClientState::ReadDeletions( CEntityReadInfo &u )
 {
-	VPROF( "ReadDeletions" );
 	while ( u.m_pBuf->ReadOneBit()!=0 )
 	{
 		int idx = u.m_pBuf->ReadUBitLong( MAX_EDICT_BITS );	
@@ -1325,7 +1324,6 @@ void CClientState::ReadDeletions( CEntityReadInfo &u )
 
 void CClientState::ReadEnterPVS( CEntityReadInfo &u )
 {
-	VPROF( "ReadEnterPVS" );
 
 	TRACE_PACKET(( "  CL Enter PVS (%d)\n", u.m_nNewEntity ));
 
@@ -1341,7 +1339,6 @@ void CClientState::ReadEnterPVS( CEntityReadInfo &u )
 
 void CClientState::ReadLeavePVS( CEntityReadInfo &u )
 {
-	VPROF( "ReadLeavePVS" );
 	// Sanity check.
 	if ( !u.m_bAsDelta )
 	{
@@ -1363,7 +1360,6 @@ void CClientState::ReadLeavePVS( CEntityReadInfo &u )
 
 void CClientState::ReadDeltaEnt( CEntityReadInfo &u )
 {
-	VPROF( "ReadDeltaEnt" );
 	CL_CopyExistingEntity( u );
 	
 	u.NextOldEntity();
@@ -1371,7 +1367,6 @@ void CClientState::ReadDeltaEnt( CEntityReadInfo &u )
 
 void CClientState::ReadPreserveEnt( CEntityReadInfo &u )
 {
-	VPROF( "ReadPreserveEnt" );
 	if ( !u.m_bAsDelta )  // Should never happen on a full update.
 	{
 		Assert(0); // cl.validsequence = 0;
@@ -1429,8 +1424,6 @@ void CClientState::StartUpdatingSteamResources()
 //-----------------------------------------------------------------------------
 void CClientState::CheckUpdatingSteamResources()
 {
-	VPROF_BUDGET( "CheckUpdatingSteamResources", VPROF_BUDGETGROUP_STEAM );
-
 	if ( m_bPrepareClientDLL )
 	{
 		float flPrepareProgress = 0.f;
@@ -1594,7 +1587,6 @@ void CClientState::CheckFileCRCsWithServer()
 //! cannot easily bypass.  Currently that is the case.  But I need to ship the SteamPipe conversion now.
 //! We can revisit pure server security after that has shipped.
 //
-//	VPROF_( "CheckFileCRCsWithServer", 1, VPROF_BUDGETGROUP_OTHER_NETWORKING, false, BUDGETFLAG_CLIENT );
 //	const float flBatchInterval = 1.0f / 5.0f;
 //	const int nBatchSize = 5;
 //
@@ -1995,8 +1987,6 @@ void CClientState::UpdateAreaBits_BackwardsCompatible()
 {
 	if ( m_pAreaBits )
 	{
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 		memcpy( m_chAreaBits, m_pAreaBits, sizeof( m_chAreaBits ) );
 		
 		// The whole point of adding this array was that the client could react to closed portals.
@@ -2018,8 +2008,6 @@ unsigned char** CClientState::GetAreaBits_BackwardCompatibility()
 void CClientState::RunFrame()
 {
 	CBaseClientState::RunFrame();
-
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
 
 	// Since cl_rate is a virtualized cvar, make sure to pickup changes in it.
 	if ( m_NetChannel )

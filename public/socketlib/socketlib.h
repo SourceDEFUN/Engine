@@ -93,11 +93,7 @@ enum SocketState_t				// State of a given socket.
 // Platform and build specific defines, change these as needed
 //-----------------------------------------------------------------------
 
-#if defined( PLATFORM_X360 )
-	#define VDP_SUPPORT_ENABLED 1
-#else 
 	#define VDP_SUPPORT_ENABLED 0
-#endif
 
 #if defined( _DEBUG )
 	#define UNSECURE_SOCKETS_ENABLED 1
@@ -113,10 +109,7 @@ enum SocketState_t				// State of a given socket.
 // polluting other source files with common #defines.
 // ----------------------------------------------------------------------------
 
-#if defined( PLATFORM_X360 )
-#include <xtl.h>
-#include <winsockx.h>
-#elif defined( PLATFORM_WINDOWS_PC )
+#if defined( PLATFORM_WINDOWS_PC )
 #include <winsock2.h>
 #else 
 #error No build platform macro (PLATFORM_*) defined

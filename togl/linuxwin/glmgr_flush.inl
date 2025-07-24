@@ -184,10 +184,6 @@ FORCEINLINE void GLMContext::FlushDrawStates( uint nStartIndex, uint nEndIndex, 
 
 		if ( pNewPair != m_pBoundPair )
 		{
-#if GL_BATCH_TELEMETRY_ZONES
-			tmZone( TELEMETRY_LEVEL2, TMZF_NONE, "NewProgram" );
-#endif
-
 			if ( !pNewPair->m_valid )
 			{
 				if ( !pNewPair->ValidateProgramPair() )
@@ -211,15 +207,6 @@ FORCEINLINE void GLMContext::FlushDrawStates( uint nStartIndex, uint nEndIndex, 
 				GL_BATCH_PERF( if ( pNewPair->m_fragmentProg != m_pBoundPair->m_fragmentProg ) m_FlushStats.m_nNewPS++; )
 				GL_BATCH_PERF( if ( pNewPair->m_vertexProg != m_pBoundPair->m_vertexProg ) m_FlushStats.m_nNewVS++; )
 			}
-
-#if GL_BATCH_PERF_ANALYSIS
-			tmMessage( TELEMETRY_LEVEL2, TMMF_ICON_NOTE, "V:%s (V Regs:%u V Bone Regs:%u) F:%s (F Regs:%u)", 
-				m_drawingProgram[ kGLMVertexProgram ]->m_shaderName,
-				m_drawingProgram[ kGLMVertexProgram ]->m_descs[kGLMGLSL].m_highWater, 
-				m_drawingProgram[ kGLMVertexProgram ]->m_descs[kGLMGLSL].m_VSHighWaterBone, 
-				m_drawingProgram[ kGLMFragmentProgram ]->m_shaderName, 
-				m_drawingProgram[ kGLMFragmentProgram ]->m_descs[kGLMGLSL].m_highWater );
-#endif
 
 			m_pBoundPair = pNewPair;
 
@@ -335,9 +322,6 @@ FORCEINLINE void GLMContext::FlushDrawStates( uint nStartIndex, uint nEndIndex, 
 			GLint vconstLoc = m_pBoundPair->m_locVertexParams;
 			if ( ( vconstLoc >= 0 ) && ( dirtySlotHighWater > firstDirtySlot ) )
 			{
-#if GL_BATCH_TELEMETRY_ZONES
-				tmZone( TELEMETRY_LEVEL2, TMZF_NONE, "VSNonBoneUniformUpdate %u %u", firstDirtySlot, dirtySlotHighWater );
-#endif
 				int numSlots = dirtySlotHighWater - DXABSTRACT_VS_FIRST_BONE_SLOT;
 				
 				// consts after the bones (c217 onwards), since we use the concatenated destination array vc[], upload these consts starting from vc[58]
@@ -389,10 +373,6 @@ FORCEINLINE void GLMContext::FlushDrawStates( uint nStartIndex, uint nEndIndex, 
 				{
 					uint nNumBoneRegs = dirtySlotHighWaterBone;
 
-#if GL_BATCH_TELEMETRY_ZONES								
-					tmZone( TELEMETRY_LEVEL2, TMZF_NONE, "VSBoneUniformUpdate %u", nNumBoneRegs );
-#endif
-
 					gGL->glUniform4fv( vconstBoneLoc, nNumBoneRegs, &m_programParamsF[kGLMVertexProgram].m_values[DXABSTRACT_VS_FIRST_BONE_SLOT][0] );
 
 					GL_BATCH_PERF( m_nTotalVSUniformBoneCalls++; )
@@ -417,9 +397,6 @@ FORCEINLINE void GLMContext::FlushDrawStates( uint nStartIndex, uint nEndIndex, 
 			GLint vconstLoc = m_pBoundPair->m_locVertexParams;
 			if ( ( vconstLoc >= 0 ) && ( dirtySlotHighWater > firstDirtySlot ) )
 			{
-	#if GL_BATCH_TELEMETRY_ZONES
-				tmZone( TELEMETRY_LEVEL2, TMZF_NONE, "VSNonBoneUniformUpdate %u %u", firstDirtySlot, dirtySlotHighWater );
-	#endif
 				gGL->glUniform4fv( m_pBoundPair->m_UniformBufferParams[kGLMVertexProgram][firstDirtySlot], dirtySlotHighWater - firstDirtySlot, &m_programParamsF[kGLMVertexProgram].m_values[firstDirtySlot][0] );
 
 				GL_BATCH_PERF( m_nTotalVSUniformCalls++; )
@@ -496,10 +473,6 @@ FORCEINLINE void GLMContext::FlushDrawStates( uint nStartIndex, uint nEndIndex, 
 		( memcmp( m_CurAttribs.m_streams, m_pDevice->m_streams, sizeof( m_pDevice->m_streams ) ) != 0 ) )
 	{
 		// This branch is taken 52.2% of the time in the L4D2 test1 (long) timedemo.
-
-#if GL_BATCH_TELEMETRY_ZONES
-		tmZone( TELEMETRY_LEVEL2, TMZF_NONE, "SetVertexAttribs" );
-#endif
 
 		m_CurAttribs.m_nTotalBufferRevision = nCurTotalBufferRevision;
 		m_CurAttribs.m_pVertDecl = m_pDevice->m_pVertDecl;
@@ -597,10 +570,6 @@ FORCEINLINE void GLMContext::FlushDrawStates( uint nStartIndex, uint nEndIndex, 
 
 			if ( dirtySlotHighWater > firstDirtySlot )
 			{
-#if GL_BATCH_TELEMETRY_ZONES
-				tmZone( TELEMETRY_LEVEL2, TMZF_NONE, "PSUniformUpdate %u %u", firstDirtySlot, dirtySlotHighWater );
-#endif
-
 				gGL->glUniform4fv( m_pBoundPair->m_UniformBufferParams[kGLMFragmentProgram][firstDirtySlot], dirtySlotHighWater - firstDirtySlot, &m_programParamsF[kGLMFragmentProgram].m_values[firstDirtySlot][0] );
 
 				GL_BATCH_PERF( m_nTotalPSUniformCalls++; )

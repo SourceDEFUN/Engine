@@ -740,8 +740,6 @@ bool CAI_Navigator::PrependLocalAvoidance( float distObstacle, const AIMoveTrace
 
 	m_flTimeLastAvoidanceTriangulate = gpGlobals->curtime;
 
-	AI_PROFILE_SCOPE(CAI_Navigator_PrependLocalAvoidance);
-
 	AI_Waypoint_t *pAvoidanceRoute = NULL;
 
 	Vector vStart = GetLocalOrigin();
@@ -1620,8 +1618,6 @@ AIMoveResult_t CAI_Navigator::MoveJump()
 
 void CAI_Navigator::MoveCalcBaseGoal( AILocalMoveGoal_t *pMoveGoal )
 {
-	AI_PROFILE_SCOPE( CAI_Navigator_MoveCalcBaseGoal );
-
 	pMoveGoal->navType			= GetNavType();
 	pMoveGoal->target			= GetPath()->CurWaypointPos();
 	pMoveGoal->maxDist			= ComputePathDirection( GetNavType(), GetLocalOrigin(), pMoveGoal->target, &pMoveGoal->dir );
@@ -2881,10 +2877,7 @@ bool CAI_Navigator::SimplifyPathForward( float maxDist )
 	AI_Waypoint_t *pCurWaypoint = GetPath()->GetCurWaypoint();
 	AI_Waypoint_t *pNextWaypoint = pCurWaypoint->GetNext();
 
-	if ( !pNextWaypoint )
-		return false;
-
-	AI_PROFILE_SCOPE(CAI_Navigator_SimplifyPathForward);
+	if ( !pNextWaypoint ) return false;
 
 	static SimplifyForwardScanParams fullScanParams = 
 	{
@@ -2923,8 +2916,6 @@ bool CAI_Navigator::SimplifyPathForward( float maxDist )
 
 bool CAI_Navigator::SimplifyPathBacktrack()
 {
-	AI_PROFILE_SCOPE(CAI_Navigator_SimplifyPathBacktrack);
-
 	AI_Waypoint_t *pCurWaypoint = GetPath()->GetCurWaypoint();
 	AI_Waypoint_t *pNextWaypoint = pCurWaypoint->GetNext();
 	
@@ -2994,8 +2985,6 @@ bool CAI_Navigator::SimplifyPathBacktrack()
 
 bool CAI_Navigator::SimplifyPathQuick()
 {
-	AI_PROFILE_SCOPE(CAI_Navigator_SimplifyPathQuick);
-
 	static SimplifyForwardScanParams quickScanParams[2] = 
 	{ 
 		{
@@ -3030,8 +3019,6 @@ int g_iFrameLastSimplified;
 
 bool CAI_Navigator::SimplifyPath( bool bFirstForPath, float scanDist )
 {
-	AI_PROFILE_SCOPE(CAI_Navigator_SimplifyPath);
-	
 	if ( TestingSteering() || IsSimplifyPathDisabled() )
 		return false;
 
@@ -3719,8 +3706,6 @@ bool CAI_Navigator::DoFindPathToPathcorner( CBaseEntity *pPathCorner )
 //-----------------------------------------------------------------------------
 bool CAI_Navigator::DoFindPath( void )
 {
-	AI_PROFILE_SCOPE(CAI_Navigator_DoFindPath);
-
 	DbgNavMsg( GetOuter(), "Finding new path\n" );
 
 	GetPath()->ClearWaypoints();

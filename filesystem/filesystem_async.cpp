@@ -626,34 +626,6 @@ void CBaseFileSystem::InitAsync()
 	if ( m_pThreadPool )
 		return;
 
-	if ( IsX360() && !IsRetail() && Plat_IsInDebugSession() )
-	{
-		class CBreakThread : public CThread
-		{
-			virtual int Run()
-			{
-				for (;;)
-				{
-					Sleep(1000);
-					static int wakeCount;
-					wakeCount++;
-					volatile static int bForceResume = false;
-					if ( bForceResume )
-					{
-						bForceResume = false;
-						BaseFileSystem()->AsyncResume();
-					}
-				}
-				// Unreachable.
-				return 0;
-			}
-		};
-
-		static CBreakThread breakThread;
-		breakThread.SetName( "DebugBreakThread" );
-		breakThread.Start( 1024 );
-	}
-
 	if ( CommandLine()->FindParm( "-noasync" ) )
 	{
 		Msg( "Async I/O disabled from command line\n" );
@@ -669,20 +641,8 @@ void CBaseFileSystem::InitAsync()
 		ThreadPoolStartParams_t params;
 		params.iThreadPriority = 0;
 		params.bIOThreads = true;
-		if ( IsX360() )
-		{
-			// override defaults
-			// 360 has a single i/o thread on the farthest proc
-			params.nThreads = 1;
-			params.fDistribute = TRS_TRUE;
-			params.bUseAffinityTable = true;
-			params.iAffinityTable[0] = XBOX_PROCESSOR_3;
-		}
-		else
-		{
-			params.nThreadsMax = MIN(params.nThreads, 4); // Limit count of IO threads to a maximum of 4.
-			params.nStackSize = 256*1024;
-		}
+		params.nThreadsMax = MIN(params.nThreads, 4); // Limit count of IO threads to a maximum of 4.
+		params.nStackSize = 256*1024;
 
 		if ( !m_pThreadPool->Start( params, "IOJob" ) )
 		{
@@ -1417,7 +1377,7 @@ FSAsyncStatus_t CBaseFileSystem::SyncGetFileSize( const FileAsyncRequest_t &requ
 //-----------------------------------------------------------------------------
 FSAsyncStatus_t CBaseFileSystem::SyncWrite(const char *pszFilename, const void *pSrc, int nSrcBytes, bool bFreeMemory, bool bAppend )
 {
-	FileHandle_t hFile = OpenEx( pszFilename, ( bAppend ) ? "ab+" : "wb", IsX360() ? FSOPEN_NEVERINPACK : 0, NULL );
+	FileHandle_t hFile = OpenEx( pszFilename, ( bAppend ) ? "ab+" : "wb", 0, NULL );
 	if ( hFile )
 	{
 		SetBufferSize( hFile, 0 );
@@ -1445,12 +1405,12 @@ FSAsyncStatus_t CBaseFileSystem::SyncWrite(const char *pszFilename, const void *
 //-----------------------------------------------------------------------------
 FSAsyncStatus_t CBaseFileSystem::SyncAppendFile(const char *pAppendToFileName, const char *pAppendFromFileName )
 {
-	FileHandle_t hDestFile = OpenEx( pAppendToFileName, "ab+", IsX360() ? FSOPEN_NEVERINPACK : 0, NULL );
+	FileHandle_t hDestFile = OpenEx( pAppendToFileName, "ab+", 0, NULL );
 	FSAsyncStatus_t result = FSASYNC_ERR_FAILURE;
 	if ( hDestFile )
 	{
 		SetBufferSize( hDestFile, 0 );
-		FileHandle_t hSourceFile = OpenEx( pAppendFromFileName, "rb", IsX360() ? FSOPEN_NEVERINPACK : 0, NULL );
+		FileHandle_t hSourceFile = OpenEx( pAppendFromFileName, "rb", 0, NULL );
 		if ( hSourceFile )
 		{
 			SetBufferSize( hSourceFile, 0 );

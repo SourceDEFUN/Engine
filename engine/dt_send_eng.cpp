@@ -6,7 +6,6 @@
 //=============================================================================//
 
 #include <tier0/dbg.h>
-#include <tier0/vprof.h>
 #include <tier0/icommandline.h>
 #include <commonmacros.h>
 #include <checksum_crc.h>
@@ -419,8 +418,6 @@ bool SendTable_Encode(
 		ErrorIfNot(	pRecipients->NumAllocated() >= pPrecalc->GetNumDataTableProxies(), ("SendTable_Encode: pRecipients array too small.") );
 	}
 
-	VPROF( "SendTable_Encode" );
-
 	CServerDTITimer timer( pTable, SERVERDTI_ENCODE );
 
 	// Setup all the info we'll be walking the tree with.
@@ -553,8 +550,6 @@ int SendTable_CalcDelta(
 	int *pDeltaPropsBase = pDeltaProps;
 	int *pDeltaPropsEnd = pDeltaProps + nMaxDeltaProps;
 
-	VPROF( "SendTable_CalcDelta" );
-	
 	// Trivial reject.
 	//if ( CompareBitArrays( pFromState, pToState, nFromBits, nToBits ) )
 	//{

@@ -15,7 +15,7 @@
 #include "nav_node.h"
 #include "nav_colors.h"
 #include "Color.h"
-#include "tier0/vprof.h"
+
 #include "collisionutils.h"
 #include "world.h"
 #include "functorutils.h"
@@ -298,8 +298,6 @@ bool CNavMesh::FindNavAreaOrLadderAlongRay( const Vector &start, const Vector &e
  */
 bool CNavMesh::FindActiveNavArea( void )
 {
-	VPROF( "CNavMesh::FindActiveNavArea" );
-
 	m_splitAlongX = false;
 	m_splitEdge = 0.0f;
 	m_selectedArea = NULL;
@@ -719,8 +717,6 @@ void CNavMesh::UpdateDragSelectionSet( void )
 ConVar nav_show_compass( "nav_show_compass", "0", FCVAR_CHEAT );
 void CNavMesh::DrawEditMode( void )
 {
-	VPROF( "CNavMesh::DrawEditMode" );
-
 	CBasePlayer *player = UTIL_GetListenServerHost();
 	if (player == NULL)
 		return;

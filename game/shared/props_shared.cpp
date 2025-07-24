@@ -12,7 +12,6 @@
 #include "animation.h"
 #include <vcollide_parse.h>
 #include <bone_setup.h>
-#include <tier0/vprof.h>
 
 #ifdef CLIENT_DLL
 #include "gamestringpool.h"
@@ -1228,7 +1227,6 @@ void PropBreakableCreateAll( int modelindex, IPhysicsObject *pPhysics, const Vec
 //-----------------------------------------------------------------------------
 void PrecacheGibsForModel( int iModel )
 {
-	VPROF_BUDGET( "PrecacheGibsForModel", VPROF_BUDGETGROUP_PLAYER );
 	vcollide_t *pCollide = modelinfo->GetVCollide( iModel );
 	if ( !pCollide )
 		return;

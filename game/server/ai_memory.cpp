@@ -268,8 +268,6 @@ bool CAI_Enemies::ShouldDiscardMemory( AI_EnemyInfo_t *pMemory )
 
 void CAI_Enemies::RefreshMemories(void)
 {
-	AI_PROFILE_SCOPE(CAI_Enemies_RefreshMemories);
-
 	if ( m_flFreeKnowledgeDuration >= m_flEnemyDiscardTime )
 	{
 		m_flFreeKnowledgeDuration = m_flEnemyDiscardTime - .1;

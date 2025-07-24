@@ -70,8 +70,6 @@ void CAI_BlendedMotor::ResetMoveCalculations()
 
 void CAI_BlendedMotor::MoveStart()
 { 
-	AI_PROFILE_SCOPE(CAI_BlendedMotor_MoveStart);
-
 	if (m_nPrimarySequence == -1)
 	{
 		m_nPrimarySequence = GetSequence();
@@ -138,8 +136,6 @@ void CAI_BlendedMotor::ResetGoalSequence( void )
 
 void CAI_BlendedMotor::MoveStop()
 { 
-	AI_PROFILE_SCOPE(CAI_BlendedMotor_MoveStop);
-
 	CAI_Motor::MoveStop();
 
 	if (m_iPrimaryLayer != -1)
@@ -169,8 +165,6 @@ void CAI_BlendedMotor::MovePaused()
 
 void CAI_BlendedMotor::MoveContinue()
 { 
-	AI_PROFILE_SCOPE(CAI_BlendedMotor_MoveContinue);
-
 	m_nPrimarySequence = GetInteriorSequence( ACT_INVALID );
 	m_nGoalSequence = m_nPrimarySequence;
 
@@ -196,8 +190,6 @@ void CAI_BlendedMotor::MoveContinue()
 //-----------------------------------------------------------------------------
 float CAI_BlendedMotor::GetMoveScriptDist( float &flNewSpeed )
 {
-	AI_PROFILE_SCOPE(CAI_BlendedMotor_GetMoveScriptDist);
-
 	int i;
 	float flTotalDist = 0;
 	float t = GetMoveInterval();
@@ -288,8 +280,6 @@ float CAI_BlendedMotor::GetMoveScriptYaw( void )
 
 void CAI_BlendedMotor::SetMoveScriptAnim( float flNewSpeed )
 {
-	AI_PROFILE_SCOPE(CAI_BlendedMotor_SetMoveScriptAnim);
-
 	// don't bother if the npc is dead
 	if (!GetOuter()->IsAlive())
 		return;
@@ -435,8 +425,6 @@ void CAI_BlendedMotor::SetMoveScriptAnim( float flNewSpeed )
 //-----------------------------------------------------------------------------
 int CAI_BlendedMotor::GetInteriorSequence( int fromSequence )
 {
-	AI_PROFILE_SCOPE(CAI_BlendedMotor_GetInteriorSequence);
-
 	// FIXME: add interior activity to path, just like arrival activity.
 	int  sequence = GetNavigator()->GetMovementSequence();
 
@@ -505,8 +493,6 @@ int CAI_BlendedMotor::GetInteriorSequence( int fromSequence )
 
 AIMotorMoveResult_t CAI_BlendedMotor::MoveGroundExecute( const AILocalMoveGoal_t &move, AIMoveTrace_t *pTraceResult )
 {
-	AI_PROFILE_SCOPE(CAI_BlendedMotor_MoveGroundExecute);
-
 	if ( move.curExpectedDist < 0.001 )
 	{
   		AIMotorMoveResult_t result = BaseClass::MoveGroundExecute( move, pTraceResult );
@@ -571,8 +557,6 @@ AIMotorMoveResult_t CAI_BlendedMotor::MoveGroundExecute( const AILocalMoveGoal_t
 
 AIMotorMoveResult_t CAI_BlendedMotor::MoveFlyExecute( const AILocalMoveGoal_t &move, AIMoveTrace_t *pTraceResult )
 {
-	AI_PROFILE_SCOPE(CAI_BlendedMotor_MoveFlyExecute);
-
 	if ( move.curExpectedDist < 0.001 )
 		return BaseClass::MoveFlyExecute( move, pTraceResult );
 
@@ -797,8 +781,6 @@ void CAI_BlendedMotor::BuildMoveScript( const AILocalMoveGoal_t &move, AIMoveTra
 
 void CAI_BlendedMotor::BuildTurnScript( const AILocalMoveGoal_t &move  )
 {
-	AI_PROFILE_SCOPE(CAI_BlendedMotor_BuildTurnScript);
-
 	int i;
 
 	AI_Movementscript_t script;
@@ -886,8 +868,6 @@ void CAI_BlendedMotor::BuildTurnScript( const AILocalMoveGoal_t &move  )
 
 int CAI_BlendedMotor::BuildTurnScript( int i, int j )
 {
-	AI_PROFILE_SCOPE(CAI_BlendedMotor_BuildTurnScript2);
-
 	int k;
 
 	Vector vecDir = m_scriptTurn[j].vecLocation - m_scriptTurn[i].vecLocation;
@@ -1011,8 +991,6 @@ ConVar ai_path_insert_pause_at_est_end( "ai_path_insert_pause_at_est_end", "1" )
 
 void CAI_BlendedMotor::BuildVelocityScript( const AILocalMoveGoal_t &move )
 {
-	AI_PROFILE_SCOPE(CAI_BlendedMotor_BuildVelocityScript);
-
 	int i;
 	float a;
 
@@ -1564,8 +1542,6 @@ void CAI_BlendedMotor::InsertSlowdown( float distToObstruction, float idealAccel
 
 void CAI_BlendedMotor::MaintainTurnActivity( void )
 {
-	AI_PROFILE_SCOPE(CAI_BlendedMotor_MaintainTurnActivity);
-
 	if (m_flNextTurnGesture > gpGlobals->curtime || m_flNextTurnAct > gpGlobals->curtime || GetOuter()->IsMoving() )
 	{
 		// clear out turn detection if currently turing or moving

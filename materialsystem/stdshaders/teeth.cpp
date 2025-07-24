@@ -473,11 +473,6 @@ BEGIN_VS_SHADER( Teeth_DX9, "Help for Teeth_DX9" )
 			pShaderAPI->GetWorldSpaceCameraPosition( vFlashlightPos );
 			pShaderAPI->SetPixelShaderConstant( PSREG_FLASHLIGHT_POSITION_RIM_BOOST, vFlashlightPos, 1 );
 
-			if ( IsX360() )
-			{
-				pShaderAPI->SetBooleanPixelShaderConstant( 0, &flashlightState.m_nShadowQuality, 1 );
-			}
-
 			if ( !g_pHardwareConfig->HasFastVertexTextures() )
 			{
 				DECLARE_DYNAMIC_VERTEX_SHADER( teeth_flashlight_vs20 );
@@ -536,7 +531,7 @@ BEGIN_VS_SHADER( Teeth_DX9, "Help for Teeth_DX9" )
 			SET_FLAGS2( MATERIAL_VAR2_LIGHTING_VERTEX_LIT );
 		}
 		bool hasFlashlight = UsingFlashlight( params );
-		if ( !hasFlashlight || ( IsX360() || r_flashlight_version2.GetInt() ) )
+		if ( !hasFlashlight || r_flashlight_version2.GetInt() )
 		{
 			DrawUsingVertexShader( params, pShaderAPI, pShaderShadow, vertexCompression );
 			SHADOW_STATE

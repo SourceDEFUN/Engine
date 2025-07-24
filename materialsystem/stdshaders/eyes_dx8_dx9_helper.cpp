@@ -96,11 +96,6 @@ static void SetDepthFlashlightParams( CBaseVSShader *pShader, IShaderDynamicAPI 
 	vScreenScale[0] = (float) nWidth  / 32.0f;
 	vScreenScale[1] = (float) nHeight / 32.0f;
 	pShaderAPI->SetPixelShaderConstant( PSREG_FLASHLIGHT_SCREEN_SCALE, vScreenScale, 1 );
-
-	if ( IsX360() )
-	{
-		pShaderAPI->SetBooleanPixelShaderConstant( 0, &flashlightState.m_nShadowQuality, 1 );
-	}
 }
 
 
@@ -510,7 +505,7 @@ void DrawEyes_DX8_DX9( bool bDX9, CBaseVSShader *pShader, IMaterialVar** params,
 		SET_FLAGS2( MATERIAL_VAR2_LIGHTING_VERTEX_LIT );
 	}
 	bool bHasFlashlight = pShader->UsingFlashlight( params );
-	if( bHasFlashlight && ( IsX360() || r_flashlight_version2.GetInt() ) )
+	if( bHasFlashlight && r_flashlight_version2.GetInt() )
 	{
 		DrawEyes_DX8_DX9_Internal( bDX9, pShader, params, pShaderAPI, pShaderShadow, false, info, vertexCompression );
 		if ( pShaderShadow )

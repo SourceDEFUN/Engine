@@ -884,12 +884,6 @@ static ConVar r_shader_srgb( "r_shader_srgb", "0", FCVAR_ALLOWED_IN_COMPETITIVE,
 
 int CHardwareConfig::NeedsShaderSRGBConversion() const
 {
-	if ( IsX360() )
-	{
-		// 360 always now uses a permanent hw solution
-		return false;
-	}
-
 	int cValue = r_shader_srgb.GetInt();
 	switch( cValue )
 	{
@@ -907,7 +901,7 @@ int CHardwareConfig::NeedsShaderSRGBConversion() const
 bool CHardwareConfig::UsesSRGBCorrectBlending() const
 {
 	int cValue = r_shader_srgb.GetInt();
-	return ( cValue == 0 ) && ( ( m_Caps.m_bDX10Blending ) || IsX360() );
+	return ( cValue == 0 ) && ( m_Caps.m_bDX10Blending );
 }
 
 static ConVar mat_disablehwmorph( "mat_disablehwmorph", "0", FCVAR_ALLOWED_IN_COMPETITIVE, "Disables HW morphing for particular mods" );
@@ -1102,24 +1096,12 @@ const char *CHardwareConfig::GetShaderDLLName() const
 
 bool CHardwareConfig::ReadPixelsFromFrontBuffer() const
 {
-	if ( IsX360() )
-	{
-		// future proof safety, not allowing the front read path
-		return false;
-	}
-
 	// GR - in DX 9.0a can blit from MSAA back buffer
 	return false;
 }
 
 bool CHardwareConfig::PreferDynamicTextures() const
 {
-	if ( IsX360() )
-	{
-		// future proof safety, not allowing these
-		return false;
-	}
-
 	return m_Caps.m_PreferDynamicTextures;
 }
 

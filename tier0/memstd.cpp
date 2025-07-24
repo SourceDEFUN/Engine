@@ -1698,7 +1698,7 @@ void CStdMemAlloc::DumpStatsFileBase( char const *pchFileBase )
 {
 #ifdef _WIN32
 	char filename[ 512 ];
-	_snprintf( filename, sizeof( filename ) - 1, ( IsX360() ) ? "D:\\%s.txt" : "%s.txt", pchFileBase );
+	_snprintf( filename, sizeof( filename ) - 1, "%s.txt", pchFileBase );
 	filename[ sizeof( filename ) - 1 ] = 0;
 	FILE *pFile = fopen( filename, "wt" );
 #ifdef USE_PHYSICAL_SMALL_BLOCK_HEAP

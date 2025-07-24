@@ -18,7 +18,6 @@
 
 
 // uncomment to get dynamic compilation for HLSL shaders
-// X360 NOTE: By default, the system looks for a shared folder named "stdshaders" on the host machine and is completely compatible with -dvd. Ensure that the share is writable if you plan on generating UPDB's.
 //#define DYNAMIC_SHADER_COMPILE
 
 // Uncomment to use remoteshadercompiler.exe as a shader compile server

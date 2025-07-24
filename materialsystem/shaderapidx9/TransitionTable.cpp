@@ -15,7 +15,7 @@
 #include "tier1/convar.h"
 #include "materialsystem/imaterialsystemhardwareconfig.h"
 #include "vertexshaderdx8.h"
-#include "tier0/vprof.h"
+
 #include "shaderdevicedx8.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -1305,7 +1305,6 @@ bool CTransitionTable::TestShadowState( const ShadowState_t& state, const Shadow
 unsigned int CTransitionTable::FindIdenticalTransitionList( unsigned int firstElem, 
 					unsigned short numOps, unsigned int nFirstTest ) const
 {
-	VPROF("CTransitionTable::FindIdenticalTransitionList");
 	// As it turns out, this works most of the time
 	if ( nFirstTest != INVALID_TRANSITION_OP )
 	{
@@ -1376,7 +1375,6 @@ void CTransitionTable::TakeDefaultStateSnapshot( )
 //-----------------------------------------------------------------------------
 void CTransitionTable::ApplyTransitionList( int snapshot, int nFirstOp, int nOpCount )
 {
-	VPROF("CTransitionTable::ApplyTransitionList");
 	// Don't bother if there's nothing to do
 	if (nOpCount > 0)
 	{
@@ -1413,7 +1411,6 @@ void CTransitionTable::ApplyTransitionList( int snapshot, int nFirstOp, int nOpC
 
 void CTransitionTable::ApplyTransition( TransitionList_t& list, int snapshot )
 {
-	VPROF("CTransitionTable::ApplyTransition");
 	if ( g_pShaderDeviceDx8->IsDeactivated() )
 		return;
 
@@ -1550,7 +1547,6 @@ StateSnapshot_t CTransitionTable::TakeSnapshot( )
 //-----------------------------------------------------------------------------
 void CTransitionTable::ApplyShaderState( const ShadowState_t &shadowState, const ShadowShaderState_t &shaderState )
 {
-	VPROF("CTransitionTable::ApplyShaderState");
 	// Don't bother testing against the current state because there
 	// could well be dynamic state modifiers affecting this too....
 	if ( !shadowState.m_UsingFixedFunction )
@@ -1585,7 +1581,6 @@ void CTransitionTable::ApplyShaderState( const ShadowState_t &shadowState, const
 //-----------------------------------------------------------------------------
 void CTransitionTable::UseSnapshot( StateSnapshot_t snapshotId )
 {
-	VPROF("CTransitionTable::UseSnapshot");
 	ShadowStateId_t id = m_SnapshotList[snapshotId].m_ShadowStateId;
 	if (m_CurrentSnapshotId != snapshotId)
 	{
@@ -1624,7 +1619,6 @@ void CTransitionTable::UseSnapshot( StateSnapshot_t snapshotId )
 //-----------------------------------------------------------------------------
 void CTransitionTable::UseDefaultState( )
 {
-	VPROF("CTransitionTable::UseDefaultState");
 	// Need to blat these out because they are tested during transitions
 	m_CurrentState.m_AlphaBlendEnable = false;
 	m_CurrentState.m_SrcBlend = D3DBLEND_ONE;
@@ -1852,7 +1846,6 @@ void CTransitionTable::EnableLinearColorSpaceFrameBuffer( bool bEnable )
 //-----------------------------------------------------------------------------
 void CTransitionTable::PerformShadowStateOverrides( )
 {
-	VPROF("CTransitionTable::PerformShadowStateOverrides");
 	// Deal with funky overrides here, because the state blocks can't...
 	if ( m_CurrentState.m_ForceDepthFuncEquals )
 	{

@@ -1212,7 +1212,7 @@ void StudioModel::DrawBones( )
 				mstudiomodel_t *pModel = pStudioHdr->pBodypart( i )->pModel( j );
 
 				const mstudio_modelvertexdata_t *vertData = pModel->GetVertexData();
-				Assert( vertData ); // This can only return NULL on X360 for now
+				Assert( vertData );
 
 				meshBuilder.Begin( pMesh, MATERIAL_POINTS, 1 );
 

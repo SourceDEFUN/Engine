@@ -13,7 +13,7 @@
 #include "NextBotLocomotionInterface.h"
 #include "NextBotBodyInterface.h"
 
-#include "tier0/vprof.h"
+
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -174,8 +174,6 @@ void ILocomotion::DriveTo( const Vector &pos )
  */
 bool ILocomotion::IsPotentiallyTraversable( const Vector &from, const Vector &to, TraverseWhenType when, float *fraction ) const
 {
-	VPROF_BUDGET( "Locomotion::IsPotentiallyTraversable", "NextBotExpensive" );
-
 	// if 'to' is high above us, it's not directly traversable
 	// Adding a bit of fudge room to allow for floating point roundoff errors
 	if ( ( to.z - from.z ) > GetMaxJumpHeight() + 0.1f )
@@ -231,8 +229,6 @@ bool ILocomotion::IsPotentiallyTraversable( const Vector &from, const Vector &to
  */
 bool ILocomotion::HasPotentialGap( const Vector &from, const Vector &desiredTo, float *fraction ) const
 {
-	VPROF_BUDGET( "Locomotion::HasPotentialGap", "NextBot" );
-
 	// find section of this ray that is actually traversable
 	float traversableFraction;
 	IsPotentiallyTraversable( from, desiredTo, IMMEDIATELY, &traversableFraction );
@@ -281,8 +277,6 @@ bool ILocomotion::HasPotentialGap( const Vector &from, const Vector &desiredTo, 
  */
 bool ILocomotion::IsGap( const Vector &pos, const Vector &forward ) const
 {
-	VPROF_BUDGET( "Locomotion::IsGap", "NextBotSpiky" );
-
 	IBody *body = GetBot()->GetBodyInterface();
 
 	//float halfWidth = ( body ) ? body->GetHullWidth()/2.0f : 1.0f;

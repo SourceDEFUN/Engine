@@ -462,7 +462,7 @@ void CEP2GameStats::Event_LoadGame( void )
 
 	char name[ 512 ];
 	Q_snprintf( name, sizeof( name ), "save/%s", pchSaveFile );
-	Q_DefaultExtension( name, IsX360() ? ".360.sav" : ".sav", sizeof( name ) );
+	Q_DefaultExtension( name, ".sav", sizeof( name ) );
 	Q_FixSlashes( name );
 	Q_strlower( name );
 

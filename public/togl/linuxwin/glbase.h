@@ -83,8 +83,6 @@
 // GL_ENABLE_UNLOCK_BUFFER_OVERWRITE_DETECTION (currently win32 only) - If 1, VirtualAlloc/VirtualProtect is used to detect cases where the app locks a buffer, copies the ptr away, unlocks, then tries to later write to the buffer.
 #define GL_ENABLE_UNLOCK_BUFFER_OVERWRITE_DETECTION 0
 
-#define GL_BATCH_TELEMETRY_ZONES 0
-
 // GL_BATCH_PERF_ANALYSIS - Enables gl_batch_vis, and various per-batch telemetry statistics messages. 
 #define GL_BATCH_PERF_ANALYSIS 0
 #define GL_BATCH_PERF_ANALYSIS_WRITE_PNGS 0

@@ -10,7 +10,7 @@
 #include "c_basetempentity.h"
 #include "IEffects.h"
 #include "tier1/KeyValues.h"
-#include "tier0/vprof.h"
+
 #include "toolframework_client.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -95,8 +95,6 @@ static inline void RecordMetalSparks( const Vector &start, const Vector &directi
 //-----------------------------------------------------------------------------
 void C_TEMetalSparks::PostDataUpdate( DataUpdateType_t updateType )
 {
-	VPROF( "C_TEMetalSparks::PostDataUpdate" );
-
 	g_pEffects->MetalSparks( m_vecPos, m_vecDir );
 	RecordMetalSparks( m_vecPos, m_vecDir );
 }

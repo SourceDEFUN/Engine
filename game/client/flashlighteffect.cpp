@@ -11,7 +11,7 @@
 #include "iviewrender.h"
 #include "view.h"
 #include "engine/ivdebugoverlay.h"
-#include "tier0/vprof.h"
+
 #include "tier1/KeyValues.h"
 #include "toolframework_client.h"
 
@@ -147,8 +147,6 @@ public:
 //-----------------------------------------------------------------------------
 void CFlashlightEffect::UpdateLightNew(const Vector &vecPos, const Vector &vecForward, const Vector &vecRight, const Vector &vecUp )
 {
-	VPROF_BUDGET( "CFlashlightEffect::UpdateLightNew", VPROF_BUDGETGROUP_SHADOW_DEPTH_TEXTURING );
-
 	FlashlightState_t state;
 
 	// We will lock some of the flashlight params if player is on a ladder, to prevent oscillations due to the trace-rays

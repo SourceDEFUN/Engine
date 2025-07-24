@@ -24,7 +24,7 @@
 #include "iengine.h"
 #include "keys.h"
 #include "con_nprint.h"
-#include "tier0/vprof.h"
+
 #include "sound.h"
 #include "gl_rmain.h"
 #include "proto_version.h"
@@ -950,8 +950,6 @@ float CEngineClient::Time()
 
 void CEngineClient::Sound_ExtraUpdate( void )
 {
-	VPROF_BUDGET( "CEngineClient::Sound_ExtraUpdate()", VPROF_BUDGETGROUP_OTHER_SOUND );
-
 	S_ExtraUpdate();
 }
 
@@ -1983,8 +1981,6 @@ void ClientDLL_ProcessInput( void )
 	if ( !g_ClientDLL )
 		return;
 
-	VPROF("ClientDLL_ProcessInput");
-	tmZoneFiltered( TELEMETRY_LEVEL0, 50, TMZF_NONE, "%s", __FUNCTION__ );
 	g_ClientDLL->HudProcessInput( cl.IsConnected() );
 }
 
@@ -1995,8 +1991,6 @@ void ClientDLL_FrameStageNotify( ClientFrameStage_t frameStage )
 {
 	if ( !g_ClientDLL )
 		return;
-
-	tmZoneFiltered( TELEMETRY_LEVEL0, 50, TMZF_NONE, "%s", __FUNCTION__ );
 
 	g_ClientDLL->FrameStageNotify( frameStage );
 }

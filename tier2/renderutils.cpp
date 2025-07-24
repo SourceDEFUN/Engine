@@ -10,7 +10,7 @@
 #include "materialsystem/imaterialsystem.h"
 #include "materialsystem/imesh.h"
 #include "materialsystem/imaterial.h"
-#include "tier0/vprof.h"
+
 #include "tier0/basetypes.h"
 #ifdef DX_TO_GL_ABSTRACTION
 #include "togl/rendermechanism.h"
@@ -782,10 +782,7 @@ void DrawScreenSpaceRectangle( IMaterial *pMaterial,
 {
 	CMatRenderContextPtr pRenderContext( g_pMaterialSystem );
 
-	if ( ( nWidth <= 0 ) || ( nHeight <= 0 ) )
-		return;
-
-	tmZone( TELEMETRY_LEVEL1, TMZF_NONE, "%s", __FUNCTION__ );
+	if ( ( nWidth <= 0 ) || ( nHeight <= 0 ) ) return;
 
 	pRenderContext->MatrixMode( MATERIAL_VIEW );
 	pRenderContext->PushMatrix();

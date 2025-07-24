@@ -125,29 +125,6 @@ bool CFontManager::SetFontGlyphSet(HFont font, const char *windowsFontName, int 
 	}
 
 	bool bForceSingleFontForXbox = false;
-	if ( IsX360() )
-	{
-		// discovered xbox only allows glyphs from these languages from the foreign fallback font
-		// prefer to have the entire range of chars from the font so UI doesn't suffer from glyph disparity
-		if ( !V_stricmp( windowsFontName, "toolbox" ) )
-		{
-			// only the toolbox font is allowed to pass
-		}
-		else
-		{
-			if ( !V_stricmp( m_szLanguage, "polish" ) || 
-				!V_stricmp( m_szLanguage, "russian" ) ||
-				!V_stricmp( m_szLanguage, "japanese" ) ||
-				!V_stricmp( m_szLanguage, "korean" ) ||
-				!V_stricmp( m_szLanguage, "portuguese" ) ||
-				!V_stricmp( m_szLanguage, "schinese" ) ||
-				!V_stricmp( m_szLanguage, "tchinese" ) )
-			{
-				windowsFontName = GetForeignFallbackFontName();
-				bForceSingleFontForXbox = true;
-			}
-		}
-	}
 	font_t *winFont = CreateOrFindWin32Font( windowsFontName, tall, weight, blur, scanlines, flags );
 
 
@@ -604,11 +581,6 @@ FallbackFont_t g_FallbackFonts[] =
 //-----------------------------------------------------------------------------
 bool CFontManager::IsFontForeignLanguageCapable(const char *windowsFontName)
 {
-	if ( IsX360() )
-	{
-		return false;
-	}
-
 	for (int i = 0; g_szValidAsianFonts[i] != NULL; i++)
 	{
 		if (!stricmp(g_szValidAsianFonts[i], windowsFontName))

@@ -83,7 +83,6 @@ float fran1(void)
 	else return temp;
 }
 
-#ifndef _XBOX
 float RandomFloat( float flLow, float flHigh )
 {
 	if (idum == 0)
@@ -94,7 +93,6 @@ float RandomFloat( float flLow, float flHigh )
 	float fl = fran1(); // float in [0,1)
 	return (fl * (flHigh-flLow)) + flLow; // float in [low,high)
 }
-#endif
 
 long RandomLong( long lLow, long lHigh )
 {

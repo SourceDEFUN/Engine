@@ -5,7 +5,7 @@
 //=============================================================================
 
 #include "basefilesystem.h"
-#include "tier0/vprof.h"
+
 
 // NOTE: This has to be the last file included!
 #include "tier0/memdbgon.h"
@@ -33,8 +33,6 @@ unsigned CFileTracker2::ThreadedProcessMD5Requests()
 
 		while ( m_PendingJobs.PopItem( &stuff ) )
 		{
-			tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ ); 
-
 			MD5Context_t ctx;
 			memset( &ctx, 0, sizeof(MD5Context_t) );
 			MD5Init( &ctx );
@@ -59,12 +57,7 @@ unsigned CFileTracker2::ThreadedProcessMD5Requests()
 			m_CompletedJobs.PushItem( stuff );
 			m_threadEventWorkCompleted.Set();
 		}
-
-		{
-			tmZone( TELEMETRY_LEVEL0, TMZF_IDLE, "m_threadEventWorkToDo" ); 
-
-			m_threadEventWorkToDo.Wait( 1000 );
-		}
+		m_threadEventWorkToDo.Wait( 1000 );
 	}
 
 	return 0;

@@ -151,8 +151,6 @@ void CAI_MoveProbe::TraceHull(
 	const Vector &vecStart, const Vector &vecEnd, const Vector &hullMin, 
 	const Vector &hullMax, unsigned int mask, trace_t *pResult ) const
 {
-	AI_PROFILE_SCOPE( CAI_MoveProbe_TraceHull );
-
 	CTraceFilterNav traceFilter( const_cast<CAI_BaseNPC *>(GetOuter()), m_bIgnoreTransientEntities, GetOuter(), GetCollisionGroup() );
 
 	Ray_t ray;
@@ -236,8 +234,6 @@ bool g_bAIDebugStep = false;
 
 bool CAI_MoveProbe::CheckStep( const CheckStepArgs_t &args, CheckStepResult_t *pResult ) const
 {
-	AI_PROFILE_SCOPE( CAI_MoveProbe_CheckStep );
-
 	Vector vecEnd;
 	unsigned collisionMask = args.collisionMask;
 	VectorMA( args.vecStart, args.stepSize, args.vecStepDir, vecEnd );
@@ -259,8 +255,6 @@ bool CAI_MoveProbe::CheckStep( const CheckStepArgs_t &args, CheckStepResult_t *p
 	}
 
 	trace_t trace;
-
-	AI_PROFILE_SCOPE_BEGIN( CAI_Motor_CheckStep_Forward );
 
 	TraceHull( stepStart, stepEnd, collisionMask, &trace );
 
@@ -362,9 +356,6 @@ bool CAI_MoveProbe::CheckStep( const CheckStepArgs_t &args, CheckStepResult_t *p
 		stepEnd = trace.endpos;
 	}
 
-	AI_PROFILE_SCOPE_END();
-
-	AI_PROFILE_SCOPE_BEGIN( CAI_Motor_CheckStep_Down );
 	// seems okay, now find the ground
 	// The ground is only valid if it's within a step height of the original position
 	Assert( VectorsAreEqual( trace.endpos, stepEnd, 1e-3 ) );
@@ -393,8 +384,6 @@ bool CAI_MoveProbe::CheckStep( const CheckStepArgs_t &args, CheckStepResult_t *p
 
 	if ( g_bAIDebugStep )
 		NDebugOverlay::Box( trace.endpos, WorldAlignMins(), WorldAlignMaxs(), 160, 160, 160, 0, 5 );
-
-	AI_PROFILE_SCOPE_END();
 
 	// Checks to see if the thing we're on is a *type* of thing we
 	// are capable of standing on. Always true ffor our current ground ent
@@ -428,7 +417,6 @@ bool CAI_MoveProbe::CheckStep( const CheckStepArgs_t &args, CheckStepResult_t *p
 
 	if (args.groundTest != STEP_DONT_CHECK_GROUND)
 	{
-		AI_PROFILE_SCOPE( CAI_Motor_CheckStep_Stand );
 		// Next, check to see if we can *geometrically* stand on the floor
 		bool bIsFloorFlat = CheckStandPosition( trace.endpos, collisionMask );
 		if (args.groundTest != STEP_ON_INVALID_GROUND && !bIsFloorFlat)
@@ -680,8 +668,6 @@ void CAI_MoveProbe::GroundMoveLimit( const Vector &vecStart, const Vector &vecEn
 	// NOTE: Never call this directly!!! Always use MoveLimit!!
 	// This assertion should ensure this happens
 	Assert( !IsMoveBlocked( *pTrace ) );
-
-	AI_PROFILE_SCOPE( CAI_Motor_GroundMoveLimit );
 
 	Vector vecActualStart, vecDesiredEnd;
 
@@ -1149,8 +1135,6 @@ bool CAI_MoveProbe::CheckStandPosition( const Vector &vecStart, unsigned int col
 	if ( UseOldCheckStandPosition() )
 		return OldCheckStandPosition( vecStart, collisionMask );
 
-	AI_PROFILE_SCOPE( CAI_Motor_CheckStandPosition );
-
 	Vector contactMin, contactMax;
 
 	// this should assume the model is already standing
@@ -1179,8 +1163,6 @@ bool CAI_MoveProbe::CheckStandPosition( const Vector &vecStart, unsigned int col
 	
 	if ( !GetOuter()->IsFlaggedEfficient() )
 	{
-		AI_PROFILE_SCOPE( CAI_Motor_CheckStandPosition_Sides );
-		
 		Vector vHullBottomCenter;
 		vHullBottomCenter.Init( 0, 0, vHullMins.z );
 
@@ -1215,7 +1197,6 @@ bool CAI_MoveProbe::CheckStandPosition( const Vector &vecStart, unsigned int col
 	}
 	else
 	{
-		AI_PROFILE_SCOPE( CAI_Motor_CheckStandPosition_Center );
 		TraceHull( vecUp, vecDown, contactMin, contactMax, collisionMask, &trace1 );
 		if ( trace1.fraction != 1.0 && CanStandOn( trace1.m_pEnt ) )
 			return true;
@@ -1228,8 +1209,6 @@ bool CAI_MoveProbe::CheckStandPosition( const Vector &vecStart, unsigned int col
 
 bool CAI_MoveProbe::OldCheckStandPosition( const Vector &vecStart, unsigned int collisionMask ) const
 {
-	AI_PROFILE_SCOPE( CAI_Motor_CheckStandPosition );
-
 	Vector contactMin, contactMax;
 
 	// this should assume the model is already standing
@@ -1249,9 +1228,7 @@ bool CAI_MoveProbe::OldCheckStandPosition( const Vector &vecStart, unsigned int 
 
 	trace_t trace;
 	
-	AI_PROFILE_SCOPE_BEGIN( CAI_Motor_CheckStandPosition_Center );
 	TraceHull( vecUp, vecDown, contactMin, contactMax, collisionMask, &trace );
-	AI_PROFILE_SCOPE_END();
 
 	if (trace.fraction == 1.0 || !CanStandOn( trace.m_pEnt ))
 		return false;
@@ -1260,7 +1237,6 @@ bool CAI_MoveProbe::OldCheckStandPosition( const Vector &vecStart, unsigned int 
 
 	if ( !GetOuter()->IsFlaggedEfficient() )
 	{
-		AI_PROFILE_SCOPE( CAI_Motor_CheckStandPosition_Sides );
 		
 		// check a box for each quadrant, allow one failure
 		int already_failed = false;
@@ -1308,8 +1284,6 @@ bool CAI_MoveProbe::OldCheckStandPosition( const Vector &vecStart, unsigned int 
 bool CAI_MoveProbe::FloorPoint( const Vector &vecStart, unsigned int collisionMask, 
 						   float flStartZ, float flEndZ, Vector *pVecResult ) const
 {
-	AI_PROFILE_SCOPE( CAI_Motor_FloorPoint );
-
 	// make a pizzabox shaped bounding hull
 	Vector mins = WorldAlignMins();
 	Vector maxs( WorldAlignMaxs().x, WorldAlignMaxs().y, mins.z );

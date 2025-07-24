@@ -37,7 +37,7 @@
 
 #include "basefilesystem.h"
 
-#include "tier0/vprof.h"
+
 #include "tier0/tslist.h"
 #include "tier1/utlbuffer.h"
 #include "tier1/convar.h"
@@ -915,19 +915,6 @@ bool CQueuedLoader::AddJob( const LoaderJob_t *pLoaderJob )
 		// must resolve now, all submitted paths must be absolute for proper sort which achieves seek linearization
 		// a resolved absolute file ensures its existence
 		PathTypeFilter_t pathFilter = FILTER_NONE;
-		if ( IsX360() && ( g_pFullFileSystem->GetDVDMode() == DVDMODE_STRICT ) )
-		{
-			if ( V_stristr( pLoaderJob->m_pFilename, ".bsp" ) || V_stristr( pLoaderJob->m_pFilename, ".ain" ) )
-			{
-				// only the bsp/ain are allowed to be external
-				pathFilter = FILTER_CULLPACK;
-			}
-			else
-			{
-				// all files are expected to be in zip
-				pathFilter = FILTER_CULLNONPACK;
-			}
-		}
 
 		PathTypeQuery_t pathType;
 		g_pFullFileSystem->RelativePathToFullPath( pLoaderJob->m_pFilename, pLoaderJob->m_pPathID, szFullPath, sizeof( szFullPath ), pathFilter, &pathType );
@@ -1699,7 +1686,7 @@ bool CQueuedLoader::BeginMapLoading( const char *pMapName, bool bLoadForHDR, boo
 	char szBaseName[MAX_PATH];
 	char szFilename[MAX_PATH];
 	V_FileBase( pMapName, szBaseName, sizeof( szBaseName ) );
-	V_snprintf( szFilename, sizeof( szFilename ), "reslists_xbox/%s%s.lst", szBaseName, GetPlatformExt() );
+	V_snprintf( szFilename, sizeof( szFilename ), "reslists_xbox/%s.lst", szBaseName );
 
 	MEM_ALLOC_CREDIT();
 
@@ -1715,7 +1702,7 @@ bool CQueuedLoader::BeginMapLoading( const char *pMapName, bool bLoadForHDR, boo
 	if ( XBX_IsLocalized() )
 	{
 		// find optional localized reslist fixup
-		V_snprintf( szFilename, sizeof( szFilename ), "reslists_xbox/%s%s.lst", XBX_GetLanguageString(), GetPlatformExt() );
+		V_snprintf( szFilename, sizeof( szFilename ), "reslists_xbox/%s.lst", XBX_GetLanguageString() );
 		CUtlBuffer localizedBuffer( 0, 0, CUtlBuffer::TEXT_BUFFER );
 		if ( g_pFullFileSystem->ReadFile( szFilename, "GAME", localizedBuffer, 0, 0 ) )
 		{

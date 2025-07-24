@@ -23,7 +23,7 @@
 #include "server_class.h"
 #include "debugoverlay.h"
 #include "collisionutils.h"
-#include "tier0/vprof.h"
+
 #include "convar.h"
 #include "mathlib/polyhedron.h"
 #include "sys_dll.h"
@@ -381,8 +381,6 @@ private:
 //-----------------------------------------------------------------------------
 int	CEngineTrace::GetPointContents( const Vector &vecAbsPosition, IHandleEntity** ppEntity )
 {
-	VPROF( "CEngineTrace_GetPointContents" );
-//	VPROF_BUDGET( "CEngineTrace_GetPointContents", "CEngineTrace_GetPointContents" );
 	
 	m_traceStatCounters[TRACE_STAT_COUNTER_POINTCONTENTS]++;
 	// First check the collision model
@@ -1576,11 +1574,6 @@ CON_COMMAND( ray_clear, "Clear the current rays" )
 
 CON_COMMAND_EXTERN( ray_bench, RayBench, "Time the rays" )
 {
-#if VPROF_LEVEL > 0 
-	g_VProfCurrentProfile.Start();
-	g_VProfCurrentProfile.Reset();
-	g_VProfCurrentProfile.ResetPeaks();
-#endif
 	{
 		double tStart = Plat_FloatTime();
 		trace_t trace;
@@ -1593,7 +1586,6 @@ CON_COMMAND_EXTERN( ray_bench, RayBench, "Time the rays" )
 			CM_BoxTrace( s_BenchmarkRays[i], 0, MASK_SOLID, true, trace );
 			if ( 0 )
 			{
-				VPROF("QueryStaticProps");
 				// Create a ray that extends only until we hit the world and adjust the trace accordingly
 				Ray_t entityRay = s_BenchmarkRays[i];
 				VectorScale( entityRay.m_Delta, trace.fraction, entityRay.m_Delta );
@@ -1607,8 +1599,6 @@ CON_COMMAND_EXTERN( ray_bench, RayBench, "Time the rays" )
 				//float flWorldFraction = trace.fraction;
 				if ( 0 )
 				{
-
-					VPROF("IntersectStaticProps");
 				for ( int i = 0; i < nCount; ++i )
 				{
 					// Generate a collideable
@@ -1632,9 +1622,6 @@ CON_COMMAND_EXTERN( ray_bench, RayBench, "Time the rays" )
 				hit++;
 			else
 				miss++;
-#if VPROF_LEVEL > 0 
-			g_VProfCurrentProfile.MarkFrame();
-#endif
 		}
 		double tEnd = Plat_FloatTime();
 		float ms = (tEnd - tStart) * 1000.0f;
@@ -1647,11 +1634,6 @@ CON_COMMAND_EXTERN( ray_bench, RayBench, "Time the rays" )
 		}
 		Msg("RAY TEST: %d hits, %d misses, %.2fms   (%d rays, %d sweeps) (%d ray/prop, %d box/prop)\n", hit, miss, ms, point, swept, rayVsProp, boxVsProp );
 	}
-#if VPROF_LEVEL > 0 
-	g_VProfCurrentProfile.MarkFrame();
-	g_VProfCurrentProfile.Stop();
-	g_VProfCurrentProfile.OutputReport( VPRT_FULL & ~VPRT_HIERARCHY, NULL );
-#endif
 }
 #endif
 
@@ -1675,10 +1657,7 @@ void CEngineTrace::TraceRay( const Ray_t &ray, unsigned int fMask, ITraceFilter 
 	}
 #endif
 
-	tmZone( TELEMETRY_LEVEL1, TMZF_NONE, "%s:%d", __FUNCTION__, __LINE__ );
-	VPROF_INCREMENT_COUNTER( "TraceRay", 1 );
 	m_traceStatCounters[TRACE_STAT_COUNTER_TRACERAY]++;
-//	VPROF_BUDGET( "CEngineTrace::TraceRay", "Ray/Hull Trace" );
 	
 	CTraceFilterHitAll traceFilter;
 	if ( !pTraceFilter )

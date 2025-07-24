@@ -10,7 +10,7 @@
 #include "igamesystem.h"
 #include "datacache/imdlcache.h"
 #include "utlvector.h"
-#include "vprof.h"
+
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -288,7 +288,6 @@ void IGameSystem::SafeRemoveIfDesiredAllSystems()
 
 void IGameSystem::PreRenderAllSystems()
 {
-	VPROF("IGameSystem::PreRenderAllSystems");
 	InvokePerFrameMethod( &IGameSystemPerFrame::PreRender );
 }
 

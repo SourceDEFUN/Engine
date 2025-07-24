@@ -25,7 +25,7 @@
 #include "player_resource.h"
 #include "engine/IEngineSound.h"
 
-#include "tier0/vprof.h"
+
 
 void Host_Say( edict_t *pEdict, bool teamonly );
 
@@ -150,10 +150,7 @@ void respawn( CBaseEntity *pEdict, bool fCopyCorpse )
 
 void GameStartFrame( void )
 {
-	VPROF("GameStartFrame()");
-
-	if ( g_fGameOver )
-		return;
+	if ( g_fGameOver ) return;
 
 	gpGlobals->teamplay = (teamplay.GetInt() != 0);
 

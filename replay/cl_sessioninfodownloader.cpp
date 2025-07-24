@@ -12,7 +12,7 @@
 #include "KeyValues.h"
 #include "convar.h"
 #include "dbg.h"
-#include "vprof.h"
+
 #include "sessioninfoheader.h"
 #include "utlbuffer.h"
 
@@ -69,8 +69,6 @@ float CSessionInfoDownloader::GetNextThinkTime() const
 
 void CSessionInfoDownloader::Think()
 {
-	VPROF_BUDGET( "CSessionInfoDownloader::Think", VPROF_BUDGETGROUP_REPLAY );
-
 	CBaseThinker::Think();
 
 	// If we're not downloading, no need to think

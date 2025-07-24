@@ -14,7 +14,7 @@
 #include "icliententitylist.h"
 #include "enginesingleuserfilter.h"
 #include "snd_audio_source.h"
-#include "tier0/vprof.h"
+
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -163,7 +163,6 @@ void CEngineSoundClient::EmitSoundInternal( IRecipientFilter& filter, int iEntIn
 	float flVolume, soundlevel_t iSoundLevel, int iFlags, int iPitch, int iSpecialDSP,  
 	const Vector *pOrigin, const Vector *pDirection, CUtlVector< Vector >* pUtlVecOrigins, bool bUpdatePositions, float soundtime /*= 0.0f*/, int speakerentity /*= -1*/ )
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
 	if (flVolume < 0 || flVolume > 1)
 	{
 		Warning ("EmitSound: volume out of bounds = %f\n", flVolume);
@@ -324,7 +323,6 @@ void CEngineSoundClient::EmitSound( IRecipientFilter& filter, int iEntIndex, int
 	float flVolume, float flAttenuation, int iFlags, int iPitch, int iSpecialDSP, 
 	const Vector *pOrigin, const Vector *pDirection, CUtlVector< Vector >* pUtlVecOrigins, bool bUpdatePositions, float soundtime /*= 0.0f*/, int speakerentity /*= -1*/ )
 {
-	VPROF( "CEngineSoundClient::EmitSound" );
 	EmitSound( filter, iEntIndex, iChannel, pSample, flVolume, ATTN_TO_SNDLVL( flAttenuation ), iFlags, 
 		iPitch, iSpecialDSP, pOrigin, pDirection, pUtlVecOrigins, bUpdatePositions, soundtime, speakerentity );
 
@@ -335,7 +333,6 @@ void CEngineSoundClient::EmitSound( IRecipientFilter& filter, int iEntIndex, int
 	float flVolume, soundlevel_t iSoundLevel, int iFlags, int iPitch, int iSpecialDSP, 
 	const Vector *pOrigin, const Vector *pDirection, CUtlVector< Vector >* pUtlVecOrigins, bool bUpdatePositions, float soundtime /*= 0.0f*/, int speakerentity /*= -1*/ )
 {
-	VPROF( "CEngineSoundClient::EmitSound" );
 	if ( pSample && TestSoundChar(pSample, CHAR_SENTENCE) )
 	{
 		int iSentenceIndex = -1;

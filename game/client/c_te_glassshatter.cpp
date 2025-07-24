@@ -11,7 +11,7 @@
 #include "tier1/KeyValues.h"
 #include "toolframework_client.h"
 #include "fx.h"
-#include "tier0/vprof.h"
+
 
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -161,8 +161,6 @@ void C_TEShatterSurface::RecordShatterSurface( )
 //-----------------------------------------------------------------------------
 void C_TEShatterSurface::PostDataUpdate( DataUpdateType_t updateType )
 {
-	VPROF( "C_TEShatterSurface::PostDataUpdate" );
-
 	RecordShatterSurface();
 
 	CSmartPtr<CSimple3DEmitter> pGlassEmitter = CSimple3DEmitter::Create( "C_TEShatterSurface 1" );

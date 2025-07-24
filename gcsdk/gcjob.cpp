@@ -1336,7 +1336,6 @@ static void ThreadedEmitFormattedOutputWrapperAndFreeResponse( CWebAPIResponse *
 //called to respond to a web api request with the specified response value
 static void WebAPIRespondToRequest( const char* pszName, uint32 nSenderIP, const CHTTPResponse& response, const CProtoBufMsg< CMsgWebAPIRequest >& msg )
 {
-	VPROF_BUDGET( "WebAPI - sending result", VPROF_BUDGETGROUP_STEAM );
 	CProtoBufMsg<CMsgHttpResponse> msgResponse( k_EGCMsgWebAPIJobRequestHttpResponse, msg );
 	response.SerializeIntoProtoBuf( msgResponse.Body() );
 	GGCBase()->BReplyToMessage( msgResponse, msg );
@@ -1377,8 +1376,6 @@ static uint32 ParseIPAddrFromForwardHeader( const char* pszHeader )
 //-----------------------------------------------------------------------------
 bool CWebAPIJob::BYieldingRunJobFromMsg( IMsgNetPacket * pNetPacket )
 {
-	VPROF_BUDGET( "WebAPI", VPROF_BUDGETGROUP_STEAM );
-
 	CProtoBufMsg<CMsgWebAPIRequest> msg( pNetPacket );
 
 	//make sure all the required parameters were present
@@ -1450,15 +1447,12 @@ bool CWebAPIJob::BYieldingRunJobFromMsg( IMsgNetPacket * pNetPacket )
 	CHTTPResponse& response = pEmitData->m_Response;
 
 	{
-		VPROF_BUDGET( "WebAPI - Prepare msg", VPROF_BUDGETGROUP_STEAM );
-
 		m_webAPIKey.DeserializeFromProtoBuf( msg.Body().api_key() );
 	}
 
 	CPlainAutoPtr< CWebAPIResponse > pwebAPIResponse( new CWebAPIResponse() );
 
 	{
-		VPROF_BUDGET( "WebAPI - Process msg", VPROF_BUDGETGROUP_STEAM );
 		if( !BYieldingRunJobFromAPIRequest( msg.Body().interface_name().c_str(), msg.Body().method_name().c_str(), msg.Body().version(), &request, &response, pwebAPIResponse.Get() ) )
 		{
 			//error executing our job
@@ -1484,8 +1478,6 @@ bool CWebAPIJob::BYieldingRunJobFromMsg( IMsgNetPacket * pNetPacket )
 //		}
 //		return true;
 //	}
-
-	VPROF_BUDGET( "WebAPI - Emitting result", VPROF_BUDGETGROUP_STEAM );
 
 	response.SetStatusCode( pwebAPIResponse->GetStatusCode() ); 
 	response.SetExpirationHeaderDeltaFromNow( pwebAPIResponse->GetExpirationSeconds() ); 

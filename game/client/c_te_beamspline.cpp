@@ -12,7 +12,7 @@
 //=============================================================================//
 #include "cbase.h"
 #include "c_basetempentity.h"
-#include "tier0/vprof.h"
+
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -69,8 +69,6 @@ void TE_BeamSpline( IRecipientFilter& filter, float delay,
 //-----------------------------------------------------------------------------
 void C_TEBeamSpline::PostDataUpdate( DataUpdateType_t updateType )
 {
-	VPROF( "C_TEBeamSpline::PostDataUpdate" );
-
 	DevMsg( 1, "Beam spline with %i points received\n", m_nPoints );
 }
 

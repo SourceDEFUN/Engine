@@ -10,6 +10,7 @@
 #include "filesystem.h"
 #include "tier0/icommandline.h"
 
+// Secton TODO: Deal with it!
 
 // Server benchmark. Only works on specified maps.
 // Lasts for N ticks.
@@ -19,7 +20,6 @@
 // Don't start measuring for the first N ticks to account for HD load.
 
 static ConVar sv_benchmark_numticks( "sv_benchmark_numticks", "3300", 0, "If > 0, then it only runs the benchmark for this # of ticks." );
-static ConVar sv_benchmark_autovprofrecord( "sv_benchmark_autovprofrecord", "0", 0, "If running a benchmark and this is set, it will record a vprof file over the duration of the benchmark with filename benchmark.vprof." );
 
 static float s_flBenchmarkStartWaitSeconds = 3;	// Wait this many seconds after level load before starting the benchmark.
 
@@ -112,21 +112,6 @@ public:
 				UpdateStartWaitCounter();
 				return;
 			}
-			else
-			{
-				// Ok, now we're officially starting it.
-				Msg( "Starting benchmark!\n" );
-				m_flLastBenchmarkCounterUpdate = m_flBenchmarkStartTime = Plat_FloatTime();
-				m_fl_ValidTime_BenchmarkStartTime = Benchmark_ValidTime();
-				m_nBenchmarkStartTick = gpGlobals->tickcount;
-				m_nLastPhysicsObjectTick = m_nLastPhysicsForceTick = 0;
-				m_BenchmarkState = BENCHMARKSTATE_RUNNING;
-
-				StartVProfRecord();
-
-				RandomSeed( 0 );
-				m_RandomStream.SetSeed( 0 );
-			}
 		}
 
 		int nTicksRunSoFar = gpGlobals->tickcount - m_nBenchmarkStartTick;
@@ -135,7 +120,6 @@ public:
 		// Are we finished with the benchmark?
 		if ( nTicksRunSoFar >= sv_benchmark_numticks.GetInt() )
 		{
-			EndVProfRecord();
 			OutputResults();
 			EndBenchmark();
 			return;
@@ -145,24 +129,6 @@ public:
 		UpdatePlayerCreation();
 		UpdateVPhysicsObjects();
 		CServerBenchmarkHook::s_pBenchmarkHook->UpdateBenchmark();
-	}
-
-	void StartVProfRecord()
-	{
-		if ( sv_benchmark_autovprofrecord.GetInt() )
-		{
-			engine->ServerCommand( "vprof_record_start benchmark\n" );
-			engine->ServerExecute();
-		}
-	}
-
-	void EndVProfRecord()
-	{
-		if ( sv_benchmark_autovprofrecord.GetInt() )
-		{
-			engine->ServerCommand( "vprof_record_stop\n" );
-			engine->ServerExecute();
-		}
 	}
 
 	virtual void EndBenchmark( void )

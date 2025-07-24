@@ -45,7 +45,6 @@
 #include <vstdlib/random.h>
 #include <irecipientfilter.h>
 #include <KeyValues.h>
-#include <tier0/vprof.h>
 #include <cdll_int.h>
 #include <eiface.h>
 #include <client_class.h>
@@ -985,7 +984,7 @@ void CBaseServer::ReplyChallenge(netadr_t &adr, int clientChallenge )
 	msg.WriteLong( clientChallenge ); // Client to server challenge to ensure our reply is what they asked
 	msg.WriteLong( authprotocol );
 
-#if !defined( NO_STEAM ) //#ifndef _XBOX
+#if !defined( NO_STEAM )
 	if ( authprotocol == PROTOCOL_STEAM )
 	{
 		msg.WriteShort( 0 ); //  steam2 encryption key not there anymore
@@ -1088,13 +1087,7 @@ void CBaseServer::GetNetStats( float &avgIn, float &avgOut )
 
 void CBaseServer::CalculateCPUUsage( void )
 {
-	if ( !sv_stats.GetBool() )
-	{
-		return;
-	}
-
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
+	if ( !sv_stats.GetBool() ) return;
 	float curtime = Sys_FloatTime();
 
 	if ( m_fStartTime == 0 )
@@ -1233,7 +1226,6 @@ if necessary
 */
 void CBaseServer::CheckTimeouts (void)
 {
-	VPROF_BUDGET( "CBaseServer::CheckTimeouts", VPROF_BUDGETGROUP_OTHER_NETWORKING );
 	// Don't timeout in _DEBUG builds
 	int i;
 
@@ -1279,7 +1271,6 @@ void CBaseServer::CheckTimeouts (void)
 // ==================
 void CBaseServer::UpdateUserSettings(void)
 {
-	VPROF_BUDGET( "CBaseServer::UpdateUserSettings", VPROF_BUDGETGROUP_OTHER_NETWORKING );
 	for (int i=0 ; i< m_Clients.Count() ; i++ )
 	{
 		CBaseClient	*cl = m_Clients[ i ];
@@ -1298,7 +1289,6 @@ void CBaseServer::UpdateUserSettings(void)
 // ==================
 void CBaseServer::SendPendingServerInfo()
 {
-	VPROF_BUDGET( "CBaseServer::SendPendingServerInfo", VPROF_BUDGETGROUP_OTHER_NETWORKING );
 	for (int i=0 ; i< m_Clients.Count() ; i++ )
 	{
 		CBaseClient	*cl = m_Clients[ i ];
@@ -1611,7 +1601,7 @@ void CBaseServer::Clear( void )
 
 	MEM_ALLOC_CREDIT();
 
-	// Use a different limit on the signon buffer, so we can save some memory in SP (for xbox).
+	// Use a different limit on the signon buffer, so we can save some memory in SP.
 	if ( IsMultiplayer() || IsDedicated() )
 	{
 		m_SignonBuffer.EnsureCapacity( NET_MAX_PAYLOAD );
@@ -1794,7 +1784,6 @@ void CBaseServer::CheckMasterServerRequestRestart()
 
 void CBaseServer::UpdateMasterServer()
 {
-	VPROF_BUDGET( "CBaseServer::UpdateMasterServer", VPROF_BUDGETGROUP_OTHER_NETWORKING );
 	if ( !ShouldUpdateMasterServer() )
 		return;
 
@@ -1913,9 +1902,6 @@ Read's packets from clients and executes messages as appropriate.
 
 void CBaseServer::RunFrame( void )
 {
-	VPROF_BUDGET( "CBaseServer::RunFrame", VPROF_BUDGETGROUP_OTHER_NETWORKING );
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "CBaseServer::RunFrame" );
-
 	NET_ProcessSocket( m_Socket, this );	
 
 #ifdef LINUX
@@ -2016,8 +2002,6 @@ CBaseClient * CBaseServer::GetFreeClient( netadr_t &adr )
 
 void CBaseServer::SendClientMessages ( bool bSendSnapshots )
 {
-	VPROF_BUDGET( "SendClientMessages", VPROF_BUDGETGROUP_OTHER_NETWORKING );
-	
 	for (int i=0; i< m_Clients.Count(); i++ )
 	{
 		CBaseClient* client = m_Clients[i];
@@ -2246,8 +2230,6 @@ static bool CEventInfo_LessFunc( CEventInfo * const &lhs, CEventInfo * const &rh
 
 void CBaseServer::WriteTempEntities( CBaseClient *client, CFrameSnapshot *pCurrentSnapshot, CFrameSnapshot *pLastSnapshot, bf_write &buf, int ev_max )
 {
-	VPROF_BUDGET( "CBaseServer::WriteTempEntities", VPROF_BUDGETGROUP_OTHER_NETWORKING );
-
 	ALIGN4 char data[NET_MAX_PAYLOAD] ALIGN4_POST;
 	SVC_TempEntities msg;
 	msg.m_DataOut.StartWriting( data, sizeof(data) );

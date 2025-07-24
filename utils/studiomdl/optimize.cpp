@@ -1058,7 +1058,7 @@ bool COptimizedModel::GenerateStripGroupVerticesFromFace(	mstudioiface_t* pFace,
 	vertIDs[2] = pFace->c;
 	
 	const mstudio_meshvertexdata_t *vertData = pStudioMesh->GetVertexData();
-	Assert( vertData ); // This can only return NULL on X360 for now
+	Assert( vertData );
 
 	bool triangleIsFlexed = false;
 	for( int faceIndex = 0; faceIndex < 3; ++faceIndex )
@@ -1910,7 +1910,7 @@ void COptimizedModel::CreateLODTriangleList( s_model_t *pSrcModel, int nLodID, s
 
 #ifdef _DEBUG
 //	const mstudio_modelvertexdata_t *vertData = pStudioModel->GetVertexData();
-//	Assert( vertData ); // This can only return NULL on X360 for now
+//	Assert( vertData );
 //	mstudiovertex_t *modelFirstVert = vertData->Vertex( 0 );
 //	mstudiovertex_t *modelLastVert = vertData->Vertex( pStudioModel->numvertices - 1 );
 //	mstudiovertex_t *meshFirstVert = vertData->Vertex( 0 );
@@ -2747,7 +2747,7 @@ static void MergeLikeBoneIndicesWithinVerts( studiohdr_t *pHdr )
 			for( vertID = 0; vertID < pModel->numvertices; vertID++ )
 			{
 				const mstudio_modelvertexdata_t *vertData = pModel->GetVertexData();
-				Assert( vertData ); // This can only return NULL on X360 for now
+				Assert( vertData );
 				mstudioboneweight_t *pBoneWeight = vertData->BoneWeights( vertID );
 				MergeLikeBoneIndicesWithinVert( pBoneWeight );
 			}
@@ -2957,7 +2957,7 @@ Vector& COptimizedModel::GetOrigVertPosition( mstudiomodel_t *pStudioModel, mstu
 	Assert( pStudioMesh->pModel() == pStudioModel );
 
 	const mstudio_meshvertexdata_t *vertData = pStudioMesh->GetVertexData();
-	Assert( vertData ); // This can only return NULL on X360 for now
+	Assert( vertData );
 	return *vertData->Position( pVert->origMeshVertID );
 }
 
@@ -2966,7 +2966,7 @@ float COptimizedModel::GetOrigVertBoneWeightValue( mstudiomodel_t *pStudioModel,
 	Assert( pStudioMesh->pModel() == pStudioModel );
 
 	const mstudio_meshvertexdata_t *vertData = pStudioMesh->GetVertexData();
-	Assert( vertData ); // This can only return NULL on X360 for now
+	Assert( vertData );
 	return vertData->BoneWeights( pVert->origMeshVertID )->weight[pVert->boneWeightIndex[boneID]];
 }
 
@@ -2975,7 +2975,7 @@ mstudioboneweight_t &COptimizedModel::GetOrigVertBoneWeight( mstudiomodel_t *pSt
 	Assert( pStudioMesh->pModel() == pStudioModel );
 
 	const mstudio_meshvertexdata_t *vertData = pStudioMesh->GetVertexData();
-	Assert( vertData ); // This can only return NULL on X360 for now
+	Assert( vertData );
 	return *vertData->BoneWeights( pVert->origMeshVertID );
 }
 
@@ -2984,7 +2984,7 @@ int COptimizedModel::GetOrigVertBoneIndex( mstudiomodel_t *pStudioModel, mstudio
 	Assert( pStudioMesh->pModel() == pStudioModel );
 
 	const mstudio_meshvertexdata_t *vertData = pStudioMesh->GetVertexData();
-	Assert( vertData ); // This can only return NULL on X360 for now
+	Assert( vertData );
 	return vertData->BoneWeights( pVert->origMeshVertID )->bone[pVert->boneWeightIndex[boneID]];
 }
 

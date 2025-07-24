@@ -1616,7 +1616,6 @@ void CNPC_Strider::StartTask( const Task_t *pTask )
 				return;
 			}
 		
-			AI_PROFILE_SCOPE(CAI_BaseNPC_FindLosToEnemy);
 			Vector vecEnemy 	= GetCannonTarget()->WorldSpaceCenter();
 
 			float flMaxRange = 4096;

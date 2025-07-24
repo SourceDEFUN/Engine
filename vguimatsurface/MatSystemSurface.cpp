@@ -46,7 +46,6 @@ ILauncherMgr *g_pLauncherMgr = NULL;
 #include "mathlib/mathlib.h"
 #include <vgui/ILocalize.h>
 #include "mathlib/vmatrix.h"
-#include <tier0/vprof.h>
 #include "materialsystem/itexture.h"
 #ifdef OSX
 #include <malloc/malloc.h>
@@ -519,8 +518,6 @@ bool CMatSystemSurface::SupportsFeature(SurfaceFeature_e feature)
 		return true;
 
 	case ISurface::OUTLINE_FONTS:
-		if ( IsX360() )
-			return false;
 		return true;
 
 	case ISurface::ESCAPE_KEY:
@@ -1567,12 +1564,6 @@ void CMatSystemSurface::DrawSetTexture( int id )
 		DrawFlushText();
 		m_iBoundTexture = id;
 
-		if ( IsX360() && id == -1 )
-		{
-			// ensure we unbind current material that may go away
-			CMatRenderContextPtr pRenderContext( g_pMaterialSystem );
-			pRenderContext->Bind( m_pWhite );
-		}
 	}
 }
 
@@ -1822,12 +1813,6 @@ void CMatSystemSurface::GetTextSize(HFont font, const wchar_t *text, int &wide, 
 //-----------------------------------------------------------------------------
 bool CMatSystemSurface::AddCustomFontFile( const char *fontName, const char *fontFileName )
 {
-	if ( IsX360() )
-	{
-		// custom fonts are not supported (not needed) on xbox, all .vfonts are offline converted to ttfs
-		// ttfs are mounted/handled elsewhere
-		return true;
-	}
 	MAT_FUNC;
 
 	char fullPath[MAX_PATH];
@@ -1997,7 +1982,7 @@ bool CMatSystemSurface::AddBitmapFontFile( const char *fontFileName )
 	MAT_FUNC;
 
 	bool bFound = false;
-	bFound = ( ( g_pFullFileSystem->GetDVDMode() == DVDMODE_STRICT ) || g_pFullFileSystem->FileExists( fontFileName, IsX360() ? "GAME" : NULL ) );
+	bFound = ( ( g_pFullFileSystem->GetDVDMode() == DVDMODE_STRICT ) || g_pFullFileSystem->FileExists( fontFileName, NULL ) );
 	if ( !bFound )
 	{
 		Msg( "Couldn't find bitmap font file '%s'\n", fontFileName );
@@ -2301,7 +2286,7 @@ bool CMatSystemSurface::DrawGetUnicodeCharRenderInfo( wchar_t ch, CharRenderInfo
 		DrawFlushText();
 	}
 
-	// This avoid copying the data in the nonclipped case!!! (X360)
+	// This avoid copying the data in the nonclipped case!!!
 	info.verts = &m_BatchedCharVerts[ m_nBatchedCharVertCount ];
 	InitVertex( info.verts[0], info.x, info.y, texCoords[0], texCoords[1] );
 	InitVertex( info.verts[1], info.x + fontWide, info.y + info.fontTall, texCoords[2], texCoords[3] );
@@ -2589,10 +2574,6 @@ void CMatSystemSurface::OnScreenSizeChanged( int nOldWidth, int nOldHeight )
 // Causes fonts to get reloaded, etc.
 void CMatSystemSurface::ResetFontCaches()
 {
-	// Don't do this on x360!!!
-	if ( IsX360() )
-		return;
-
 	// clear font texture cache
 	g_FontTextureCache.Clear();
 	m_iBoundTexture = -1;
@@ -3014,7 +2995,6 @@ void CMatSystemSurface::InternalSolveTraverse(VPANEL panel)
 	VPanel * RESTRICT vp = (VPanel *)panel;
 
 	vp->TraverseLevel( 1 );
-	tmZone( TELEMETRY_LEVEL1, TMZF_NONE, "%s - %s", __FUNCTION__, vp->GetName() );
 
 	// solve the parent
 	vp->Solve();
@@ -3045,7 +3025,6 @@ void CMatSystemSurface::InternalThinkTraverse(VPANEL panel)
 	VPanel * RESTRICT vp = (VPanel *)panel;
 
 	vp->TraverseLevel( 1 );
-	tmZone( TELEMETRY_LEVEL1, TMZF_NONE, "%s - %s", __FUNCTION__, vp->GetName() );
 
 	// think the parent
 	vp->Client()->Think();
@@ -3074,7 +3053,6 @@ void CMatSystemSurface::InternalSchemeSettingsTraverse(VPANEL panel, bool forceA
 	VPanel * RESTRICT vp = (VPanel *)panel;
 
 	vp->TraverseLevel( 1 );
-	tmZone( TELEMETRY_LEVEL1, TMZF_NONE, "%s - %s", __FUNCTION__, vp->GetName() );
 
 	CUtlVector< VPanel * > &children = vp->GetChildren();
 
@@ -3098,23 +3076,9 @@ void CMatSystemSurface::InternalSchemeSettingsTraverse(VPANEL panel, bool forceA
 //-----------------------------------------------------------------------------
 void CMatSystemSurface::SolveTraverse(VPANEL panel, bool forceApplySchemeSettings)
 {
-	{
-		VPROF( "InternalSchemeSettingsTraverse" );
-		tmZone( TELEMETRY_LEVEL1, TMZF_NONE, "%s - InternalSchemeSettingsTraverse", __FUNCTION__ );
-		InternalSchemeSettingsTraverse(panel, forceApplySchemeSettings);
-	}
-
-	{
-		VPROF( "InternalThinkTraverse" );
-		tmZone( TELEMETRY_LEVEL1, TMZF_NONE, "%s - InternalThinkTraverse", __FUNCTION__ );
-		InternalThinkTraverse(panel);
-	}
-
-	{
-		VPROF( "InternalSolveTraverse" );
-		tmZone( TELEMETRY_LEVEL1, TMZF_NONE, "%s - InternalSolveTraverse", __FUNCTION__ );
-		InternalSolveTraverse(panel);
-	}
+	{ InternalSchemeSettingsTraverse(panel, forceApplySchemeSettings);}
+	{ InternalThinkTraverse(panel);                                   }
+	{ InternalSolveTraverse(panel);                                   }
 }
 
 //-----------------------------------------------------------------------------
@@ -3165,7 +3129,6 @@ void CMatSystemSurface::PaintTraverseEx(VPANEL panel, bool paintPopups /*= false
 	if ( !ipanel()->IsVisible( panel ) )
 		return;
 
-	VPROF( "CMatSystemSurface::PaintTraverse" );
 	CMatRenderContextPtr pRenderContext( g_pMaterialSystem );
 	bool bTopLevelDraw = false;
 
@@ -3206,14 +3169,12 @@ void CMatSystemSurface::PaintTraverseEx(VPANEL panel, bool paintPopups /*= false
 		else
 		{
 			// paint traverse the root panel, painting all children
-			VPROF( "ipanel()->PaintTraverse" );
 			ipanel()->PaintTraverse( panel, true );
 		}
 	}
 	else
 	{
 		// If it's a popup, it should already have been painted above
-		VPROF( "ipanel()->PaintTraverse" );
 		if ( !paintPopups || !ipanel()->IsPopup( panel ) )
 		{
 			ipanel()->PaintTraverse( panel, true );
@@ -3226,7 +3187,6 @@ void CMatSystemSurface::PaintTraverseEx(VPANEL panel, bool paintPopups /*= false
 		// now draw the popups front to back
 		// since depth-test and depth-write are on, the front panels will occlude the underlying ones
 		{
-			VPROF( "CMatSystemSurface::PaintTraverse popups loop" );
 			int popups = GetPopupCount();
 			if ( popups > 254 )
 			{
@@ -3267,7 +3227,6 @@ void CMatSystemSurface::PaintTraverseEx(VPANEL panel, bool paintPopups /*= false
 	if ( bTopLevelDraw )
 	{
 		// only undo the 2d ortho mode once
-		VPROF( "FinishDrawing" );
 
 		// Reset stencil to normal state
 		pRenderContext->SetStencilEnable( false );
@@ -3291,12 +3250,6 @@ void CMatSystemSurface::PaintTraverse(VPANEL panel)
 void CMatSystemSurface::Begin3DPaint( int iLeft, int iTop, int iRight, int iBottom, bool bRenderToTexture )
 {
 	MAT_FUNC;
-
-	if ( IsX360() )
-	{
-		Assert( 0 );
-		return;
-	}
 
 	Assert( iRight > iLeft );
 	Assert( iBottom > iTop );
@@ -3372,12 +3325,6 @@ void CMatSystemSurface::Begin3DPaint( int iLeft, int iTop, int iRight, int iBott
 void CMatSystemSurface::End3DPaint()
 {
 	MAT_FUNC;
-
-	if ( IsX360() )
-	{
-		Assert( 0 );
-		return;
-	}
 
 	// Can't use this feature when drawing into the 3D world
 	Assert( !m_bDrawingIn3DWorld );

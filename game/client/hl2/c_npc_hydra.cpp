@@ -8,7 +8,7 @@
 #include "bone_setup.h"
 #include "c_ai_basenpc.h"
 #include "engine/ivdebugoverlay.h"
-#include "tier0/vprof.h"
+
 #include "soundinfo.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -147,8 +147,6 @@ bool C_NPC_Hydra::SetupBones( matrix3x4_t *pBoneToWorldOut, int nMaxBones, int b
 
 void  C_NPC_Hydra::StandardBlendingRules( Vector pos[], Quaternion q[], float currentTime, int boneMask )
 {
-	VPROF( "C_NPC_Hydra::StandardBlendingRules" );
-
 	studiohdr_t *hdr = GetModelPtr();
 	if ( !hdr )
 	{

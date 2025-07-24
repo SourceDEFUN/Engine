@@ -1,15 +1,13 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 /* 
 TODO: add option to null out drawprim calls.
- 
-Also maybe hook the PIX_ENABLE stuff to Telemetry
- 
+
 		In imaterialsystem.h:
 		#define PIX_ENABLE 1                   // set this to 1 and build engine/studiorender to enable pix events in the engine
 
 		And in shaderapidx8.h:
     	#define PIX_ENABLE 1                   // set this to 1 and build engine/studiorender to enable pix events in the engine
- 
+
 Might be interesting to make it so dx9hook.h paid attention to the PIX_ENABLE names
 	and allowed you to filter drawprim calls based on those?
 */
@@ -38,15 +36,9 @@ Might be interesting to make it so dx9hook.h paid attention to the PIX_ENABLE na
 
 #if D3D_BATCH_PERF_ANALYSIS
 	#define XXX \
-		tmZone( TELEMETRY_LEVEL3, TMZF_NONE, "D3D9: %s", __FUNCTION__ ); \
 		CD3DCallTimer scopedCallTimer;
 #else
-	#define XXX																													\
-		if( ThreadInMainThread() )  																							\
-		{   																													\
-			tmMessage( TELEMETRY_LEVEL0, TMMF_ICON_NOTE | TMMF_SEVERITY_WARNING, "(source/d3d)%s", __FUNCTION__ );				\
-			tmZoneFiltered( TELEMETRY_LEVEL0, 50, TMZF_NONE, "%s", __FUNCTION__ );												\
-		}
+	#define XXX do {} while(0)
 #endif
 
 // Hooks for routines which return values.
@@ -966,12 +958,12 @@ public:
 
 			if ( s_rdtsc_to_ms == 0.0f )
 			{
-				TmU64 t0 = tmFastTime();
+				unsigned long long t0 = tmFastTime();
 				double d0 = Plat_FloatTime();
 
 				ThreadSleep( 1 );
 
-				TmU64 t1 = tmFastTime();
+				unsigned long long t1 = tmFastTime();
 				double d1 = Plat_FloatTime();
 
 				s_rdtsc_to_ms = ( 1000.0f * ( d1 - d0 ) ) / ( t1 - t0 );

@@ -11,7 +11,7 @@
 #include "gl_model_private.h"
 #include "view_shared.h"
 #include "cmodel_engine.h"
-#include "tier0/vprof.h"
+
 #include "utllinkedlist.h"
 #include "ivrenderview.h"
 
@@ -148,7 +148,6 @@ static void VisMark_Cached( const VisCacheEntry &cache, const worldbrushdata_t &
 
 static void VisCache_Build( VisCacheEntry &cache, const worldbrushdata_t &worldbrush )
 {
-	VPROF_INCREMENT_COUNTER( "VisCache misses", 1 );
 	int			i;
 	mleaf_t		*leaf;
 	int			cluster;
@@ -210,7 +209,6 @@ bool Map_AreAnyLeavesVisible( const worldbrushdata_t &worldbrush, int *leafList,
 //-----------------------------------------------------------------------------
 void Map_VisMark( bool forcenovis, model_t *worldmodel )
 {
-	VPROF( "Map_VisMark" );
 	int			i, c;
 
 	// development aid to let you run around and see exactly where

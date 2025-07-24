@@ -24,7 +24,7 @@
 #include "tier0/memdbgon.h"
 
 
-#define MOD_DIR ( IsXbox() ? "DEFAULT_WRITE_PATH" : "MOD" )
+#define MOD_DIR ( "MOD" )
 
 
 const char g_pszMedalNames[4][8] =
@@ -41,19 +41,12 @@ const char *COM_GetModDirectory();
 
 bool WriteBonusMapSavedData( KeyValues *data )
 {
-	if ( IsX360() && ( XBX_GetStorageDeviceId() == XBX_INVALID_STORAGE_ID || XBX_GetStorageDeviceId() == XBX_STORAGE_DECLINED ) )
-		return false;
-
 	CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
 
 	data->RecursiveSaveToFile( buf, 0 );
 
 	char	szFilename[_MAX_PATH];
-
-	if ( IsX360() )
-		Q_snprintf( szFilename, sizeof( szFilename ), "cfg:/bonus_maps_data.bmd" );
-	else
-		Q_snprintf( szFilename, sizeof( szFilename ), "save/bonus_maps_data.bmd" );
+	Q_snprintf( szFilename, sizeof( szFilename ), "save/bonus_maps_data.bmd" );
 
 	bool bWriteSuccess = g_pFullFileSystem->WriteFile( szFilename, MOD_DIR, buf );
 
@@ -93,7 +86,7 @@ void GetBooleanStatus( KeyValues *pBonusFilesKey, BonusMapDescription_t &map )
 bool SetBooleanStatus( KeyValues *pBonusFilesKey, const char *pchName, const char *pchFileName, const char *pchMapName, bool bValue )
 {
 	// Don't create entries for files that don't exist
-	if ( !IsX360() && ! (g_pFullFileSystem->FileExists( pchFileName, "MOD" ) || g_pFullFileSystem->IsDirectory( pchFileName, "MOD" ) ) )
+	if ( !(g_pFullFileSystem->FileExists( pchFileName, "MOD" ) || g_pFullFileSystem->IsDirectory( pchFileName, "MOD" ) ) )
 	{
 		DevMsg( "Failed to set boolean status for file %s.", pchFileName );
 		return false;
@@ -192,7 +185,7 @@ float GetChallengeBests( KeyValues *pBonusFilesKey, BonusMapDescription_t &chall
 bool UpdateChallengeBest( KeyValues *pBonusFilesKey, const BonusMapChallenge_t &challenge )
 {
 	// Don't create entries for files that don't exist
-	if ( !IsX360() && !g_pFullFileSystem->FileExists( challenge.szFileName, "MOD" ) )
+	if ( !g_pFullFileSystem->FileExists( challenge.szFileName, "MOD" ) )
 	{
 		DevMsg( "Failed to set challenge best for file %s.", challenge.szFileName );
 		return false;
@@ -333,11 +326,7 @@ bool CBonusMapsDatabase::ReadBonusMapSaveData( void )
 		return false;
 	}
 	char	szFilename[_MAX_PATH];
-
-	if ( IsX360() )
-		Q_snprintf( szFilename, sizeof( szFilename ), "cfg:/bonus_maps_data.bmd" );
-	else
-		Q_snprintf( szFilename, sizeof( szFilename ), "save/bonus_maps_data.bmd" );
+	Q_snprintf( szFilename, sizeof( szFilename ), "save/bonus_maps_data.bmd" );
 
 	m_pBonusMapSavedData->LoadFromFile( g_pFullFileSystem, szFilename, NULL );
 
@@ -704,7 +693,7 @@ void CBonusMapsDatabase::AddBonus( const char *pCurrentPath, const char *pDirFil
 	Q_snprintf( szFileName, sizeof( szFileName ), "%s%s", pCurrentPath, pDirFileName );
 
 	// Only load bonus maps from the current mod's maps dir
-	if( !IsX360() && !( g_pFullFileSystem->IsDirectory( szFileName, "MOD" ) || g_pFullFileSystem->FileExists( szFileName, "MOD" ) ))
+	if( !( g_pFullFileSystem->IsDirectory( szFileName, "MOD" ) || g_pFullFileSystem->FileExists( szFileName, "MOD" ) ))
 		return;
 
 	ParseBonusMapData( szFileName, pDirFileName, bIsFolder );

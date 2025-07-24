@@ -10,7 +10,7 @@
 #include "mempool.h"
 #include "movevars_shared.h"
 #include "utlrbtree.h"
-#include "tier0/vprof.h"
+
 #include "entitydatainstantiator.h"
 #include "positionwatcher.h"
 #include "movetype_push.h"
@@ -1721,7 +1721,6 @@ void CBaseEntity::PhysicsToss( void )
 //-----------------------------------------------------------------------------
 void CBaseEntity::PhysicsRigidChild( void )
 {
-	VPROF("CBaseEntity::PhysicsRigidChild");
 	// NOTE: rigidly attached children do simulation in local space
 	// Collision impulses will be handled either not at all, or by
 	// forwarding the information to the highest move parent
@@ -1729,10 +1728,7 @@ void CBaseEntity::PhysicsRigidChild( void )
 	Vector vecPrevOrigin = GetAbsOrigin();
 
 	// regular thinking
-	if ( !PhysicsRunThink() )
-		return;
-
-	VPROF_SCOPE_BEGIN("CBaseEntity::PhysicsRigidChild-2");
+	if ( !PhysicsRunThink() ) return;
 
 #if !defined( CLIENT_DLL )
 	// Cause touch functions to be called
@@ -1746,8 +1742,6 @@ void CBaseEntity::PhysicsRigidChild( void )
 		VPhysicsGetObject()->UpdateShadow( GetAbsOrigin(), bAxisAligned ? vec3_angle : GetAbsAngles(), true, gpGlobals->frametime );
 	}
 #endif
-
-	VPROF_SCOPE_END();
 }
 
 
@@ -1786,7 +1780,6 @@ void CBaseEntity::UpdateBaseVelocity( void )
 //-----------------------------------------------------------------------------
 void CBaseEntity::PhysicsSimulate( void )
 {
-	VPROF( "CBaseEntity::PhysicsSimulate" );
 	// NOTE:  Players override PhysicsSimulate and drive through their CUserCmds at that point instead of
 	//  processng through this function call!!!  They shouldn't chain to here ever.
 	// Make sure not to simulate this guy twice per frame
@@ -1814,12 +1807,10 @@ void CBaseEntity::PhysicsSimulate( void )
 
 	if (pMoveParent)
 	{
-		VPROF( "CBaseEntity::PhysicsSimulate-MoveParent" );
 		pMoveParent->PhysicsSimulate();
 	}
 	else
 	{
-		VPROF( "CBaseEntity::PhysicsSimulate-BaseVelocity" );
 
 		UpdateBaseVelocity();
 
@@ -1839,7 +1830,6 @@ void CBaseEntity::PhysicsSimulate( void )
 	{
 	case MOVETYPE_PUSH:
 		{
-			VPROF( "CBaseEntity::PhysicsSimulate-MOVETYPE_PUSH" );
 			PhysicsPusher();
 		}
 		break;
@@ -1852,7 +1842,6 @@ void CBaseEntity::PhysicsSimulate( void )
 
 	case MOVETYPE_NONE:
 		{
-			VPROF( "CBaseEntity::PhysicsSimulate-MOVETYPE_NONE" );
 			Assert(pMoveParent);
 			PhysicsRigidChild();
 		}
@@ -1860,14 +1849,12 @@ void CBaseEntity::PhysicsSimulate( void )
 
 	case MOVETYPE_NOCLIP:
 		{
-			VPROF( "CBaseEntity::PhysicsSimulate-MOVETYPE_NOCLIP" );
 			PhysicsNoclip();
 		}
 		break;
 
 	case MOVETYPE_STEP:
 		{
-			VPROF( "CBaseEntity::PhysicsSimulate-MOVETYPE_STEP" );
 			PhysicsStep();
 		}
 		break;
@@ -1875,14 +1862,12 @@ void CBaseEntity::PhysicsSimulate( void )
 	case MOVETYPE_FLY:
 	case MOVETYPE_FLYGRAVITY:
 		{
-			VPROF( "CBaseEntity::PhysicsSimulate-MOVETYPE_FLY" );
 			PhysicsToss();
 		}
 		break;
 
 	case MOVETYPE_CUSTOM:
 		{
-			VPROF( "CBaseEntity::PhysicsSimulate-MOVETYPE_CUSTOM" );
 			PhysicsCustom();
 		}
 		break;

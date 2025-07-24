@@ -9,7 +9,7 @@
 #include "IEffects.h"
 #include "tier1/KeyValues.h"
 #include "toolframework_client.h"
-#include "tier0/vprof.h"
+
 
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -90,8 +90,6 @@ static inline void RecordMuzzleFlash( const Vector &start, const QAngle &angles,
 //-----------------------------------------------------------------------------
 void C_TEMuzzleFlash::PostDataUpdate( DataUpdateType_t updateType )
 {
-	VPROF( "C_TEMuzzleFlash::PostDataUpdate" );
-
 	//FIXME: Index is incorrect
 	g_pEffects->MuzzleFlash( m_vecOrigin, m_vecAngles, m_flScale, m_nType );	
 	RecordMuzzleFlash( m_vecOrigin, m_vecAngles, m_flScale, m_nType ); 

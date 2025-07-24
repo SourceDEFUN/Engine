@@ -555,14 +555,7 @@ void CNPC_GroundTurret::Shoot()
 
 	EmitSound( "NPC_FloorTurret.ShotSounds", m_ShotSounds );
 
-	if( IsX360() )
-	{
-		m_flTimeNextShoot = gpGlobals->curtime + 0.2;
-	}
-	else
-	{
-		m_flTimeNextShoot = gpGlobals->curtime + 0.09;
-	}
+	m_flTimeNextShoot = gpGlobals->curtime + 0.09;
 }
 
 //-----------------------------------------------------------------------------

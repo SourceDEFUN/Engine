@@ -20,7 +20,7 @@
 #include "inetchannel.h"
 #include "cl_replaycontext.h"
 #include <time.h>
-#include "vprof.h"
+
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -504,8 +504,6 @@ void CReplayManager::AttemptToSetupNewReplay()
 
 void CReplayManager::Think()
 {
-	VPROF_BUDGET( "CReplayManager::Think", VPROF_BUDGETGROUP_REPLAY );
-
 	BaseClass::Think();
 
 	DebugThink();

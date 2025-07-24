@@ -1148,33 +1148,20 @@ void CMatRenderContext::BeginRender()
 #if 1 // Rick's optimization: not sure this is needed anymore
 	if ( GetMaterialSystem()->GetThreadMode() != MATERIAL_SINGLE_THREADED )
 	{
-		VPROF_INCREMENT_GROUP_COUNTER( "render/CMatBeginRender", COUNTER_GROUP_TELEMETRY, 1 );
-
-		TelemetrySetLockName( TELEMETRY_LEVEL1, (char const *)&g_MatSysMutex, "MatSysMutex" );
-
-		tmTryLock( TELEMETRY_LEVEL1, (char const *)&g_MatSysMutex, "BeginRender" );
 		g_MatSysMutex.Lock();
-		tmEndTryLock( TELEMETRY_LEVEL1, (char const *)&g_MatSysMutex, TMLR_SUCCESS );
-		tmSetLockState( TELEMETRY_LEVEL1, (char const *)&g_MatSysMutex, TMLS_LOCKED, "BeginRender" );
 	}
 #endif
 }
 
 void CMatRenderContext::EndRender()
 {
-#if 1 // Rick's optimization: not sure this is needed anymore
+// Rick's optimization: not sure this is needed anymore
 	if ( GetMaterialSystem()->GetThreadMode() != MATERIAL_SINGLE_THREADED )
-	{
 		g_MatSysMutex.Unlock();
-		tmSetLockState( TELEMETRY_LEVEL1, (char const *)&g_MatSysMutex, TMLS_RELEASED, "EndRender" );
-	}
-#endif
 }
 
 void CMatRenderContext::Flush( bool flushHardware )
 {
-	VPROF( "CMatRenderContextBase::Flush" );
-
 	g_pShaderAPI->FlushBufferedPrimitives();
 	if ( IsPC() && flushHardware )
 	{
@@ -1659,7 +1646,6 @@ void CMatRenderContext::BindMorph( IMorph *pMorph )
 
 IMesh* CMatRenderContext::GetDynamicMesh( bool buffered, IMesh* pVertexOverride, IMesh* pIndexOverride, IMaterial *pAutoBind )
 {
-	VPROF_ASSERT_ACCOUNTED( "CMatRenderContext::GetDynamicMesh" );
 	if( pAutoBind )
 	{
 		Bind( pAutoBind, NULL );
@@ -1689,7 +1675,6 @@ IMesh* CMatRenderContext::GetDynamicMesh( bool buffered, IMesh* pVertexOverride,
 
 IMesh* CMatRenderContext::GetDynamicMeshEx( VertexFormat_t vertexFormat, bool bBuffered, IMesh* pVertexOverride, IMesh* pIndexOverride, IMaterial *pAutoBind )
 {
-	VPROF_ASSERT_ACCOUNTED( "CMatRenderContext::GetDynamicMesh" );
 	if( pAutoBind )
 	{
 		Bind( pAutoBind, NULL );
@@ -2198,85 +2183,7 @@ void CMatRenderContext::CopyRenderTargetToTextureEx( ITexture *pTexture, int nRe
 
 	GetMaterialSystem()->Flush( false );
 	ITextureInternal *pTextureInternal = (ITextureInternal *)pTexture;
-
-	if ( IsPC() || !IsX360() )
-	{
-		pTextureInternal->CopyFrameBufferToMe( nRenderTargetID, pSrcRect, pDstRect );
-	}
-	else
-	{
-		// X360 only does 1:1 resolves. So we can do full resolves to textures of size 
-		// equal or greater than the viewport trivially. Downsizing is nasty.
-		Rect_t srcRect;
-		if ( !pSrcRect )
-		{
-			// build out source rect
-			pSrcRect = &srcRect;
-			int x, y, w, h;
-			GetViewport( x, y, w, h );
-
-			pSrcRect->x = 0;
-			pSrcRect->y = 0;
-			pSrcRect->width = w;
-			pSrcRect->height = h;
-		}
-
-		Rect_t dstRect;
-		if ( !pDstRect )
-		{
-			// build out target rect
-			pDstRect = &dstRect;
-
-			pDstRect->x = 0;
-			pDstRect->y = 0;
-			pDstRect->width = pTexture->GetActualWidth();
-			pDstRect->height = pTexture->GetActualHeight();
-		}
-
-		if ( pSrcRect->width == pDstRect->width && pSrcRect->height == pDstRect->height )
-		{
-			// 1:1 mapping, no stretching needed, use direct path
-			pTextureInternal->CopyFrameBufferToMe( nRenderTargetID, pSrcRect, pDstRect );
-			return;
-		}
-
-		if( (pDstRect->x == 0) && (pDstRect->y == 0) && 
-			(pDstRect->width == pTexture->GetActualWidth()) && (pDstRect->height == pTexture->GetActualHeight()) &&
-			(pDstRect->width >= pSrcRect->width) && (pDstRect->height >= pSrcRect->height) )
-		{
-			// Resolve takes up the whole texture, and the texture is large enough to hold the resolve.
-			// This is turned into a 1:1 resolve within shaderapi by making D3D think the texture is smaller from now on. (Until it resolves from a bigger source)
-			pTextureInternal->CopyFrameBufferToMe( nRenderTargetID, pSrcRect, pDstRect );
-			return;
-		}
-
-		// currently assuming disparate copies are only for FB blits
-		// ensure active render target is actually the back buffer
-		Assert( m_RenderTargetStack.Top().m_pRenderTargets[0] == NULL );
-
-		// nasty sequence:
-		// resolve FB surface to matching clone DDR texture
-		// gpu draw from clone DDR FB texture to disparate RT target surface
-		// resolve to its matching DDR clone texture
-		ITextureInternal *pFullFrameFB = (ITextureInternal*)GetMaterialSystem()->FindTexture( "_rt_FullFrameFB", TEXTURE_GROUP_RENDER_TARGET );
-		pFullFrameFB->CopyFrameBufferToMe( nRenderTargetID, NULL, NULL );
-
-		// target texture must be a render target
-		PushRenderTargetAndViewport( pTexture );
-
-		// blit FB source to render target
-		DrawScreenSpaceRectangle(
-			GetMaterialSystem()->GetRenderTargetBlitMaterial(),
-			pDstRect->x, pDstRect->y, pDstRect->width, pDstRect->height,
-			pSrcRect->x, pSrcRect->y, pSrcRect->x+pSrcRect->width-1, pSrcRect->y+pSrcRect->height-1, 
-			pFullFrameFB->GetActualWidth(), pFullFrameFB->GetActualHeight() );
-
-		// resolve render target to texture
-		((ITextureInternal *)pTexture)->CopyFrameBufferToMe( 0, NULL, NULL );
-
-		// restore render target and viewport
-		PopRenderTargetAndViewport();
-	}
+	pTextureInternal->CopyFrameBufferToMe( nRenderTargetID, pSrcRect, pDstRect );
 }
 
 void CMatRenderContext::CopyRenderTargetToTexture( ITexture *pTexture )
@@ -2295,15 +2202,7 @@ void CMatRenderContext::CopyTextureToRenderTargetEx( int nRenderTargetID, ITextu
 
 	GetMaterialSystem()->Flush( false );
 	ITextureInternal *pTextureInternal = (ITextureInternal *)pTexture;
-
-	if ( IsPC() || !IsX360() )
-	{
-		pTextureInternal->CopyMeToFrameBuffer( nRenderTargetID, pSrcRect, pDstRect );
-	}
-	else
-	{
-		Assert( 0 );
-	}
+	pTextureInternal->CopyMeToFrameBuffer( nRenderTargetID, pSrcRect, pDstRect );
 }
 
 

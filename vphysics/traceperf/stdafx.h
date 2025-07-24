@@ -10,6 +10,6 @@
 #include "phyfile.h"
 #include "vphysics_interface.h"
 #include "tier0/icommandline.h"
-#include "tier0/vprof.h"
+
 
 // TODO: reference additional headers your program requires here

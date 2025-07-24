@@ -13,7 +13,7 @@
 #include "iserver.h"
 #include "sv_filepublish.h"
 #include <time.h>
-#include "vprof.h"
+
 #include "sv_fileservercleanup.h"
 #include "sv_sessionrecorder.h"
 
@@ -51,8 +51,6 @@ const char *CServerRecordingSessionManager::GetNewSessionName() const
 
 void CServerRecordingSessionManager::Think()
 {
-	VPROF_BUDGET( "CServerRecordingSessionManager::Think", VPROF_BUDGETGROUP_REPLAY );
-
 	BaseClass::Think();
 }
 

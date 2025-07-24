@@ -429,8 +429,6 @@ void CAI_FollowBehavior::ClearFollowGoal( CAI_FollowGoal *pGoal )
 
 bool CAI_FollowBehavior::UpdateFollowPosition()
 {
-	AI_PROFILE_SCOPE( CAI_FollowBehavior_UpdateFollowPosition );
-
 	if ( m_flTimeUpdatedFollowPosition == gpGlobals->curtime )
 	{
 		return true;
@@ -1328,8 +1326,6 @@ bool CAI_FollowBehavior::FindCoverFromEnemyAtFollowTarget( float coverRadius, Ve
 
 void CAI_FollowBehavior::StartTask( const Task_t *pTask )
 {
-	AI_PROFILE_SCOPE( CAI_FollowBehavior_StartTask );
-
 	switch ( pTask->iTask )
 	{
 		case TASK_RANGE_ATTACK1:

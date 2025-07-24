@@ -21,7 +21,7 @@
 #include "vtf/vtf.h"
 #include "tier1/convar.h"
 #include "tier1/KeyValues.h"
-#include "tier0/vprof.h"
+
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -201,8 +201,6 @@ float CStudioRender::RampFlexWeight( mstudioflex_t &flex, float w )
 //-----------------------------------------------------------------------------
 void CStudioRender::R_StudioFlexVerts( mstudiomesh_t *pmesh, int lod )
 {
-	VPROF_BUDGET( "CStudioRender::R_StudioFlexVerts", VPROF_BUDGETGROUP_MODEL_RENDERING );
-
 	Assert( pmesh );
 
 	const float flVertAnimFixedPointScale = m_pStudioHdr->VertAnimFixedPointScale();
@@ -519,13 +517,10 @@ void CStudioRender::PrecacheGlint()
 		// Begin block in which all render targets should be allocated
 		g_pMaterialSystem->EndRenderTargetAllocation();
 
-		if ( !IsX360() )
-		{
-			// Get the texture that we are going to be updating procedurally.
-			s_pProcGlint = g_pMaterialSystem->CreateProceduralTexture( 
-				"proc_eyeglint", TEXTURE_GROUP_MODEL, 32, 32, IMAGE_FORMAT_BGRA8888, TEXTUREFLAGS_NOMIP|TEXTUREFLAGS_NOLOD );
-			s_pProcGlint->SetTextureRegenerator( &s_GlintTextureRegen );
-		}
+		// Get the texture that we are going to be updating procedurally.
+		s_pProcGlint = g_pMaterialSystem->CreateProceduralTexture( 
+			"proc_eyeglint", TEXTURE_GROUP_MODEL, 32, 32, IMAGE_FORMAT_BGRA8888, TEXTUREFLAGS_NOMIP|TEXTUREFLAGS_NOLOD );
+		s_pProcGlint->SetTextureRegenerator( &s_GlintTextureRegen );
 
 		// JAY: I don't see this pattern in the code often.  It looks like the material system
 		// would rather than I deal exclusively with IMaterials instead.
@@ -533,7 +528,7 @@ void CStudioRender::PrecacheGlint()
 		// For now, just hardcode one
 		// UNDONE: Add a $lodtexture to the eyes shader.  Maybe add a $lodsize too.
 		// UNDONE: Make eyes texture load $lodtexture and switch to that here instead of black
-		m_pGlintLODTexture = g_pMaterialSystem->FindTexture( IsX360() ? "black" : "vgui/black", NULL, false );
+		m_pGlintLODTexture = g_pMaterialSystem->FindTexture( "vgui/black", NULL, false );
 		m_pGlintLODTexture->IncrementReferenceCount();
 	}
 }
@@ -745,11 +740,6 @@ ITexture* CStudioRender::RenderGlintTexture( const eyeballstate_t *pState,
 	pRenderContext->MatrixMode( MATERIAL_PROJECTION );
 	pRenderContext->PopMatrix();
 
-	if ( IsX360() )
-	{
-		pRenderContext->CopyRenderTargetToTextureEx( m_pGlintTexture, 0, NULL, NULL );
-	}
-
 	pRenderContext->PopRenderTargetAndViewport( );
 
 	pRenderContext->Bind( pPrevMaterial, pPrevProxy );
@@ -789,7 +779,7 @@ void CStudioRender::R_StudioEyeballGlint( const eyeballstate_t *pstate, IMateria
 	}
 
 	// Legacy method for DX8
-	if ( !IsX360() && ( r_glint_procedural.GetInt() || g_pMaterialSystemHardwareConfig->GetDXSupportLevel() < 90 ) )
+	if ( r_glint_procedural.GetInt() || g_pMaterialSystemHardwareConfig->GetDXSupportLevel() < 90 )
 	{
 		// Set up the texture regenerator
 		s_GlintTextureRegen.m_pVRight = &vright;

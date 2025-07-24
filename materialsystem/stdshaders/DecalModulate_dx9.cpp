@@ -137,7 +137,7 @@ BEGIN_VS_SHADER( DecalModulate_dx9,
 		}
 		DYNAMIC_STATE
 		{
-			if ( pShaderAPI->InFlashlightMode() && ( !IsX360() && ( r_flashlight_version2.GetInt() == 0 ) ) )
+			if ( pShaderAPI->InFlashlightMode() && ( r_flashlight_version2.GetInt() == 0 ) )
 			{
 				// Don't draw anything for the flashlight pass
 				Draw( false );

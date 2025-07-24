@@ -6,7 +6,7 @@
 #include "cbase.h"
 #include "fx.h"
 #include "c_te_effect_dispatch.h"
-#include "tier0/vprof.h"
+
 #include "fx_line.h"
 #include "fx_quad.h"
 #include "view.h"
@@ -194,8 +194,6 @@ DECLARE_CLIENT_EFFECT( "HelicopterTracer", HelicopterTracerCallback );
 //-----------------------------------------------------------------------------
 void FX_PlayerAR2Tracer( const Vector &start, const Vector &end )
 {
-	VPROF_BUDGET( "FX_PlayerAR2Tracer", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
-	
 	Vector	shotDir, dStart, dEnd;
 	float	length;
 
@@ -229,8 +227,6 @@ void FX_PlayerAR2Tracer( const Vector &start, const Vector &end )
 //-----------------------------------------------------------------------------
 void FX_AR2Tracer( Vector& start, Vector& end, int velocity, bool makeWhiz )
 {
-	VPROF_BUDGET( "FX_AR2Tracer", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
-	
 	//Don't make small tracers
 	float dist;
 	Vector dir;
@@ -434,14 +430,12 @@ void CreateMuzzleflashELight( const Vector &origin, int exponent, int nMinRadius
 //-----------------------------------------------------------------------------
 void MuzzleFlash_Airboat( ClientEntityHandle_t hEntity, int attachmentIndex )
 {
-	VPROF_BUDGET( "MuzzleFlash_Airboat", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
-
 	CSmartPtr<CLocalSpaceEmitter> pSimple = CLocalSpaceEmitter::Create( "MuzzleFlash", hEntity, attachmentIndex );
 
 	SimpleParticle *pParticle;
 	Vector			forward(1,0,0), offset; //NOTENOTE: All coords are in local space
 
-	float flScale = random->RandomFloat( 0.75f, IsXbox() ? 2.0f : 2.5f );
+	float flScale = random->RandomFloat( 0.75f, 2.5f );
 
 	PMaterialHandle pMuzzle[2];
 	pMuzzle[0] = pSimple->GetPMaterial( "effects/combinemuzzle1" );
@@ -458,7 +452,7 @@ void MuzzleFlash_Airboat( ClientEntityHandle_t hEntity, int attachmentIndex )
 			return;
 
 		pParticle->m_flLifetime		= 0.0f;
-		pParticle->m_flDieTime		= IsXbox() ? 0.0001f : 0.01f;
+		pParticle->m_flDieTime		= 0.01f;
 
 		pParticle->m_vecVelocity.Init();
 
@@ -533,8 +527,6 @@ DECLARE_CLIENT_EFFECT( "AirboatMuzzleFlash", AirboatMuzzleFlashCallback );
 //-----------------------------------------------------------------------------
 void MuzzleFlash_Chopper( ClientEntityHandle_t hEntity, int attachmentIndex )
 {
-	VPROF_BUDGET( "MuzzleFlash_Chopper", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
-
 	matrix3x4_t	matAttachment;
 	// If the client hasn't seen this entity yet, bail.
 	if ( !FX_GetAttachmentTransform( hEntity, attachmentIndex, matAttachment ) )
@@ -598,8 +590,6 @@ DECLARE_CLIENT_EFFECT( "ChopperMuzzleFlash", ChopperMuzzleFlashCallback );
 //-----------------------------------------------------------------------------
 void MuzzleFlash_Gunship( ClientEntityHandle_t hEntity, int attachmentIndex )
 {
-	VPROF_BUDGET( "MuzzleFlash_Gunship", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
-
 	// If the client hasn't seen this entity yet, bail.
 	matrix3x4_t	matAttachment;
 	if ( !FX_GetAttachmentTransform( hEntity, attachmentIndex, matAttachment ) )
@@ -659,8 +649,6 @@ DECLARE_CLIENT_EFFECT( "GunshipMuzzleFlash", GunshipMuzzleFlashCallback );
 //-----------------------------------------------------------------------------
 void MuzzleFlash_Hunter( ClientEntityHandle_t hEntity, int attachmentIndex )
 {
-	VPROF_BUDGET( "MuzzleFlash_Hunter", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
-
 	// If the client hasn't seen this entity yet, bail.
 	matrix3x4_t	matAttachment;
 	if ( !FX_GetAttachmentTransform( hEntity, attachmentIndex, matAttachment ) )

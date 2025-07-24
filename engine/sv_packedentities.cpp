@@ -21,7 +21,7 @@
 #endif
 #include "dt_instrumentation_server.h"
 #include "LocalNetworkBackdoor.h"
-#include "tier0/vprof.h"
+
 #include "host.h"
 #include "networkstringtableserver.h"
 #include "networkstringtable.h"
@@ -113,7 +113,6 @@ static inline void SV_PackEntity(
 	CFrameSnapshot *pSnapshot )
 {
 	Assert( edictIdx < pSnapshot->m_nNumEntities );
-	tmZoneFiltered( TELEMETRY_LEVEL0, 50, TMZF_NONE, "PackEntities_Normal%s", __FUNCTION__ );
 
 	int iSerialNum = pSnapshot->m_pEntities[ edictIdx ].m_nSerialNumber;
 
@@ -354,8 +353,6 @@ void PackEntities_NetworkBackDoor(
 {
 	Assert( clientCount == 1 );
 
-	VPROF_BUDGET( "PackEntities_NetworkBackDoor", VPROF_BUDGETGROUP_OTHER_NETWORKING );
-
 	CGameClient *client = clients[0];	// update variables cl, pInfo, frame for current client
 	CCheckTransmitInfo *pInfo =  &client->m_PackInfo;
 
@@ -406,7 +403,6 @@ void PackEntities_Normal(
 	CFrameSnapshot *snapshot )
 {
 	Assert( snapshot->m_nValidEntities >= 0 && snapshot->m_nValidEntities <= MAX_EDICTS );
-	tmZoneFiltered( TELEMETRY_LEVEL0, 50, TMZF_NONE, "%s %d", __FUNCTION__, snapshot->m_nValidEntities );
 
 	CUtlVectorFixed< PackWork_t, MAX_EDICTS > workItems;
 
@@ -476,13 +472,9 @@ void SV_ComputeClientPacks(
 	CGameClient **clients,
 	CFrameSnapshot *snapshot )
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 	MDLCACHE_CRITICAL_SECTION_(g_pMDLCache);
 	// Do some setup for each client
 	{
-		VPROF_BUDGET_FLAGS( "SV_ComputeClientPacks", "CheckTransmit", BUDGETFLAG_SERVER );
-
 		for (int iClient = 0; iClient < clientCount; ++iClient)
 		{
 			CCheckTransmitInfo *pInfo = &clients[iClient]->m_PackInfo;
@@ -491,8 +483,6 @@ void SV_ComputeClientPacks(
 			clients[iClient]->SetupPrevPackInfo();
 		}
 	}
-
-	VPROF_BUDGET_FLAGS( "SV_ComputeClientPacks", "ComputeClientPacks", BUDGETFLAG_SERVER );
 
 	if ( g_pLocalNetworkBackdoor )
 	{

@@ -46,19 +46,20 @@ enum ServerDataRequestType_t
 	SERVERDATA_SETVALUE,
 	SERVERDATA_EXECCOMMAND,
 	SERVERDATA_AUTH, // special RCON command to authenticate a connection
-	SERVERDATA_VPROF, // subscribe to a vprof stream
-	SERVERDATA_REMOVE_VPROF, // unsubscribe from a vprof stream
+	// SERVERDATA_VPROF,
+	// SERVERDATA_REMOVE_VPROF,
 	SERVERDATA_TAKE_SCREENSHOT,
 	SERVERDATA_SEND_CONSOLE_LOG,
 };
-
+// Secton: it is always very risky to remove something from enum
+//         so for now i commented it out.
 enum ServerDataResponseType_t
 {
 	SERVERDATA_RESPONSE_VALUE = 0,
 	SERVERDATA_UPDATE,
 	SERVERDATA_AUTH_RESPONSE,
-	SERVERDATA_VPROF_DATA,
-	SERVERDATA_VPROF_GROUPS,
+	// SERVERDATA_VPROF_DATA,
+	// SERVERDATA_VPROF_GROUPS,
 	SERVERDATA_SCREENSHOT_RESPONSE,
 	SERVERDATA_CONSOLE_LOG_RESPONSE,
 	SERVERDATA_RESPONSE_STRING,

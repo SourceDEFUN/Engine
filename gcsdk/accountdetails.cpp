@@ -523,8 +523,6 @@ void CAccountDetailsManager::WakeWaitingAccountDetailsJobs( const CSteamID &stea
 //-----------------------------------------------------------------------------
 const char *CAccountDetailsManager::YieldingGetPersonaName( const CSteamID &steamID )
 {
-	VPROF_BUDGET( "CAccountDetailsManager::YieldingGetPersonaName", VPROF_BUDGETGROUP_STEAM );
-
 	AssertRunningJob();
 
 	if( !steamID.IsValid() || !steamID.BIndividualAccount() )
@@ -668,8 +666,6 @@ void CAccountDetailsManager::WakeWaitingPersonaNameJobs( const CSteamID &steamID
 //-----------------------------------------------------------------------------
 bool CAccountDetailsManager::BExpireRecords( CLimitTimer &limitTimer )
 {
-	VPROF_BUDGET( "Expire account details", VPROF_BUDGETGROUP_STEAM );
-
 	for ( CAccountDetails *pDetails = m_hashAccountDetailsCache.PvRecordRun(); NULL != pDetails; pDetails = m_hashAccountDetailsCache.PvRecordRun() )
 	{
 		if ( pDetails->BIsExpired() )

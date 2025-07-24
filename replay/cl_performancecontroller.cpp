@@ -15,7 +15,7 @@
 #include "KeyValues.h"
 #include "replaysystem.h"
 #include "cl_replaymanager.h"
-#include "vprof.h"
+
 #include "cl_performance_common.h"
 #include "engine/ivdebugoverlay.h"
 #include "utlbuffer.h"
@@ -1011,10 +1011,7 @@ void CPerformanceController::DebugRender()
 
 void CPerformanceController::Think()
 {
-	VPROF_BUDGET( "CReplayPerformancePlayer::Think", VPROF_BUDGETGROUP_REPLAY );
-
 	CBaseThinker::Think();
-
 	PlaybackThink();
 }
 

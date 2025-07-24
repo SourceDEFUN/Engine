@@ -3194,8 +3194,6 @@ void CBasePlayer::RunNullCommand( void )
 //-----------------------------------------------------------------------------
 void CBasePlayer::PhysicsSimulate( void )
 {
-	VPROF_BUDGET( "CBasePlayer::PhysicsSimulate", VPROF_BUDGETGROUP_PLAYER );
-
 	// If we've got a moveparent, we must simulate that first.
 	CBaseEntity *pMoveParent = GetMoveParent();
 	if (pMoveParent)
@@ -3360,7 +3358,6 @@ void CBasePlayer::PhysicsSimulate( void )
 			// Update our vphysics object.
 			if ( m_pPhysicsController )
 			{
-				VPROF( "CBasePlayer::PhysicsSimulate-UpdateVPhysicsPosition" );
 				// If simulating at 2 * TICK_INTERVAL, add an extra TICK_INTERVAL to position arrival computation
 				UpdateVPhysicsPosition( m_vNewVPhysicsPosition, m_vNewVPhysicsVelocity, vphysicsArrivalTime );
 				vphysicsArrivalTime += TICK_INTERVAL;
@@ -4516,7 +4513,6 @@ void CBasePlayer::PostThink()
 		if ( IsAlive() )
 		{
 			// set correct collision bounds (may have changed in player movement code)
-			VPROF_SCOPE_BEGIN( "CBasePlayer::PostThink-Bounds" );
 			if ( GetFlags() & FL_DUCKING )
 			{
 				SetCollisionBounds( VEC_DUCK_HULL_MIN, VEC_DUCK_HULL_MAX );
@@ -4525,9 +4521,7 @@ void CBasePlayer::PostThink()
 			{
 				SetCollisionBounds( VEC_HULL_MIN, VEC_HULL_MAX );
 			}
-			VPROF_SCOPE_END();
 
-			VPROF_SCOPE_BEGIN( "CBasePlayer::PostThink-Use" );
 			// Handle controlling an entity
 			if ( m_hUseEntity != NULL )
 			{ 
@@ -4548,12 +4542,9 @@ void CBasePlayer::PostThink()
 					ClearUseEntity();
 				}
 			}
-			VPROF_SCOPE_END();
 
 			// do weapon stuff
-			VPROF_SCOPE_BEGIN( "CBasePlayer::PostThink-ItemPostFrame" );
 			ItemPostFrame();
-			VPROF_SCOPE_END();
 
 			if ( GetFlags() & FL_ONGROUND )
 			{		
@@ -4566,7 +4557,6 @@ void CBasePlayer::PostThink()
 			}
 
 			// select the proper animation for the player character	
-			VPROF( "CBasePlayer::PostThink-Animation" );
 			// If he's in a vehicle, sit down
 			if ( IsInAVehicle() )
 				SetAnimation( PLAYER_IN_VEHICLE );
@@ -4584,24 +4574,12 @@ void CBasePlayer::PostThink()
 			SetSequence( 0 );
 		}
 
-		VPROF_SCOPE_BEGIN( "CBasePlayer::PostThink-StudioFrameAdvance" );
 		StudioFrameAdvance();
-		VPROF_SCOPE_END();
-
-		VPROF_SCOPE_BEGIN( "CBasePlayer::PostThink-DispatchAnimEvents" );
 		DispatchAnimEvents( this );
-		VPROF_SCOPE_END();
-
 		SetSimulationTime( gpGlobals->curtime );
-
 		//Let the weapon update as well
-		VPROF_SCOPE_BEGIN( "CBasePlayer::PostThink-Weapon_FrameUpdate" );
 		Weapon_FrameUpdate();
-		VPROF_SCOPE_END();
-
-		VPROF_SCOPE_BEGIN( "CBasePlayer::PostThink-UpdatePlayerSound" );
 		UpdatePlayerSound();
-		VPROF_SCOPE_END();
 
 		if ( m_bForceOrigin )
 		{
@@ -4610,10 +4588,7 @@ void CBasePlayer::PostThink()
 			m_Local.m_vecPunchAngle = RandomAngle( -25, 25 );
 			m_Local.m_vecPunchAngleVel.Init();
 		}
-
-		VPROF_SCOPE_BEGIN( "CBasePlayer::PostThink-PostThinkVPhysics" );
 		PostThinkVPhysics();
-		VPROF_SCOPE_END();
 	}
 
 #if !defined( NO_ENTITY_PREDICTION )
@@ -6635,14 +6610,6 @@ bool CBasePlayer::BumpWeapon( CBaseCombatWeapon *pWeapon )
 		else
 		{
 #ifdef HL2_DLL
-
-			if ( IsX360() )
-			{
-				CFmtStr hint;
-				hint.sprintf( "#valve_hint_select_%s", pWeapon->GetClassname() );
-				UTIL_HudHintText( this, hint.Access() );
-			}
-
 			// Always switch to a newly-picked up weapon
 			if ( !PlayerHasMegaPhysCannon() )
 			{
@@ -6905,7 +6872,7 @@ bool CBasePlayer::ShouldAutoaim( void )
 		return false;
 
 	// autoaiming is only for easy and medium skill
-	return ( IsX360() || !g_pGameRules->IsSkillLevel(SKILL_HARD) );
+	return ( !g_pGameRules->IsSkillLevel(SKILL_HARD) );
 }
 
 //-----------------------------------------------------------------------------

@@ -40,7 +40,7 @@
 #include "saverestoretypes.h"
 #include "physics_saverestore.h"
 #include "achievement_saverestore.h"
-#include "tier0/vprof.h"
+
 #include "effect_dispatch_data.h"
 #include "engine/IStaticPropMgr.h"
 #include "TemplateEntities.h"
@@ -617,10 +617,6 @@ bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory,
 		return false;
 	if ( (scenefilecache = (ISceneFileCache *)appSystemFactory( SCENE_FILE_CACHE_INTERFACE_VERSION, NULL )) == NULL )
 		return false;
-	if ( IsX360() && (xboxsystem = (IXboxSystem *)appSystemFactory( XBOXSYSTEM_INTERFACE_VERSION, NULL )) == NULL )
-		return false;
-	if ( IsX360() && (matchmaking = (IMatchmaking *)appSystemFactory( VENGINE_MATCHMAKING_VERSION, NULL )) == NULL )
-		return false;
 
 	// If not running dedicated, grab the engine vgui interface
 	if ( !engine->IsDedicatedServer() )
@@ -937,8 +933,6 @@ bool CServerGameDLL::IsRestoring()
 // Called any time a new level is started (after GameInit() also on level transitions within a game)
 bool CServerGameDLL::LevelInit( const char *pMapName, char const *pMapEntities, char const *pOldLevel, char const *pLandmarkName, bool loadGame, bool background )
 {
-	VPROF("CServerGameDLL::LevelInit");
-
 #ifdef USES_ECON_ITEMS
 	GameItemSchema_t *pItemSchema = ItemSystem()->GetItemSchema();
 	if ( pItemSchema )
@@ -949,12 +943,6 @@ bool CServerGameDLL::LevelInit( const char *pMapName, char const *pMapEntities, 
 
 	ResetWindspeed();
 	UpdateChapterRestrictions( pMapName );
-
-	if ( IsX360() && !background && (gpGlobals->maxClients == 1) && (g_nCurrentChapterIndex >= 0) )
-	{
-		// Single player games tell xbox live what game & chapter the user is playing
-		UpdateRichPresence();
-	}
 
 	//Tony; parse custom manifest if exists!
 	ParseParticleEffectsMap( pMapName, false );
@@ -1172,8 +1160,6 @@ ConVar  trace_report( "trace_report", "0" );
 
 void CServerGameDLL::GameFrame( bool simulating )
 {
-	VPROF( "CServerGameDLL::GameFrame" );
-
 	// Don't run frames until fully restored
 	if ( g_InRestore )
 		return;
@@ -2161,12 +2147,6 @@ void UpdateChapterRestrictions( const char *mapname )
 		{
 			// ok we're at a higher chapter, unlock
 			sv_unlockedchapters.SetValue( nNewChapter );
-
-			// HACK: Call up through a better function than this? 7/23/07 - jdw
-			if ( IsX360() )
-			{
-				engine->ServerCommand( "host_writeconfig\n" );
-			}
 		}
 
 		g_nCurrentChapterIndex = nNewChapter;

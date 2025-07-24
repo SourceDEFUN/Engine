@@ -16,7 +16,6 @@
 
 #include "DialogCvarChange.h"
 #include "DialogAddBan.h"
-#include "BudgetPanelContainer.h"
 
 #include <vgui/ISystem.h>
 #include <vgui/ISurface.h>
@@ -82,10 +81,7 @@ CGamePanelInfo::CGamePanelInfo(vgui::Panel *parent, const char *name, const char
 	m_pGraphsPanel = new CGraphPanel(this,"GraphsPanel");
 	m_pServerInfoPanel = new CServerInfoPanel(this, "ServerInfo");
 	
-	if ( CommandLine()->CheckParm( "-BudgetPanel" ) )
-		m_pBudgetPanel = new CBudgetPanelContainer( this, "BudgetPanel" );
-	else
-		m_pBudgetPanel = NULL;
+	m_pBudgetPanel = NULL; // Secton TODO: Remove it!
 
 	m_pServerInfoPanel->AddActionSignalTarget(this);
 

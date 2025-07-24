@@ -1660,15 +1660,8 @@ void CPropAirboat::FireGun( )
 	Vector vecEyeDirection, vecEyePosition;
 	if ( !m_bUnableToFire )
 	{
-		if ( IsX360() )
-		{
-			GetAttachment( m_nGunBarrelAttachment, vecEyePosition, &vecEyeDirection );
-		}
-		else
-		{
-			vecEyePosition = m_hPlayer->EyePosition();
-			m_hPlayer->EyeVectors( &vecEyeDirection, NULL, NULL );
-		}
+		vecEyePosition = m_hPlayer->EyePosition();
+		m_hPlayer->EyeVectors( &vecEyeDirection, NULL, NULL );
 	}
 	else
 	{

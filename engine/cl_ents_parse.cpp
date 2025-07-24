@@ -122,9 +122,7 @@ void CL_DeleteDLLEntity( int iEnt, const char *reason, bool bOnRecreatingAllEnti
 	{
 		ClientClass *pClientClass = pNet->GetClientClass();
 		TRACE_DELTA( va( "Trace %i (%s): delete (%s)\n", iEnt, pClientClass ? pClientClass->m_pNetworkName : "unknown", reason ) );
-#ifndef _XBOX
 		CL_RecordDeleteEntity( iEnt, pClientClass );
-#endif
 		if ( bOnRecreatingAllEntities )
 		{
 			pNet->SetDestroyedOnRecreateEntities();
@@ -151,9 +149,7 @@ IClientNetworkable* CL_CreateDLLEntity( int iEnt, int iClass, int iSerialNum )
 	if ( ( pClientClass = cl.m_pServerClasses[iClass].m_pClientClass ) != NULL )
 	{
 		TRACE_DELTA( va( "Trace %i (%s): create\n", iEnt, pClientClass->m_pNetworkName ) );
-#ifndef _XBOX
 		CL_RecordAddEntity( iEnt );
-#endif		
 
 		if ( !cl.IsActive() )
 		{
@@ -414,10 +410,8 @@ void CL_CopyNewEntity(
 	// Net stats..
 	//
 	int bit_count = u.m_pBuf->GetNumBitsRead() - start_bit;
-#ifndef _XBOX
 	if ( cl_entityreport.GetBool() )
 		CL_RecordEntityBits( u.m_nNewEntity, bit_count );
-#endif
 	if ( CL_IsPlayerIndex( u.m_nNewEntity ) )
 	{
 		if ( u.m_nNewEntity == cl.m_nPlayerSlot + 1 )
@@ -487,10 +481,8 @@ void CL_CopyExistingEntity( CEntityReadInfo &u )
 	u.m_pTo->transmit_entity.Set( u.m_nNewEntity );
 
 	int bit_count = u.m_pBuf->GetNumBitsRead() - start_bit;
-#ifndef _XBOX
 	if ( cl_entityreport.GetBool() )
 		CL_RecordEntityBits( u.m_nNewEntity,  bit_count );
-#endif
 	if ( CL_IsPlayerIndex( u.m_nNewEntity ) )
 	{
 		if ( u.m_nNewEntity == cl.m_nPlayerSlot + 1 )
@@ -533,9 +525,7 @@ void CL_MarkEntitiesOutOfPVS( CBitVec<MAX_EDICTS> *pvs_flags )
 		{
 			// Inform the client entity list that the entity left the PVS
 			ent->NotifyShouldTransmit( SHOULDTRANSMIT_END );
-#ifndef _XBOX
 			CL_RecordLeavePVS( i );
-#endif
 		}
 	}
 }
@@ -569,8 +559,6 @@ static ConVar cl_debug_player_perf( "cl_debug_player_perf", "0", 0 );
 //-----------------------------------------------------------------------------
 bool CL_ProcessPacketEntities ( SVC_PacketEntities *entmsg )
 {
-	VPROF( "_CL_ParsePacketEntities" );
-
 	// Packed entities for that frame
 	// Allocate space for new packet info.
 	CClientFrame *newFrame = cl.AllocateFrame();

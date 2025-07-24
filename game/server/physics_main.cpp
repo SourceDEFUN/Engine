@@ -26,7 +26,7 @@
 #include "engine/IEngineSound.h"
 #include "datacache/imdlcache.h"
 #include "ispatialpartition.h"
-#include "tier0/vprof.h"
+
 #include "movevars_shared.h"
 #include "hierarchy.h"
 #include "trains.h"
@@ -38,12 +38,6 @@
 #include "tier0/memdbgon.h"
 
 extern ConVar think_limit;
-#ifdef _XBOX
-ConVar vprof_think_limit( "vprof_think_limit", "0" );
-#endif
-
-ConVar vprof_scope_entity_thinks( "vprof_scope_entity_thinks", "0" );
-ConVar vprof_scope_entity_gamephys( "vprof_scope_entity_gamephys", "0" );
 
 ConVar	npc_vphysics	( "npc_vphysics","0");
 //-----------------------------------------------------------------------------
@@ -679,8 +673,6 @@ int CPushBlockerEnum::s_nEnumCount = 0;
 //-----------------------------------------------------------------------------
 void CPhysicsPushedEntities::GenerateBlockingEntityList()
 {
-	VPROF("CPhysicsPushedEntities::GenerateBlockingEntityList");
-
 	m_rgMoved.RemoveAll();
 	CPushBlockerEnum blockerEnum( this );
 
@@ -707,8 +699,6 @@ void CPhysicsPushedEntities::GenerateBlockingEntityList()
 //-----------------------------------------------------------------------------
 void CPhysicsPushedEntities::GenerateBlockingEntityListAddBox( const Vector &vecMoved )
 {
-	VPROF("CPhysicsPushedEntities::GenerateBlockingEntityListAddBox");
-
 	m_rgMoved.RemoveAll();
 	CPushBlockerEnum blockerEnum( this );
 
@@ -748,10 +738,7 @@ void CPhysicsPushedEntities::GenerateBlockingEntityListAddBox( const Vector &vec
 //-----------------------------------------------------------------------------
 void CPhysicsPushedEntities::SetupAllInHierarchy( CBaseEntity *pParent )
 {
-	if (!pParent)
-		return;
-
-	VPROF("CPhysicsPushedEntities::SetupAllInHierarchy");
+	if (!pParent) return;
 
 	// Make sure to snack the position +before+ relink because applying the
 	// rotation (which occurs in relink) will put it at the final location
@@ -774,8 +761,6 @@ void CPhysicsPushedEntities::SetupAllInHierarchy( CBaseEntity *pParent )
 //-----------------------------------------------------------------------------
 void CPhysicsPushedEntities::RotateRootEntity( CBaseEntity *pRoot, float movetime, RotatingPushMove_t &rotation )
 {
-	VPROF("CPhysicsPushedEntities::RotateRootEntity");
-
 	rotation.amove = pRoot->GetLocalAngularVelocity() * movetime;
 	rotation.origin = pRoot->GetAbsOrigin();
 
@@ -799,8 +784,6 @@ void CPhysicsPushedEntities::RotateRootEntity( CBaseEntity *pRoot, float movetim
 //-----------------------------------------------------------------------------
 CBaseEntity *CPhysicsPushedEntities::PerformRotatePush( CBaseEntity *pRoot, float movetime )
 {
-	VPROF("CPhysicsPushedEntities::PerformRotatePush");
-
 	m_bIsUnblockableByPlayer = (pRoot->GetFlags() & FL_UNBLOCKABLE_BY_PLAYER) ? true : false;
 	// Build a list of this entity + all its children because we're going to try to move them all
 	// This will also make sure each entity is linked in the appropriate place
@@ -839,8 +822,6 @@ CBaseEntity *CPhysicsPushedEntities::PerformRotatePush( CBaseEntity *pRoot, floa
 //-----------------------------------------------------------------------------
 void CPhysicsPushedEntities::LinearlyMoveRootEntity( CBaseEntity *pRoot, float movetime, Vector *pAbsPushVector )
 {
-	VPROF("CPhysicsPushedEntities::LinearlyMoveRootEntity");
-
 	// move the pusher to it's final position
 	Vector move = pRoot->GetLocalVelocity() * movetime;
 	Vector origin = pRoot->GetLocalOrigin();
@@ -857,8 +838,6 @@ void CPhysicsPushedEntities::LinearlyMoveRootEntity( CBaseEntity *pRoot, float m
 //-----------------------------------------------------------------------------
 CBaseEntity *CPhysicsPushedEntities::PerformLinearPush( CBaseEntity *pRoot, float movetime )
 {
-	VPROF("CPhysicsPushedEntities::PerformLinearPush");
-
 	m_flMoveTime = movetime;
 
 	m_bIsUnblockableByPlayer = (pRoot->GetFlags() & FL_UNBLOCKABLE_BY_PLAYER) ? true : false;
@@ -909,10 +888,6 @@ CBaseEntity *CPhysicsPushedEntities::PerformLinearPush( CBaseEntity *pRoot, floa
 //-----------------------------------------------------------------------------
 void CBaseEntity::PhysicsDispatchThink( BASEPTR thinkFunc )
 {
-	VPROF_ENTER_SCOPE( ( !vprof_scope_entity_thinks.GetBool() ) ? 
-						"CBaseEntity::PhysicsDispatchThink" : 
-						EntityFactoryDictionary()->GetCannonicalName( GetClassname() ) );
-
 	float thinkLimit = think_limit.GetFloat();
 	
 	// The thinkLimit stuff makes a LOT of calls to Sys_FloatTime, which winds up calling into
@@ -945,13 +920,6 @@ void CBaseEntity::PhysicsDispatchThink( BASEPTR thinkFunc )
 		float time = ( engine->Time() - startTime ) * 1000.0f;
 		if ( time > thinkLimit )
 		{
-#if defined( _XBOX ) && !defined( _RETAIL )
-			if ( vprof_think_limit.GetBool() )
-			{
-				extern bool g_VProfSignalSpike;
-				g_VProfSignalSpike = true;
-			}
-#endif
 			// If its an NPC print out the shedule/task that took so long
 			CAI_BaseNPC *pNPC = MyNPCPointer();
 			if (pNPC && pNPC->GetCurSchedule())
@@ -970,8 +938,6 @@ void CBaseEntity::PhysicsDispatchThink( BASEPTR thinkFunc )
 			}
 		}
 	}
-
-	VPROF_EXIT_SCOPE();
 }
 
 //-----------------------------------------------------------------------------
@@ -998,8 +964,6 @@ void CBaseEntity::PhysicsCheckSweep( const Vector& vecAbsStart, const Vector &ve
 //-----------------------------------------------------------------------------
 int CBaseEntity::PhysicsTryMove( float flTime, trace_t *steptrace )
 {
-	VPROF("CBaseEntity::PhysicsTryMove");
-
 	int			bumpcount, numbumps;
 	Vector		dir;
 	float		d;
@@ -1179,7 +1143,6 @@ int CBaseEntity::PhysicsTryMove( float flTime, trace_t *steptrace )
 //-----------------------------------------------------------------------------
 void CBaseEntity::PhysicsAddHalfGravity( float timestep )
 {
-	VPROF("CBaseEntity::PhysicsAddHalfGravity");
 	float	ent_gravity;
 
 	if ( GetGravity() )
@@ -1213,8 +1176,6 @@ void CBaseEntity::PhysicsAddHalfGravity( float timestep )
 //-----------------------------------------------------------------------------
 void CBaseEntity::PhysicsPushEntity( const Vector& push, trace_t *pTrace )
 {
-	VPROF("CBaseEntity::PhysicsPushEntity");
-
 	if ( GetMoveParent() )
 	{
 		Warning( "pushing entity (%s) that has parent (%s)!\n", GetDebugName(), GetMoveParent()->GetDebugName() );
@@ -1253,8 +1214,6 @@ void CBaseEntity::PhysicsPushEntity( const Vector& push, trace_t *pTrace )
 //-----------------------------------------------------------------------------
 bool CBaseEntity::PhysicsTestEntityPosition( CBaseEntity **ppEntity /*=NULL*/ )
 {
-	VPROF("CBaseEntity::PhysicsTestEntityPosition");
-
 	trace_t	trace;
 	
 	unsigned int mask = PhysicsSolidMaskForEntity();
@@ -1279,8 +1238,6 @@ bool CBaseEntity::PhysicsTestEntityPosition( CBaseEntity **ppEntity /*=NULL*/ )
 //-----------------------------------------------------------------------------
 CBaseEntity *CBaseEntity::PhysicsPushMove( float movetime )
 {
-	VPROF("CBaseEntity::PhysicsPushMove");
-
 	// If this entity isn't moving, just update the time.
 	IncrementLocalTime( movetime );
 
@@ -1306,8 +1263,6 @@ CBaseEntity *CBaseEntity::PhysicsPushMove( float movetime )
 //-----------------------------------------------------------------------------
 CBaseEntity *CBaseEntity::PhysicsPushRotate( float movetime )
 {
-	VPROF("CBaseEntity::PhysicsPushRotate");
-
 	IncrementLocalTime( movetime );
 
 	// Not rotating
@@ -1332,7 +1287,6 @@ CBaseEntity *CBaseEntity::PhysicsPushRotate( float movetime )
 //-----------------------------------------------------------------------------
 void CBaseEntity::PerformPush( float movetime )
 {
-	VPROF("CBaseEntity::PerformPush");
 	// NOTE: Use handle index because the previous blocker could have been deleted
 	int hPrevBlocker = m_pBlocker.ToInt();
 	CBaseEntity *pBlocker;
@@ -1440,8 +1394,6 @@ void CBaseEntity::PerformPush( float movetime )
 //-----------------------------------------------------------------------------
 void CBaseEntity::PhysicsPusher( void )
 {
-	VPROF("CBaseEntity::PhysicsPusher");
-
 	// regular thinking
 	if ( !PhysicsRunThink() )
 		return;
@@ -1464,8 +1416,6 @@ void CBaseEntity::PhysicsPusher( void )
 //-----------------------------------------------------------------------------
 void CBaseEntity::PhysicsNone( void )
 {
-	VPROF("CBaseEntity::PhysicsNone");
-
 	// regular thinking
 	PhysicsRunThink();
 }
@@ -1476,8 +1426,6 @@ void CBaseEntity::PhysicsNone( void )
 //-----------------------------------------------------------------------------
 void CBaseEntity::PhysicsNoclip( void )
 {
-	VPROF("CBaseEntity::PhysicsNoclip");
-
 	// regular thinking
 	if ( !PhysicsRunThink() )
 	{
@@ -1505,7 +1453,6 @@ void CBaseEntity::PerformCustomPhysics( Vector *pNewPosition, Vector *pNewVeloci
 //-----------------------------------------------------------------------------
 void CBaseEntity::PhysicsCustom()
 {
-	VPROF("CBaseEntity::PhysicsCustom");
 	PhysicsCheckWater();
 
 	// regular thinking
@@ -1941,10 +1888,6 @@ void CBaseEntity::PhysicsStepRunTimestep( float timestep )
 
 void Physics_SimulateEntity( CBaseEntity *pEntity )
 {
-	VPROF( ( !vprof_scope_entity_gamephys.GetBool() ) ? 
-			"Physics_SimulateEntity" : 
-			EntityFactoryDictionary()->GetCannonicalName( pEntity->GetClassname() ) );
-
 	if ( pEntity->edict() )
 	{
 #if !defined( NO_ENTITY_PREDICTION )
@@ -1990,10 +1933,6 @@ void Physics_SimulateEntity( CBaseEntity *pEntity )
 				}
 			}	
 			{
-				VPROF( ( !vprof_scope_entity_gamephys.GetBool() ) ? 
-						"pEntity->PhysicsSimulate" : 
-						EntityFactoryDictionary()->GetCannonicalName( pEntity->GetClassname() ) );
-
 				// Run entity physics
 				pEntity->PhysicsSimulate();
 			}
@@ -2018,8 +1957,6 @@ void Physics_SimulateEntity( CBaseEntity *pEntity )
 //-----------------------------------------------------------------------------
 void Physics_RunThinkFunctions( bool simulating )
 {
-	VPROF( "Physics_RunThinkFunctions");
-
 	g_bTestMoveTypeStepSimulation = sv_teststepsimulation.GetBool();
 
 	float starttime = gpGlobals->curtime;

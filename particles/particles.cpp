@@ -18,7 +18,7 @@
 #include "materialsystem/imaterialvar.h"
 #include "materialsystem/itexture.h"
 #include "materialsystem/imesh.h"
-#include "tier0/vprof.h"
+
 #include "tier1/KeyValues.h"
 #include "tier1/lzmaDecoder.h"
 #include "random_floats.h"
@@ -1726,26 +1726,13 @@ void CParticleCollection::UpdatePrevControlPoints( float dt )
 
 #if MEASURE_PARTICLE_PERF
 
-#if VPROF_LEVEL > 0
-#define START_OP float flOpStartTime = Plat_FloatTime(); VPROF_ENTER_SCOPE(pOp->GetDefinition()->GetName())
-#else
 #define START_OP float flOpStartTime = Plat_FloatTime();
-#endif
 
-#if VPROF_LEVEL > 0
-#define END_OP  if ( 1 ) {																						\
-	float flETime = Plat_FloatTime() - flOpStartTime;									\
-	IParticleOperatorDefinition *pDef = (IParticleOperatorDefinition *) pOp->m_pDef;	\
-	pDef->RecordExecutionTime( flETime );												\
-} \
-	VPROF_EXIT_SCOPE()
-#else
 #define END_OP  if ( 1 ) {																						\
 	float flETime = Plat_FloatTime() - flOpStartTime;									\
 	IParticleOperatorDefinition *pDef = (IParticleOperatorDefinition *) pOp->m_pDef;	\
 	pDef->RecordExecutionTime( flETime );												\
 }
-#endif
 #else
 #define START_OP
 #define END_OP
@@ -1753,8 +1740,6 @@ void CParticleCollection::UpdatePrevControlPoints( float dt )
 
 void CParticleCollection::InitializeNewParticles( int nFirstParticle, int nParticleCount, uint32 nInittedMask )
 {
-	VPROF_BUDGET( "CParticleCollection::InitializeNewParticles", VPROF_BUDGETGROUP_PARTICLE_SIMULATION );
-
 #ifdef _DEBUG
 	m_bIsRunningInitializers = true;
 #endif
@@ -1920,12 +1905,8 @@ void CParticleCollection::SimulateFirstFrame( )
 
 void CParticleCollection::Simulate( float dt, bool updateBboxOnly )
 {
-	VPROF_BUDGET( "CParticleCollection::Simulate", VPROF_BUDGETGROUP_PARTICLE_SIMULATION );
-	if ( dt < 0.0f )
-		return;
-
-	if ( !m_pDef )
-		return;
+	if ( dt < 0.0f ) return;
+	if ( !m_pDef ) return;
 
 	// Don't do anything until we've hit t == 0
 	// This is used for delayed children
@@ -3297,26 +3278,6 @@ bool CParticleSystemMgr::ReadParticleConfigFile( const char *pFileName, bool bPr
 		++pFileName;
 	}
 
-	if ( IsX360() )
-	{
-		char szTargetName[MAX_PATH];
-		CreateX360Filename( pFileName, szTargetName, sizeof( szTargetName ) );
-
-		CUtlBuffer fileBuffer;
-		bool bHaveParticles = g_pFullFileSystem->ReadFile( szTargetName, "GAME", fileBuffer );
-		if ( bHaveParticles )
-		{			
-			fileBuffer.SetBigEndian( false );
-			return ReadParticleConfigFile( fileBuffer, bPrecache, bDecommitTempMemory, szTargetName );
-		}
-		else if ( g_pFullFileSystem->GetDVDMode() != DVDMODE_OFF )
-		{
-			// 360 version should have been there, 360 zips can only have binary particles
-			Warning( "Particles: Missing '%s'\n", szTargetName );
-			return false;
-		}
-	}
-
 	char pFallbackBuf[MAX_PATH];
 	if ( IsPC() )
 	{
@@ -3348,11 +3309,6 @@ bool CParticleSystemMgr::ReadParticleConfigFile( const char *pFileName, bool bPr
 	}
 
 	CUtlBuffer buf( 0, 0, 0 );
-	if ( IsX360() )
-	{
-		// fell through, load as pc particle resource file
-		buf.ActivateByteSwapping( true );
-	}
 
 	if ( g_pFullFileSystem->ReadFile( pFileName, "GAME", buf ) )
 	{
@@ -3751,10 +3707,7 @@ void CParticleSystemMgr::CommitProfileInformation( bool bCommit )
 void CParticleSystemMgr::DrawRenderCache( bool bShadowDepth )
 {
 	int nRenderCacheCount = m_RenderCache.Count();
-	if ( nRenderCacheCount == 0 )
-		return;
-
-	VPROF_BUDGET( "CParticleSystemMgr::DrawRenderCache", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
+	if ( nRenderCacheCount == 0 ) return;
 
 	CMatRenderContextPtr pRenderContext( g_pMaterialSystem );
 	pRenderContext->MatrixMode( MATERIAL_MODEL );

@@ -2553,21 +2553,11 @@ void CThreadSpinRWLock::UnlockRead()
 	LockInfo_t oldValue;
 	LockInfo_t newValue;
 	
-	if( IsX360() )
-	{
-		// this is the code equivalent to original code (see below) that doesn't cause LHS on Xbox360
-		// WARNING: This code assumes BIG Endian CPU
-		oldValue.m_i64 = uint32( m_lockInfo.m_nReaders );
-		newValue.m_i64 = oldValue.m_i64 - 1; // NOTE: when we have -1 (or 0xFFFFFFFF) readers, this will result in non-equivalent code
-	}
-	else
-	{
-		// this is the original code that worked here for a while
-		oldValue.m_nReaders = m_lockInfo.m_nReaders;
-		oldValue.m_writerId = 0;
-		newValue.m_nReaders = oldValue.m_nReaders - 1;
-		newValue.m_writerId = 0;
-	}
+	// this is the original code that worked here for a while
+	oldValue.m_nReaders = m_lockInfo.m_nReaders;
+	oldValue.m_writerId = 0;
+	newValue.m_nReaders = oldValue.m_nReaders - 1;
+	newValue.m_writerId = 0;
 	ThreadMemoryBarrier();
 	if( AssignIf( newValue, oldValue ) )
 		return;

@@ -237,8 +237,6 @@ public:
 	void VerifySOCacheLRU();
 
 	void SetProfilingEnabled( bool bEnabled );
-	void SetDumpVprofImbalances( bool bEnabled );
-	bool GetVprofImbalances();
 
 	bool YieldingWritebackDirtyCaches( uint32 unSecondToDelayWrite );
 	void AddCacheToWritebackQueue( CGCSharedObjectCache *pSOCache );
@@ -328,7 +326,6 @@ private:
 	// profiling
 	bool m_bStartProfiling;
 	bool m_bStopProfiling;
-	bool m_bDumpVprofImbalances;
 
 	//the time that the GC started so that we can compute uptime
 	RTime32	m_nInitTime;

@@ -16,7 +16,7 @@
 #include "viewrender.h"
 #include "c_te_legacytempents.h"
 #include "cl_mat_stub.h"
-#include "tier0/vprof.h"
+
 #include "iclientvehicle.h"
 #include "engine/IEngineTrace.h"
 #include "mathlib/vmatrix.h"
@@ -509,8 +509,6 @@ StereoEye_t		CViewRender::GetLastEye() const
 // simulation so entities can access attachment points on view models during simulation.
 void CViewRender::OnRenderStart()
 {
-	VPROF_("CViewRender::OnRenderStart", 2, VPROF_BUDGETGROUP_OTHER_UNACCOUNTED, false, 0);
-
     SetUpViews();
 
 	// Adjust mouse sensitivity based upon the current FOV
@@ -638,8 +636,6 @@ float CViewRender::GetZFar()
 //-----------------------------------------------------------------------------
 void CViewRender::SetUpViews()
 {
-	VPROF("CViewRender::SetUpViews");
-
 	// Initialize view structure with default values
 	float farZ = GetZFar();
 
@@ -1056,9 +1052,6 @@ void CViewRender::Render( vrect_t *rect )
 {
 	Assert(s_DbgSetupOrigin == m_View.origin);
 	Assert(s_DbgSetupAngles == m_View.angles);
-
-	VPROF_BUDGET( "CViewRender::Render", "CViewRender::Render" );
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
 
 	vrect_t vr = *rect;
 

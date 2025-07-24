@@ -13,13 +13,13 @@
 #include "NextBotBodyInterface.h"
 #include "NextBotManager.h"
 
-#include "tier0/vprof.h"
+
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
 // development only, off by default for 360
-ConVar NextBotDebugHistory( "nb_debug_history", IsX360() ? "0" : "1", FCVAR_CHEAT, "If true, each bot keeps a history of debug output in memory" );
+ConVar NextBotDebugHistory( "nb_debug_history", "1", FCVAR_CHEAT, "If true, each bot keeps a history of debug output in memory" );
 
 //----------------------------------------------------------------------------------------------------------------
 INextBot::INextBot( void ) : m_debugHistory( MAX_NEXTBOT_DEBUG_HISTORY, 0 )	// CUtlVector: grow to max length, alloc 0 initially
@@ -113,8 +113,6 @@ void INextBot::EndUpdate( void )
 //----------------------------------------------------------------------------------------------------------------
 void INextBot::Update( void )
 {
-	VPROF_BUDGET( "INextBot::Update", "NextBot" );
-
 	m_debugDisplayLine = 0;
 
 	if ( IsDebugging( NEXTBOT_DEBUG_ALL ) )
@@ -139,8 +137,6 @@ void INextBot::Update( void )
 //----------------------------------------------------------------------------------------------------------------
 void INextBot::Upkeep( void )
 {
-	VPROF_BUDGET( "INextBot::Upkeep", "NextBot" );
-
 	// do upkeep for all components
 	for( INextBotComponent *comp = m_componentList; comp; comp = comp->m_nextComponent )
 	{

@@ -14,7 +14,7 @@
 #include "toolframework_client.h"
 #include "tier1/KeyValues.h"
 #include "model_types.h"
-#include "vprof.h"
+
 #include "input.h"
 
 extern ConVar cl_particleeffect_aabb_buffer;
@@ -503,9 +503,7 @@ void CNewParticleEffect::DebugDrawBbox ( bool bCulled )
 //-----------------------------------------------------------------------------
 int CNewParticleEffect::DrawModel( int flags )
 {
-	VPROF_BUDGET( "CNewParticleEffect::DrawModel", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
-	if ( r_DrawParticles.GetBool() == false )
-		return 0;
+	if ( r_DrawParticles.GetBool() == false ) return 0;
 
 	if ( !g_pClientMode->ShouldDrawParticles() || !ParticleMgr()->ShouldRenderParticleSystems() )
 		return 0;

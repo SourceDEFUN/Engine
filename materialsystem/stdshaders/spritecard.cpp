@@ -146,7 +146,7 @@ SHADER_INIT_PARAMS()
 	}
 	if ( !params[USEINSTANCING]->IsDefined() )
 	{
-		params[ USEINSTANCING ]->SetIntValue( IsX360() ? 1 : 0 );
+		params[ USEINSTANCING ]->SetIntValue( 0 );
 	}
 	SET_FLAGS2( MATERIAL_VAR2_IS_SPRITECARD );
 }
@@ -217,7 +217,7 @@ SHADER_DRAW
 			bBlendFrames = false;
 		}
 		bool bAddSelf = params[ADDSELF]->GetFloatValue() != 0.0;
-		bool bUseInstancing = IsX360() ? ( params[ USEINSTANCING ]->GetIntValue() != 0 ) : false;
+		bool bUseInstancing = false;
 		if ( nSplineType )
 			bUseInstancing = false;
 

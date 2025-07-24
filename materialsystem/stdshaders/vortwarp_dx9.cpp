@@ -617,7 +617,7 @@ BEGIN_VS_SHADER( VortWarp_DX9,
 		// UGH!!!  FIXME!!!!!  Should fix VertexlitGeneric_dx9_helper so that you
 		// can override the vertex shader/pixel shader used (along with the combo vars).
 		bool bHasFlashlight = UsingFlashlight( params );
-		if ( bHasFlashlight && ( IsX360() || r_flashlight_version2.GetInt() ) )
+		if ( bHasFlashlight && r_flashlight_version2.GetInt() )
 		{
 			DrawVortWarp_DX9( this, params, pShaderAPI, pShaderShadow, true, false, vars, vertexCompression );
 			SHADOW_STATE

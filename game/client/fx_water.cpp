@@ -13,7 +13,7 @@
 #include "decals.h"
 #include "engine/IEngineSound.h"
 #include "fx_quad.h"
-#include "tier0/vprof.h"
+
 #include "fx.h"
 #include "fx_water.h"
 
@@ -82,7 +82,6 @@ void UTIL_GetNormalizedColorTintAndLuminosity( const Vector &color, Vector *tint
 //-----------------------------------------------------------------------------
 void FX_WaterRipple( const Vector &origin, float scale, Vector *pColor, float flLifetime, float flAlpha )
 {
-	VPROF_BUDGET( "FX_WaterRipple", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
 	trace_t	tr;
 
 	Vector	color = pColor ? *pColor : Vector( 0.8f, 0.8f, 0.75f );
@@ -119,10 +118,7 @@ void FX_WaterRipple( const Vector &origin, float scale, Vector *pColor, float fl
 //-----------------------------------------------------------------------------
 void FX_GunshotSplash( const Vector &origin, const Vector &normal, float scale )
 {
-	VPROF_BUDGET( "FX_GunshotSplash", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
-	
-	if ( cl_show_splashes.GetBool() == false )
-		return;
+	if ( cl_show_splashes.GetBool() == false ) return;
 
 	Vector	color;
 	float	luminosity;
@@ -257,11 +253,7 @@ void FX_GunshotSplash( const Vector &origin, const Vector &normal, float scale )
 //-----------------------------------------------------------------------------
 void FX_GunshotSlimeSplash( const Vector &origin, const Vector &normal, float scale )
 {
-	if ( cl_show_splashes.GetBool() == false )
-		return;
-
-	VPROF_BUDGET( "FX_GunshotSlimeSplash", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
-	
+	if ( cl_show_splashes.GetBool() == false ) return;
 #if 0
 
 	float	colorRamp;
@@ -290,10 +282,6 @@ void FX_GunshotSlimeSplash( const Vector &origin, const Vector &normal, float sc
 	sparkEmitter->m_ParticleCollision.SetGravity( 800.0f );
 	sparkEmitter->SetFlag( bitsPARTICLE_TRAIL_VELOCITY_DAMPEN );
 	sparkEmitter->SetVelocityDampen( 2.0f );
-	if ( IsXbox() )
-	{
-		sparkEmitter->GetBinding().SetBBox( origin - Vector( 32, 32, 64 ), origin + Vector( 32, 32, 64 ) );
-	}
 
 	//Dump out drops
 	for ( int i = 0; i < 24; i++ )
@@ -331,11 +319,6 @@ void FX_GunshotSlimeSplash( const Vector &origin, const Vector &normal, float sc
 	pSimple->SetSortOrigin( origin );
 	pSimple->SetClipHeight( origin.z );
 	pSimple->SetParticleCullRadius( scale * 2.0f );
-
-	if ( IsXbox() )
-	{
-		pSimple->GetBinding().SetBBox( origin - Vector( 32, 32, 64 ), origin + Vector( 32, 32, 64 ) );
-	}
 
 	SimpleParticle	*pParticle;
 

@@ -1995,7 +1995,7 @@ void CNPC_CScanner::BlindFlashTarget( CBaseEntity *pTarget )
 				white.a = ( byte )( ( float )white.a * 0.9f );
 			}
 
-			float flFadeTime = ( IsX360() ) ? 0.5f : 3.0f;
+			float flFadeTime = 3.0f;
 			UTIL_ScreenFade( pTarget, white, flFadeTime, 0.5, FFADE_IN );
 		}
 	}

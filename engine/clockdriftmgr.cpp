@@ -121,7 +121,7 @@ float CClockDriftMgr::AdjustFrameTime( float inputFrameTime )
 	float flAdjustmentThisFrame = 0;
 	float flAdjustmentPerSec = 0;
 	if ( IsClockCorrectionEnabled() 
-#if !defined( _XBOX ) && !defined( SWDS )
+#ifndef SWDS
 		 && !demoplayer->IsPlayingBack()
 #endif
 		)

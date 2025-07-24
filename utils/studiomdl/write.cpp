@@ -3068,7 +3068,7 @@ void WriteModelFiles(void)
 			{
 				mstudiomodel_t *pModel = pBodyPart->pModel( modelID );
 				const mstudio_modelvertexdata_t *vertData = pModel->GetVertexData();
-				Assert( vertData ); // This can only return NULL on X360 for now
+				Assert( vertData );
 				int vertID;
 				for( vertID = 0; vertID < pModel->numvertices; vertID++ )
 				{

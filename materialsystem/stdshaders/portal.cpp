@@ -52,16 +52,6 @@ BEGIN_VS_SHADER( Portal_DX90,
 	{
 		if ( params[BASETEXTURE]->IsDefined() )
 		{
-			if ( IsX360() )
-			{
-				// prevent unused rt access
-				IMaterialVar* pNameVar = params[BASETEXTURE];
-				const char *pStringValue = pNameVar->GetStringValue();
-				if ( !V_stricmp( pStringValue, "_rt_portal1" ) || !V_stricmp( pStringValue, "_rt_portal2" ) )
-				{
-					pNameVar->SetStringValue( "white" );
-				}
-			}
 			LoadTexture( BASETEXTURE, TEXTUREFLAGS_SRGB );
 		}
 

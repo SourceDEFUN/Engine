@@ -15,7 +15,7 @@
 #include "nav_node.h"
 #include "fmtstr.h"
 #include "utlbuffer.h"
-#include "tier0/vprof.h"
+
 #ifdef TERROR
 #include "func_simpleladder.h"
 #endif
@@ -248,8 +248,6 @@ void CNavMesh::DestroyNavigationMesh( bool incremental )
  */
 void CNavMesh::Update( void )
 {
-	VPROF( "CNavMesh::Update" );
-
 	if (IsGenerating())
 	{
 		UpdateGeneration( 0.03 );
@@ -412,8 +410,6 @@ public:
  */
 void CNavMesh::FireGameEvent( IGameEvent *gameEvent )
 {
-	VPROF_BUDGET( "CNavMesh::FireGameEvent", VPROF_BUDGETGROUP_NPCS );
-
 	if ( FStrEq( gameEvent->GetName(), "break_prop" ) || FStrEq( gameEvent->GetName(), "break_breakable" ) )
 	{
 		CheckAreasOverlappingBreakable collector( UTIL_EntityByIndex( gameEvent->GetInt( "entindex" ) ) );
@@ -687,10 +683,7 @@ inline void CNavMesh::GridToWorld( int gridX, int gridY, Vector *pos ) const
  */
 CNavArea *CNavMesh::GetNavArea( const Vector &pos, float beneathLimit ) const
 {
-	VPROF_BUDGET( "CNavMesh::GetNavArea", "NextBot"  );
-
-	if ( !m_grid.Count() )
-		return NULL;
+	if ( !m_grid.Count() ) return NULL;
 
 	// get list in cell that contains position
 	int x = WorldToGridX( pos.x );
@@ -738,8 +731,6 @@ CNavArea *CNavMesh::GetNavArea( const Vector &pos, float beneathLimit ) const
 //----------------------------------------------------------------------------
 CNavArea *CNavMesh::GetNavArea( CBaseEntity *pEntity, int nFlags, float flBeneathLimit ) const
 {
-	VPROF( "CNavMesh::GetNavArea [ent]" );
-
 	if ( !m_grid.Count() )
 		return NULL;
 
@@ -823,10 +814,7 @@ CNavArea *CNavMesh::GetNavArea( CBaseEntity *pEntity, int nFlags, float flBeneat
  */
 CNavArea *CNavMesh::GetNearestNavArea( const Vector &pos, bool anyZ, float maxDist, bool checkLOS, bool checkGround, int team ) const
 {
-	VPROF_BUDGET( "CNavMesh::GetNearestNavArea", "NextBot" );
-
-	if ( !m_grid.Count() )
-		return NULL;	
+	if ( !m_grid.Count() ) return NULL;	
 
 	CNavArea *close = NULL;
 	float closeDistSq = maxDist * maxDist;
@@ -999,8 +987,6 @@ CNavArea *CNavMesh::GetNearestNavArea( const Vector &pos, bool anyZ, float maxDi
 //----------------------------------------------------------------------------
 CNavArea *CNavMesh::GetNearestNavArea( CBaseEntity *pEntity, int nFlags, float maxDist ) const
 {
-	VPROF( "CNavMesh::GetNearestNavArea [ent]" );
-
 	if ( !m_grid.Count() )
 		return NULL;
 
@@ -1324,8 +1310,6 @@ public:
 
 bool CNavMesh::GetGroundHeight( const Vector &pos, float *height, Vector *normal ) const
 {
-	VPROF( "CNavMesh::GetGroundHeight" );
-
 	const float flMaxOffset = 100.0f;
 
 	CTraceFilterGroundEntities filter( NULL, COLLISION_GROUP_NONE, WALK_THRU_EVERYTHING );
@@ -3129,7 +3113,6 @@ void CNavMesh::OnAreaUnblocked( CNavArea *area )
 //--------------------------------------------------------------------------------------------------------
 void CNavMesh::UpdateBlockedAreas( void )
 {
-	VPROF( "CNavMesh::UpdateBlockedAreas" );
 	for ( int i=0; i<m_blockedAreas.Count(); ++i )
 	{
 		CNavArea *area = m_blockedAreas[i];
@@ -3175,7 +3158,6 @@ void CNavMesh::OnAvoidanceObstacleLeftArea( CNavArea *area )
 //--------------------------------------------------------------------------------------------------------
 void CNavMesh::UpdateAvoidanceObstacleAreas( void )
 {
-	VPROF( "CNavMesh::UpdateAvoidanceObstacleAreas" );
 	for ( int i=0; i<m_avoidanceObstacleAreas.Count(); ++i )
 	{
 		CNavArea *area = m_avoidanceObstacleAreas[i];

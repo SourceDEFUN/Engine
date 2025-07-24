@@ -243,7 +243,7 @@ void C_PropAirboat::DrawHudElements( )
 
 	MDLCACHE_CRITICAL_SECTION();
 
-	CHudTexture *pIcon = gHUD.GetIcon( IsX360() ? "crosshair_default" : "plushair" );
+	CHudTexture *pIcon = gHUD.GetIcon( "plushair" );
 	if ( pIcon != NULL )
 	{
 		float x, y;
@@ -294,25 +294,7 @@ void C_PropAirboat::UpdateViewAngles( C_BasePlayer *pLocalPlayer, CUserCmd *pCmd
 
 		if ( ( pCmd->mousedx != 0 || pCmd->mousedy != 0 ) || ( fabsf( m_flThrottle ) < 0.01f ) )
 		{
-			if ( IsX360() )
-			{
-				// Only reset this if there isn't an autoaim target!
-				C_BaseHLPlayer *pLocalHLPlayer = (C_BaseHLPlayer *)pLocalPlayer;
-				if ( pLocalHLPlayer )
-				{
-					// Get the autoaim target.
-					CBaseEntity *pTarget = pLocalHLPlayer->m_HL2Local.m_hAutoAimTarget.Get();
-
-					if( !pTarget )
-					{
-						bResetViewAngleTime = true;
-					}
-				}
-			}
-			else
-			{
-				bResetViewAngleTime = true;
-			}
+			bResetViewAngleTime = true;
 		}
 
 		if( bResetViewAngleTime )

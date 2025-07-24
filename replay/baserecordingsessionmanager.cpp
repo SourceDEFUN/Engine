@@ -12,7 +12,7 @@
 #include "shared_replaycontext.h"
 #include "filesystem.h"
 #include "iserver.h"
-#include "vprof.h"
+
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -216,10 +216,7 @@ const char *CBaseRecordingSessionManager::GetRelativeIndexPath() const
 
 void CBaseRecordingSessionManager::Think()
 {
-	VPROF_BUDGET( "CBaseRecordingSessionManager::Think", VPROF_BUDGETGROUP_REPLAY );
-
 	DeleteSessionThink();
-
 	BaseClass::Think();
 }
 

@@ -14,7 +14,7 @@
 
 #include "tier1/mempool.h"
 
-#include "tier0/vprof.h"
+
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -81,8 +81,6 @@ CDependencyGraph::CDependencyGraph() :
 
 void CDependencyGraph::Reset( const CUtlVector< IDmeOperator * > &operators )
 {
-	VPROF_BUDGET( "CDependencyGraph::Reset", VPROF_BUDGETGROUP_TOOLS );
-
 	Cleanup();
 
 	CUtlVector< CDmAttribute * > attrs; // moved outside the loop to function as a temporary memory pool for performance
@@ -154,8 +152,6 @@ CDependencyGraph::~CDependencyGraph()
 
 void CDependencyGraph::Cleanup()
 {
-	VPROF_BUDGET( "CDependencyGraph::Cleanup", VPROF_BUDGETGROUP_TOOLS );
-
 	int on = m_opNodes.Count();
 	for ( int oi = 0; oi < on; ++oi )
 	{
@@ -297,8 +293,6 @@ bool CDependencyGraph::GetOperatorOrdering( CUtlVector< COperatorNode * > &pOpNo
 //-----------------------------------------------------------------------------
 CAttributeNode *CDependencyGraph::FindAttrNode( CDmAttribute *pAttr )
 {
-	VPROF_BUDGET( "CDependencyGraph::FindAttrNode", VPROF_BUDGETGROUP_TOOLS );
-
 	Assert( pAttr );
 
 	CAttributeNode search( pAttr );
@@ -310,12 +304,10 @@ CAttributeNode *CDependencyGraph::FindAttrNode( CDmAttribute *pAttr )
 
 	CAttributeNode *pAttrNode = 0;
 	{
-		VPROF( "CDependencyGraph::FindAttrNode_Alloc" );
 		pAttrNode = g_AttrNodePool.Alloc();
 		pAttrNode->m_attribute = pAttr;
 	}
 	{
-		VPROF( "CDependencyGraph::FindAttrNode_Alloc2" );
 		m_attrNodes.Insert( pAttrNode );
 	}
 	return pAttrNode;

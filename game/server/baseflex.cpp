@@ -896,7 +896,6 @@ bool CBaseFlex::CheckSceneEventCompletion( CSceneEventInfo *info, float currentt
 //-----------------------------------------------------------------------------
 void CBaseFlex::ProcessSceneEvents( void )
 {
-	VPROF( "CBaseFlex::ProcessSceneEvents" );
 	// slowly decay to netural expression
 	for ( LocalFlexController_t i = LocalFlexController_t(0); i < GetNumFlexControllers(); i++)
 	{
@@ -1026,41 +1025,6 @@ public:
 		// Add to list
 		m_FileList.AddToTail( pfile );
 
-		// Swap the entire file
-		if ( IsX360() )
-		{
-			CByteswap swap;
-			swap.ActivateByteSwapping( true );
-			byte *pData = (byte*)buffer;
-			flexsettinghdr_t *pHdr = (flexsettinghdr_t*)pData;
-			swap.SwapFieldsToTargetEndian( pHdr );
-
-			// Flex Settings
-			flexsetting_t *pFlexSetting = (flexsetting_t*)((byte*)pHdr + pHdr->flexsettingindex);
-			for ( int i = 0; i < pHdr->numflexsettings; ++i, ++pFlexSetting )
-			{
-				swap.SwapFieldsToTargetEndian( pFlexSetting );
-				
-				flexweight_t *pWeight = (flexweight_t*)(((byte*)pFlexSetting) + pFlexSetting->settingindex );
-				for ( int j = 0; j < pFlexSetting->numsettings; ++j, ++pWeight )
-				{
-					swap.SwapFieldsToTargetEndian( pWeight );
-				}
-			}
-
-			// indexes
-			pData = (byte*)pHdr + pHdr->indexindex;
-			swap.SwapBufferToTargetEndian( (int*)pData, (int*)pData, pHdr->numindexes );
-
-			// keymappings
-			pData  = (byte*)pHdr + pHdr->keymappingindex;
-			swap.SwapBufferToTargetEndian( (int*)pData, (int*)pData, pHdr->numkeys );
-
-			// keyname indices
-			pData = (byte*)pHdr + pHdr->keynameindex;
-			swap.SwapBufferToTargetEndian( (int*)pData, (int*)pData, pHdr->numkeys );
-		}
-
 		// Fill in translation table
 		EnsureTranslations( instance, ( const flexsettinghdr_t * )pfile->buffer );
 
@@ -1173,8 +1137,6 @@ ConVar	ai_expression_frametime( "ai_expression_frametime", "0.05", FCVAR_NONE, "
 //-----------------------------------------------------------------------------
 bool CBaseFlex::ProcessFlexAnimationSceneEvent( CSceneEventInfo *info, CChoreoScene *scene, CChoreoEvent *event )
 {
-	VPROF( "CBaseFlex::ProcessFlexAnimationSceneEvent" );
-
 	if ( event->HasEndTime() )
 	{
 		// don't bother with flex animation if the player can't see you
@@ -1225,8 +1187,6 @@ bool CBaseFlex::ProcessFlexSettingSceneEvent( CSceneEventInfo *info, CChoreoScen
 	if ( !event->HasEndTime() )
 		return true;
 
-	VPROF( "CBaseFlex::ProcessFlexSettingSceneEvent" );
-
 	// Look up the actual strings
 	const char *scenefile	= event->GetParameters();
 	const char *name		= event->GetParameters2();
@@ -1255,8 +1215,6 @@ bool CBaseFlex::ProcessFacingSceneEvent( CSceneEventInfo *info, CChoreoScene *sc
 	// make sure target exists
 	if (info->m_hTarget == NULL)
 		return false;
-
-	VPROF( "CBaseFlex::ProcessFacingSceneEvent" );
 
 	// make sure we're still able to play this command
 	if (!EnterSceneSequence( scene, event, true ))
@@ -1367,8 +1325,6 @@ bool CBaseFlex::ProcessMoveToSceneEvent( CSceneEventInfo *info, CChoreoScene *sc
 	CAI_BaseNPC *myNpc = MyNPCPointer( );
 	if (!myNpc)
 		return false;
-
-	VPROF( "CBaseFlex::ProcessMoveToSceneEvent" );
 
 	// make sure we're still able to play this command
 	if (!EnterSceneSequence( scene, event, true ))
@@ -1512,7 +1468,6 @@ bool CBaseFlex::ProcessMoveToSceneEvent( CSceneEventInfo *info, CChoreoScene *sc
 
 bool CBaseFlex::ProcessLookAtSceneEvent( CSceneEventInfo *info, CChoreoScene *scene, CChoreoEvent *event )
 {
-	VPROF( "CBaseFlex::ProcessLookAtSceneEvent" );
 	CAI_BaseNPC *myNpc = MyNPCPointer( );
 	if (myNpc && info->m_hTarget != NULL)
 	{
@@ -1541,7 +1496,6 @@ bool CBaseFlex::ProcessLookAtSceneEvent( CSceneEventInfo *info, CChoreoScene *sc
 //-----------------------------------------------------------------------------
 bool CBaseFlex::ProcessSceneEvent( CSceneEventInfo *info, CChoreoScene *scene, CChoreoEvent *event )
 {
-	VPROF( "CBaseFlex::ProcessSceneEvent" );
 	switch ( event->GetType() )
 	{
 	case CChoreoEvent::FLEXANIMATION:
@@ -1692,8 +1646,6 @@ void CBaseFlex::AddFlexAnimation( CSceneEventInfo *info )
 	// decay if this is a background scene and there's other flex animations playing
 	float weight = event->GetIntensity( scenetime ) * info->UpdateWeight( this );
 	{
-	VPROF( "AddFlexAnimation_SetFlexWeight" );
-
 	// Compute intensity for each track in animation and apply
 	// Iterate animation tracks
 	for ( int i = 0; i < event->GetNumFlexAnimationTracks(); i++ )

@@ -292,12 +292,6 @@ KeyValues *CShaderDeviceMgrBase::FindDXLevelSpecificConfig( KeyValues *pKeyValue
 //-----------------------------------------------------------------------------
 KeyValues *CShaderDeviceMgrBase::FindDXLevelAndVendorSpecificConfig( KeyValues *pKeyValues, int nDxLevel, int nVendorID )
 {
-	if ( IsX360() )
-	{
-		// 360 unique dxlevel implies hw config, vendor variance not applicable
-		return NULL;
-	}
-
 	KeyValues *pGroup = pKeyValues->GetFirstSubKey();
 	for( pGroup = pKeyValues->GetFirstSubKey(); pGroup; pGroup = pGroup->GetNextKey() )
 	{
@@ -315,12 +309,6 @@ KeyValues *CShaderDeviceMgrBase::FindDXLevelAndVendorSpecificConfig( KeyValues *
 //-----------------------------------------------------------------------------
 KeyValues *CShaderDeviceMgrBase::FindCPUSpecificConfig( KeyValues *pKeyValues, int nCPUMhz, bool bAMD )
 {
-	if ( IsX360() )
-	{
-		// 360 unique dxlevel implies hw config, cpu variance not applicable
-		return NULL;
-	}
-
 	for( KeyValues *pGroup = pKeyValues->GetFirstSubKey(); pGroup; pGroup = pGroup->GetNextKey() )
 	{
 		const char *pName = pGroup->GetString( "name", NULL );
@@ -348,12 +336,6 @@ KeyValues *CShaderDeviceMgrBase::FindCPUSpecificConfig( KeyValues *pKeyValues, i
 //-----------------------------------------------------------------------------
 KeyValues *CShaderDeviceMgrBase::FindCardSpecificConfig( KeyValues *pKeyValues, int nVendorId, int nDeviceId )
 {
-	if ( IsX360() )
-	{
-		// 360 unique dxlevel implies hw config, vendor variance not applicable
-		return NULL;
-	}
-
 	KeyValues *pGroup = pKeyValues->GetFirstSubKey();
 	for( pGroup = pKeyValues->GetFirstSubKey(); pGroup; pGroup = pGroup->GetNextKey() )
 	{
@@ -373,12 +355,6 @@ KeyValues *CShaderDeviceMgrBase::FindCardSpecificConfig( KeyValues *pKeyValues, 
 //-----------------------------------------------------------------------------
 KeyValues *CShaderDeviceMgrBase::FindMemorySpecificConfig( KeyValues *pKeyValues, int nSystemRamMB )
 {
-	if ( IsX360() )
-	{
-		// 360 unique dxlevel implies hw config, memory variance not applicable
-		return NULL;
-	}
-
 	for( KeyValues *pGroup = pKeyValues->GetFirstSubKey(); pGroup; pGroup = pGroup->GetNextKey() )
 	{
 		// Used to help us debug this code
@@ -401,12 +377,6 @@ KeyValues *CShaderDeviceMgrBase::FindMemorySpecificConfig( KeyValues *pKeyValues
 //-----------------------------------------------------------------------------
 KeyValues *CShaderDeviceMgrBase::FindVidMemSpecificConfig( KeyValues *pKeyValues, int nVideoRamMB )
 {	
-	if ( IsX360() )
-	{
-		// 360 unique dxlevel implies hw config, vidmem variance not applicable
-		return NULL;
-	}
-
 	for( KeyValues *pGroup = pKeyValues->GetFirstSubKey(); pGroup; pGroup = pGroup->GetNextKey() )
 	{
 		int nMinMB = pGroup->GetInt( "min megatexels", -1 );
@@ -529,11 +499,6 @@ KeyValues *CShaderDeviceMgrBase::ReadDXSupportKeyValues()
 	KeyValues *pCfg = new KeyValues( "dxsupport" );
 
 	const char *pPathID = "EXECUTABLE_PATH";
-	if ( IsX360() && g_pFullFileSystem->GetDVDMode() == DVDMODE_STRICT )
-	{
-		// 360 dvd optimzation, expect it inside the platform zip
-		pPathID = "PLATFORM";
-	}
 
 	// First try to read a game-specific config, if it exists
 	if ( !pCfg->LoadFromFile( g_pFullFileSystem, SUPPORT_CFG_FILE, pPathID ) )
@@ -837,8 +802,6 @@ int CShaderDeviceMgrBase::GetClosestActualDXLevel( int nDxLevel ) const
 	if ( nDxLevel <= 94 )
 		return 90;
 
-	if ( IsX360() && nDxLevel <= 98 )
-		return 98;
 	if ( nDxLevel <= 99 )
 		return 95;
 	return 100;

@@ -12,7 +12,7 @@
 #define _SHARED_FUNCTOR_UTILS_H_
 
 #include "debugoverlay_shared.h"
-#include "vprof.h"
+
 
 //--------------------------------------------------------------------------------------------------------
 /**
@@ -40,7 +40,6 @@ public:
 
 	virtual bool operator() ( PlayerType *them )
 	{
-		VPROF( "TargetScan()" );
 		if ( them != m_me && 
 			 them->IsAlive() && 
 			 (m_team == TEAM_ANY || them->GetTeamNumber() == m_team) &&

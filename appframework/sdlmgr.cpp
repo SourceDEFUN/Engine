@@ -14,7 +14,6 @@
 
 #include "togl/rendermechanism.h"
 
-#include "tier0/vprof_telemetry.h"
 #include "tier0/icommandline.h"
 
 #include "tier1/utllinkedlist.h"
@@ -1186,11 +1185,7 @@ void CSDLMgr::OnFrameRendered()
 void CSDLMgr::ShowPixels( CShowPixelsParams *params )
 {
 	SDLAPP_FUNC;
-	
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, __FUNCTION__ );
-
-	if (params->m_onlySyncView)
-		return;
+	if (params->m_onlySyncView) return;
 
 	int swapInterval	= 0;
 	int swapLimit		= 0;

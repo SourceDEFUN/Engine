@@ -20,7 +20,7 @@
 #include "imaterialsysteminternal.h"
 #include "imatrendercontextinternal.h"
 #include "studio.h"
-#include "tier0/vprof.h"
+
 #include "renderparm.h"
 #include "tier2/renderutils.h"
 #include "bitmap/imageformat.h"
@@ -1539,9 +1539,7 @@ int CMorph::BuildNonZeroMorphList( int *pWeightIndices, int nWeightCount, const 
 //-----------------------------------------------------------------------------
 bool CMorph::RenderMorphWeights( IMatRenderContext *pRenderContext, int nRenderId, int nWeightCount, const MorphWeight_t* pWeights )
 {
-	VPROF_BUDGET( "CMorph::RenderMorphWeights", _T("HW Morphing") );
-	if ( m_nMaxMorphTargetCount == 0 )
-		return false;
+	if ( m_nMaxMorphTargetCount == 0 ) return false;
 
 	// Cache off the weights, we need them when we accumulate the morphs later.
 	int nCountToCopy = min( nWeightCount, m_nMaxMorphTargetCount );
@@ -1598,8 +1596,6 @@ bool CMorph::RenderMorphWeights( IMatRenderContext *pRenderContext, int nRenderI
 //-----------------------------------------------------------------------------
 void CMorph::AccumulateMorph( int nRenderId )
 {
-	VPROF_BUDGET( "CMorph::AccumulateMorph", _T("HW Morphing") );
-
 	// Build a non-zero weight list and a total quad count
 	int *pTargets = (int*)_alloca( m_nMaxMorphTargetCount * sizeof(int) );
 	int nTargetCount = BuildNonZeroMorphList( pTargets, m_nMaxMorphTargetCount, m_pRenderMorphWeight ); 
@@ -2135,8 +2131,6 @@ bool CMorphMgr::GetMorphAccumulatorTexCoord( IMorphMgrRenderContext *pRenderCont
 //-----------------------------------------------------------------------------
 void CMorphMgr::BeginMorphAccumulation( IMorphMgrRenderContext *pIRenderContext )
 {
-	VPROF_BUDGET( "CMorph::BeginMorphAccumulation", _T("HW Morphing") );
-
 	// Set up the render context
 	CMorphMgrRenderContext *pMorphRenderContext = static_cast< CMorphMgrRenderContext* >( pIRenderContext );
 	Assert( !pMorphRenderContext->m_bInMorphAccumulation );
@@ -2182,11 +2176,8 @@ void CMorphMgr::BeginMorphAccumulation( IMorphMgrRenderContext *pIRenderContext 
 
 void CMorphMgr::EndMorphAccumulation( IMorphMgrRenderContext *pIRenderContext )
 {
-	VPROF_BUDGET( "CMorph::EndMorphAccumulation", _T("HW Morphing") );
-
 	CMorphMgrRenderContext *pMorphRenderContext = static_cast< CMorphMgrRenderContext* >( pIRenderContext );
 	Assert( pMorphRenderContext->m_bInMorphAccumulation );
-	VPROF_INCREMENT_COUNTER( "HW Morph Count", pMorphRenderContext->m_nMorphCount );
 
 	CMatRenderContextPtr pRenderContext( g_pMaterialSystem );
 

@@ -31,7 +31,7 @@
 #include "client.h"
 #include "cl_main.h"
 #include "collisionutils.h"
-#include "tier0/vprof.h"
+
 #include "filesystem_engine.h"
 #include "mathlib/anorms.h"
 #include "gl_matsysiface.h"
@@ -628,7 +628,6 @@ static void ComputeAmbientFromSurface( SurfaceHandle_t surfID, dworldlight_t* pS
 static void ComputeAmbientFromSphericalSamples( const Vector& start, 
 						Vector* lightBoxColor )
 {
-	VPROF( "ComputeAmbientFromSphericalSamples" );
 	// find any ambient lights
 	dworldlight_t *pSkylight = FindAmbientLight();
 
@@ -734,7 +733,6 @@ static void R_StudioGetAmbientLightForPoint(
 {
 	*bAddedLeafAmbientCube = false;
 
-	VPROF( "R_StudioGetAmbientLightForPoint" );
 	int i;
 	if ( g_pMaterialSystemConfig->nFullbright == 1 )
 	{
@@ -1506,7 +1504,6 @@ static void WorldLightFromDynamicLight( dlight_t const& dynamicLight,
 static const byte *ComputeLightStyles( lightcache_t* pCache, LightingState_t& lightingState,
 									  const Vector& origin, int leaf, const byte* pVis )
 {
-	VPROF_INCREMENT_COUNTER( "ComputeLightStyles", 1 );
 	LightingStateInfo_t info;
 
 	lightingState.ZeroLightingState();
@@ -1657,8 +1654,6 @@ static const byte *ComputeDynamicLighting( lightcache_t* pCache, LightingState_t
 {
 	if (pCache->m_LastFrameUpdated_DynamicLighting != r_framecount)
 	{
-		VPROF_INCREMENT_COUNTER( "ComputeDynamicLighting", 1 );
-
 		// First factor in the cache into the current lighting state..
 		LightingStateInfo_t info;
 
@@ -1823,7 +1818,6 @@ static void AddStaticLighting(
 	bool bStaticProp,
 	bool bAddedLeafAmbientCube )
 {
-	VPROF( "AddStaticLighting" );
 	// First, blat out the lighting state
 	int i;
 	pCache->m_StaticLightingState.numlights = 0;
@@ -2066,9 +2060,6 @@ bool IdentifyLightingErrors( int leaf, LightingState_t& lightingState )
 //-----------------------------------------------------------------------------
 static const byte* ComputeStaticLightingForCacheEntry( CBaseLightCache *pcache, const Vector& origin, int leaf, bool bStaticProp = false )
 {
-	VPROF_INCREMENT_COUNTER( "ComputeStaticLightingForCacheEntry", 1 );
-	
-	VPROF( "ComputeStaticLightingForCacheEntry" );
 	// Figure out the PVS info for this location
  	const byte* pVis = CM_ClusterPVS( CM_LeafCluster( leaf ) );
 
@@ -2606,8 +2597,6 @@ lightcache_t *FindNearestCache( int x, int y, int z, int leafIndex )
 ITexture *LightcacheGetDynamic( const Vector& origin, LightingState_t& lightingState, 
 							   LightcacheGetDynamic_Stats &stats, unsigned int flags, bool bDebugModel )
 {
-	VPROF_BUDGET( "LightcacheGet", VPROF_BUDGETGROUP_LIGHTCACHE );
-
 	LightingStateInfo_t info;
 
 	// generate the hashing vars
@@ -2651,8 +2640,6 @@ ITexture *LightcacheGetDynamic( const Vector& origin, LightingState_t& lightingS
 	}
 	if ( !pCache )
 	{
-		VPROF_INCREMENT_COUNTER( "lightcache miss", 1 );
-
 		// cache miss, nothing appropriate from the frame cache, make a new entry
 		pCache = NewLightcacheEntry(bucket);
 		

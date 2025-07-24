@@ -4,7 +4,7 @@
 //
 //=============================================================================//
 #include "cbase.h"
-#include "tier0/vprof.h"
+
 #include "animation.h"
 #include "studio.h"
 #include "apparent_velocity_helper.h"
@@ -1070,8 +1070,6 @@ float CMultiPlayerAnimState::GetInterpolatedGroundSpeed( void )
 //-----------------------------------------------------------------------------
 void CMultiPlayerAnimState::ComputeSequences( CStudioHdr *pStudioHdr )
 {
-	VPROF( "CBasePlayerAnimState::ComputeSequences" );
-
 	// Lower body (walk/run/idle).
 	ComputeMainSequence();
 
@@ -1086,8 +1084,6 @@ void CMultiPlayerAnimState::ComputeSequences( CStudioHdr *pStudioHdr )
 //-----------------------------------------------------------------------------
 void CMultiPlayerAnimState::ComputeMainSequence()
 {
-	VPROF( "CBasePlayerAnimState::ComputeMainSequence" );
-
 	CBaseAnimatingOverlay *pPlayer = GetBasePlayer();
 
 	// Have our class or the mod-specific class determine what the current activity is.
@@ -1159,8 +1155,6 @@ void CMultiPlayerAnimState::ResetGroundSpeed( void )
 //-----------------------------------------------------------------------------
 void CMultiPlayerAnimState::UpdateInterpolators()
 {
-	VPROF( "CBasePlayerAnimState::UpdateInterpolators" );
-
 	// First, figure out their current max speed based on their current activity.
 	float flCurMaxSpeed = GetCurrentMaxGroundSpeed();
 
@@ -1265,9 +1259,6 @@ extern ConVar mp_feetyawrate;
 //-----------------------------------------------------------------------------
 void CMultiPlayerAnimState::Update( float eyeYaw, float eyePitch )
 {
-	// Profile the animation update.
-	VPROF( "CMultiPlayerAnimState::Update" );
-
 	// Get the studio header for the player.
 	CStudioHdr *pStudioHdr = GetBasePlayer()->GetModelPtr();
 	if ( !pStudioHdr )

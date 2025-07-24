@@ -735,7 +735,7 @@ CDbgMemAlloc::CDbgMemAlloc() : m_sMemoryAllocFailed( (size_t)0 )
 	m_OutputFunc = DefaultHeapReportFunc;
 	m_bInitialized = false;
 
-	if ( !IsDebug() && !IsX360() )
+	if ( !IsDebug() )
 	{
 		Plat_DebugString( "USE_MEM_DEBUG is enabled in a release build. Don't check this in!\n" );
 	}
@@ -1452,10 +1452,6 @@ void CDbgMemAlloc::DumpStatsFileBase( char const *pchFileBase )
 	if (m_OutputFunc == DefaultHeapReportFunc)
 	{
 		char *pPath = "";
-		if ( IsX360() )
-		{
-			pPath = "D:\\";
-		}
 
 		_snprintf( szFileName, sizeof( szFileName ), "%s%s%d.txt", pPath, pchFileBase, s_FileCount );
 		szFileName[ ARRAYSIZE(szFileName) - 1 ] = 0;
@@ -1477,20 +1473,6 @@ void CDbgMemAlloc::DumpStatsFileBase( char const *pchFileBase )
 	m_OutputFunc("\n");
 
 	DumpMemInfo( "Totals", 0, m_GlobalInfo );
-
-#ifdef WIN32
-	if ( IsX360() )
-	{
-		// add a line that has free memory
-		size_t usedMemory, freeMemory;
-		GlobalMemoryStatus( &usedMemory, &freeMemory );
-		MemInfo_t info;
-		// OS takes 32 MB, report our internal allocations only
-		info.m_nCurrentSize = usedMemory;
-		DumpMemInfo( "Used Memory", 0, info );
-	}
-#endif
-
 	DumpFileStats();
 
 	if (m_OutputFunc == DefaultHeapReportFunc)

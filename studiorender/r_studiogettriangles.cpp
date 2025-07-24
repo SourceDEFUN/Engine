@@ -8,15 +8,13 @@
 
 #include "studiorendercontext.h"
 #include "optimize.h"
-#include "tier0/vprof.h"
+
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
 void CStudioRenderContext::GetTriangles( const DrawModelInfo_t& info, matrix3x4_t *pBoneToWorld, GetTriangles_Output_t &out )
 {
-	VPROF( "CStudioRender::GetTriangles");
-
 	out.m_MaterialBatches.RemoveAll(); // clear out data.
 
 	if( !info.m_pStudioHdr || !info.m_pHardwareData || 
@@ -76,7 +74,7 @@ void CStudioRenderContext::GetTriangles( const DrawModelInfo_t& info, matrix3x4_
 				continue;
 			}
 			const mstudio_meshvertexdata_t *vertData = pMesh->GetVertexData( info.m_pStudioHdr );
-			Assert( vertData ); // This can only return NULL on X360 for now
+			Assert( vertData );
 
 			// add the verts from this mesh to the materialBatch
 			materialBatch.m_Verts.SetCount( pMesh->numvertices );

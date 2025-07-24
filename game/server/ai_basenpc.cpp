@@ -142,7 +142,7 @@ ConVar  ai_debug_enemies( "ai_debug_enemies", "0" );
 ConVar	ai_rebalance_thinks( "ai_rebalance_thinks", "1" );
 ConVar	ai_use_efficiency( "ai_use_efficiency", "1" );
 ConVar	ai_use_frame_think_limits( "ai_use_frame_think_limits", "1" );
-ConVar	ai_default_efficient( "ai_default_efficient", ( IsX360() ) ? "1" : "0" );
+ConVar	ai_default_efficient( "ai_default_efficient", "0" );
 ConVar	ai_efficiency_override( "ai_efficiency_override", "0" );
 ConVar	ai_debug_efficiency( "ai_debug_efficiency", "0" );
 ConVar	ai_debug_dyninteractions( "ai_debug_dyninteractions", "0", FCVAR_NONE, "Debug the NPC dynamic interaction system." );
@@ -205,7 +205,7 @@ ConVar	ai_spread_pattern_focus_time( "ai_spread_pattern_focus_time","0.8" );
 ConVar	ai_reaction_delay_idle( "ai_reaction_delay_idle","0.3" );
 ConVar	ai_reaction_delay_alert( "ai_reaction_delay_alert", "0.1" );
 
-ConVar ai_strong_optimizations( "ai_strong_optimizations", ( IsX360() ) ? "1" : "0" );
+ConVar ai_strong_optimizations( "ai_strong_optimizations", "0" );
 bool AIStrongOpt( void )
 {
 	return ai_strong_optimizations.GetBool();
@@ -2824,10 +2824,7 @@ void CAI_BaseNPC::MaintainLookTargets ( float flInterval )
 void CAI_BaseNPC::MaintainTurnActivity( )
 {
 	// Don't bother if we're in a vehicle
-	if ( IsInAVehicle() )
-		return;
-
-	AI_PROFILE_SCOPE( CAI_BaseNPC_MaintainTurnActivity );
+	if ( IsInAVehicle() ) return;
 	GetMotor()->MaintainTurnActivity( );
 }
 
@@ -2838,10 +2835,8 @@ void CAI_BaseNPC::MaintainTurnActivity( )
 void CAI_BaseNPC::PerformMovement()
 {
 	// don't bother to move if the npc isn't alive
-	if (!IsAlive())
-		return;
+	if (!IsAlive()) return;
 
-	AI_PROFILE_SCOPE(CAI_BaseNPC_PerformMovement);
 	g_AIMoveTimer.Start();
 
 	float flInterval = ( m_flTimeLastMovement != FLT_MAX ) ? gpGlobals->curtime - m_flTimeLastMovement : 0.1;
@@ -2859,8 +2854,6 @@ void CAI_BaseNPC::PerformMovement()
 
 void CAI_BaseNPC::PostMovement()
 {
-	AI_PROFILE_SCOPE( CAI_BaseNPC_PostMovement );
-
 	InvalidateBoneCache();
 
 	if ( GetModelPtr() && GetModelPtr()->SequencesAvailable() )
@@ -2869,7 +2862,6 @@ void CAI_BaseNPC::PostMovement()
 
 		if ( CapabilitiesGet() & bits_CAP_AIM_GUN )
 		{
-			AI_PROFILE_SCOPE( CAI_BaseNPC_PM_AimGun );
 			AimGun();
 		}
 		else
@@ -2881,13 +2873,11 @@ void CAI_BaseNPC::PostMovement()
 		// set look targets for npcs with animated faces
 		if ( CapabilitiesGet() & bits_CAP_ANIMATEDFACE )
 		{
-			AI_PROFILE_SCOPE( CAI_BaseNPC_PM_MaintainLookTargets );
 			MaintainLookTargets(flInterval);
 		}
 	}
 
 	{
-	AI_PROFILE_SCOPE( CAI_BaseNPC_PM_MaintainTurnActivity );
 	// update turning as needed
 	MaintainTurnActivity( );
 	}
@@ -2967,11 +2957,7 @@ bool CAI_BaseNPC::PreThink( void )
 
 void CAI_BaseNPC::RunAnimation( void )
 {
-	VPROF_BUDGET( "CAI_BaseNPC_RunAnimation", VPROF_BUDGETGROUP_SERVER_ANIM );
-
-	if ( !GetModelPtr() )
-		return;
-
+	if ( !GetModelPtr() ) return;
 	float flInterval = GetAnimTimeInterval();
 		
 	StudioFrameAdvance( ); // animate
@@ -3022,8 +3008,6 @@ void CAI_BaseNPC::RunAnimation( void )
 
 void CAI_BaseNPC::PostRun( void )
 {
-	AI_PROFILE_SCOPE(CAI_BaseNPC_PostRun);
-
 	g_AIPostRunTimer.Start();
 
 	if ( !IsMoving() )
@@ -3547,8 +3531,6 @@ void CAI_BaseNPC::RebalanceThinks()
 
 	if ( ShouldRebalanceThinks() && gpGlobals->tickcount >= gm_iNextThinkRebalanceTick )
 	{
-		AI_PROFILE_SCOPE(AI_Think_Rebalance );
-
 		static CUtlVector<AIRebalanceInfo_t> rebalanceCandidates( 16, 64 );
 		gm_iNextThinkRebalanceTick = gpGlobals->tickcount + TIME_TO_TICKS( random->RandomFloat( 3, 5) );
 
@@ -3690,7 +3672,7 @@ bool CAI_BaseNPC::PreNPCThink()
 #ifdef _DEBUG
 	const float NPC_THINK_LIMIT = 30.0 / 1000.0;
 #else
-	const float NPC_THINK_LIMIT = ( !IsXbox() ) ? (10.0 / 1000.0) : (12.5 / 1000.0);
+	const float NPC_THINK_LIMIT = 10.0 / 1000.0;
 #endif
 
 	g_StartTimeCurThink = 0;
@@ -3932,10 +3914,6 @@ void CAI_BaseNPC::NPCThink( void )
 
 		if ( g_pAINetworkManager && g_pAINetworkManager->IsInitialized() )
 		{
-			VPROF_BUDGET( "NPCs", VPROF_BUDGETGROUP_NPCS );
-
-			AI_PROFILE_SCOPE_BEGIN_( GetClassScheduleIdSpace()->GetClassName() ); // need to use a string stable from map load to map load
-
 			SetPlayerAvoidState();
 
 			if ( PreThink() )
@@ -3967,8 +3945,6 @@ void CAI_BaseNPC::NPCThink( void )
 			}
 			else
 				m_flTimeLastMovement = FLT_MAX;
-
-			AI_PROFILE_SCOPE_END();
 		}
 
 		if ( thinkLimit > 0 )
@@ -4223,8 +4199,6 @@ void CAI_BaseNPC::ClearAttackConditions( )
 
 void CAI_BaseNPC::GatherAttackConditions( CBaseEntity *pTarget, float flDist )
 {
-	AI_PROFILE_SCOPE(CAI_BaseNPC_GatherAttackConditions);
-	
 	Vector vecLOS = ( pTarget->GetAbsOrigin() - GetAbsOrigin() );
 	vecLOS.z = 0;
 	VectorNormalize( vecLOS );
@@ -4244,7 +4218,6 @@ void CAI_BaseNPC::GatherAttackConditions( CBaseEntity *pTarget, float flDist )
 	capability		= CapabilitiesGet();
 
 	// Clear all attack conditions
-	AI_PROFILE_SCOPE_BEGIN( CAI_BaseNPC_GatherAttackConditions_PrimaryWeaponLOS );
 
 	// @TODO (toml 06-15-03):  There are simple cases where
 	// the upper torso of the enemy is visible, and the NPC is at an angle below
@@ -4257,11 +4230,8 @@ void CAI_BaseNPC::GatherAttackConditions( CBaseEntity *pTarget, float flDist )
 	targetPos = pTarget->EyePosition();
 	bWeaponHasLOS = CurrentWeaponLOSCondition( targetPos, true );
 
-	AI_PROFILE_SCOPE_END();
-
 	if ( !bWeaponHasLOS )
 	{
-		AI_PROFILE_SCOPE( CAI_BaseNPC_GatherAttackConditions_SecondaryWeaponLOS );
 		ClearAttackConditions( );
 		targetPos		= pTarget->BodyTarget( GetAbsOrigin() );
 		bWeaponHasLOS	= CurrentWeaponLOSCondition( targetPos, true );
@@ -4276,8 +4246,6 @@ void CAI_BaseNPC::GatherAttackConditions( CBaseEntity *pTarget, float flDist )
 	// FIXME: move this out of here
 	if ( (capability & bits_CAP_WEAPON_RANGE_ATTACK1) && bWeaponIsReady )
 	{
-		AI_PROFILE_SCOPE( CAI_BaseNPC_GatherAttackConditions_WeaponRangeAttack1Condition );
-
 		condition = GetActiveWeapon()->WeaponRangeAttack1Condition(flDot, flDist);
 
 		if ( condition == COND_NOT_FACING_ATTACK && FInAimCone( targetPos ) )
@@ -4290,8 +4258,6 @@ void CAI_BaseNPC::GatherAttackConditions( CBaseEntity *pTarget, float flDist )
 	}
 	else if ( capability & bits_CAP_INNATE_RANGE_ATTACK1 )
 	{
-		AI_PROFILE_SCOPE( CAI_BaseNPC_GatherAttackConditions_RangeAttack1Condition );
-
 		condition = RangeAttack1Conditions( flDot, flDist );
 		if (condition != COND_CAN_RANGE_ATTACK1 || bWeaponHasLOS)
 		{
@@ -4301,8 +4267,6 @@ void CAI_BaseNPC::GatherAttackConditions( CBaseEntity *pTarget, float flDist )
 
 	if ( (capability & bits_CAP_WEAPON_RANGE_ATTACK2) && bWeaponIsReady && ( GetActiveWeapon()->CapabilitiesGet() & bits_CAP_WEAPON_RANGE_ATTACK2 ) )
 	{
-		AI_PROFILE_SCOPE( CAI_BaseNPC_GatherAttackConditions_WeaponRangeAttack2Condition );
-
 		condition = GetActiveWeapon()->WeaponRangeAttack2Condition(flDot, flDist);
 		if (condition != COND_CAN_RANGE_ATTACK2 || bWeaponHasLOS)
 		{
@@ -4311,8 +4275,6 @@ void CAI_BaseNPC::GatherAttackConditions( CBaseEntity *pTarget, float flDist )
 	}
 	else if ( capability & bits_CAP_INNATE_RANGE_ATTACK2 )
 	{
-		AI_PROFILE_SCOPE( CAI_BaseNPC_GatherAttackConditions_RangeAttack2Condition );
-
 		condition = RangeAttack2Conditions( flDot, flDist );
 		if (condition != COND_CAN_RANGE_ATTACK2 || bWeaponHasLOS)
 		{
@@ -4322,23 +4284,19 @@ void CAI_BaseNPC::GatherAttackConditions( CBaseEntity *pTarget, float flDist )
 
 	if ( (capability & bits_CAP_WEAPON_MELEE_ATTACK1) && bWeaponIsReady)
 	{
-		AI_PROFILE_SCOPE( CAI_BaseNPC_GatherAttackConditions_WeaponMeleeAttack1Condition );
 		SetCondition(GetActiveWeapon()->WeaponMeleeAttack1Condition(flDot, flDist));
 	}
 	else if ( capability & bits_CAP_INNATE_MELEE_ATTACK1 )
 	{
-		AI_PROFILE_SCOPE( CAI_BaseNPC_GatherAttackConditions_MeleeAttack1Condition );
 		SetCondition(MeleeAttack1Conditions ( flDot, flDist ));
 	}
 
 	if ( (capability & bits_CAP_WEAPON_MELEE_ATTACK2) && bWeaponIsReady)
 	{
-		AI_PROFILE_SCOPE( CAI_BaseNPC_GatherAttackConditions_WeaponMeleeAttack2Condition );
 		SetCondition(GetActiveWeapon()->WeaponMeleeAttack2Condition(flDot, flDist));
 	}
 	else if ( capability & bits_CAP_INNATE_MELEE_ATTACK2 )
 	{
-		AI_PROFILE_SCOPE( CAI_BaseNPC_GatherAttackConditions_MeleeAttack2Condition );
 		SetCondition(MeleeAttack2Conditions ( flDot, flDist ));
 	}
 
@@ -4674,7 +4632,6 @@ void CAI_BaseNPC::GatherConditions( void )
 
 			if ( ShouldPlayIdleSound() )
 			{
-				AI_PROFILE_SCOPE(CAI_BaseNPC_IdleSound);
 				IdleSound();
 			}
 
@@ -4782,7 +4739,6 @@ void CAI_BaseNPC::PrescheduleThink( void )
 
 void CAI_BaseNPC::RunAI( void )
 {
-	AI_PROFILE_SCOPE(CAI_BaseNPC_RunAI);
 	g_AIRunTimer.Start();
 
 	if( ai_debug_squads.GetBool() )
@@ -4836,10 +4792,8 @@ void CAI_BaseNPC::RunAI( void )
 		AddTimedOverlay( "NPC w/no reachable nodes!", 5 );
 	}
 
-	AI_PROFILE_SCOPE_BEGIN(CAI_BaseNPC_RunAI_GatherConditions);
 	GatherConditions();
 	RemoveIgnoredConditions();
-	AI_PROFILE_SCOPE_END();
 
 	if ( !m_bConditionsGathered )
 		m_bConditionsGathered = true; // derived class didn't call to base
@@ -4848,9 +4802,7 @@ void CAI_BaseNPC::RunAI( void )
 
 	g_AIPrescheduleThinkTimer.Start();
 
-	AI_PROFILE_SCOPE_BEGIN(CAI_RunAI_PrescheduleThink);
 	PrescheduleThink();
-	AI_PROFILE_SCOPE_END();
 
 	g_AIPrescheduleThinkTimer.End();
 	
@@ -5483,8 +5435,6 @@ bool CAI_BaseNPC::UpdateEnemyMemory( CBaseEntity *pEnemy, const Vector &position
 {
 	bool firstHand = ( pInformer == NULL || pInformer == this );
 	
-	AI_PROFILE_SCOPE(CAI_BaseNPC_UpdateEnemyMemory);
-	
 	if ( GetEnemies() )
 	{
 		// If the was eluding me and allow the NPC to play a sound
@@ -5538,8 +5488,6 @@ CBaseEntity *CAI_BaseNPC::GetEnemyOccluder(void)
 //-----------------------------------------------------------------------------
 void CAI_BaseNPC::GatherEnemyConditions( CBaseEntity *pEnemy )
 {
-	AI_PROFILE_SCOPE(CAI_BaseNPC_GatherEnemyConditions);
-
 	ClearCondition( COND_ENEMY_FACING_ME  );
 	ClearCondition( COND_BEHIND_ENEMY   );
 
@@ -5548,8 +5496,6 @@ void CAI_BaseNPC::GatherEnemyConditions( CBaseEntity *pEnemy )
 	// ---------------------------
 	if ( HasCondition( COND_NEW_ENEMY ) || GetSenses()->GetTimeLastUpdate( GetEnemy() ) == gpGlobals->curtime )
 	{
-		AI_PROFILE_SCOPE_BEGIN(CAI_BaseNPC_GatherEnemyConditions_Visibility);
-
 		ClearCondition( COND_HAVE_ENEMY_LOS );
 		ClearCondition( COND_ENEMY_OCCLUDED  );
 
@@ -5567,7 +5513,6 @@ void CAI_BaseNPC::GatherEnemyConditions( CBaseEntity *pEnemy )
 
 			if (HasMemory( bits_MEMORY_HAD_LOS ))
 			{
-				AI_PROFILE_SCOPE(CAI_BaseNPC_GatherEnemyConditions_Outputs);
 				// Send output event
 				if (GetEnemy()->IsPlayer())
 				{
@@ -5594,7 +5539,6 @@ void CAI_BaseNPC::GatherEnemyConditions( CBaseEntity *pEnemy )
 
 			if (!HasMemory( bits_MEMORY_HAD_LOS ))
 			{
-				AI_PROFILE_SCOPE(CAI_BaseNPC_GatherEnemyConditions_Outputs);
 				// Send output event
 				EHANDLE hEnemy;
 				hEnemy.Set( GetEnemy() );
@@ -5611,8 +5555,6 @@ void CAI_BaseNPC::GatherEnemyConditions( CBaseEntity *pEnemy )
 			}
 			Remember( bits_MEMORY_HAD_LOS );
 		}
-
-		AI_PROFILE_SCOPE_END();
 	}
 
   	// -------------------
@@ -5628,8 +5570,6 @@ void CAI_BaseNPC::GatherEnemyConditions( CBaseEntity *pEnemy )
 	
 	float flDistToEnemy = EnemyDistance(pEnemy);
 
-	AI_PROFILE_SCOPE_BEGIN(CAI_BaseNPC_GatherEnemyConditions_SeeEnemy);
-	
 	if ( HasCondition( COND_SEE_ENEMY ) )
 	{
 		// Trail the enemy a bit if he's moving
@@ -5663,8 +5603,6 @@ void CAI_BaseNPC::GatherEnemyConditions( CBaseEntity *pEnemy )
 		// secondhand so that the NPC doesn't 
 		UpdateEnemyMemory( pEnemy, pEnemy->GetAbsOrigin(), pEnemy );
 	}
-
-	AI_PROFILE_SCOPE_END();
 
 	float tooFar = m_flDistTooFar;
 	if ( GetActiveWeapon() && HasCondition(COND_SEE_ENEMY) )
@@ -5846,8 +5784,6 @@ void CAI_BaseNPC::UpdateTargetPos()
 //-----------------------------------------------------------------------------
 void CAI_BaseNPC::CheckTarget( CBaseEntity *pTarget )
 {
-	AI_PROFILE_SCOPE(CAI_Enemies_CheckTarget);
-
 	ClearCondition ( COND_HAVE_TARGET_LOS );
 	ClearCondition ( COND_TARGET_OCCLUDED  );
 
@@ -6060,8 +5996,6 @@ Activity CAI_BaseNPC::TranslateActivity( Activity idealActivity, Activity *pIdea
 //-----------------------------------------------------------------------------
 void CAI_BaseNPC::ResolveActivityToSequence(Activity NewActivity, int &iSequence, Activity &translatedActivity, Activity &weaponActivity)
 {
-	AI_PROFILE_SCOPE( CAI_BaseNPC_ResolveActivityToSequence );
-
 	iSequence = ACTIVITY_NOT_AVAILABLE;
 
 	translatedActivity = TranslateActivity( NewActivity, &weaponActivity );
@@ -6309,8 +6243,6 @@ void CAI_BaseNPC::AdvanceToIdealActivity(void)
 //-----------------------------------------------------------------------------
 void CAI_BaseNPC::MaintainActivity(void)
 {
-	AI_PROFILE_SCOPE( CAI_BaseNPC_MaintainActivity );
-
 	if ( m_lifeState == LIFE_DEAD )
 	{
 		// Don't maintain activities if we're daid.
@@ -7687,7 +7619,6 @@ bool CAI_BaseNPC::CanBeAnEnemyOf( CBaseEntity *pEnemy )
 
 CBaseEntity *CAI_BaseNPC::BestEnemy( void )
 {
-	AI_PROFILE_SCOPE( CAI_BaseNPC_BestEnemy );
 	// TODO - may want to consider distance, attack types, back turned, etc.
 
 	CBaseEntity*	pBestEnemy			= NULL;
@@ -10194,8 +10125,6 @@ bool CAI_BaseNPC::ShouldChooseNewEnemy()
 
 bool CAI_BaseNPC::ChooseEnemy( void )
 {
-	AI_PROFILE_SCOPE(CAI_Enemies_ChooseEnemy);
-
 	DbgEnemyMsg( this, "ChooseEnemy() {\n" );
 
 	//---------------------------------
@@ -12885,8 +12814,6 @@ ConVar ai_LOS_mode( "ai_LOS_mode", "0", FCVAR_REPLICATED );
 //-----------------------------------------------------------------------------
 void AI_TraceLOS( const Vector& vecAbsStart, const Vector& vecAbsEnd, CBaseEntity *pLooker, trace_t *ptr, ITraceFilter *pFilter )
 {
-	AI_PROFILE_SCOPE( AI_TraceLOS );
-
 	if ( ai_LOS_mode.GetBool() )
 	{
 		// Don't use LOS tracefilter

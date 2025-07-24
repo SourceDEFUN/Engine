@@ -442,18 +442,7 @@ NavErrorType CCSNavArea::LoadLegacy( CUtlBuffer &fileBuffer, unsigned int versio
 
 	// load visibility information
 	unsigned int visibleAreaCount = fileBuffer.GetUnsignedInt();
-	if ( !IsX360() )
-	{
-		m_potentiallyVisibleAreas.EnsureCapacity( visibleAreaCount );
-	}
-	else
-	{
-/* TODO: Re-enable when latest 360 code gets integrated (MSB 5/5/09)
-		size_t nBytes = visibleAreaCount * sizeof( AreaBindInfo ); 
-		m_potentiallyVisibleAreas.~CAreaBindInfoArray();
-		new ( &m_potentiallyVisibleAreas ) CAreaBindInfoArray( (AreaBindInfo *)engine->AllocLevelStaticData( nBytes ), visibleAreaCount );
-*/
-	}
+	m_potentiallyVisibleAreas.EnsureCapacity( visibleAreaCount );
 
 	for( unsigned int j=0; j<visibleAreaCount; ++j )
 	{

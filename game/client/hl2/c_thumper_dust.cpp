@@ -104,7 +104,6 @@ void FX_ThumperDust( const CEffectData &data )
 
 	Vector	offset;
 
-	//int	numPuffs = IsXbox() ? THUMPER_MAX_PARTICLES/2 : THUMPER_MAX_PARTICLES;
 	int	numPuffs = THUMPER_MAX_PARTICLES;
 
 	float flYaw = 0;

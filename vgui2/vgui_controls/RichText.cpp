@@ -609,8 +609,6 @@ int RichText::PixelToCursorSpace(int cx, int cy)
 //-----------------------------------------------------------------------------
 int RichText::DrawString(int iFirst, int iLast, TRenderState &renderState, HFont font)
 {
-//	VPROF( "RichText::DrawString" );
-
 	// Calculate the render size
 	int fontTall = surface()->GetFontTall(font);
 	// BUGBUG John: This won't exactly match the rendered size

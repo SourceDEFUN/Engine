@@ -33,7 +33,7 @@ typedef int SOCKET;
 #include "locald3dtypes.h"
 #include "shaderapidx8_global.h"
 #include "recording.h"
-#include "tier0/vprof.h"
+
 #include "materialsystem/imaterialsystem.h"
 #include "materialsystem/imaterialsystemhardwareconfig.h"
 #include "KeyValues.h"
@@ -201,9 +201,6 @@ static void RegisterVS( const void* pShaderBits, int nShaderSize, IDirect3DVerte
 	{
 		int nMemUsed = 23 * 1024;
 		s_UniqueVS.Insert( crc, 1 );
-		VPROF_INCREMENT_GROUP_COUNTER( "unique vs count", COUNTER_GROUP_NO_RESET, 1 );
-		VPROF_INCREMENT_GROUP_COUNTER( "vs driver mem", COUNTER_GROUP_NO_RESET, nMemUsed );
-		VPROF_INCREMENT_GROUP_COUNTER( "total driver mem", COUNTER_GROUP_NO_RESET, nMemUsed );
 	}
 #endif
 }
@@ -227,9 +224,6 @@ static void RegisterPS( const void* pShaderBits, int nShaderSize, IDirect3DPixel
 	{
 		int nMemUsed = 400;
 		s_UniquePS.Insert( crc, 1 );
-		VPROF_INCREMENT_GROUP_COUNTER( "unique ps count", COUNTER_GROUP_NO_RESET, 1 );
-		VPROF_INCREMENT_GROUP_COUNTER( "ps driver mem", COUNTER_GROUP_NO_RESET, nMemUsed );
-		VPROF_INCREMENT_GROUP_COUNTER( "total driver mem", COUNTER_GROUP_NO_RESET, nMemUsed );
 	}
 #endif
 }
@@ -250,9 +244,6 @@ static void UnregisterVS( IDirect3DVertexShader9* pShader )
 		if ( --s_UniqueVS[nIndex] <= 0 )
 		{
 			int nMemUsed = 23 * 1024;
-			VPROF_INCREMENT_GROUP_COUNTER( "unique vs count", COUNTER_GROUP_NO_RESET, -1 );
-			VPROF_INCREMENT_GROUP_COUNTER( "vs driver mem", COUNTER_GROUP_NO_RESET, -nMemUsed );
-			VPROF_INCREMENT_GROUP_COUNTER( "total driver mem", COUNTER_GROUP_NO_RESET, -nMemUsed );
 			s_UniqueVS.Remove( nIndex );
 		}
 	}
@@ -275,9 +266,6 @@ static void UnregisterPS( IDirect3DPixelShader9* pShader )
 		if ( --s_UniquePS[nIndex] <= 0 )
 		{
 			int nMemUsed = 400;
-			VPROF_INCREMENT_GROUP_COUNTER( "unique ps count", COUNTER_GROUP_NO_RESET, -1 );
-			VPROF_INCREMENT_GROUP_COUNTER( "ps driver mem", COUNTER_GROUP_NO_RESET, -nMemUsed );
-			VPROF_INCREMENT_GROUP_COUNTER( "total driver mem", COUNTER_GROUP_NO_RESET, -nMemUsed );
 			s_UniquePS.Remove( nIndex );
 		}
 	}
@@ -895,8 +883,6 @@ void CShaderManager::Init()
 	m_bCreateShadersOnDemand = IsPC() && ( ShaderUtil()->InEditorMode() || CommandLine()->CheckParm( "-shadersondemand" ) );
 
 #ifdef DYNAMIC_SHADER_COMPILE
-	if( !IsX360() )
-	{
 
 #ifdef REMOTE_DYNAMIC_SHADER_COMPILE
 	InitRemoteShaderCompile();
@@ -917,7 +903,6 @@ void CShaderManager::Init()
 
 #endif
 
-	}
 #endif // DYNAMIC_SHADER_COMPILE
 
 	CreateStaticShaders();
@@ -1242,16 +1227,8 @@ const CShaderManager::ShaderCombos_t *CShaderManager::FindOrCreateShaderCombos( 
 		}
 
 		// Check if line intended for platform lines
-		if( IsX360() )
-		{
-			if ( Q_stristr( line, "[PC]" ) )
-				continue;
-		}
-		else
-		{
-			if ( Q_stristr( line, "[360]" ) || Q_stristr( line, "[XBOX]" ) )
-				continue;
-		}
+		if ( Q_stristr( line, "[360]" ) || Q_stristr( line, "[XBOX]" ) )
+			continue;
 
 		// Skip any lines intended for other shader version
 		if ( Q_stristr( pShaderName, "_ps20" ) && !Q_stristr( pShaderName, "_ps20b" ) &&
@@ -1541,12 +1518,9 @@ static const char *FileNameToShaderModel( const char *pShaderName, bool bVertexS
 HardwareShader_t CShaderManager::CompileShader( const char *pShaderName, 
 												int nStaticIndex, int nDynamicIndex, bool bVertexShader )
 {
-	VPROF_BUDGET( "CompileShader", "CompileShader" );
 	Assert( m_ShaderNameToCombos.Defined( pShaderName ) );
 	if( !m_ShaderNameToCombos.Defined( pShaderName ) )
-	{
 		return INVALID_HARDWARE_SHADER;
-	}
 	const ShaderCombos_t &combos = m_ShaderNameToCombos[pShaderName];
 #ifdef _DEBUG
 	int numStaticCombos = combos.GetNumStaticCombos();
@@ -1839,8 +1813,7 @@ retry_compile:
 #endif
 			goto retry_compile;
 		}
-		if( !IsX360() ) //errors make the 360 puke and die. We have a better solution for this particular error
-			Error( "Failed dynamic shader compile\nBuild shaderapidx9.dll in debug to find problem\n" );
+		Error( "Failed dynamic shader compile\nBuild shaderapidx9.dll in debug to find problem\n" );
 #else
 		Assert( 0 );
 
@@ -2596,38 +2569,22 @@ bool CShaderManager::LoadAndCreateShaders( ShaderLookup_t &lookup, bool bVertexS
 	lookup.m_nDataOffset = nStartingOffset - nAlignedOffset;
 
 	bool bOK = true;
-	if ( IsX360() && g_pQueuedLoader->IsMapLoading() )
+	//printf("\n CShaderManager::LoadAndCreateShaders - reading %d bytes from file offset %d", nAlignedBytesToRead, nAlignedOffset);
+	// single optimal read of all dynamic combos into monolithic buffer
+	uint8 *pOptimalBuffer = (uint8 *)g_pFullFileSystem->AllocOptimalReadBuffer( hFile, nAlignedBytesToRead, nAlignedOffset );
+	g_pFullFileSystem->Seek( hFile, nAlignedOffset, FILESYSTEM_SEEK_HEAD );
+	g_pFullFileSystem->Read( pOptimalBuffer, nAlignedBytesToRead, hFile );
+
+	if ( pFileCache->IsOldVersion() )
 	{
-		LoaderJob_t loaderJob;
-		loaderJob.m_pFilename = m_ShaderSymbolTable.String( pFileCache->m_Filename );
-		loaderJob.m_pPathID = "GAME";
-		loaderJob.m_pCallback = QueuedLoaderCallback;
-		loaderJob.m_pContext = (void *)&lookup;
-		loaderJob.m_pContext2 = (void *)pFileCache->IsOldVersion();
-		loaderJob.m_Priority = LOADERPRIORITY_DURINGPRELOAD;
-		loaderJob.m_nBytesToRead = nAlignedBytesToRead;
-		loaderJob.m_nStartOffset = nAlignedOffset;
-		g_pQueuedLoader->AddJob( &loaderJob );
+		bOK = CreateDynamicCombos_Ver4( &lookup, pOptimalBuffer );
 	}
 	else
 	{
-		//printf("\n CShaderManager::LoadAndCreateShaders - reading %d bytes from file offset %d", nAlignedBytesToRead, nAlignedOffset);
-		// single optimal read of all dynamic combos into monolithic buffer
-		uint8 *pOptimalBuffer = (uint8 *)g_pFullFileSystem->AllocOptimalReadBuffer( hFile, nAlignedBytesToRead, nAlignedOffset );
-		g_pFullFileSystem->Seek( hFile, nAlignedOffset, FILESYSTEM_SEEK_HEAD );
-		g_pFullFileSystem->Read( pOptimalBuffer, nAlignedBytesToRead, hFile );
-
-		if ( pFileCache->IsOldVersion() )
-		{
-			bOK = CreateDynamicCombos_Ver4( &lookup, pOptimalBuffer );
-		}
-		else
-		{
-			bOK = CreateDynamicCombos_Ver5( &lookup, pOptimalBuffer, debugLabel );
-		}
-
-		g_pFullFileSystem->FreeOptimalReadBuffer( pOptimalBuffer );
+		bOK = CreateDynamicCombos_Ver5( &lookup, pOptimalBuffer, debugLabel );
 	}
+
+	g_pFullFileSystem->FreeOptimalReadBuffer( pOptimalBuffer );
 
 	g_pFullFileSystem->Close( hFile );
 
@@ -3226,21 +3183,6 @@ void CShaderManager::SetVertexShader( VertexShader_t shader )
 		// compile it since we haven't already!
 		dxshader = CompileShader( m_ShaderSymbolTable.String( vshLookup.m_Name ), vshLookup.m_nStaticIndex, vshIndex, true );
 		Assert( dxshader != INVALID_HARDWARE_SHADER );
-
-		if( IsX360() )
-		{
-			//360 does not respond well at all to bad shaders or Error() calls. So we're staying here until we get something that compiles
-			while( dxshader == INVALID_HARDWARE_SHADER )
-			{
-				Warning( "A dynamically compiled vertex shader has failed to build. Pausing for 5 seconds and attempting rebuild.\n" );
-#ifdef _WIN32
-				Sleep( 5000 );
-#elif POSIX
-				usleep( 5000 );
-#endif
-				dxshader = CompileShader( m_ShaderSymbolTable.String( vshLookup.m_Name ), vshLookup.m_nStaticIndex, vshIndex, true );
-			}
-		}
 	}
 #else
 	if ( vshLookup.m_Flags & SHADER_FAILED_LOAD )
@@ -3329,21 +3271,6 @@ void CShaderManager::SetPixelShader( PixelShader_t shader )
 		// compile it since we haven't already!
 		dxshader = CompileShader( m_ShaderSymbolTable.String( pshLookup.m_Name ), pshLookup.m_nStaticIndex, pshIndex, false );
 //		Assert( dxshader != INVALID_HARDWARE_SHADER );
-
-		if( IsX360() )
-		{
-			//360 does not respond well at all to bad shaders or Error() calls. So we're staying here until we get something that compiles
-			while( dxshader == INVALID_HARDWARE_SHADER )
-			{
-				Warning( "A dynamically compiled pixel shader has failed to build. Pausing for 5 seconds and attempting rebuild.\n" );
-#ifdef _WIN32
-				Sleep( 5000 );
-#elif POSIX
-				usleep( 5000 );
-#endif
-				dxshader = CompileShader( m_ShaderSymbolTable.String( pshLookup.m_Name ), pshLookup.m_nStaticIndex, pshIndex, false );
-			}
-		}
 	}
 #else
 	if ( pshLookup.m_Flags & SHADER_FAILED_LOAD )

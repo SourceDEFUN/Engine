@@ -239,8 +239,6 @@ char const *CAudioSourceWave::GetFileName()
 //-----------------------------------------------------------------------------
 bool CAudioSourceWave::IsAsyncLoad()
 {
-	VPROF("CAudioSourceWave::IsAsyncLoad");
-
 	if ( !m_AudioCacheHandle.IsValid() )
 	{
 		m_AudioCacheHandle.Get( GetType(), m_pSfx->IsPrecachedSound(), m_pSfx, &m_nCachedDataSize );
@@ -1311,8 +1309,6 @@ void CAudioSourceMemWave::ParseDataChunk( IterateRIFF &walk )
 //-----------------------------------------------------------------------------
 int CAudioSourceMemWave::GetCacheStatus( void )
 {
-	VPROF("CAudioSourceMemWave::GetCacheStatus");
-
 	// NOTE: This will start the load if it isn't started
 	bool bCacheValid;
 	bool bCompleted = wavedatacache->IsDataLoadCompleted( m_hCache, &bCacheValid );
@@ -2406,8 +2402,6 @@ CAudioSourceCache::SearchPathCache *CAudioSourceCache::LookUpCacheEntry( const c
 //-----------------------------------------------------------------------------
 CAudioSourceCachedInfo *CAudioSourceCache::GetInfo( int audiosourcetype, bool soundisprecached, CSfxTable *sfx )
 {
-	VPROF("CAudioSourceCache::GetInfo");
-
 	Assert( sfx );
 
 	char fn[ 512 ];
@@ -2437,8 +2431,6 @@ CAudioSourceCachedInfo *CAudioSourceCache::GetInfo( int audiosourcetype, bool so
 
 void CAudioSourceCache::RebuildCacheEntry( int audiosourcetype, bool soundisprecached, CSfxTable *sfx )
 {
-	VPROF("CAudioSourceCache::RebuildCacheEntry");
-
 	Assert( sfx );
 
 	char fn[ 512 ];

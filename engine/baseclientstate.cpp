@@ -758,9 +758,6 @@ void CBaseClientState::Disconnect( const char *pszReason, bool bShowMainMenu )
 
 void CBaseClientState::RunFrame (void)
 {
-	VPROF("CBaseClientState::RunFrame");
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 	if ( (m_nSignonState > SIGNONSTATE_NEW) && m_NetChannel && g_GameEventManager.HasClientListenersChanged() )
 	{
 		// assemble a list of all events we listening to and tell the server
@@ -860,8 +857,6 @@ void CBaseClientState::CheckForResend (void)
 
 bool CBaseClientState::ProcessConnectionlessPacket( netpacket_t *packet )
 {
-	VPROF( "ProcessConnectionlessPacket" );
-
 	Assert( packet );
 
 	master->ProcessConnectionlessPacket( packet );
@@ -992,8 +987,6 @@ bool CBaseClientState::ProcessConnectionlessPacket( netpacket_t *packet )
 
 bool CBaseClientState::ProcessTick( NET_Tick *msg )
 {
-	VPROF( "ProcessTick" );
-
 	m_NetChannel->SetRemoteFramerate( msg->m_flHostFrameTime, msg->m_flHostFrameTimeStdDeviation );
 
 	// Note: CClientState separates the client and server clock states and drifts
@@ -1020,8 +1013,6 @@ void CBaseClientState::SendStringCmd(const char * command)
 
 bool CBaseClientState::ProcessStringCmd( NET_StringCmd *msg )
 {
-	VPROF( "ProcessStringCmd" );
-
 	// Don't restrict commands from the server in single player or if cl_restrict_stuffed_commands is 0.
 	if ( !m_bRestrictServerCommands || sv.IsActive() )
 	{
@@ -1045,8 +1036,6 @@ bool CBaseClientState::ProcessStringCmd( NET_StringCmd *msg )
 
 bool CBaseClientState::ProcessSetConVar( NET_SetConVar *msg )
 {
-	VPROF( "ProcessSetConVar" );
-
 	// Never process on local client, since the ConVar is directly linked here
 	if ( m_NetChannel->IsLoopback() )
 		return true;
@@ -1087,23 +1076,17 @@ bool CBaseClientState::ProcessSetConVar( NET_SetConVar *msg )
 
 bool CBaseClientState::ProcessSignonState( NET_SignonState *msg )
 {
-	VPROF( "ProcessSignonState" );
-
 	return SetSignonState( msg->m_nSignonState, msg->m_nSpawnCount ) ;	
 }
 
 bool CBaseClientState::ProcessPrint( SVC_Print *msg )
 {
-	VPROF( "ProcessPrint" );
-
 	ConMsg( "%s", msg->m_szText );
 	return true;
 }
 
 bool CBaseClientState::ProcessMenu( SVC_Menu *msg )
 {
-	VPROF( "ProcessMenu" );
-
 #if !defined(SWDS)
 	PluginHelpers_Menu( msg );	
 #endif
@@ -1112,8 +1095,6 @@ bool CBaseClientState::ProcessMenu( SVC_Menu *msg )
 
 bool CBaseClientState::ProcessServerInfo( SVC_ServerInfo *msg )
 {
-	VPROF( "ProcessServerInfo" );
-
 #ifndef SWDS
 	EngineVGui()->UpdateProgressBar(PROGRESS_PROCESSSERVERINFO);
 #endif
@@ -1246,8 +1227,6 @@ bool CBaseClientState::ProcessServerInfo( SVC_ServerInfo *msg )
 
 bool CBaseClientState::ProcessSendTable( SVC_SendTable *msg )
 {
-	VPROF( "ProcessSendTable" );
-
 	if ( !RecvTable_RecvClassInfos( &msg->m_DataIn, msg->m_bNeedsDecoder ) )
 	{
 		Host_EndGame(true, "ProcessSendTable: RecvTable_RecvClassInfos failed.\n" );
@@ -1259,8 +1238,6 @@ bool CBaseClientState::ProcessSendTable( SVC_SendTable *msg )
 
 bool CBaseClientState::ProcessClassInfo( SVC_ClassInfo *msg )
 {
-	VPROF( "ProcessClassInfo" );
-
 	COM_TimestampedLog( " CBaseClient::ProcessClassInfo" );
 
 	if ( msg->m_bCreateOnClient )
@@ -1312,16 +1289,12 @@ bool CBaseClientState::ProcessClassInfo( SVC_ClassInfo *msg )
 
 bool CBaseClientState::ProcessSetPause( SVC_SetPause *msg )
 {
-	VPROF( "ProcessSetPause" );
-
 	m_bPaused = msg->m_bPaused;
 	return true;
 }
 
 bool CBaseClientState::ProcessSetPauseTimed( SVC_SetPauseTimed *msg )
 {
-	VPROF( "ProcessSetPauseTimed" );
-
 	m_bPaused = msg->m_bPaused;
 	m_flPausedExpireTime = msg->m_flExpireTime;
 	return true;
@@ -1330,8 +1303,6 @@ bool CBaseClientState::ProcessSetPauseTimed( SVC_SetPauseTimed *msg )
 
 bool CBaseClientState::ProcessCreateStringTable( SVC_CreateStringTable *msg )
 {
-	VPROF( "ProcessCreateStringTable" );
-
 #ifndef SWDS
 	EngineVGui()->UpdateProgressBar(PROGRESS_PROCESSSTRINGTABLE);
 #endif
@@ -1410,8 +1381,6 @@ bool CBaseClientState::ProcessCreateStringTable( SVC_CreateStringTable *msg )
 
 bool CBaseClientState::ProcessUpdateStringTable( SVC_UpdateStringTable *msg )
 {
-	VPROF( "ProcessUpdateStringTable" );
-
 	int startbit = msg->m_DataIn.GetNumBitsRead();
 
 #ifndef SHARED_NET_STRING_TABLES
@@ -1441,16 +1410,12 @@ bool CBaseClientState::ProcessUpdateStringTable( SVC_UpdateStringTable *msg )
 
 bool CBaseClientState::ProcessSetView( SVC_SetView *msg )
 {
-	VPROF( "ProcessSetView" );
-
 	m_nViewEntity = msg->m_nEntityIndex;
 	return true;
 }
 
 bool CBaseClientState::ProcessPacketEntities( SVC_PacketEntities *msg )
 {
-	VPROF( "ProcessPacketEntities" );
-
 	// First update is the final signon stage where we actually receive an entity (i.e., the world at least)
 
 	if ( m_nSignonState < SIGNONSTATE_SPAWN )
@@ -1485,8 +1450,6 @@ bool CBaseClientState::ProcessPacketEntities( SVC_PacketEntities *msg )
 
 void CBaseClientState::ReadPacketEntities( CEntityReadInfo &u )
 {
-	VPROF( "ReadPacketEntities" );
-
 	// Loop until there are no more entities to read
 	
 	u.NextOldEntity();
@@ -1644,8 +1607,6 @@ void CBaseClientState::FreeEntityBaselines()
 
 void CBaseClientState::SetEntityBaseline(int iBaseline, ClientClass *pClientClass, int index, char *packedData, int length)
 {
-	VPROF( "CBaseClientState::SetEntityBaseline" );
-
 	Assert( index >= 0 && index < MAX_EDICTS );
 	Assert( pClientClass );
 	Assert( (iBaseline == 0) || (iBaseline == 1) );
@@ -1757,16 +1718,12 @@ bool CBaseClientState::GetClassBaseline( int iClass, void const **pData, int *pD
 
 bool CBaseClientState::ProcessGameEventList( SVC_GameEventList *msg )
 {
-	VPROF( "ProcessGameEventList" );
-
 	return g_GameEventManager.ParseEventList( msg );
 }
 
 
 bool CBaseClientState::ProcessGetCvarValue( SVC_GetCvarValue *msg )
 {
-	VPROF( "ProcessGetCvarValue" );
-
 	// Prepare the response.
 	CLC_RespondCvarValue returnMsg;
 	

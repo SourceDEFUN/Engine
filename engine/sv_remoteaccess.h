@@ -34,8 +34,6 @@ public:
 	// sends a message to all the watching admin UI's
 	void SendMessageToAdminUI( ra_listener_id listenerID, const char *message);
 
-	void SendVProfData( ra_listener_id listenerID, bool bGroupData, void *data, int len );
-
 	virtual ra_listener_id GetNextListenerID( bool authConnection, const netadr_t *adr = NULL );
 	virtual void RegisterAdminUIID( ra_listener_id listener ) { m_AdminUIID = listener; }
 

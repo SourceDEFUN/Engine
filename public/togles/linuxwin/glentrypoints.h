@@ -34,7 +34,7 @@
 #ifdef DX_TO_GL_ABSTRACTION
 
 #include "tier0/platform.h"
-#include "tier0/vprof_telemetry.h"
+
 #include "interface.h"
 #include "togles/rendermechanism.h"
 
@@ -362,10 +362,6 @@ inline void CGLExecuteHelperBase::StartCall(const char *pName)
 { 
 	(void)pName;
 
-#if GL_TELEMETRY_ZONES	
-	tmEnter( TELEMETRY_LEVEL3, TMZF_NONE, pName );
-#endif
-
 #if GL_TRACK_API_TIME
 	m_nStartTime = tmFastTime();
 #endif
@@ -391,10 +387,6 @@ inline void CGLExecuteHelperBase::StopCall(const char *pName)
 { 
 #if GL_TRACK_API_TIME
 	uint64 nTotalCycles = tmFastTime() - m_nStartTime;
-#endif
-
-#if GL_TELEMETRY_ZONES
-	tmLeave( TELEMETRY_LEVEL3 );
 #endif
 
 #if GL_TRACK_API_TIME	

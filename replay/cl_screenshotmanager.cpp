@@ -13,7 +13,7 @@
 #include "imageutils.h"
 #include "filesystem.h"
 #include "fmtstr.h"
-#include "vprof.h"
+
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -72,8 +72,6 @@ float CScreenshotManager::GetNextThinkTime() const
 
 void CScreenshotManager::Think()
 {
-	VPROF_BUDGET( "CScreenshotManager::Think", VPROF_BUDGETGROUP_REPLAY );
-
 	//
 	// NOTE:DoCaptureScreenshot() gets called from CReplaySystem::CL_Render()
 	//

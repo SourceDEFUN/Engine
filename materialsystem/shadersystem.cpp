@@ -23,7 +23,7 @@
 #include "tier1/convar.h"
 #include "tier1/KeyValues.h"
 #include "shader_dll_verify.h"
-#include "tier0/vprof.h"
+
 
 // NOTE: This must be the last file included!
 #include "tier0/memdbgon.h"
@@ -313,20 +313,15 @@ void CShaderSystem::LoadAllShaderDLLs( )
 	// Add the shaders to the dictionary of shaders...
 	SetupShaderDictionary( i );
 
-	// 360 has the the debug shaders in its dx9 dll
-	if ( IsPC() || !IsX360() )
-	{
-		// Always need the debug shaders
-		LoadShaderDLL( "stdshader_dbg" DLL_EXT_STRING );
-	}
+	// Always need the debug shaders
+	LoadShaderDLL( "stdshader_dbg" DLL_EXT_STRING );
 
 	// Load up standard shader DLLs...
 	int dxSupportLevel = HardwareConfig()->GetMaxDXSupportLevel();
 	Assert( dxSupportLevel >= 60 );
 	dxSupportLevel /= 10;
 
-	// 360 only supports its dx9 dll
-	int dxStart = IsX360() ? 9 : 6;
+	int dxStart = 6;
 	char buf[32];
 	for ( i = dxStart; i <= dxSupportLevel; ++i )
 	{
@@ -376,9 +371,6 @@ const char *COM_GetModDirectory()
 
 void CShaderSystem::LoadModShaderDLLs( int dxSupportLevel )
 {
-	if ( IsX360() )
-		return;
-
 	// Don't do this for Valve mods. They don't need them, and attempting to load them is an opportunity for cheaters to get their code into the process
 	const char *pGameDir = COM_GetModDirectory();
 	if ( !Q_stricmp( pGameDir, "hl2" ) || !Q_stricmp( pGameDir, "cstrike" ) || !Q_stricmp( pGameDir, "cstrike_beta" ) ||
@@ -936,14 +928,9 @@ void CShaderSystem::PrepForShaderDraw( IShader *pShader,
 {
 	Assert( !m_pRenderState );
 
-	// 360 runs the console remotely, spew cannot cause the matsys to be reentrant
-	// 360 sidesteps the other negative affect that *all* buffered spew redirects as warning text
-	if ( IsPC() || !IsX360() )
-	{
-		Assert( !m_SaveSpewOutput );
-		m_SaveSpewOutput = GetSpewOutputFunc();
-		SpewOutputFunc( MySpewOutputFunc );
-	}
+	Assert( !m_SaveSpewOutput );
+	m_SaveSpewOutput = GetSpewOutputFunc();
+	SpewOutputFunc( MySpewOutputFunc );
 
 	m_pRenderState = pRenderState;
 	m_nModulation = nModulation;
@@ -952,12 +939,9 @@ void CShaderSystem::PrepForShaderDraw( IShader *pShader,
 
 void CShaderSystem::DoneWithShaderDraw()
 {
-	if ( IsPC() || !IsX360() )
-	{
-		SpewOutputFunc( m_SaveSpewOutput );
-		PrintBufferedSpew();
-		m_SaveSpewOutput = NULL;
-	}
+	SpewOutputFunc( m_SaveSpewOutput );
+	PrintBufferedSpew();
+	m_SaveSpewOutput = NULL;
 
 	m_pRenderState = NULL;
 }
@@ -1560,8 +1544,6 @@ void CShaderSystem::DrawElements( IShader *pShader, IMaterialVar **params,
 								  VertexCompressionType_t vertexCompression, 
 								  uint32 nMaterialVarChangeTimeStamp )
 {
-	VPROF("CShaderSystem::DrawElements");
-
 	g_pShaderAPI->InvalidateDelayedShaderConstants();
 	// Compute modulation...
 	int mod = pShader->ComputeModulationFlags( params, g_pShaderAPI );

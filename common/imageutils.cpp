@@ -1581,7 +1581,6 @@ static void DoDeleteFile( const char *filename )
 
 ConversionErrorType	ImgUtl_ConvertToVTFAndDumpVMT( const char *pInPath, const char *pMaterialsSubDir, int nMaxWidth/*=-1*/, int nMaxHeight/*=-1*/ )
 {
-#ifndef _XBOX
 	if ((pInPath == NULL) || (pInPath[0] == 0))
 	{
 		return CE_ERROR_PARSING_SOURCE;
@@ -1815,7 +1814,6 @@ ConversionErrorType	ImgUtl_ConvertToVTFAndDumpVMT( const char *pInPath, const ch
 	}
 
 	return nErrorCode;
-#endif
 }
 
 ConversionErrorType ImgUtl_WriteGenericVMT( const char *vtfPath, const char *pMaterialsSubDir )

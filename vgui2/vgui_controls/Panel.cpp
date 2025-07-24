@@ -42,7 +42,7 @@
 #include "tier0/icommandline.h"
 #include "tier0/minidump.h"
 
-#include "tier0/vprof.h"
+
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
@@ -933,7 +933,6 @@ int Panel::GetYPos()
 //-----------------------------------------------------------------------------
 void Panel::SetSize(int wide, int tall)
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - %s", __FUNCTION__, GetName() );
 	Assert( abs(wide) < 32768 && abs(tall) < 32768 );
 	ipanel()->SetSize(GetVPanel(), wide, tall);
 }
@@ -1115,8 +1114,6 @@ void Panel::Think()
 
 void Panel::OnChildSettingsApplied( KeyValues *pInResourceData, Panel *pChild  )
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - %s", __FUNCTION__, GetName() );
-
 	Panel* pParent = GetParent();
 	if( pParent )
 	{
@@ -1141,14 +1138,6 @@ void Panel::PaintTraverse( bool repaint, bool allowForce )
 
 	float oldAlphaMultiplier = surface()->DrawGetAlphaMultiplier();
 	float newAlphaMultiplier = oldAlphaMultiplier * m_flAlpha * 1.0f/255.0f;
-
-	if ( IsXbox() && !newAlphaMultiplier )
-	{
-		// xbox optimization not suitable for pc
-		// xbox panels are compliant and can early out and not traverse their children
-		// when they have no opacity
-		return;
-	}
 
 	if ( !repaint &&
 		 allowForce &&
@@ -1587,8 +1576,6 @@ int Panel::FindChildIndexByName(const char *childName)
 //-----------------------------------------------------------------------------
 Panel *Panel::FindChildByName(const char *childName, bool recurseDown)
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - %s finding %s", __FUNCTION__, GetName(), childName );
-
 	auto idx = m_dictChidlren.Find( childName );
 	if ( idx != m_dictChidlren.InvalidIndex() )
 	{
@@ -3159,7 +3146,7 @@ void Panel::OnKeyCodeTyped(KeyCode keycode)
 	vgui::KeyCode code = GetBaseButtonCode( keycode );
 
 	// handle focus change
-	if ( IsX360() || IsConsoleStylePanel() )
+	if ( IsConsoleStylePanel() )
 	{
 		// eat these typed codes, will get handled in OnKeyCodePressed
 		switch ( code )
@@ -3565,7 +3552,7 @@ void Panel::RequestFocus(int direction)
 {
 	// NOTE: This doesn't make any sense if we don't have keyboard input enabled
 	// NOTE: Well, maybe it does if you have a steam controller...
-	// Assert( ( IsX360() || IsConsoleStylePanel() ) || IsKeyBoardInputEnabled() );
+	// Assert( ( IsConsoleStylePanel() ) || IsKeyBoardInputEnabled() );
 	//	ivgui()->DPrintf2("RequestFocus(%s, %s)\n", GetName(), GetClassName());
 	OnRequestFocus(GetVPanel(), NULL);
 }
@@ -3706,7 +3693,6 @@ void Panel::PostActionSignal( KeyValues *message )
 
 void Panel::SetBorder(IBorder *border)
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - %s", __FUNCTION__, GetName() );
 	_border = border;
 
 	if (border)
@@ -4141,7 +4127,6 @@ void Panel::PerformApplySchemeSettings()
 
 	if ( _flags.IsFlagSet( NEEDS_SCHEME_UPDATE ) )
 	{
-		VPROF( "ApplySchemeSettings" );
 		IScheme *pScheme = scheme()->GetIScheme( GetScheme() );
 		AssertOnce( pScheme );
 		if ( pScheme ) // this should NEVER be null, but if it is bad things would happen in ApplySchemeSettings...
@@ -4165,8 +4150,6 @@ static Panel *lastWarningParent = 0;
 
 void Panel::ApplyAutoResizeSettings(KeyValues *inResourceData)
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - %s", __FUNCTION__, GetName() );
-
 	int x, y;
 	GetPos(x, y);
 
@@ -4297,8 +4280,6 @@ Panel::PinCorner_e GetPinCornerFromString( const char* pszCornerName )
 //-----------------------------------------------------------------------------
 void Panel::ApplySettings(KeyValues *inResourceData)
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - %s", __FUNCTION__, GetName() );
-
 	// First restore to default values
 	if ( _flags.IsFlagSet( NEEDS_DEFAULT_SETTINGS_APPLIED ) )
 	{
@@ -4382,7 +4363,7 @@ void Panel::ApplySettings(KeyValues *inResourceData)
 	excludeEdgeFromTitleSafe.width = 0;
 	excludeEdgeFromTitleSafe.height = 0;
 
-	if ( IsX360() || panel_test_title_safe.GetBool() )
+	if ( panel_test_title_safe.GetBool() )
 	{
 		// "usetitlesafe" "1" - required inner 90%
 		// "usetitlesafe" "2" - suggested inner 85%
@@ -4569,7 +4550,6 @@ void Panel::ApplySettings(KeyValues *inResourceData)
 		SetName(newName);
 	}
 
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - %s: Action signal", __FUNCTION__, GetName() );
 	// Automatically add an action signal target if one is specified.  This allows for
 	// nested child buttons to add their distant parents as action signal targets.
 	int nActionSignalLevel = inResourceData->GetInt( "actionsignallevel", -1 );
@@ -4600,14 +4580,12 @@ void Panel::ApplySettings(KeyValues *inResourceData)
 	// HPE_END
 	//=============================================================================
 
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - %s: Pin Sibling", __FUNCTION__, GetName() );
 	const char *pszSiblingName = inResourceData->GetString("pin_to_sibling", NULL);
 	PinCorner_e pinOurCornerToSibling = GetPinCornerFromString( inResourceData->GetString( "pin_corner_to_sibling", NULL ) );
 	PinCorner_e pinSiblingCorner = GetPinCornerFromString( inResourceData->GetString( "pin_to_sibling_corner", NULL ) );
 	PinToSibling( pszSiblingName, pinOurCornerToSibling, pinSiblingCorner );
 
 
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - %s: Color overrides", __FUNCTION__, GetName() );
 	// Allow overriding of colors. Used mostly by HUD elements, where scheme color usage is often undesired.
 	IScheme *pScheme = vgui::scheme()->GetIScheme( GetScheme() );
 	for ( int i = 0; i < m_OverridableColorEntries.Count(); i++ )
@@ -4638,7 +4616,6 @@ void Panel::ApplySettings(KeyValues *inResourceData)
 		}
 	}
 
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - %s: Keyboard enabled", __FUNCTION__, GetName() );
 	const char *pKeyboardInputEnabled = inResourceData->GetString( "keyboardinputenabled", NULL );
 	if ( pKeyboardInputEnabled && pKeyboardInputEnabled[0] )
 	{
@@ -5508,11 +5485,11 @@ void Panel::PreparePanelMap( PanelMap_t *panelMap )
 void Panel::OnDelete()
 {
 #ifdef WIN32
-	Assert( IsX360() || ( IsPC() && _heapchk() == _HEAPOK ) );
+	Assert( IsPC() && _heapchk() == _HEAPOK );
 #endif
 	delete this;
 #ifdef WIN32
-	Assert( IsX360() || ( IsPC() && _heapchk() == _HEAPOK ) );
+	Assert( IsPC() && _heapchk() == _HEAPOK );
 #endif
 }
 
@@ -6305,8 +6282,6 @@ PanelAnimationMapEntry *Panel::FindPanelAnimationEntry( char const *scriptname, 
 // Recursively invoke settings for PanelAnimationVars
 void Panel::InternalApplySettings( PanelAnimationMap *map, KeyValues *inResourceData)
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - %s", __FUNCTION__, GetName() );
-
 	// Loop through keys
 	KeyValues *kv;
 	
@@ -7823,11 +7798,6 @@ Panel* Panel::NavigateBack()
 //-----------------------------------------------------------------------------
 void Panel::NavigateTo()
 {
-	if ( IsX360() )
-	{
-		RequestFocus( 0 );
-	}
-
 	CallParentFunction( new KeyValues( "OnNavigateTo", "panelName", GetName() ) );
 
 	Panel *target = GetNavToRelay();

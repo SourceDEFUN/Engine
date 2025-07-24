@@ -43,7 +43,7 @@
 
 #include "in_buttons.h"
 #include "engine/IEngineSound.h"
-#include "tier0/vprof.h"
+
 #include "SoundEmitterSystem/isoundemittersystembase.h"
 #include "decals.h"
 #include "obstacle_pushaway.h"
@@ -230,8 +230,6 @@ bool CBasePlayer::UsingStandardWeaponsInVehicle( void )
 //-----------------------------------------------------------------------------
 void CBasePlayer::ItemPostFrame()
 {
-	VPROF( "CBasePlayer::ItemPostFrame" );
-
 	// Put viewmodels into basically correct place based on new player origin
 	CalcViewModelView( EyePosition(), EyeAngles() );
 

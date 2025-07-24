@@ -18,7 +18,7 @@
 #include "tier1/KeyValues.h"
 #include "view_scene.h"
 #include "viewrender.h"
-#include "vprof.h"
+
 
 CLIENTEFFECT_REGISTER_BEGIN( PrecachePortalDrawingMaterials )
 CLIENTEFFECT_MATERIAL( "shadertest/wireframe" )
@@ -452,8 +452,6 @@ void CPortalRender::EnteredPortal( CPortalRenderable *pEnteredPortal )
    
 bool CPortalRender::DrawPortalsUsingStencils( CViewRender *pViewRender )
 {	  
-	VPROF( "CPortalRender::DrawPortalsUsingStencils" );
-
 	if( !ShouldUseStencilsToRenderPortals() )
 		return false;
 

@@ -82,8 +82,6 @@ bool CAI_LocalNavigator::HaveObstacles()
 
 bool CAI_LocalNavigator::MoveCalcDirect( AILocalMoveGoal_t *pMoveGoal, bool bOnlyCurThink, float *pDistClear, AIMoveResult_t *pResult )
 {
-	AI_PROFILE_SCOPE(CAI_LocalNavigator_MoveCalcDirect);
-
 	bool bRetVal = false;
 	
 	if ( pMoveGoal->speed )
@@ -257,7 +255,6 @@ bool CAI_LocalNavigator::MoveCalcSteer( AILocalMoveGoal_t *pMoveGoal, float dist
 	if ( GetOuter()->IsFlaggedEfficient() )
 		return false;
 
-	AI_PROFILE_SCOPE(CAI_Motor_MoveCalcSteer);
 	Vector moveSolution;
 	if ( m_pPlaneSolver->Solve( *pMoveGoal, distClear, &moveSolution ) )
 	{
@@ -321,7 +318,6 @@ bool CAI_LocalNavigator::MoveCalcStop( AILocalMoveGoal_t *pMoveGoal, float distC
 
 AIMoveResult_t CAI_LocalNavigator::MoveCalcRaw( AILocalMoveGoal_t *pMoveGoal, bool bOnlyCurThink )
 {
-	AI_PROFILE_SCOPE(CAI_Motor_MoveCalc);
 	
 	AIMoveResult_t result = AIMR_OK; // Assume success
 	AIMoveTrace_t  directTrace;

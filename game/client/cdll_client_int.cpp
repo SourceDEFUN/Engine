@@ -44,7 +44,7 @@
 #include "engine/ivdebugoverlay.h"
 #include "vguicenterprint.h"
 #include "iviewrender_beams.h"
-#include "tier0/vprof.h"
+
 #include "engine/IEngineTrace.h"
 #include "engine/ivmodelinfo.h"
 #include "physics.h"
@@ -923,14 +923,8 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 		return false;
 	if ( (scenefilecache = (ISceneFileCache *)appSystemFactory( SCENE_FILE_CACHE_INTERFACE_VERSION, NULL )) == NULL )
 		return false;
-	if ( IsX360() && (xboxsystem = (IXboxSystem *)appSystemFactory( XBOXSYSTEM_INTERFACE_VERSION, NULL )) == NULL )
-		return false;
-	if ( IsX360() && (matchmaking = (IMatchmaking *)appSystemFactory( VENGINE_MATCHMAKING_VERSION, NULL )) == NULL )
-		return false;
-#ifndef _XBOX
 	if ( ( gamestatsuploader = (IUploadGameStats *)appSystemFactory( INTERFACEVERSION_UPLOADGAMESTATS, NULL )) == NULL )
 		return false;
-#endif
 
 #if defined( REPLAY_ENABLED )
 	if ( IsPC() && (g_pEngineReplay = (IEngineReplay *)appSystemFactory( ENGINE_REPLAY_INTERFACE_VERSION, NULL )) == NULL )
@@ -1490,8 +1484,6 @@ void CHLClient::DecodeUserCmdFromBuffer( bf_read& buf, int slot )
 //-----------------------------------------------------------------------------
 void CHLClient::View_Render( vrect_t *rect )
 {
-	VPROF( "View_Render" );
-
 	// UNDONE: This gets hit at startup sometimes, investigate - will cause NaNs in calcs inside Render()
 	if ( rect->width == 0 || rect->height == 0 )
 		return;
@@ -1963,14 +1955,11 @@ bool CHLClient::DispatchUserMessage( int msg_type, bf_read &msg_data )
 
 void SimulateEntities()
 {
-	VPROF_BUDGET("Client SimulateEntities", VPROF_BUDGETGROUP_CLIENT_SIM);
-
 	// Service timer events (think functions).
   	ClientThinkList()->PerformThinkFunctions();
 
 	// TODO: make an ISimulateable interface so C_BaseNetworkables can simulate?
 	{
-		VPROF_("C_BaseEntity::Simulate", 1, VPROF_BUDGETGROUP_CLIENT_SIM, false, BUDGETFLAG_CLIENT);
 		C_BaseEntityIterator iterator;
 		C_BaseEntity *pEnt;
 		while ( (pEnt = iterator.Next()) != NULL )
@@ -1983,8 +1972,6 @@ void SimulateEntities()
 
 bool AddDataChangeEvent( IClientNetworkable *ent, DataUpdateType_t updateType, int *pStoredEvent )
 {
-	VPROF( "AddDataChangeEvent" );
-
 	Assert( ent );
 	// Make sure we don't already have an event queued for this guy.
 	if ( *pStoredEvent >= 0 )
@@ -2014,7 +2001,6 @@ void ClearDataChangedEvent( int iStoredEvent )
 
 void ProcessOnDataChangedEvents()
 {
-	VPROF_("ProcessOnDataChangedEvents", 1, VPROF_BUDGETGROUP_CLIENT_SIM, false, BUDGETFLAG_CLIENT);
 	FOR_EACH_LL( g_DataChangedEvents, i )
 	{
 		CDataChangedEvent *pEvent = &g_DataChangedEvents[i];
@@ -2100,7 +2086,6 @@ void UpdatePVSNotifiers()
 
 void OnRenderStart()
 {
-	VPROF( "OnRenderStart" );
 	MDLCACHE_CRITICAL_SECTION();
 	MDLCACHE_COARSE_LOCK();
 
@@ -2120,8 +2105,6 @@ void OnRenderStart()
 	}
 
 	{
-		// vprof node for this bloc of math
-		VPROF( "OnRenderStart: dirty bone caches");
 		// Invalidate any bone information.
 		C_BaseAnimating::InvalidateBoneCaches();
 
@@ -2173,7 +2156,6 @@ void OnRenderStart()
 	C_BaseAnimating::ThreadedBoneSetup();
 
 	{
-		VPROF_("Client TempEnts", 0, VPROF_BUDGETGROUP_CLIENT_SIM, false, BUDGETFLAG_CLIENT);
 		// This creates things like temp entities.
 		engine->FireEvents();
 
@@ -2193,7 +2175,6 @@ void OnRenderStart()
 		// Enable FP exceptions here when FP_EXCEPTIONS_ENABLED is defined,
 		// to help track down bad math.
 		FPExceptionEnabler enableExceptions;
-		VPROF_BUDGET( "ParticleMgr()->Simulate", VPROF_BUDGETGROUP_PARTICLE_SIMULATION );
 		ParticleMgr()->Simulate( gpGlobals->frametime );
 	}
 
@@ -2241,8 +2222,6 @@ void CHLClient::FrameStageNotify( ClientFrameStage_t curStage )
 
 	case FRAME_RENDER_START:
 		{
-			VPROF( "CHLClient::FrameStageNotify FRAME_RENDER_START" );
-
 			// Last thing before rendering, run simulation.
 			OnRenderStart();
 		}
@@ -2250,7 +2229,6 @@ void CHLClient::FrameStageNotify( ClientFrameStage_t curStage )
 		
 	case FRAME_RENDER_END:
 		{
-			VPROF( "CHLClient::FrameStageNotify FRAME_RENDER_END" );
 			OnRenderEnd();
 
 			PREDICTION_SPEWVALUECHANGES();
@@ -2259,7 +2237,6 @@ void CHLClient::FrameStageNotify( ClientFrameStage_t curStage )
 		
 	case FRAME_NET_UPDATE_START:
 		{
-			VPROF( "CHLClient::FrameStageNotify FRAME_NET_UPDATE_START" );
 			// disabled all recomputations while we update entities
 			C_BaseEntity::EnableAbsRecomputations( false );
 			C_BaseEntity::SetAbsQueriesValid( false );
@@ -2283,13 +2260,11 @@ void CHLClient::FrameStageNotify( ClientFrameStage_t curStage )
 		break;
 	case FRAME_NET_UPDATE_POSTDATAUPDATE_START:
 		{
-			VPROF( "CHLClient::FrameStageNotify FRAME_NET_UPDATE_POSTDATAUPDATE_START" );
 			PREDICTION_STARTTRACKVALUE( "postdataupdate" );
 		}
 		break;
 	case FRAME_NET_UPDATE_POSTDATAUPDATE_END:
 		{
-			VPROF( "CHLClient::FrameStageNotify FRAME_NET_UPDATE_POSTDATAUPDATE_END" );
 			PREDICTION_ENDTRACKVALUE();
 			// Let prediction copy off pristine data
 			prediction->PostEntityPacketReceived();
@@ -2489,7 +2464,6 @@ void CHLClient::WriteSaveGameScreenshotOfSize( const char *pFilename, int width,
 // See RenderViewInfo_t
 void CHLClient::RenderView( const CViewSetup &setup, int nClearFlags, int whatToDraw )
 {
-	VPROF("RenderView");
 	view->RenderView( setup, nClearFlags, whatToDraw );
 }
 

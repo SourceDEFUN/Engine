@@ -253,7 +253,7 @@ BEGIN_VS_SHADER( DecalBaseTimesLightmapAlphaBlendSelfIllum_DX9, "" )
 	SHADER_DRAW
 	{
 		bool bUsingFlashlight = UsingFlashlight( params );
-		if ( bUsingFlashlight && ( IsX360() || r_flashlight_version2.GetInt() ) )
+		if ( bUsingFlashlight && ( r_flashlight_version2.GetInt() ) )
 		{
 			DrawPass( params, pShaderAPI, pShaderShadow, false );
 			if ( pShaderShadow )

@@ -19,7 +19,7 @@
 #include "engine/IEngineSound.h"
 #include "engine/IEngineTrace.h"
 #include "engine/ivmodelinfo.h"
-#include "tier0/vprof.h"
+
 #include "fx_line.h"
 #include "interface.h"
 #include "materialsystem/imaterialsystem.h"
@@ -807,8 +807,6 @@ void C_BaseEntity::Interp_SetupMappings( VarMapping_t *map )
 
 void C_BaseEntity::Interp_RestoreToLastNetworked( VarMapping_t *map )
 {
-	VPROF( "C_BaseEntity::Interp_RestoreToLastNetworked" );
-
 	PREDICTION_TRACKVALUECHANGESCOPE_ENTITY( this, "restoretolastnetworked" );
 
 	Vector oldOrigin = GetLocalOrigin();
@@ -1935,7 +1933,6 @@ float *C_BaseEntity::GetRenderClipPlane( void )
 //-----------------------------------------------------------------------------
 int C_BaseEntity::DrawBrushModel( bool bDrawingTranslucency, int nFlags, bool bTwoPass )
 {
-	VPROF_BUDGET( "C_BaseEntity::DrawBrushModel", VPROF_BUDGETGROUP_BRUSHMODEL_RENDERING );
 	// Identity brushes are drawn in view->DrawWorld as an optimization
 	Assert ( modelinfo->GetModelType( model ) == mod_brush );
 
@@ -2125,8 +2122,6 @@ void C_BaseEntity::MarkMessageReceived()
 //-----------------------------------------------------------------------------
 void C_BaseEntity::PreDataUpdate( DataUpdateType_t updateType )
 {
-	VPROF( "C_BaseEntity::PreDataUpdate" );
-
 	// Register for an OnDataChanged call and call OnPreDataChanged().
 	if ( AddDataChangeEvent( this, updateType, &m_DataChangeEventRef ) )
 	{
@@ -2284,7 +2279,6 @@ void C_BaseEntity::MarkAimEntsDirty()
 
 void C_BaseEntity::CalcAimEntPositions()
 {
-	VPROF("CalcAimEntPositions");
 	int i;
 	int c = g_AimEntsList.Count();
 	for ( i = 0; i < c; ++i )
@@ -2873,8 +2867,6 @@ void C_BaseEntity::BaseInterpolatePart2( Vector &oldOrigin, QAngle &oldAngles, V
 //-----------------------------------------------------------------------------
 bool C_BaseEntity::Interpolate( float currentTime )
 {
-	VPROF( "C_BaseEntity::Interpolate" );
-
 	Vector oldOrigin;
 	QAngle oldAngles;
 	Vector oldVel;
@@ -3178,8 +3170,6 @@ static ConVar cl_interpolate( "cl_interpolate", "1.0f", FCVAR_USERINFO | FCVAR_D
 // (static function)
 void C_BaseEntity::InterpolateServerEntities()
 {
-	VPROF_BUDGET( "C_BaseEntity::InterpolateServerEntities", VPROF_BUDGETGROUP_INTERPOLATION );
-
 	s_bInterpolate = cl_interpolate.GetBool();
 
 	// Don't interpolate during timedemo playback
@@ -3229,8 +3219,6 @@ void C_BaseEntity::InterpolateServerEntities()
 void C_BaseEntity::AddVisibleEntities()
 {
 #if !defined( NO_ENTITY_PREDICTION )
-	VPROF_BUDGET( "C_BaseEntity::AddVisibleEntities", VPROF_BUDGETGROUP_WORLD_RENDERING );
-
 	// Let non-dormant client created predictables get added, too
 	int c = predictables->GetPredictableCount();
 	for ( int i = 0 ; i < c ; i++ )
@@ -5679,8 +5667,6 @@ RenderGroup_t C_BaseEntity::GetRenderGroup()
 int C_BaseEntity::SaveData( const char *context, int slot, int type )
 {
 #if !defined( NO_ENTITY_PREDICTION )
-	VPROF( "C_BaseEntity::SaveData" );
-
 	void *dest = ( slot == SLOT_ORIGINALDATA ) ? GetOriginalNetworkDataObject() : GetPredictedFrame( slot );
 	Assert( dest );
 
@@ -5728,8 +5714,6 @@ int C_BaseEntity::SaveData( const char *context, int slot, int type )
 int C_BaseEntity::RestoreData( const char *context, int slot, int type )
 {
 #if !defined( NO_ENTITY_PREDICTION )
-	VPROF( "C_BaseEntity::RestoreData" );
-
 	const void *src = ( slot == SLOT_ORIGINALDATA ) ? GetOriginalNetworkDataObject() : GetPredictedFrame( slot );
 	Assert( src );
 
@@ -6159,10 +6143,7 @@ bool C_BaseEntity::HasRecordedThisFrame() const
 void C_BaseEntity::GetToolRecordingState( KeyValues *msg )
 {
 	Assert( ToolsEnabled() );
-	if ( !ToolsEnabled() )
-		return;
-
-	VPROF_BUDGET( "C_BaseEntity::GetToolRecordingState", VPROF_BUDGETGROUP_TOOLS );
+	if ( !ToolsEnabled() ) return;
 
 	C_BaseEntity *pOwner = m_hOwnerEntity;
 
@@ -6225,10 +6206,7 @@ void C_BaseEntity::RecordToolMessage()
 // (static function)
 void C_BaseEntity::ToolRecordEntities()
 {
-	VPROF_BUDGET( "C_BaseEntity::ToolRecordEnties", VPROF_BUDGETGROUP_TOOLS );
-
-	if ( !ToolsEnabled() || !clienttools->IsInRecordingMode() )
-		return;
+	if ( !ToolsEnabled() || !clienttools->IsInRecordingMode() ) return;
 
 	// Let non-dormant client created predictables get added, too
 	int c = recordinglist->Count();

@@ -17,7 +17,7 @@
 #include "materialsystem/imaterial.h"
 #include "tier2/tier2.h"
 #include "materialsystem/imaterialsystemhardwareconfig.h"
-#include "tier0/vprof.h"
+
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -263,9 +263,6 @@ void MakeSkyVec( float s, float t, int axis, float zFar, Vector& position, Vecto
 //-----------------------------------------------------------------------------
 void R_DrawSkyBox( float zFar, int nDrawFlags /*= 0x3F*/  )
 {
-	VPROF("R_DrawSkyBox");
-	tmZoneFiltered( TELEMETRY_LEVEL0, 50, TMZF_NONE, "%s %x", __FUNCTION__, nDrawFlags );
-
 	int		i;
 	Vector	normal;
 

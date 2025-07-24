@@ -15,7 +15,7 @@
 #include "clientsideeffects.h"
 
 #include "SoundEmitterSystem/isoundemittersystembase.h"
-#include "tier0/vprof.h"
+
 #include "collisionutils.h"
 #include "clienteffectprecachesystem.h"
 
@@ -141,7 +141,6 @@ FX_PlayerTracer
 
 void FX_PlayerTracer( Vector& start, Vector& end )
 {
-	VPROF_BUDGET( "FX_PlayerTracer", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
 	Vector	shotDir, dStart, dEnd;
 	float	length;
 
@@ -291,7 +290,6 @@ void FX_TracerSound( const Vector &start, const Vector &end, int iTracerType )
 
 void FX_Tracer( Vector& start, Vector& end, int velocity, bool makeWhiz )
 {
-	VPROF_BUDGET( "FX_Tracer", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
 	//Don't make small tracers
 	float dist;
 	Vector dir;

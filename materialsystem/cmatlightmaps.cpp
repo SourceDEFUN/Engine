@@ -585,7 +585,6 @@ void CMatLightmaps::RestoreLightmapPages()
 //-----------------------------------------------------------------------------
 void CMatLightmaps::InitLightmapBits( int lightmap )
 {
-	VPROF_( "CMatLightmaps::InitLightmapBits", 1, VPROF_BUDGETGROUP_DLIGHT_RENDERING, false, 0 );
 	int width = GetLightmapWidth(lightmap);
 	int height = GetLightmapHeight(lightmap);
 
@@ -649,7 +648,6 @@ void CMatLightmaps::InitLightmapBits( int lightmap )
 bool CMatLightmaps::LockLightmap( int lightmap )
 {
 //	Warning( "locking lightmap page: %d\n", lightmap );
-	VPROF_INCREMENT_COUNTER( "lightmap fullpage texlock", 1 );
 	if( m_nLockedLightmap != -1 )
 	{
 		g_pShaderAPI->TexUnlock();
@@ -764,13 +762,6 @@ void CMatLightmaps::BumpedLightmapBitsToPixelWriter_LDR( float* pFloatImage, flo
 void CMatLightmaps::BumpedLightmapBitsToPixelWriter_HDRF( float* pFloatImage, float *pFloatImageBump1, float *pFloatImageBump2, 
 												 float *pFloatImageBump3, int pLightmapSize[2], int pOffsetIntoLightmapPage[2], FloatBitMap_t *pfmOut )
 {
-	if ( IsX360() )
-	{
-		// 360 does not support HDR float mode 
-		Assert( 0 );
-		return;
-	}
-
 	Assert( !pfmOut );		// unsupported in this mode
 
 	const int nLightmapSize0 = pLightmapSize[0];
@@ -814,66 +805,39 @@ void CMatLightmaps::BumpedLightmapBitsToPixelWriter_HDRI( float* RESTRICT pFloat
 
 	if( m_LightmapPixelWriter.IsUsingFloatFormat() )
 	{
-		AssertMsg(!IsX360(), "Tried to use a floating-point pixel format for lightmaps on 360, which is not supported.");
-		if (!IsX360())
+		for( int t = 0; t < pLightmapSize[1]; t++ )
 		{
-			for( int t = 0; t < pLightmapSize[1]; t++ )
+			int srcTexelOffset = ( sizeof( Vector4D ) / sizeof( float ) ) * ( 0 + t * nLightmapSize0 );
+			m_LightmapPixelWriter.Seek( pOffsetIntoLightmapPage[0], pOffsetIntoLightmapPage[1] + t );
+
+			for( int s = 0; 
+				s < nLightmapSize0; 
+				s++, m_LightmapPixelWriter.SkipBytes(nRewindToNextPixel),srcTexelOffset += (sizeof(Vector4D)/sizeof(float)))
 			{
-				int srcTexelOffset = ( sizeof( Vector4D ) / sizeof( float ) ) * ( 0 + t * nLightmapSize0 );
-				m_LightmapPixelWriter.Seek( pOffsetIntoLightmapPage[0], pOffsetIntoLightmapPage[1] + t );
+				unsigned short color[4][4];
 
-				for( int s = 0; 
-					s < nLightmapSize0; 
-					s++, m_LightmapPixelWriter.SkipBytes(nRewindToNextPixel),srcTexelOffset += (sizeof(Vector4D)/sizeof(float)))
-				{
-					unsigned short color[4][4];
+				ColorSpace::LinearToBumpedLightmap( &pFloatImage[srcTexelOffset],
+					&pFloatImageBump1[srcTexelOffset], &pFloatImageBump2[srcTexelOffset],
+					&pFloatImageBump3[srcTexelOffset],
+					color[0], color[1], color[2], color[3] );
+				float alpha = pFloatImage[srcTexelOffset+3];
+				Assert( alpha >= 0.0f && alpha <= 1.0f );
+				color[0][3] = color[1][3] = color[2][3] = color[3][3] = alpha;
 
-					ColorSpace::LinearToBumpedLightmap( &pFloatImage[srcTexelOffset],
-						&pFloatImageBump1[srcTexelOffset], &pFloatImageBump2[srcTexelOffset],
-						&pFloatImageBump3[srcTexelOffset],
-						color[0], color[1], color[2], color[3] );
-					float alpha = pFloatImage[srcTexelOffset+3];
-					Assert( alpha >= 0.0f && alpha <= 1.0f );
-					color[0][3] = color[1][3] = color[2][3] = color[3][3] = alpha;
+				float toFloat = ( 1.0f / ( float )( 1 << 16 ) );
 
-					float toFloat = ( 1.0f / ( float )( 1 << 16 ) );
+				m_LightmapPixelWriter.WritePixelNoAdvanceF( toFloat * color[0][0], toFloat * color[0][1], toFloat * color[0][2], toFloat * color[0][3] );
 
-					/* // This code is now a can't-happen, because we do not allow float formats on 360.
-#if ( defined( USE_32BIT_LIGHTMAPS_ON_360 ) )
-					if( IsX360() )
-					{
-						for( int i = 0; i != 4; ++i )
-						{
-							Vector4D vRGBScale;
+				m_LightmapPixelWriter.SkipBytes( nLightmap0WriterSizeBytes );
+				m_LightmapPixelWriter.WritePixelNoAdvanceF( toFloat * color[1][0], toFloat * color[1][1], toFloat * color[1][2], toFloat * color[1][3] );
 
-							vRGBScale.x = color[i][0] * (16.0f / 65535.0f);
-							vRGBScale.y = color[i][1] * (16.0f / 65535.0f);
-							vRGBScale.z = color[i][2] * (16.0f / 65535.0f);
-							vRGBScale = ConvertLightmapColorToRGBScale( &vRGBScale.x );
-							color[i][0] = RoundFloatToByte( vRGBScale.x * 255.0f );
-							color[i][1] = RoundFloatToByte( vRGBScale.y * 255.0f );
-							color[i][2] = RoundFloatToByte( vRGBScale.z * 255.0f );
-							color[i][3] = RoundFloatToByte( vRGBScale.w * 255.0f );
-						}
+				m_LightmapPixelWriter.SkipBytes( nLightmap0WriterSizeBytes );
+				m_LightmapPixelWriter.WritePixelNoAdvanceF( toFloat * color[2][0], toFloat * color[2][1], toFloat * color[2][2], toFloat * color[2][3] );
 
-						toFloat = ( 1.0f / ( float )( 1 << 8 ) );
-					}
-#endif
-					*/
-
-					m_LightmapPixelWriter.WritePixelNoAdvanceF( toFloat * color[0][0], toFloat * color[0][1], toFloat * color[0][2], toFloat * color[0][3] );
-
-					m_LightmapPixelWriter.SkipBytes( nLightmap0WriterSizeBytes );
-					m_LightmapPixelWriter.WritePixelNoAdvanceF( toFloat * color[1][0], toFloat * color[1][1], toFloat * color[1][2], toFloat * color[1][3] );
-
-					m_LightmapPixelWriter.SkipBytes( nLightmap0WriterSizeBytes );
-					m_LightmapPixelWriter.WritePixelNoAdvanceF( toFloat * color[2][0], toFloat * color[2][1], toFloat * color[2][2], toFloat * color[2][3] );
-
-					m_LightmapPixelWriter.SkipBytes( nLightmap0WriterSizeBytes );
-					m_LightmapPixelWriter.WritePixelNoAdvanceF( toFloat * color[3][0], toFloat * color[3][1], toFloat * color[3][2], toFloat * color[3][3] );
+				m_LightmapPixelWriter.SkipBytes( nLightmap0WriterSizeBytes );
+				m_LightmapPixelWriter.WritePixelNoAdvanceF( toFloat * color[3][0], toFloat * color[3][1], toFloat * color[3][2], toFloat * color[3][3] );
 				}
 			}
-		}
 	}
 	else
 	{
@@ -896,24 +860,6 @@ void CMatLightmaps::BumpedLightmapBitsToPixelWriter_HDRI( float* RESTRICT pFloat
 				unsigned short alpha = ColorSpace::LinearToUnsignedShort( pFloatImage[srcTexelOffset+3], 16 );
 				color[0][3] = color[1][3] = color[2][3] = color[3][3] = alpha;
 
-#if ( defined( USE_32BIT_LIGHTMAPS_ON_360 ) )
-				if( IsX360() )
-				{
-					for( int i = 0; i != 4; ++i )
-					{
-						Vector4D vRGBScale;
-
-						vRGBScale.x = color[i][0] * (16.0f / 65535.0f);
-						vRGBScale.y = color[i][1] * (16.0f / 65535.0f);
-						vRGBScale.z = color[i][2] * (16.0f / 65535.0f);
-						vRGBScale = ConvertLightmapColorToRGBScale( &vRGBScale.x );
-						color[i][0] = RoundFloatToByte( vRGBScale.x * 255.0f );
-						color[i][1] = RoundFloatToByte( vRGBScale.y * 255.0f );
-						color[i][2] = RoundFloatToByte( vRGBScale.z * 255.0f );
-						color[i][3] = RoundFloatToByte( vRGBScale.w * 255.0f );
-					}						
-				}
-#endif
 				m_LightmapPixelWriter.WritePixelNoAdvance( color[0][0], color[0][1], color[0][2], color[0][3] );
 
 				m_LightmapPixelWriter.SkipBytes( nLightmap0WriterSizeBytes );
@@ -1067,13 +1013,6 @@ void CMatLightmaps::LightmapBitsToPixelWriter_LDR( float* pFloatImage, int pLigh
 
 void CMatLightmaps::LightmapBitsToPixelWriter_HDRF( float* pFloatImage, int pLightmapSize[2], int pOffsetIntoLightmapPage[2], FloatBitMap_t *pfmOut )
 {
-	if ( IsX360() )
-	{
-		// 360 does not support HDR float 
-		Assert( 0 );
-		return;
-	}
-
 	// float HDR lightmap processing
 	float *pSrc = pFloatImage;
 	for ( int t = 0; t < pLightmapSize[1]; ++t )
@@ -1089,8 +1028,6 @@ void CMatLightmaps::LightmapBitsToPixelWriter_HDRF( float* pFloatImage, int pLig
 // numbers come in on the domain [0..16]
 void CMatLightmaps::LightmapBitsToPixelWriter_HDRI( float* RESTRICT pFloatImage, int pLightmapSize[2], int pOffsetIntoLightmapPage[2], FloatBitMap_t * RESTRICT pfmOut )
 {
-#ifndef X360_USE_SIMD_LIGHTMAP
-	// PC code (and old, pre-SIMD xbox version -- unshippably slow)
 	if ( m_LightmapPixelWriter.IsUsingFloatFormat() )
 	{
 		// integer HDR lightmap processing
@@ -1109,25 +1046,6 @@ void CMatLightmaps::LightmapBitsToPixelWriter_HDRI( float* RESTRICT pFloatImage,
 
 				float toFloat = ( 1.0f / ( float )( 1 << 16 ) );
 
-#if ( defined( USE_32BIT_LIGHTMAPS_ON_360 ) )
-				if( IsX360() )
-				{
-					Vector4D vRGBScale;
-
-					vRGBScale.x = r * (16.0f / 65535.0f);
-					vRGBScale.y = g * (16.0f / 65535.0f);
-					vRGBScale.z = b * (16.0f / 65535.0f);
-					vRGBScale = ConvertLightmapColorToRGBScale( &vRGBScale.x );
-
-					r = RoundFloatToByte( vRGBScale.x * 255.0f );
-					g = RoundFloatToByte( vRGBScale.y * 255.0f );
-					b = RoundFloatToByte( vRGBScale.z * 255.0f );
-					a = RoundFloatToByte( vRGBScale.w * 255.0f );
-
-					toFloat = ( 1.0f / ( float )( 1 << 8 ) );
-				}
-
-#endif
 				Assert( pSrc[3] >= 0.0f && pSrc[3] <= 1.0f );
 				m_LightmapPixelWriter.WritePixelF( r * toFloat, g * toFloat, b * toFloat, pSrc[3] );
 			}
@@ -1149,22 +1067,6 @@ void CMatLightmaps::LightmapBitsToPixelWriter_HDRI( float* RESTRICT pFloatImage,
 				b = ColorSpace::LinearFloatToCorrectedShort( pSrc[2] );
 				a = ColorSpace::LinearToUnsignedShort( pSrc[3], 16 );
 
-#if ( defined( USE_32BIT_LIGHTMAPS_ON_360 ) )
-				if( IsX360() )
-				{
-					Vector4D vRGBScale;
-
-					vRGBScale.x = r * (16.0f / 65535.0f);
-					vRGBScale.y = g * (16.0f / 65535.0f);
-					vRGBScale.z = b * (16.0f / 65535.0f);
-					vRGBScale = ConvertLightmapColorToRGBScale( &vRGBScale.x );
-
-					r = RoundFloatToByte( vRGBScale.x * 255.0f );
-					g = RoundFloatToByte( vRGBScale.y * 255.0f );
-					b = RoundFloatToByte( vRGBScale.z * 255.0f );
-					a = RoundFloatToByte( vRGBScale.w * 255.0f );
-				}
-#endif
 				m_LightmapPixelWriter.WritePixel( r, g, b, a );
 
 				if ( pfmOut )
@@ -1180,180 +1082,6 @@ void CMatLightmaps::LightmapBitsToPixelWriter_HDRI( float* RESTRICT pFloatImage,
 			}
 		}
 	}
-#else
-	// XBOX360 code
-	if ( m_LightmapPixelWriter.IsUsingFloatFormat() )
-	{
-		if( IsX360() )
-		{
-			AssertMsg( false, "Float-format pixel writers do not exist on x360." );
-		}
-		else
-		{	// This code is here as an example only, in case floating point
-			// format is restored to 360.
-
-			// integer HDR lightmap processing
-			float * RESTRICT pSrc = pFloatImage;
-			for ( int t = 0; t < pLightmapSize[1]; ++t )
-			{
-				m_LightmapPixelWriter.Seek( pOffsetIntoLightmapPage[0], pOffsetIntoLightmapPage[1] + t );
-				for ( int s = 0; s < pLightmapSize[0]; ++s, pSrc += (sizeof(Vector4D)/sizeof(*pSrc)) )
-				{
-					int r, g, b, a;
-
-					r = ColorSpace::LinearFloatToCorrectedShort( pSrc[0] );
-					g = ColorSpace::LinearFloatToCorrectedShort( pSrc[1] );
-					b = ColorSpace::LinearFloatToCorrectedShort( pSrc[2] );
-					a = ColorSpace::LinearToUnsignedShort( pSrc[3], 16 );
-
-					float toFloat = ( 1.0f / ( float )( 1 << 16 ) );
-
-#if ( defined( USE_32BIT_LIGHTMAPS_ON_360 ) )
-					if( IsX360() )
-					{
-						Vector4D vRGBScale;
-
-						vRGBScale.x = r * (16.0f / 65535.0f);
-						vRGBScale.y = g * (16.0f / 65535.0f);
-						vRGBScale.z = b * (16.0f / 65535.0f);
-						vRGBScale = ConvertLightmapColorToRGBScale( &vRGBScale.x );
-
-						r = RoundFloatToByte( vRGBScale.x * 255.0f );
-						g = RoundFloatToByte( vRGBScale.y * 255.0f );
-						b = RoundFloatToByte( vRGBScale.z * 255.0f );
-						a = RoundFloatToByte( vRGBScale.w * 255.0f );
-
-						toFloat = ( 1.0f / ( float )( 1 << 8 ) );
-					}
-
-#endif
-					Assert( pSrc[3] >= 0.0f && pSrc[3] <= 1.0f );
-					m_LightmapPixelWriter.WritePixelF( r * toFloat, g * toFloat, b * toFloat, pSrc[3] );
-				}
-			}
-		}
-	}
-	else
-	{
-		// This is the fast X360 pathway.
-
-		// integer HDR lightmap processing
-		float * RESTRICT pSrc = pFloatImage;
-		// Assert((reinterpret_cast<unsigned int>(pSrc) & 15) == 0); // 16-byte aligned?
-		COMPILE_TIME_ASSERT(sizeof(Vector4D)/sizeof(*pSrc) == 4); // assert that 1 * 4 = 4
-#ifndef USE_32BIT_LIGHTMAPS_ON_360 
-#pragma error("This function only supports 32 bit lightmaps.")
-#endif
-
-		// input numbers from pSrc are on the domain [0..+inf]
-		// we clamp them to the range [0..16]
-		// output is RGBA 
-		// the shader does this: rOut = Rin * Ain * 16.0f 
-		// where Rin is [0..1], a float computed from a byte value [0..255]
-		// Ain is therefore the brightest channel (say R) divided by 16 and quantized
-		// Rin is computed from pSrc->r by dividing by Ain
-		
-		// rather than switching inside WritePixel for each different format,
-		// thus causing a 23-cycle pipeline clear for every pixel, we'll
-		// branch on the format here. That will allow us to unroll the inline
-		// pixel write functions differently depending on their different 
-		// latencies. 
-
-		Assert(!pfmOut); // should never happen on 360.
-#ifndef ALLOW_PFM_OUTPUT_ON_360
-		if ( pfmOut )
-		{
-			Warning("*****************************************\n"
-					"Lightmap output on 360 HAS BEEN DISABLED.\n"
-					"A grave error has just occurred.\n"
-					"*****************************************\n");
-		}
-#endif
-
-		// switch once, here, outside the loop, rather than
-		// switching inside each pixel. Switches are not fast
-		// on x360: they are usually implemented as jumps 
-		// through function tables, which have a 24-cycle
-		// stall. 
-		switch (m_LightmapPixelWriter.GetFormat())
-		{
-			// note: format names are low-order-byte first. 
-		case IMAGE_FORMAT_RGBA8888:
-		case IMAGE_FORMAT_LINEAR_RGBA8888:
-		{
-			for ( int t = 0; t < pLightmapSize[1]; ++t )
-			{
-				m_LightmapPixelWriter.Seek( pOffsetIntoLightmapPage[0], pOffsetIntoLightmapPage[1] + t );
-				for ( int s = 0; s < pLightmapSize[0]; ++s, pSrc += 4 )
-				{	
-					static const fltx4 vSixteen = {16.0f, 16.0f, 16.0f, 16.0f};
-					fltx4 rgba = LoadUnalignedSIMD(pSrc);
-
-					// clamp to 0..16 float
-					rgba = MinSIMD(rgba, vSixteen);
-					// compute the scaling factor, place it in w, and 
-					// scale the rest by it.
-					rgba = ConvertLightmapColorToRGBScale( rgba );
-					// rgba is now  float 0..255 in each component
-					m_LightmapPixelWriter.WritePixelNoAdvance_RGBA8888(rgba);
-
-
-					/*  // not supported on X360
-					if ( pfmOut )
-					{
-						// Write data to the bitmapped represenations so that PFM files can be written
-						PixRGBAF pixelData;
-						XMStoreVector4(&pixelData,rgba);
-						pfmOut->WritePixelRGBAF( pOffsetIntoLightmapPage[0] + s, pOffsetIntoLightmapPage[1] + t, pixelData );
-					}			
-					*/
-				}
-			}
-			break;
-		}
-
-		case IMAGE_FORMAT_BGRA8888: // NOTE! : the low order bits are first in this naming convention.
-		case IMAGE_FORMAT_LINEAR_BGRA8888:
-		{			
-			for ( int t = 0; t < pLightmapSize[1]; ++t )
-			{
-				m_LightmapPixelWriter.Seek( pOffsetIntoLightmapPage[0], pOffsetIntoLightmapPage[1] + t );
-				for ( int s = 0; s < pLightmapSize[0]; ++s, pSrc += 4 )
-				{	
-					static const fltx4 vSixteen = {16.0f, 16.0f, 16.0f, 16.0f};
-					fltx4 rgba = LoadUnalignedSIMD(pSrc);
-
-					// clamp to 0..16 float
-					rgba = MinSIMD(rgba, vSixteen);
-					// compute the scaling factor, place it in w, and 
-					// scale the rest by it.
-					rgba = ConvertLightmapColorToRGBScale( rgba );
-					// rgba is now  float 0..255 in each component
-					m_LightmapPixelWriter.WritePixelNoAdvance_BGRA8888(rgba);
-					// forcibly advance
-					m_LightmapPixelWriter.SkipBytes(4);
-
-					/* // not supported on X360
-					if ( pfmOut )
-					{
-						// Write data to the bitmapped represenations so that PFM files can be written
-						PixRGBAF pixelData;
-						XMStoreVector4(&pixelData,rgba);
-						pfmOut->WritePixelRGBAF( pOffsetIntoLightmapPage[0] + s, pOffsetIntoLightmapPage[1] + t, pixelData );
-					}			
-					*/
-				}
-			}
-			break;
-		}
-
-		default:
-			AssertMsg1(false,"Unsupported pixel format %d while writing lightmaps!", m_LightmapPixelWriter.GetFormat() );
-			Warning("Unsupported pixel format used in lightmap. Lightmaps could not be downloaded.\n");
-			break;
-		}
-	}
-#endif
 }
 
 void CMatLightmaps::BeginUpdateLightmaps( void )
@@ -1416,8 +1144,6 @@ void CMatLightmaps::UpdateLightmap( int lightmapPageID, int lightmapSize[2],
 									  float *pFloatImage, float *pFloatImageBump1,
 									  float *pFloatImageBump2, float *pFloatImageBump3 )
 {
-	VPROF( "CMatRenderContext::UpdateLightmap" );
-
 	bool hasBump = false;
 	int uSize = 1;
 	FloatBitMap_t *pfmOut = NULL;
@@ -1457,12 +1183,9 @@ void CMatLightmaps::UpdateLightmap( int lightmapPageID, int lightmapSize[2],
 	// added to the right of the original lightmap.
 	bool bLockSubRect;
 	{
-		VPROF_( "Locking lightmaps", 2, VPROF_BUDGETGROUP_DLIGHT_RENDERING, false, 0 ); // vprof scope
-
 		bLockSubRect = m_nUpdatingLightmapsStackDepth <= 0 && !bDynamic;
 		if( bLockSubRect )
 		{
-			VPROF_INCREMENT_COUNTER( "lightmap subrect texlock", 1 );
 			g_pShaderAPI->ModifyTexture( m_LightmapPageTextureHandles[lightmapPageID] );
 			if (!g_pShaderAPI->TexLock( 0, 0, offsetIntoLightmapPage[0], offsetIntoLightmapPage[1],
 				lightmapSize[0] * uSize, lightmapSize[1], m_LightmapPixelWriter ))
@@ -1484,7 +1207,6 @@ void CMatLightmaps::UpdateLightmap( int lightmapPageID, int lightmapSize[2],
 
 	{
 		// account for the part spent in math:
-		VPROF_( "LightmapBitsToPixelWriter", 2, VPROF_BUDGETGROUP_DLIGHT_RENDERING, false, 0 );
 		if ( hasBump )
 		{
 			switch( HardwareConfig()->GetHDRType() )
@@ -1528,7 +1250,6 @@ void CMatLightmaps::UpdateLightmap( int lightmapPageID, int lightmapSize[2],
 
 	if( bLockSubRect )
 	{
-		VPROF_( "Unlocking Lightmaps", 2, VPROF_BUDGETGROUP_DLIGHT_RENDERING, false, 0 );
 		g_pShaderAPI->TexUnlock();
 	}
 }

@@ -12,7 +12,7 @@
 #include "NextBotRetreatPath.h"
 #include "NextBotUtil.h"
 #include "NextBotPathFollow.h"
-#include "tier0/vprof.h"
+
 
 
 //----------------------------------------------------------------------------------------------
@@ -69,12 +69,8 @@ inline void RetreatPath::Invalidate( void )
  */
 inline void RetreatPath::Update( INextBot *bot, CBaseEntity *threat )
 {
-	VPROF_BUDGET( "RetreatPath::Update", "NextBot" );
-
 	if ( threat == NULL )
-	{
 		return;
-	}
 
 	// if our path threat changed, repath immediately
 	if ( threat != m_pathThreat )
@@ -113,10 +109,7 @@ public:
 
 	CNavArea *ComputePath( void )
 	{
-		VPROF_BUDGET( "NavAreaBuildRetreatPath", "NextBot" );
-		
-		if ( m_mover == NULL )
-			return NULL;
+		if ( m_mover == NULL ) return NULL;
 		
 		CNavArea *startArea = m_me->GetEntity()->GetLastKnownArea();
 
@@ -501,8 +494,6 @@ private:
  */
 inline void RetreatPath::RefreshPath( INextBot *bot, CBaseEntity *threat )
 {
-	VPROF_BUDGET( "RetreatPath::RefreshPath", "NextBot" );
-
 	if ( threat == NULL )
 	{
 		if ( bot->IsDebugging( INextBot::PATH ) )

@@ -13,7 +13,7 @@
 
 #include <vgui/IInput.h>
 #include "vgui_controls/Controls.h"
-#include "tier0/vprof.h"
+
 #include "debugoverlay_shared.h"
 #include "cam_thirdperson.h"
 
@@ -235,8 +235,6 @@ CAM_Think
 */
 void CInput::CAM_Think( void )
 {
-	VPROF("CAM_Think");
-	//
 	if ( m_pCameraThirdData )
 	{
 		return CAM_CameraThirdThink();

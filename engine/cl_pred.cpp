@@ -40,10 +40,7 @@ void CL_Predict( int world_start_state, bool validframe, int start_command, int 
 //-----------------------------------------------------------------------------
 void CL_RunPrediction( PREDICTION_REASON reason )
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
-	if ( !cl.IsActive() )
-		return;
+	if ( !cl.IsActive() ) return;
 
 	if ( cl.m_nDeltaTick < 0 ) 
 	{

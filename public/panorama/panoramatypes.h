@@ -24,11 +24,7 @@ typedef void (RenderCallbackFunction_t)( ISceneView *, IRenderContext **, IScene
 
 #endif
 
-#if !defined( SOURCE2_PANORAMA )
-#define VPROF_BUDGET_THREAD VPROF_BUDGET
-#else
-#define VPROF_BUDGET_THREAD( name, group ) ((void)0)
-
+#if defined( SOURCE2_PANORAMA )
 const uint32 k_cubSHA1Hash = k_cubHash;
 
 #ifndef SAFE_DELETE

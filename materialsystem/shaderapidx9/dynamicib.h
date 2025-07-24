@@ -115,14 +115,6 @@ public:
 
 	void HandlePerFrameTextureStats( int frame )
 	{
-#ifdef VPROF_ENABLED
-		if ( m_Frame != frame && !m_bDynamic )
-		{
-			m_Frame = frame;
-			VPROF_INCREMENT_GROUP_COUNTER( "TexGroup_frame_" TEXTURE_GROUP_STATIC_INDEX_BUFFER, 
-				COUNTER_GROUP_TEXTURE_PER_FRAME, IndexCount() * IndexSize() );
-		}
-#endif
 	}
 	
 	static int BufferCount()
@@ -174,10 +166,6 @@ private :
 	unsigned char	m_bSoftwareVertexProcessing : 1;
 	unsigned char	m_bLateCreateShouldDiscard : 1;
 
-#ifdef VPROF_ENABLED
-	int				m_Frame;
-#endif
-
 	CInterlockedInt	m_nReferenceCount;
 
 #ifdef _DEBUG
@@ -218,9 +206,6 @@ inline CIndexBuffer::CIndexBuffer( IDirect3DDevice9 *pD3D, int count,
 		m_bDynamic(dynamic),
 		m_bSoftwareVertexProcessing( bSoftwareVertexProcessing ),
 		m_bLateCreateShouldDiscard( false )
-#ifdef VPROF_ENABLED
-		,m_Frame( -1 )
-#endif
 		, m_nReferenceCount( 0 ) 
 {
 	// For write-combining, ensure we always have locked memory aligned to 4-byte boundaries
@@ -259,20 +244,6 @@ inline CIndexBuffer::CIndexBuffer( IDirect3DDevice9 *pD3D, int count,
 		m_pSysmemBuffer = NULL;
 		Create( pD3D );
 	}
-
-
-#ifdef VPROF_ENABLED
-	if ( !m_bDynamic )
-	{
-		VPROF_INCREMENT_GROUP_COUNTER( "TexGroup_global_" TEXTURE_GROUP_STATIC_INDEX_BUFFER, 
-			COUNTER_GROUP_TEXTURE_GLOBAL, IndexCount() * IndexSize() );
-	}
-	else if ( IsX360() )
-	{
-		VPROF_INCREMENT_GROUP_COUNTER( "TexGroup_global_" TEXTURE_GROUP_DYNAMIC_INDEX_BUFFER, 
-			COUNTER_GROUP_TEXTURE_GLOBAL, IndexCount() * IndexSize() );
-	}
-#endif
 }
 
 
@@ -329,9 +300,6 @@ void CIndexBuffer::Create( IDirect3DDevice9 *pD3D )
 
 #ifdef MEASURE_DRIVER_ALLOCATIONS
 	int nMemUsed = 1024;
-	VPROF_INCREMENT_GROUP_COUNTER( "ib count", COUNTER_GROUP_NO_RESET, 1 );
-	VPROF_INCREMENT_GROUP_COUNTER( "ib driver mem", COUNTER_GROUP_NO_RESET, nMemUsed );
-	VPROF_INCREMENT_GROUP_COUNTER( "total driver mem", COUNTER_GROUP_NO_RESET, nMemUsed );
 #endif
 
 #if defined( _DEBUG )
@@ -373,9 +341,6 @@ inline CIndexBuffer::~CIndexBuffer()
 	if ( !m_bExternalMemory )
 	{
 		int nMemUsed = 1024;
-		VPROF_INCREMENT_GROUP_COUNTER( "ib count", COUNTER_GROUP_NO_RESET, -1 );
-		VPROF_INCREMENT_GROUP_COUNTER( "ib driver mem", COUNTER_GROUP_NO_RESET, -nMemUsed );
-		VPROF_INCREMENT_GROUP_COUNTER( "total driver mem", COUNTER_GROUP_NO_RESET, -nMemUsed );
 	}
 #endif
 
@@ -386,22 +351,6 @@ inline CIndexBuffer::~CIndexBuffer()
 
 		m_pIB->Release();
 	}
-
-#ifdef VPROF_ENABLED
-	if ( !m_bExternalMemory )
-	{
-		if ( !m_bDynamic )
-		{
-			VPROF_INCREMENT_GROUP_COUNTER( "TexGroup_global_" TEXTURE_GROUP_STATIC_INDEX_BUFFER,
-				COUNTER_GROUP_TEXTURE_GLOBAL, - IndexCount() * IndexSize() );
-		}
-		else if ( IsX360() )
-		{
-			VPROF_INCREMENT_GROUP_COUNTER( "TexGroup_global_" TEXTURE_GROUP_DYNAMIC_INDEX_BUFFER,
-				COUNTER_GROUP_TEXTURE_GLOBAL, - IndexCount() * IndexSize() );
-		}
-	}
-#endif
 }
 
 
@@ -442,7 +391,7 @@ inline unsigned short* CIndexBuffer::Lock( bool bReadOnly, int numIndices, int& 
 		return 0; 
 	}
 	
-	if ( !IsX360() && !m_pIB && !m_pSysmemBuffer )
+	if ( !m_pIB && !m_pSysmemBuffer )
 		return 0;
 
 	DWORD dwFlags;
@@ -532,14 +481,7 @@ inline unsigned short* CIndexBuffer::Lock( bool bReadOnly, int numIndices, int& 
 
 	Assert( pLockedData != NULL );
 	   
-	if ( !IsX360() )
-	{
-		startIndex = position;
-	}
-	else
-	{
-		startIndex = 0;
-	}
+	startIndex = position;
 
 	Assert( m_bLocked == false );
 	m_bLocked = true;
@@ -557,7 +499,7 @@ inline void CIndexBuffer::Unlock( int numIndices )
 //	if( m_bDynamic )
 //		numIndices = ALIGN_VALUE( numIndices, 2 );
 
-	if ( !IsX360() && !m_pIB && !m_pSysmemBuffer )
+	if ( !m_pIB && !m_pSysmemBuffer )
 		return;
 
 	RECORD_COMMAND( DX8_UNLOCK_INDEX_BUFFER, 1 );

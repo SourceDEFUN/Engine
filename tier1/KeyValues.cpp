@@ -19,7 +19,7 @@
 #include "filesystem.h"
 #include <vstdlib/IKeyValuesSystem.h>
 #include "tier0/icommandline.h"
-#include "tier0/vprof_telemetry.h"
+
 #include <Color.h>
 #include <stdlib.h>
 #include "tier0/dbg.h"
@@ -645,12 +645,9 @@ void KeyValues::UsesConditionals(bool state)
 //-----------------------------------------------------------------------------
 bool KeyValues::LoadFromFile( IBaseFileSystem *filesystem, const char *resourceName, const char *pathID, bool refreshCache )
 {
-	TM_ZONE_DEFAULT( TELEMETRY_LEVEL0 );
-	TM_ZONE_DEFAULT_PARAM( TELEMETRY_LEVEL0, resourceName );
-
 	Assert(filesystem);
 #ifdef WIN32
-	Assert( IsX360() || ( IsPC() && _heapchk() == _HEAPOK ) );
+	Assert( IsPC() && _heapchk() == _HEAPOK );
 #endif
 
 #ifdef STAGING_ONLY
@@ -2227,7 +2224,7 @@ bool EvaluateConditional( const char *str )
 		return IsSteamDeck() ^ bNot;
 
 	if ( Q_stristr( str, "$X360" ) )
-		return IsX360() ^ bNot;
+		return bNot;
 
 	if ( Q_stristr( str, "$WIN32" ) )
 		return IsPC() ^ bNot; // hack hack - for now WIN32 really means IsPC

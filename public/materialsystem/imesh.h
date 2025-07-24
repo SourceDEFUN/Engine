@@ -1519,15 +1519,7 @@ inline unsigned int CVertexBuilder::Color() const
 	// Swizzle it so it returns the same format as accepted by Color4ubv - rgba
 	Assert( m_nCurrentVertex < m_nMaxVertexCount );
 	unsigned int color;
-	if ( IsPC() || !IsX360() )
-	{
-		color = (m_pCurrColor[3] << 24) | (m_pCurrColor[0] << 16) | (m_pCurrColor[1] << 8) | (m_pCurrColor[2]);
-	}
-	else
-	{
-		// in memory as argb, back to rgba
-		color = (m_pCurrColor[1] << 24) | (m_pCurrColor[2] << 16) | (m_pCurrColor[3] << 8) | (m_pCurrColor[0]);
-	}
+	color = (m_pCurrColor[3] << 24) | (m_pCurrColor[0] << 16) | (m_pCurrColor[1] << 8) | (m_pCurrColor[2]);
 	return color;
 }
 
@@ -2192,11 +2184,6 @@ inline void CVertexBuilder::BoneMatrix( int idx, int matrixIdx )
 	
 #ifndef NEW_SKINNING
 	unsigned char* pBoneMatrix = &m_pBoneMatrixIndex[m_nCurrentVertex * m_VertexSize_BoneMatrixIndex];
-	if ( IsX360() )
-	{
-		// store sequentially as wzyx order, gpu delivers as xyzw
-		idx = 3-idx;
-	}
 	pBoneMatrix[idx] = (unsigned char)matrixIdx;
 #else
 	float* pBoneMatrix = &m_pBoneMatrixIndex[m_nCurrentVertex * m_VertexSize_BoneMatrixIndex];
@@ -2229,8 +2216,8 @@ template <VertexCompressionType_t T> inline void CVertexBuilder::CompressedBoneW
 		// Only 1 or 2 weights (SHORT2N) supported for compressed verts so far
 		Assert( m_NumBoneWeights <= 2 );
 
-		const int WEIGHT0_SHIFT = IsX360() ? 16 : 0;
-		const int WEIGHT1_SHIFT = IsX360() ? 0 : 16;
+		const int WEIGHT0_SHIFT = 0;
+		const int WEIGHT1_SHIFT = 16;
 		unsigned int *weights = (unsigned int *)pDestWeights;
 
 		// We scale our weights so that they sum to 32768, then subtract 1 (which gets added
@@ -2855,13 +2842,10 @@ inline void CIndexBuilder::FastPolygon( int startVert, int triangleCount )
 {
 	unsigned short *pIndex = &m_pIndices[m_nCurrentIndex];
 	startVert += m_nIndexOffset;
-	if ( !IsX360() )
-	{
-		// NOTE: IndexSize is 1 or 0 (0 for alt-tab)
-		// This prevents us from writing into bogus memory
-		Assert( m_nIndexSize == 0 || m_nIndexSize == 1 );
-		triangleCount *= m_nIndexSize;
-	}
+	// NOTE: IndexSize is 1 or 0 (0 for alt-tab)
+	// This prevents us from writing into bogus memory
+	Assert( m_nIndexSize == 0 || m_nIndexSize == 1 );
+	triangleCount *= m_nIndexSize;
 	for ( int v = 0; v < triangleCount; ++v )
 	{
 		*pIndex++ = startVert;
@@ -2877,13 +2861,10 @@ inline void CIndexBuilder::FastPolygonList( int startVert, int *pVertexCount, in
 	startVert += m_nIndexOffset;
 	int indexOut = 0;
 
-	if ( !IsX360() )
-	{
-		// NOTE: IndexSize is 1 or 0 (0 for alt-tab)
-		// This prevents us from writing into bogus memory
-		Assert( m_nIndexSize == 0 || m_nIndexSize == 1 );
-		polygonCount *= m_nIndexSize;
-	}
+	// NOTE: IndexSize is 1 or 0 (0 for alt-tab)
+	// This prevents us from writing into bogus memory
+	Assert( m_nIndexSize == 0 || m_nIndexSize == 1 );
+	polygonCount *= m_nIndexSize;
 
 	for ( int i = 0; i < polygonCount; i++ )
 	{
@@ -2905,13 +2886,10 @@ inline void CIndexBuilder::FastIndexList( const unsigned short *pIndexList, int 
 {
 	unsigned short *pIndexOut = &m_pIndices[m_nCurrentIndex];
 	startVert += m_nIndexOffset;
-	if ( !IsX360() )
-	{
-		// NOTE: IndexSize is 1 or 0 (0 for alt-tab)
-		// This prevents us from writing into bogus memory
-		Assert( m_nIndexSize == 0 || m_nIndexSize == 1 );
-		indexCount *= m_nIndexSize;
-	}
+	// NOTE: IndexSize is 1 or 0 (0 for alt-tab)
+	// This prevents us from writing into bogus memory
+	Assert( m_nIndexSize == 0 || m_nIndexSize == 1 );
+	indexCount *= m_nIndexSize;
 	for ( int i = 0; i < indexCount; ++i )
 	{
 		pIndexOut[i] = startVert + pIndexList[i];

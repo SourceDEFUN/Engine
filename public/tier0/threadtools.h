@@ -115,7 +115,7 @@ enum ThreadPriorityEnum_t
 #define TP_IS_PRIORITY_HIGHER( a, b ) ( ( a ) > ( b ) )
 #endif
 
-#if (defined( PLATFORM_WINDOWS_PC ) || defined( PLATFORM_X360 )) && !defined( STEAM ) && !defined( _CERT )
+#if defined( PLATFORM_WINDOWS_PC ) && !defined( STEAM ) && !defined( _CERT )
 //Thread parent stack trace linkage requires ALL executing binaries to disable frame pointer omission to operate speedily/successfully. (/Oy-)  "vpc /nofpo"
 #define THREAD_PARENT_STACK_TRACE_SUPPORTED 1 //uncomment to support joining the root of a thread's stack trace to its parent's at time of invocation. Must also set ENABLE_THREAD_PARENT_STACK_TRACING in stacktools.h
 #endif
@@ -2565,7 +2565,7 @@ FORCEINLINE bool CThreadSpinRWLock::TryLockForRead()
 	LockInfo_t oldValue;
 	LockInfo_t newValue;
 
-	if( IsX360() || IsPS3() )
+	if( IsPS3() )
 	{
 		// this is the code equivalent to original code (see below) that doesn't cause LHS on Xbox360
 		// WARNING: This code assumes BIG Endian CPU

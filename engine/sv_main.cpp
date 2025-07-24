@@ -36,7 +36,7 @@
 #include "testscriptmgr.h"
 #include "PlayerState.h"
 #include "saverestoretypes.h"
-#include "tier0/vprof.h"
+
 #include "proto_oob.h"
 #include "staticpropmgr.h"
 #include "checksum_crc.h"
@@ -1847,8 +1847,6 @@ static void SV_ParallelSendSnapshot( CGameClient *& pClient )
 
 void CGameServer::SendClientMessages ( bool bSendSnapshots )
 {
-	VPROF_BUDGET( "SendClientMessages", VPROF_BUDGETGROUP_OTHER_NETWORKING );
-	
 	// build individual updates
 	int receivingClientCount = 0;
 	CGameClient*	pReceivingClients[ABSOLUTE_PLAYER_LIMIT];
@@ -2798,9 +2796,6 @@ bool SV_HasPlayers()
 //-----------------------------------------------------------------------------
 void SV_Think( bool bIsSimulating )
 {
-	VPROF( "SV_Physics" );
-	tmZone( TELEMETRY_LEVEL1, TMZF_NONE, "SV_Think(%s)", bIsSimulating ? "simulating" : "not simulating" );
-	
 // @FD The staging branch already did away with "frames" and wakes on tick
 // optimally.  Currently the hibernating flag essentially means "is empty
 // and available to host a game," which is used for the GC matchmaking.
@@ -2899,8 +2894,6 @@ void SV_SendClientUpdates( bool bIsSimulating, bool bSendDuringPause )
 
 void SV_Frame( bool finalTick )
 {
-	VPROF( "SV_Frame" );
-
 	if ( serverGameDLL && finalTick )
 	{
 		serverGameDLL->Think( finalTick );

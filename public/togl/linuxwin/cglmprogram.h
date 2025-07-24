@@ -130,7 +130,7 @@ public:
 	~CGLMProgram( );	
 
 	void	SetProgramText			( char *text );				// import text to GLM object - invalidate any prev compiled program
-	void	SetShaderName			( const char *name );				// only used for debugging/telemetry markup
+	void	SetShaderName			( const char *name );				// only used for debugging markup
 	
 	void	CompileActiveSources	( void );					// compile only the flavors that were provided.
 	void	Compile					( EGLMProgramLang lang );	

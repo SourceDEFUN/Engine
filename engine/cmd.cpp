@@ -35,7 +35,7 @@
 #include "vstdlib/random.h"
 #include "tier1/utldict.h"
 #include "tier0/etwprof.h"
-#include "tier0/vprof.h"
+
 #include "gl_matsysiface.h"		// update materialsystem config
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -203,12 +203,6 @@ CON_COMMAND( BindToggle, "Performs a bind <key> \"increment var <cvar> 0 1 1\"" 
 	Q_snprintf( newCmd, sizeof(newCmd), "bind %s \"incrementvar %s 0 1 1\"\n", args[1], args[2] );
 
 	Cbuf_InsertText( newCmd );
-}
-
-CON_COMMAND_F( PerfMark, "inserts a telemetry marker into the stream. If args are provided, they will be included.", FCVAR_NONE )
-{
-	// Nothing to do, we had our message written out by Cbuf_ExecuteCommand. 
-}
 
 
 //-----------------------------------------------------------------------------
@@ -366,15 +360,13 @@ bool Cbuf_HasRoomForExecutionMarkers( int cExecutionMarkers )
 //-----------------------------------------------------------------------------
 static void Cbuf_ExecuteCommand( const CCommand &args, cmd_source_t source )
 {
-	// Note: If you remove this, PerfMark needs to do the same logic--so don't do that.
-	tmMessage( TELEMETRY_LEVEL0, TMMF_SEVERITY_LOG | TMMF_ICON_NOTE, "(source/command) %s", tmDynamicString( TELEMETRY_LEVEL0, args.GetCommandString() ) );
 	// Add the command text to the ETW stream to give better context to traces.
 	ETWMark( args.GetCommandString() );
 
 	// execute the command line
 	const ConCommandBase *pCmd = Cmd_ExecuteCommand( args, source );
 
-#if !defined(SWDS) && !defined(_XBOX)
+#if !defined(SWDS)
 	if ( pCmd && !pCmd->IsFlagSet( FCVAR_DONTRECORD ) )
 	{
 		demorecorder->RecordCommand( args.GetCommandString() );
@@ -388,9 +380,6 @@ static void Cbuf_ExecuteCommand( const CCommand &args, cmd_source_t source )
 //-----------------------------------------------------------------------------
 void Cbuf_Execute()
 {
-	VPROF("Cbuf_Execute");
-	tmZoneFiltered( TELEMETRY_LEVEL0, 50, TMZF_NONE, "%s", __FUNCTION__ );
-
 	if ( !ThreadInMainThread() )
 	{
 		Warning( "Executing command outside main loop thread\n" );
@@ -1083,10 +1072,8 @@ void Cmd_ForwardToServer( const CCommand &args, bool bReliable )
 #ifndef SWDS
 	char str[1024];
 
-#ifndef _XBOX
 	if ( demoplayer->IsPlayingBack() )
 		return;		// not really connected
-#endif
 
 	str[0] = 0;
 	if ( Q_strcasecmp( args[0], "cmd") != 0 )

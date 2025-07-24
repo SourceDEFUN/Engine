@@ -771,9 +771,6 @@ void *VTexFilesystemFactory( const char *pName, int *pReturnCode )
 
 void* MdlPickerFSFactory( const char *pName, int *pReturnCode )
 {
-	if ( IsX360() )
-		return NULL;
-
 	if ( Q_stricmp( pName, FILESYSTEM_INTERFACE_VERSION ) == 0 )
 		return g_pFullFileSystem;
 

@@ -54,7 +54,7 @@
 #include "ctype.h"
 #include "ifilelist.h"
 #include "tier0/icommandline.h"
-#include "tier0/vprof.h"
+
 
 // NOTE: This must be the last file included!!!
 #include "tier0/memdbgon.h"
@@ -1195,8 +1195,6 @@ IVTFTexture *CTexture::GetScratchVTFTexture( )
 
 void CTexture::ReleaseScratchVTFTexture( IVTFTexture* tex )
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 	const bool cbThreadInMatQueue = ( MaterialSystem()->GetRenderThreadId() == ThreadGetCurrentId() ); cbThreadInMatQueue;
 	Assert( cbThreadInMatQueue || ThreadInMainThread() );
 	Assert( m_pStreamingVTF == NULL || ThreadInMainThread() );	// Can only manipulate m_pStreamingVTF to release safely in main thread.
@@ -1395,8 +1393,6 @@ void CTexture::CopyToStagingTexture( ITexture* pDstTex )
 {
 	Assert( pDstTex );
 
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 	// Need to flush any commands in flight on our side of things
 	materials->Flush( false );
 
@@ -1418,8 +1414,6 @@ void CTexture::CopyToStagingTexture( ITexture* pDstTex )
 
 void CTexture::Map( void** pOutBits, int* pOutPitch )
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 	// Must be a staging texture to avoid catastrophic perf fail.
 	Assert( m_nFlags & TEXTUREFLAGS_STAGING_MEMORY );
 
@@ -1450,8 +1444,6 @@ bool CTexture::MakeResident( ResidencyType_t newResidence )
 	// If we already think we're supposed to go here, nothing to do and we should report success.
 	if ( m_residenceTarget == newResidence )
 		return true;
-
-	TM_ZONE_DEFAULT( TELEMETRY_LEVEL0 );
 
 	// What are we moving towards?
 	switch ( newResidence )
@@ -1520,8 +1512,6 @@ void CTexture::MakeNonResident()
 
 void CTexture::MakePartiallyResident()
 {
-	TM_ZONE_DEFAULT( TELEMETRY_LEVEL0 );
-
 	ResidencyType_t oldCurrentResidence = m_residenceCurrent;
 	ResidencyType_t oldTargetResidence = m_residenceTarget;
 
@@ -1568,8 +1558,6 @@ void CTexture::MakePartiallyResident()
 
 bool CTexture::MakeFullyResident()
 {
-	TM_ZONE_DEFAULT( TELEMETRY_LEVEL0 );
-
 	ResidencyType_t oldCurrentResidence = m_residenceCurrent;
 	ResidencyType_t oldTargetResidence = m_residenceTarget;
 
@@ -1884,8 +1872,6 @@ bool CTexture::AllocateShaderAPITextures()
 {
 	Assert( !HasBeenAllocated() );
 	
-	TM_ZONE_DEFAULT( TELEMETRY_LEVEL0 );
-
 	int nCount = m_nFrameCount;
 
 	int nCreateFlags = 0;
@@ -2034,8 +2020,6 @@ void CTexture::FreeShaderAPITextures()
 
 void CTexture::MigrateShaderAPITextures()
 {
-	TM_ZONE_DEFAULT( TELEMETRY_LEVEL0 );
-
 	const int cBytes = m_nFrameCount * sizeof ( ShaderAPITextureHandle_t );
 
 	ShaderAPITextureHandle_t *pTextureHandles =	( ShaderAPITextureHandle_t * ) stackalloc( cBytes );
@@ -2327,8 +2311,6 @@ void CTexture::DownloadTexture( Rect_t *pRect, bool bCopyFromCurrent )
 
 void CTexture::Download( Rect_t *pRect, int nAdditionalCreationFlags /* = 0 */ )
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 	// Only download the bits if we can...
 	if ( g_pShaderAPI->CanDownloadTextures() )
 	{
@@ -2444,8 +2426,6 @@ bool CTexture::SaveToFile( const char *fileName )
 
 bool CTexture::AsyncReadTextureFromFile( IVTFTexture* pVTFTexture, unsigned int nAdditionalCreationFlags )
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-	
 	m_bStreamingFileReadFailed = false; // Optimism!
 
 	char pCacheFileName[ MATERIAL_MAX_PATH ];
@@ -2457,10 +2437,7 @@ bool CTexture::AsyncReadTextureFromFile( IVTFTexture* pVTFTexture, unsigned int 
 		m_bStreamingFileReadFailed = true;
 		return false;
 	}
-
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - %s", __FUNCTION__, tmDynamicString( TELEMETRY_LEVEL0, pCacheFileName ) );
-
-	// OSX hackery
+	// macOS hackery
 	int nPreserveFlags = nAdditionalCreationFlags;
 	if ( m_nFlags & TEXTUREFLAGS_SRGB )
 		nPreserveFlags |= TEXTUREFLAGS_SRGB;
@@ -2763,10 +2740,7 @@ bool CTexture::IsVolumeTexture() const
 //-----------------------------------------------------------------------------
 void CTexture::SetFilteringAndClampingMode( bool bOnlyLodValues )
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
-	if( !HasBeenAllocated() )
-		return;
+	if( !HasBeenAllocated() ) return;
 
 	for ( int iFrame = 0; iFrame < m_nFrameCount; ++iFrame )
 	{
@@ -2872,8 +2846,6 @@ precacheFailed:
 //-----------------------------------------------------------------------------
 void CTexture::LoadLowResTexture( IVTFTexture *pTexture )
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 	delete [] m_pLowResImage;
 	m_pLowResImage = NULL;
 
@@ -3132,8 +3104,6 @@ void CTexture::CopyLowResImageToTexture( IVTFTexture *pTexture )
 //-----------------------------------------------------------------------------
 bool CTexture::SetupDebuggingTextures( IVTFTexture *pVTFTexture )
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 	if ( pVTFTexture->Flags() & TEXTUREFLAGS_NODEBUGOVERRIDE )
 		return false;
 
@@ -3172,10 +3142,7 @@ bool CTexture::SetupDebuggingTextures( IVTFTexture *pVTFTexture )
 //-----------------------------------------------------------------------------
 bool CTexture::ConvertToActualFormat( IVTFTexture *pVTFTexture )
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
-	if ( !g_pShaderDevice->IsUsingGraphics() )
-		return false;
+	if ( !g_pShaderDevice->IsUsingGraphics() ) return false;
 
 	bool bConverted = false;
 
@@ -3184,8 +3151,6 @@ bool CTexture::ConvertToActualFormat( IVTFTexture *pVTFTexture )
 	ImageFormat dstFormat = ComputeActualFormat( pVTFTexture->Format() );
 	if ( fmt != dstFormat )
 	{
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - conversion from (%d to %d)", __FUNCTION__, fmt, dstFormat );
-
 		pVTFTexture->ConvertImageFormat( dstFormat, false );
 
 		m_ImageFormat = dstFormat;
@@ -3238,8 +3203,6 @@ void CTexture::ReloadFilesInList( IFileList *pFilesToReload )
 //-----------------------------------------------------------------------------
 IVTFTexture *CTexture::LoadTextureBitsFromFile( char *pCacheFileName, char **ppResolvedFilename )
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s %s", __FUNCTION__, tmDynamicString( TELEMETRY_LEVEL0, pCacheFileName ) );
-	
 	if ( m_bStreamingFileReadFailed )
 	{
 		Assert( m_pStreamingVTF == NULL );
@@ -3583,8 +3546,6 @@ void CTexture::ReconstructPartialTexture( const Rect_t *pRect )
 //-----------------------------------------------------------------------------
 IVTFTexture *CTexture::ReconstructProceduralBits()
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 	// Figure out the actual size for this texture based on the current mode
 	bool bIgnorePicmip = ( m_nFlags & ( TEXTUREFLAGS_STAGING_MEMORY | TEXTUREFLAGS_IGNORE_PICMIP ) ) != 0;
 	ComputeActualSize( bIgnorePicmip );
@@ -3592,22 +3553,14 @@ IVTFTexture *CTexture::ReconstructProceduralBits()
 	// Create the texture
 	IVTFTexture *pVTFTexture = NULL;
 	
-	{
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - GetScratchVTFTexture", __FUNCTION__ );
-		pVTFTexture = GetScratchVTFTexture();
-	}
-
-	{
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - Init", __FUNCTION__ );
-		// Initialize the texture
-		pVTFTexture->Init( m_dimsActual.m_nWidth, m_dimsActual.m_nHeight, m_dimsActual.m_nDepth,
-			ComputeActualFormat( m_ImageFormat ), m_nFlags, m_nFrameCount );
-	}
+	pVTFTexture = GetScratchVTFTexture();
+	// Initialize the texture
+	pVTFTexture->Init( m_dimsActual.m_nWidth, m_dimsActual.m_nHeight, m_dimsActual.m_nDepth,
+		ComputeActualFormat( m_ImageFormat ), m_nFlags, m_nFrameCount );
 
 	// Generate the bits from the installed procedural regenerator
 	if ( m_pTextureRegenerator )
 	{
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - RegenerateTextureBits", __FUNCTION__ );
 
 		Rect_t rect;
 		rect.x = 0; rect.y = 0;
@@ -3617,8 +3570,6 @@ IVTFTexture *CTexture::ReconstructProceduralBits()
 	}
 	else
 	{
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - GenerateErrorTexture", __FUNCTION__ );
-
 		// In this case, we don't have one, so just use a checkerboard...
 		TextureManager()->GenerateErrorTexture( this, pVTFTexture );
 	}
@@ -3628,8 +3579,6 @@ IVTFTexture *CTexture::ReconstructProceduralBits()
 
 void CTexture::WriteDataToShaderAPITexture( int nFrameCount, int nFaceCount, int nFirstFace, int nMipCount, IVTFTexture *pVTFTexture, ImageFormat fmt )
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 	// If we're a staging texture, there's nothing to do.
 	if ( ( m_nFlags & TEXTUREFLAGS_STAGING_MEMORY ) != 0 )
 		return;
@@ -3678,8 +3627,6 @@ void CTexture::NotifyUnloadedFile()
 //-----------------------------------------------------------------------------
 void CTexture::ReconstructTexture( bool bCopyFromCurrent )
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 	Assert( !bCopyFromCurrent || HardwareConfig()->CanStretchRectFromTextures() );
 
 	int oldWidth = m_dimsAllocated.m_nWidth;
@@ -3693,7 +3640,6 @@ void CTexture::ReconstructTexture( bool bCopyFromCurrent )
 	IVTFTexture *pVTFTexture = NULL;
 	
 	{
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - Begin", __FUNCTION__ );
 		if ( IsProcedural() )
 		{
 			// This will call the installed texture bit regeneration interface
@@ -3729,16 +3675,12 @@ void CTexture::ReconstructTexture( bool bCopyFromCurrent )
 		m_dimsAllocated.m_nMipCount != oldMipCount ||
 		m_nFrameCount != oldFrameCount )
 	{
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - Allocation", __FUNCTION__ );
-
 		const bool cbCanStretchRectTextures = HardwareConfig()->CanStretchRectFromTextures();
 		const bool cbShouldMigrateTextures = ( ( m_nFlags & TEXTUREFLAGS_STREAMABLE_FINE ) != 0 ) && m_nFrameCount == oldFrameCount;
 
 		// If we're just streaming in more data--or demoting ourselves, do a migration instead. 
 		if ( bCopyFromCurrent || ( cbCanStretchRectTextures && cbShouldMigrateTextures ) )
 		{
-			tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - Migration", __FUNCTION__ );
-
 			MigrateShaderAPITextures();
 
 			// Ahh--I feel terrible about this, but we genuinely don't need anything else if we're streaming.
@@ -3747,8 +3689,6 @@ void CTexture::ReconstructTexture( bool bCopyFromCurrent )
 		}
 		else
 		{
-			tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - Deallocate / Allocate", __FUNCTION__ );
-
 			// If we're doing a wholesale copy, we need to restore these values that will be cleared by FreeShaderAPITextures.
 			// Record them here, restore them below.
 			unsigned int restoreStreamingFlag = ( m_nFlags & TEXTUREFLAGS_STREAMABLE );
@@ -3757,15 +3697,11 @@ void CTexture::ReconstructTexture( bool bCopyFromCurrent )
 
 			if ( HasBeenAllocated() )
 			{
-				tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - Deallocate", __FUNCTION__ );
-
 				// This is necessary for the reload case, we may discover there
 				// are more frames of a texture animation, for example, which means
 				// we can't rely on having the same number of texture frames.
 				FreeShaderAPITextures();
 			}
-
-			tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - Allocate", __FUNCTION__ );
 
 			// Create the shader api textures
 			if ( !AllocateShaderAPITextures() )
@@ -3790,15 +3726,11 @@ void CTexture::ReconstructTexture( bool bCopyFromCurrent )
 	// Render Targets just need to be cleared, they have no upload
 	if ( IsRenderTarget() )
 	{
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - RT Stuff", __FUNCTION__ );
-
 		// Clear the render target to opaque black
 
 		// Only clear if we're not a depth-stencil texture
 		if ( !IsDepthTextureFormat( m_ImageFormat ) )
 		{
-			tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - Clearing", __FUNCTION__ );
-
 			CMatRenderContextPtr pRenderContext( MaterialSystem() );
 			ITexture *pThisTexture = GetEmbeddedTexture( 0 );
 			pRenderContext->PushRenderTargetAndViewport( pThisTexture );						// Push this texture on the stack
@@ -3818,8 +3750,6 @@ void CTexture::ReconstructTexture( bool bCopyFromCurrent )
 
 	ReleaseScratchVTFTexture( pVTFTexture );
 	pVTFTexture = NULL;
-
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - Final Cleanup", __FUNCTION__ );
 
 	// allocated by strdup
 	free( pResolvedFilename );
@@ -4145,8 +4075,6 @@ void CTextureStreamingJob::OnAsyncFindComplete( ITexture* pTex, void* pExtraArgs
 // ------------------------------------------------------------------------------------------------
 int GetThreadId()
 {
-	TM_ZONE_DEFAULT( TELEMETRY_LEVEL0 );
-
 	// Turns the current thread into a 0-based index for use in accessing statics in this file.
 	int retVal = INT_MAX;
 	if ( ThreadInMainThread() )
@@ -4185,7 +4113,6 @@ bool SLoadTextureBitsFromFile( IVTFTexture **ppOutVtfTexture, FileHandle_t hFile
 	CUtlBuffer buf;
 
 	{
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - ReadHeaderFromFile", __FUNCTION__ );
 		int nHeaderSize = VTFFileHeaderSize( VTF_MAJOR_VERSION );
 
 		// restrict read to the header only!
@@ -4219,8 +4146,6 @@ bool SLoadTextureBitsFromFile( IVTFTexture **ppOutVtfTexture, FileHandle_t hFile
 
 	// Compute the actual texture dimensions
 	int nMipSkipCount = ComputeMipSkipCount( pName, dimsMappingCurrent, false, *ppOutVtfTexture, nFullFlags, nDesiredDimensionLimit, pOutStreamedMips, pInOutCachedFileLodSettings, pOptOutDimsActual, pOptOutDimsAllocated, pOptOutStripFlags );
-	
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - ReadDataFromFile", __FUNCTION__ );
 
 	// Determine how much of the file to read in
 	int nFileSize = ( *ppOutVtfTexture )->FileSize( nMipSkipCount );
@@ -4540,7 +4465,6 @@ int GetOptimalReadBuffer( CUtlBuffer* pOutOptimalBuffer, FileHandle_t hFile, int
 	// NOTE! NOTE! NOTE! or by the streaming texture code!
 	Assert( GetThreadId() < MAX_RENDER_THREADS );
 
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s (%d bytes)", __FUNCTION__, nSize );
 	Assert( pOutOptimalBuffer != NULL );
 
 	// get an optimal read buffer, only resize if necessary
@@ -4578,8 +4502,6 @@ void FreeOptimalReadBuffer( int nMaxSize )
 	// NOTE! NOTE! NOTE! implications. It can be called synchronously by the Main thread, 
 	// NOTE! NOTE! NOTE! or by the streaming texture code!
 	Assert( GetThreadId() < MAX_RENDER_THREADS );
-
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
 
 	const int ti = GetThreadId();
 

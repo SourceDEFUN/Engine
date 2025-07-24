@@ -24,7 +24,6 @@
 #include "dt_recv_eng.h"
 #include "vgui_baseui_interface.h"
 #include "testscriptmgr.h"
-#include <tier0/vprof.h>
 #include <proto_oob.h>
 #include "materialsystem/imaterialsystemhardwareconfig.h"
 #include "gl_matsysiface.h"
@@ -94,7 +93,7 @@ extern ConVar rcon_password;
 extern ConVar host_framerate;
 extern ConVar cl_clanid;
 
-ConVar sv_unlockedchapters( "sv_unlockedchapters", "1", FCVAR_ARCHIVE | FCVAR_ARCHIVE_XBOX, "Highest unlocked game chapter." );
+ConVar sv_unlockedchapters( "sv_unlockedchapters", "1", FCVAR_ARCHIVE, "Highest unlocked game chapter." );
 
 static ConVar tv_nochat	( "tv_nochat", "0", FCVAR_ARCHIVE | FCVAR_USERINFO, "Don't receive chat messages from other SourceTV spectators" );
 static ConVar cl_LocalNetworkBackdoor( "cl_localnetworkbackdoor", "1", 0, "Enable network optimizations for single player games." );
@@ -370,17 +369,6 @@ bool CL_IsPortalDemo()
 }
 
 
-#ifdef _XBOX
-extern void Host_WriteConfiguration( const char *dirname, const char *filename );
-//-----------------------------------------------------------------------------
-// Convar callback to write the user configuration 
-//-----------------------------------------------------------------------------
-void WriteConfig_f( ConVar *var, const char *pOldString )
-{
-	Host_WriteConfiguration( "xboxuser.cfg" );
-}
-#endif
-
 //-----------------------------------------------------------------------------
 // Purpose: If the client is in the process of connecting and the cl.signon hits
 //  is complete, make sure the client thinks its totally connected.
@@ -488,11 +476,7 @@ Updates the local time and reads/handles messages on client net connection.
 
 void CL_ReadPackets ( bool bFinalTick )
 {
-	VPROF_BUDGET( "CL_ReadPackets", VPROF_BUDGETGROUP_OTHER_NETWORKING );
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
-	if ( !Host_ShouldRun() )
-		return;
+	if ( !Host_ShouldRun() ) return;
 	
 	// update client times/tick
 
@@ -514,8 +498,6 @@ void CL_ReadPackets ( bool bFinalTick )
 	// read packets, if any in queue
 	if ( demoplayer->IsPlayingBack() && cl.m_NetChannel )
 	{
-		tmZoneFiltered( TELEMETRY_LEVEL0, 50, TMZF_NONE, "ReadPacket" );
-
 		// process data from demo file
 		cl.m_NetChannel->ProcessPlayback();
 	}
@@ -523,7 +505,6 @@ void CL_ReadPackets ( bool bFinalTick )
 	{
 		if ( !cl_ignorepackets.GetInt() )
 		{
-			tmZoneFiltered( TELEMETRY_LEVEL0, 50, TMZF_NONE, "ProcessSocket" );
 			// process data from net socket
 			NET_ProcessSocket( NS_CLIENT, &cl );
 		}
@@ -1337,8 +1318,6 @@ ConCommand screenshot_internal_command( "__screenshot_internal", screenshot_inte
 
 void CL_TakeSnapshotAndSwap()
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 	bool bReadPixelsFromFrontBuffer = g_pMaterialSystemHardwareConfig->ReadPixelsFromFrontBuffer();
 	if ( bReadPixelsFromFrontBuffer )
 	{
@@ -1382,7 +1361,7 @@ void CL_TakeSnapshotAndSwap()
 			}
 
 			char extension[MAX_OSPATH];
-			Q_snprintf( extension, sizeof( extension ), "%s.%s", GetPlatformExt(), cl_takejpeg ? "jpg" : "tga" );
+			Q_snprintf( extension, sizeof( extension ), cl_takejpeg ? "jpg" : "tga" );
 
 			// Using a subdir? If so, create it
 			if ( cl_snapshot_subdirname[0] )
@@ -2069,8 +2048,6 @@ void CL_Move(float accumulated_extra_samples, bool bFinalTick )
 	if ( !Host_ShouldRun() )
 		return;
 
-	tmZoneFiltered( TELEMETRY_LEVEL0, 50, TMZF_NONE, "%s", __FUNCTION__ );
-
 	// only send packets on the final tick in one engine frame
 	bool bSendPacket = true;	
 
@@ -2103,8 +2080,6 @@ void CL_Move(float accumulated_extra_samples, bool bFinalTick )
 
 	if ( cl.IsActive() )
 	{
-		VPROF( "CL_Move" );
-
 		int nextcommandnr = cl.lastoutgoingcommand + cl.chokedcommands + 1;
 
 		// Have client .dll create and store usercmd structure

@@ -510,8 +510,6 @@ protected:
 
 	virtual void ResolveThis( CTextureCompositor* _comp )
 	{
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 		// We shouldn't have any children, we're going to ignore them anyways.
 		Assert( GetFirstChild() == NULL );
 
@@ -565,7 +563,6 @@ protected:
 		SetResult( res );
 
 		CleanupChildResults( _comp );
-		tmMessage( TELEMETRY_LEVEL0, TMMF_ICON_NOTE, "Completed: %s", __FUNCTION__ );
 	}
 
 	virtual bool HasTeamSpecificsThis() const OVERRIDE
@@ -742,8 +739,6 @@ protected:
 
 	virtual void ResolveThis( CTextureCompositor* _comp )
 	{
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 		ECompositeResolveStatus resolveStatus = GetResolveStatus();
 		// If we're done, we're done.
 		if ( resolveStatus == ECRS_Complete || resolveStatus == ECRS_Error )
@@ -788,7 +783,6 @@ protected:
 		// texture back to the pool for use by another stage. Everything is pipelined, so this just
 		// works.
 		CleanupChildResults( _comp );
-		tmMessage( TELEMETRY_LEVEL0, TMMF_ICON_NOTE, "Completed: %s", __FUNCTION__ );
 	}
 
 	virtual bool HasTeamSpecificsThis() const OVERRIDE{ return false; }
@@ -871,8 +865,6 @@ protected:
 
 	virtual void ResolveThis( CTextureCompositor* _comp )
 	{
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 		// We shouldn't have any children, we're going to ignore them anyways.
 		Assert( GetFirstChild() == NULL );
 
@@ -924,7 +916,6 @@ protected:
 		SetResult( outRes );
 
 		CleanupChildResults( _comp );
-		tmMessage( TELEMETRY_LEVEL0, TMMF_ICON_NOTE, "Completed: %s", __FUNCTION__ );
 	}
 
 	virtual bool HasTeamSpecificsThis() const OVERRIDE { return false; }
@@ -1098,8 +1089,6 @@ protected:
 
 	virtual void ResolveThis( CTextureCompositor* _comp )
 	{
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 		ECompositeResolveStatus resolveStatus = GetResolveStatus();
 		// If we're done, we're done.
 		if ( resolveStatus == ECRS_Complete || resolveStatus == ECRS_Error )
@@ -1159,7 +1148,6 @@ protected:
 		// texture back to the pool for use by another stage. Everything is pipelined, so this just
 		// works.
 		CleanupChildResults( _comp );
-		tmMessage( TELEMETRY_LEVEL0, TMMF_ICON_NOTE, "Completed: %s", __FUNCTION__ );
 	}
 
 	virtual bool HasTeamSpecificsThis() const OVERRIDE{ return false; }
@@ -1256,7 +1244,6 @@ public:
 	virtual void OnAsyncCreateComplete( ITexture* pTex, void* pExtraArgs ) 
 	{ 
 		SafeAssign( &m_pTex, pTex ); 
-		tmMessage( TELEMETRY_LEVEL0, TMMF_ICON_NOTE, "Completed: %s", __FUNCTION__ );
 	}
 
 	virtual bool DoesTargetRenderTarget() const { return false; }
@@ -1266,8 +1253,6 @@ private:
 
 	virtual void ResolveThis( CTextureCompositor* _comp )
 	{
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 		ECompositeResolveStatus resolveStatus = GetResolveStatus();
 
 		// If we're done, we're done.
@@ -1337,8 +1322,6 @@ private:
 		pRenderContext->AsyncCreateTextureFromRenderTarget( GetFirstChild()->GetResult().m_pRenderTarget, buffer, fmt, bGenMipmaps, nCreateFlags, this, NULL );
 
 		SetResolveStatus( ECRS_PendingComposites );
-		// Don't clean up here just yet, we'll get cleaned up when the composite is totally complete.
-		tmMessage( TELEMETRY_LEVEL0, TMMF_ICON_NOTE, "Begun: %s", __FUNCTION__ );
 	}
 
 	virtual bool HasTeamSpecificsThis() const OVERRIDE { return false; }
@@ -1379,7 +1362,6 @@ CTextureCompositor::CTextureCompositor( int _width, int _height, int nTeam, cons
 // ------------------------------------------------------------------------------------------------
 CTextureCompositor::~CTextureCompositor()
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
 	Assert ( m_nReferenceCount == 0 );
 
 	// Have to clean up the stages before cleaning up the render target pool, because cleanup up
@@ -1445,8 +1427,6 @@ int CTextureCompositor::Release()
 // ------------------------------------------------------------------------------------------------
 void CTextureCompositor::Update()
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 	Assert( m_pRootStage );
 
 	if ( m_bError )
@@ -1477,12 +1457,6 @@ void CTextureCompositor::Update()
 		#endif
 
 		m_ResolveStatus = ECRS_Complete;
-
-#ifdef RAD_TELEMETRY_ENABLED
-		char buffer[ 256 ];
-		GetTextureName( buffer, ARRAYSIZE( buffer ) );
-		tmEndTimeSpan( TELEMETRY_LEVEL0, m_nCompositePaintKitId, 0, "Composite: %s", tmDynamicString( TELEMETRY_LEVEL0, buffer ) );
-#endif
 	}
 }
 
@@ -1503,8 +1477,6 @@ ECompositeResolveStatus CTextureCompositor::GetResolveStatus() const
 // ------------------------------------------------------------------------------------------------
 void CTextureCompositor::ScheduleResolve( )
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 	Assert( m_pRootStage );
 	Assert( m_ResolveStatus == ECRS_Idle );
 
@@ -1532,13 +1504,6 @@ void CTextureCompositor::ScheduleResolve( )
 		}
 	#endif
 
-	#ifdef RAD_TELEMETRY_ENABLED
-		m_nCompositePaintKitId = ++s_nCompositeCount;
-		char buffer[256];
-		GetTextureName( buffer, ARRAYSIZE( buffer ) );
-		tmBeginTimeSpan( TELEMETRY_LEVEL0, m_nCompositePaintKitId, 0, "Composite: %s", tmDynamicString( TELEMETRY_LEVEL0, buffer ) );
-	#endif
-
 	m_ResolveStatus = ECRS_Scheduled;
 
 	// Naughty.
@@ -1549,8 +1514,6 @@ void CTextureCompositor::ScheduleResolve( )
 // ------------------------------------------------------------------------------------------------
 void CTextureCompositor::Resolve()
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 	// We can actually get in multiply times for the same one because of the way EconItemView works.
 	// So if that's the case, bail.
 	if ( m_ResolveStatus != ECRS_Scheduled )
@@ -1597,8 +1560,6 @@ void CTextureCompositor::SetRootStage( CTCStage* rootStage )
 // TODO: Need to accept format and depth status
 ITexture* CTextureCompositor::AllocateCompositorRenderTarget( )
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 	FOR_EACH_VEC( m_RenderTargetPool, i )
 	{
 		const RenderTarget_t& rt = m_RenderTargetPool[ i ];
@@ -1651,8 +1612,6 @@ void CTextureCompositor::GetTextureName( char* pOutBuffer, int nBufferLen ) cons
 // ------------------------------------------------------------------------------------------------
 void CTextureCompositor::GetSeed( uint32* pOutHi, uint32* pOutLo ) const
 {
-	tmZone( TELEMETRY_LEVEL2, TMZF_NONE, "%s", __FUNCTION__ );
-
 	Assert( pOutHi && pOutLo );
 	( *pOutHi ) = 0;
 	( *pOutLo ) = 0;
@@ -1769,8 +1728,6 @@ void CTCStage::CleanupChildResults( CTextureCompositor* _comp )
 // ------------------------------------------------------------------------------------------------
 void CTCStage::Render( ITexture* _destRT, IMaterial* _mat, const CUtlVector<CTCStageResult_t>& _inputs, CTextureCompositor* _comp, bool bClear )
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 	CUtlVector< IMaterialVar* > varsToClean;
 	bool bFound = false;
 	char buffer[128];
@@ -1933,8 +1890,6 @@ void ParseIntoStruct( S* _outStruct, CUtlVector< KeyValues *>* _leftovers, KeyVa
 // ------------------------------------------------------------------------------------------------
 bool ParseNodes( CUtlVector< CTCStage* >* _outStages, const CUtlVector< KeyValues *>& _kvs, uint32 nTexCompositeCreateFlags )
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 	bool anyFails = false;
 
 	FOR_EACH_VEC( _kvs, thisKey )
@@ -2544,8 +2499,6 @@ bool HasTemplateOrVariables( const char** ppOutTemplateName, KeyValues* pKV)
 // ------------------------------------------------------------------------------------------------
 CTextureCompositor* CreateTextureCompositor( int _w, int _h, const char* pCompositeName, int nTeamNum, uint64 nRandomSeed, KeyValues* _stageDesc, uint32 nTexCompositeCreateFlags )
 {
-	TM_ZONE_DEFAULT( TELEMETRY_LEVEL0 );
-
 	#ifdef STAGING_ONLY
 		if ( r_texcomp_dump.GetInt() == 3 || r_texcomp_dump.GetInt() == 4 )
 		{
@@ -2695,8 +2648,6 @@ bool CTextureCompositorTemplate::ResolveDependencies() const
 bool CTextureCompositorTemplate::HasDependencyCycles()
 {
 	// Uses Floyd's algorithm to determine if there's a cycle. 
-	TM_ZONE_DEFAULT( TELEMETRY_LEVEL1 );
-
 	if ( HasCycle( this ) )
 	{
 		// Print the cycle. This also marks the nodes as having been tested for cycles.
@@ -2806,8 +2757,6 @@ bool HasCycle( CTextureCompositorTemplate* pStartTempl )
 // ------------------------------------------------------------------------------------------------
 void PrintMinimumCycle( CTextureCompositorTemplate* pTmpl )
 {
-	TM_ZONE_DEFAULT( TELEMETRY_LEVEL1 );
-
 	const char* pFirstNodeName = pTmpl->GetName();
 	// Also mark the nodes as having been cycle-tested to save execution of retesting the same templates.
 

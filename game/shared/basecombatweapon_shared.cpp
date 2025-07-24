@@ -187,11 +187,6 @@ void CBaseCombatWeapon::Spawn( void )
 	}
 
 #if !defined( CLIENT_DLL )
-	if( IsX360() )
-	{
-		AddEffects( EF_ITEM_BLINK );
-	}
-
 	FallInit();
 	SetCollisionGroup( COLLISION_GROUP_WEAPON );
 	m_takedamage = DAMAGE_EVENTS_ONLY;
@@ -1608,9 +1603,7 @@ void CBaseCombatWeapon::ItemPreFrame( void )
 	MaintainIdealActivity();
 
 #ifndef CLIENT_DLL
-#ifndef HL2_EPISODIC
-	if ( IsX360() )
-#endif
+#ifdef HL2_EPISODIC
 	{
 		// If we haven't displayed the hint enough times yet, it's time to try to 
 		// display the hint, and the player is not standing still, try to show a hud hint.
@@ -1639,6 +1632,7 @@ void CBaseCombatWeapon::ItemPreFrame( void )
 			}
 		}
 	}
+#endif
 #endif
 }
 
@@ -1690,7 +1684,7 @@ void CBaseCombatWeapon::ItemPostFrame( void )
 			// stops the crossbow from firing on the 360 if the player chooses to hold down their
 			// zoom button. (sjb) Orange Box 7/25/2007
 #if !defined(CLIENT_DLL)
-			if( !IsX360() || !ClassMatches("weapon_crossbow") )
+			if( !ClassMatches("weapon_crossbow") )
 #endif
 			{
 				bFired = ShouldBlockPrimaryFire();

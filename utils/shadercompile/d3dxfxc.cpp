@@ -83,8 +83,6 @@ namespace InterceptFxc
 			// DxProxyModule
 			static DxProxyModule s_dxModule;
 
-			// X360TEMP: This needs to be moved to an external semantic (or fixed)
-			bool bIsX360 = false;
 			for ( int i=0; ;i++ )
 			{
 				if ( !pMacros[i].Name )
@@ -93,7 +91,6 @@ namespace InterceptFxc
 				}
 				if ( V_stristr( pMacros[i].Name, "_X360" ) && atoi( pMacros[i].Definition ) )
 				{
-					bIsX360 = true;
 					break;
 				}
 			}

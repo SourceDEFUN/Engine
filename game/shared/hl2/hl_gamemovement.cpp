@@ -652,7 +652,7 @@ void CHL2GameMovement::FullLadderMove()
 		// Otherwise, if the move would leave the ladder, disallow it.
 		if ( pressed_use )
 		{
-			if ( ExitLadderViaDismountNode( ladder, false, IsX360() ) )
+			if ( ExitLadderViaDismountNode( ladder, false, false ) )
 			{
 				// See if they +used a dismount point mid-span..
 				return;

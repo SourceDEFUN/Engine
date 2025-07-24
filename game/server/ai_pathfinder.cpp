@@ -278,10 +278,7 @@ int CAI_Pathfinder::NearestNodeToPoint( const Vector &vecOrigin )
 
 AI_Waypoint_t *CAI_Pathfinder::FindBestPath(int startID, int endID) 
 {
-	AI_PROFILE_SCOPE( CAI_Pathfinder_FindBestPath );
-	
-	if ( !GetNetwork()->NumNodes() )
-		return NULL;
+	if ( !GetNetwork()->NumNodes() ) return NULL;
 
 #ifdef AI_PERF_MON
 	m_nPerfStatPB++;
@@ -754,8 +751,6 @@ AI_Waypoint_t* CAI_Pathfinder::CreateNodeWaypoint( Hull_t hullType, int nodeID, 
 //-----------------------------------------------------------------------------
 AI_Waypoint_t* CAI_Pathfinder::RouteToNode(const Vector &vecOrigin, int buildFlags, int nodeID, float goalTolerance)
 {
-	AI_PROFILE_SCOPE( CAI_Pathfinder_RouteToNode );
-	
 	buildFlags |= NPCBuildFlags( GetOuter(), vecOrigin );
 	buildFlags &= ~bits_BUILD_GET_CLOSE;
 
@@ -784,8 +779,6 @@ AI_Waypoint_t* CAI_Pathfinder::RouteToNode(const Vector &vecOrigin, int buildFla
 
 AI_Waypoint_t* CAI_Pathfinder::RouteFromNode(const Vector &vecOrigin, int buildFlags, int nodeID, float goalTolerance)
 {
-	AI_PROFILE_SCOPE( CAI_Pathfinder_RouteFromNode );
-	
 	buildFlags |= NPCBuildFlags( GetOuter(), vecOrigin );
 	buildFlags |= bits_BUILD_GET_CLOSE;
 
@@ -848,8 +841,6 @@ AI_Waypoint_t *CAI_Pathfinder::BuildComplexRoute( Navigation_t navType, const Ve
 	const Vector &vEnd, const CBaseEntity *pTarget, int endFlags, int nodeID, 
 	int buildFlags, float flYaw, float goalTolerance, float maxLocalNavDistance )
 {
-	AI_PROFILE_SCOPE( CAI_Pathfinder_BuildComplexRoute );
-	
 	float flTotalDist = ComputePathDistance( navType, vStart, vEnd );
 	if ( flTotalDist < 0.0625 )
 	{
@@ -863,8 +854,6 @@ AI_Waypoint_t *CAI_Pathfinder::BuildComplexRoute( Navigation_t navType, const Ve
 	if ( flTotalDist <= maxLocalNavDistance )
 	{
 		AIMoveTrace_t moveTrace;
-
-		AI_PROFILE_SCOPE_BEGIN( CAI_Pathfinder_BuildComplexRoute_Direct );
 	
 		GetOuter()->GetMoveProbe()->MoveLimit( navType, vStart, vEnd, collideFlags, pTarget, (bCheckGround) ? 100 : 0, &moveTrace);
 
@@ -883,14 +872,10 @@ AI_Waypoint_t *CAI_Pathfinder::BuildComplexRoute( Navigation_t navType, const Ve
 			return new AI_Waypoint_t( vEnd, flYaw, navType, endFlags, nodeID );
 		}
 
-		AI_PROFILE_SCOPE_END();
-
 		// -------------------------------------------------------------------
 		// Try to triangulate if requested
 		// -------------------------------------------------------------------
 
-		AI_PROFILE_SCOPE_BEGIN( CAI_Pathfinder_BuildComplexRoute_Triangulate );
-		
 		if (buildFlags & bits_BUILD_TRIANG)
 		{
 			if ( !UseStrongOptimizations() || ( GetOuter()->GetState() == NPC_STATE_SCRIPT || GetOuter()->IsCurSchedule( SCHED_SCENE_GENERIC, false ) ) )
@@ -907,8 +892,6 @@ AI_Waypoint_t *CAI_Pathfinder::BuildComplexRoute( Navigation_t navType, const Ve
 			}
 		}
 		
-		AI_PROFILE_SCOPE_END();
-
 		// -------------------------------------------------------------------
 		// Try to giveway if requested
 		// -------------------------------------------------------------------
@@ -1048,8 +1031,6 @@ AI_Waypoint_t *CAI_Pathfinder::BuildTriangulationRoute(
 	  float flDistToBlocker,// how far away is the obstruction from the start?
 	  Navigation_t navType)
 {
-	AI_PROFILE_SCOPE( CAI_Pathfinder_BuildTriangulationRoute );
-	
 	Vector vApex;
 	if (!Triangulate(navType, vStart, vEnd, flDistToBlocker, pTarget, &vApex ))
 		return NULL;
@@ -1263,8 +1244,6 @@ AI_Waypoint_t *CAI_Pathfinder::BuildOBBAvoidanceRoute(	const Vector &vStart, con
 														const CBaseEntity *pTarget,		 // target to ignore
 														Navigation_t navType )
 {
-	AI_PROFILE_SCOPE( CAI_Pathfinder_BuildOBBAvoidanceRoute );
-
 	// If the point we're navigating to is within our OBB, then fail
 	// TODO: We could potentially also just try to get as near as possible
 	if ( pObstruction->CollisionProp()->IsPointInBounds( vEnd ) )
@@ -1317,8 +1296,6 @@ AI_Waypoint_t *CAI_Pathfinder::BuildOBBAvoidanceRoute(	const Vector &vStart, con
 //-----------------------------------------------------------------------------
 AI_Waypoint_t *CAI_Pathfinder::BuildLocalRoute(const Vector &vStart, const Vector &vEnd, const CBaseEntity *pTarget, int endFlags, int nodeID, int buildFlags, float goalTolerance)
 {
-	AI_PROFILE_SCOPE( CAI_Pathfinder_BuildLocalRoute );
-
 	// Get waypoint yaw
 	float flYaw;
 	if (nodeID != NO_NODE)
@@ -1613,8 +1590,6 @@ bool CAI_Pathfinder::CheckStaleNavTypeRoute( Navigation_t navType, const Vector 
 //-----------------------------------------------------------------------------
 bool CAI_Pathfinder::CheckStaleRoute(const Vector &vStart, const Vector &vEnd, int moveTypes)
 {
-	AI_PROFILE_SCOPE( CAI_Pathfinder_CheckStaleRoute );
-
 	// -------------------------------------------------------------------
 	// First try to go there directly
 	// -------------------------------------------------------------------
@@ -1745,8 +1720,6 @@ public:
 
 AI_Waypoint_t *CAI_Pathfinder::BuildNearestNodeRoute( const Vector &vGoal, bool bToNode, int buildFlags, float goalTolerance, int *pNearestNode )
 {
-	AI_PROFILE_SCOPE( CAI_Pathfinder_BuildNearestNodeRoute );
-
 	CPathfindNearestNodeFilter filter( this, vGoal, bToNode, buildFlags, goalTolerance );
 	*pNearestNode  = GetNetwork()->NearestNodeToPoint( GetOuter(), vGoal, true, &filter );
 
@@ -1761,8 +1734,6 @@ AI_Waypoint_t *CAI_Pathfinder::BuildNearestNodeRoute( const Vector &vGoal, bool 
 
 AI_Waypoint_t *CAI_Pathfinder::BuildNodeRoute(const Vector &vStart, const Vector &vEnd, int buildFlags, float goalTolerance)
 {
-	AI_PROFILE_SCOPE( CAI_Pathfinder_BuildNodeRoute );
-
 	// ----------------------------------------------------------------------
 	//  Make sure network has nodes
 	// ----------------------------------------------------------------------
@@ -1883,8 +1854,6 @@ bool CAI_Pathfinder::Triangulate( Navigation_t navType, const Vector &vecStart, 
 		return false;
 
 	Assert( pApex );
-
-	AI_PROFILE_SCOPE( CAI_Pathfinder_Triangulate );
 
 	Vector vecForward, vecUp, vecPerpendicular;
 	VectorSubtract( vecEndIn, vecStart, vecForward );

@@ -13,7 +13,7 @@
 #include "studiorendercontext.h"
 #include "materialsystem/imaterial.h"
 #include "materialsystem/imaterialvar.h"
-#include "tier0/vprof.h"
+
 #include "tier3/tier3.h"
 #include "datacache/imdlcache.h"
 
@@ -35,12 +35,6 @@ FORCEINLINE StudioModelLighting_t CStudioRender::R_StudioComputeLighting( IMater
 
 	Assert( pMaterial );
 	bool doMouthLighting = materialFlags && (m_pStudioHdr->nummouths >= 1);
-
-	if ( IsX360() )
-	{
-		// 360 does not do software lighting
-		return doMouthLighting ? LIGHTING_MOUTH : LIGHTING_HARDWARE;
-	}
 
 	bool doSoftwareLighting = doMouthLighting ||
 		(pMaterial->IsVertexLit() && pMaterial->NeedsSoftwareLighting() );
@@ -71,7 +65,6 @@ FORCEINLINE StudioModelLighting_t CStudioRender::R_StudioComputeLighting( IMater
 IMaterial* CStudioRender::R_StudioSetupSkinAndLighting( IMatRenderContext *pRenderContext, int index, IMaterial **ppMaterials, int materialFlags,  
 	void /*IClientRenderable*/ *pClientRenderable, ColorMeshInfo_t *pColorMeshes, StudioModelLighting_t &lighting )
 {
-	VPROF( "R_StudioSetupSkin" );
 	IMaterial *pMaterial = NULL;
 	bool bCheckForConVarDrawTranslucentSubModels = false;
 	if( m_pRC->m_Config.bWireframe && !m_pRC->m_pForcedMaterial )

@@ -16,7 +16,7 @@
 #include "locald3dtypes.h"
 #include "shaderapidx8_global.h"
 #include "recording.h"
-#include "tier0/vprof.h"
+
 #include "materialsystem/imaterialsystem.h"
 #include "materialsystem/imaterialsystemhardwareconfig.h"
 #include "shaderapidx8.h"
@@ -33,15 +33,6 @@
 #include "tier0/memdbgon.h"
 
 #if SHADERAPI_USE_SMP
-
-// Set this to 1 to get vprof nodes for playing back the command stream.  This is good for counting calls in a frame, etc.
-#define SHADERAPI_VPROF_BUFFER_PLAYBACK 1
-
-#if SHADERAPI_VPROF_BUFFER_PLAYBACK && SHADERAPI_BUFFER_D3DCALLS
-#define VPROF_BUFFER_PLAYBACK(name) VPROF(name)
-#else
-#define VPROF_BUFFER_PLAYBACK(name) ((void)0)
-#endif
 
 template<class T, int QSIZE> class FixedWorkQueue
 {
@@ -144,7 +135,6 @@ void D3DDeviceWrapper::ExecuteAllWork( void )
 {
 	if( !m_bBufferingD3DCalls )
 		return;
-	VPROF_BUDGET( "ExecuteAllWork", "ExecuteAllWork" );
 	SubmitPushBufferAndGetANewOne();
 	PushBuffer *Pbuf;
 	while( ( Pbuf = PBQueue.GetWorkUnit() ) != NULL )
@@ -215,7 +205,6 @@ void D3DDeviceWrapper::SetASyncMode( bool onoff )
 
 PushBuffer *D3DDeviceWrapper::FindFreePushBuffer( PushBufferState newstate )
 {
-	VPROF_BUFFER_PLAYBACK( "D3DDeviceWrapper::FindFreePushBuffer" );
 	for(;;)
 	{
 		for(int i=0;i<N_PUSH_BUFFERS;i++)
@@ -234,7 +223,6 @@ PushBuffer *D3DDeviceWrapper::FindFreePushBuffer( PushBufferState newstate )
 
 void D3DDeviceWrapper::GetPushBuffer( void )
 {
-	VPROF_BUFFER_PLAYBACK( "D3DDeviceWrapper::GetPushBuffer" );
 	m_pCurPushBuffer = FindFreePushBuffer( PUSHBUFFER_BEING_FILLED );
 	m_pOutputPtr = m_pCurPushBuffer->m_BufferData;
 	m_PushBufferFreeSlots = PUSHBUFFER_NELEMS - 1; // leave room for end marker
@@ -242,8 +230,6 @@ void D3DDeviceWrapper::GetPushBuffer( void )
 
 void D3DDeviceWrapper::SubmitPushBufferAndGetANewOne( void )
 {
-	VPROF_BUFFER_PLAYBACK( "D3DDeviceWrapper::SubmitPushBufferAndGetANewOne" );
-
 	// submit the current push buffer
 	if ( m_pCurPushBuffer )
 	{
@@ -259,7 +245,6 @@ void D3DDeviceWrapper::SubmitPushBufferAndGetANewOne( void )
 
 void D3DDeviceWrapper::SubmitIfNotBusy( void )
 {
-	VPROF_BUFFER_PLAYBACK( "D3DDeviceWrapper::SubmitIfNotBusy" );
 	if ( PBQueue.IsEmpty() )
 		SubmitPushBufferAndGetANewOne();
 }
@@ -291,8 +276,6 @@ void D3DDeviceWrapper::AsynchronousLock( IDirect3DIndexBuffer9* ib,
 										  DWORD flags,
 										  LockedBufferContext *lb)
 {
-	VPROF_BUFFER_PLAYBACK( "D3DDeviceWrapper::AsynchronousLock index" );
-
 	if ( size <= sizeof( PushBuffers[0]->m_BufferData ))
 	{
 		// can use one of our pushbuffers for this
@@ -322,7 +305,6 @@ void D3DDeviceWrapper::AsynchronousLock( IDirect3DVertexBuffer9* vb,
 										   DWORD flags,
 										   LockedBufferContext *lb)
 {
-	VPROF_BUFFER_PLAYBACK( "D3DDeviceWrapper::AsynchronousLock vertex" );
 	// we have commands in flight. Need to use temporary memory for this lock.
 	// if the size needed is < the amount of space in a push buffer, we can use
 	// a push buffer for the buffer. Otherwise, we're going to malloc one.
@@ -354,7 +336,6 @@ void D3DDeviceWrapper::AsynchronousLock( IDirect3DVertexBuffer9* vb,
 
 inline void RememberLockedPointer( void *key, void *value )
 {
-	VPROF_BUFFER_PLAYBACK( "RememberLockedPointer" );
 	int repl=-1;
 	int i;
 	for(i=0;i<MAXIMUM_NUMBER_OF_BUFFERS_LOCKED_AT_ONCE;i++)
@@ -386,8 +367,6 @@ inline void RememberLockedPointer( void *key, void *value )
 
 inline void *RecallLockedPointer( void *key )
 {
-	VPROF_BUFFER_PLAYBACK( "RecallLockedPointer" );
-
 	for(int i=0;i<MAXIMUM_NUMBER_OF_BUFFERS_LOCKED_AT_ONCE;i++)
 		if ( RememberedPointerHistory[i].m_pKey == key )
 			return RememberedPointerHistory[i].m_pRememberedPtr;
@@ -496,7 +475,6 @@ int n_pbs_executed=0;
 
 void D3DDeviceWrapper::ExecutePushBuffer( PushBuffer const* pb)
 {
-	VPROF_BUFFER_PLAYBACK( "D3DDeviceWrapper::ExecutePushBuffer" );
 	uint32 const *dptr=pb->m_BufferData;
 	n_pbs_executed++;
 	for(;;)
@@ -506,14 +484,12 @@ void D3DDeviceWrapper::ExecutePushBuffer( PushBuffer const* pb)
 		{
 			case PBCMD_END:
 			{
-				VPROF_BUFFER_PLAYBACK( "END" );
 				n_commands_executed--;						// doesn't count
 				return;
 			}
 
 			case PBCMD_SET_RENDERSTATE:
 			{
-				VPROF_BUFFER_PLAYBACK( "SET_RENDERSTATE" );
 				Dx9Device()->SetRenderState((D3DRENDERSTATETYPE) dptr[1],dptr[2]);
 				dptr+=3;
 				break;
@@ -521,18 +497,13 @@ void D3DDeviceWrapper::ExecutePushBuffer( PushBuffer const* pb)
 
 			case PBCMD_SET_SAMPLER_STATE:
 			{
-				VPROF_BUFFER_PLAYBACK( "SET_SAMPLER_STATE" );
 				Dx9Device()->SetSamplerState(dptr[1], (D3DSAMPLERSTATETYPE) dptr[2], dptr[3]);
 				dptr+=4;
 				break;
 			}
 
 			case PBCMD_DRAWPRIM:
-			{
-				VPROF_BUFFER_PLAYBACK( "DRAWPRIM" );
-				
-				tmZone( TELEMETRY_LEVEL2, TMZF_NONE, "Dx9Device()->DrawPrimitive" );
-				
+			{				
 				Dx9Device()->DrawPrimitive( (D3DPRIMITIVETYPE) dptr[1], dptr[2], dptr[3] );
 				dptr+=4;
 				break;
@@ -540,10 +511,6 @@ void D3DDeviceWrapper::ExecutePushBuffer( PushBuffer const* pb)
 
 			case PBCMD_DRAWINDEXEDPRIM:
 			{
-				VPROF_BUFFER_PLAYBACK( "DRAWINDEXEDPRIM" );
-				
-				tmZone( TELEMETRY_LEVEL2, TMZF_NONE, "Dx9Device()->DrawIndexedPrimitive" );
-
 				Dx9Device()->DrawIndexedPrimitive( (D3DPRIMITIVETYPE) dptr[1], dptr[2], dptr[3],
 												   dptr[4], dptr[5], dptr[6]);
 				dptr+=7;
@@ -552,7 +519,6 @@ void D3DDeviceWrapper::ExecutePushBuffer( PushBuffer const* pb)
 
 			case PBCMD_SET_STREAM_SOURCE:
 			{
-				VPROF_BUFFER_PLAYBACK( "SET_STREAM_SOURCE" );
 				Dx9Device()->SetStreamSource( dptr[1],(IDirect3DVertexBuffer9 *) FetchPtr(dptr+2),
 											  dptr[3],dptr[4] );
 				dptr += 4+N_DWORDS( IDirect3DVertexBuffer9 * );
@@ -561,7 +527,6 @@ void D3DDeviceWrapper::ExecutePushBuffer( PushBuffer const* pb)
 
 			case PBCMD_SET_TEXTURE:
 			{
-				VPROF_BUFFER_PLAYBACK( "SET_TEXTURE" );
 				Dx9Device()->SetTexture( dptr[1],(IDirect3DBaseTexture *) FetchPtr(dptr+2));
 				dptr += 2+N_DWORDS_IN_PTR;
 				break;
@@ -569,7 +534,6 @@ void D3DDeviceWrapper::ExecutePushBuffer( PushBuffer const* pb)
 
 			case PBCMD_SET_RENDER_TARGET:
 			{
-				VPROF_BUFFER_PLAYBACK( "SET_RENDER_TARGET" );
 				Dx9Device()->SetRenderTarget( dptr[1],(IDirect3DSurface *) FetchPtr(dptr+2));
 				dptr += 2+N_DWORDS_IN_PTR;
 				break;
@@ -577,7 +541,6 @@ void D3DDeviceWrapper::ExecutePushBuffer( PushBuffer const* pb)
 
 			case PBCMD_SET_PIXEL_SHADER:
 			{
-				VPROF_BUFFER_PLAYBACK( "SET_PIXEL_SHADER" );
 				Dx9Device()->SetPixelShader( (IDirect3DPixelShader9 *) FetchPtr(dptr+1));
 				dptr += 1+N_DWORDS_IN_PTR;
 				break;
@@ -585,7 +548,6 @@ void D3DDeviceWrapper::ExecutePushBuffer( PushBuffer const* pb)
 
 			case PBCMD_SET_INDICES:
 			{
-				VPROF_BUFFER_PLAYBACK( "SET_INDICES" );
 				Dx9Device()->SetIndices( (IDirect3DIndexBuffer9*) FetchPtr(dptr+1));
 				dptr += 1+N_DWORDS_IN_PTR;
 				break;
@@ -593,7 +555,6 @@ void D3DDeviceWrapper::ExecutePushBuffer( PushBuffer const* pb)
 
 			case PBCMD_SET_DEPTH_STENCIL_SURFACE:
 			{
-				VPROF_BUFFER_PLAYBACK( "SET_DEPTH_STENCIL_SURFACE" );
 				Dx9Device()->SetDepthStencilSurface( (IDirect3DSurface9*) FetchPtr(dptr+1));
 				dptr += 1+N_DWORDS_IN_PTR;
 				break;
@@ -601,7 +562,6 @@ void D3DDeviceWrapper::ExecutePushBuffer( PushBuffer const* pb)
 
 			case PBCMD_SETVIEWPORT:
 			{
-				VPROF_BUFFER_PLAYBACK( "SETVIEWPORT" );
 				Dx9Device()->SetViewport( (D3DVIEWPORT9 const *) (dptr+1) );
 				dptr += 1+N_DWORDS(D3DVIEWPORT9);
 				break;
@@ -609,7 +569,6 @@ void D3DDeviceWrapper::ExecutePushBuffer( PushBuffer const* pb)
 
 			case PBCMD_SET_VERTEX_SHADER:
 			{
-				VPROF_BUFFER_PLAYBACK( "SET_VERTEX_SHADER" );
 				Dx9Device()->SetVertexShader( (IDirect3DVertexShader9 *) FetchPtr(dptr+1));
 				dptr += 1+N_DWORDS_IN_PTR;
 				break;
@@ -617,7 +576,6 @@ void D3DDeviceWrapper::ExecutePushBuffer( PushBuffer const* pb)
 
 			case PBCMD_ASYNC_LOCK_VB:
 			{
-				VPROF_BUFFER_PLAYBACK( "ASYNC_LOCK_VB" );
 				HandleAsynchronousLockVBCommand(dptr);
 				dptr+=1+N_DWORDS_IN_PTR+3;
 				break;
@@ -625,7 +583,6 @@ void D3DDeviceWrapper::ExecutePushBuffer( PushBuffer const* pb)
 
 			case PBCMD_ASYNC_UNLOCK_VB:
 			{
-				VPROF_BUFFER_PLAYBACK( "ASYNC_UNLOCK_VB" );
 				HandleAsynchronousUnLockVBCommand( dptr );
 				dptr+=1+N_DWORDS_IN_PTR+N_DWORDS( LockedBufferContext )+1;
 				break;
@@ -633,7 +590,6 @@ void D3DDeviceWrapper::ExecutePushBuffer( PushBuffer const* pb)
 
 			case PBCMD_ASYNC_LOCK_IB:
 			{
-				VPROF_BUFFER_PLAYBACK( "ASYNC_LOCK_IB" );
 				HandleAsynchronousLockIBCommand(dptr);
 				dptr+=1+N_DWORDS_IN_PTR+3;
 				break;
@@ -641,7 +597,6 @@ void D3DDeviceWrapper::ExecutePushBuffer( PushBuffer const* pb)
 
 			case PBCMD_ASYNC_UNLOCK_IB:
 			{
-				VPROF_BUFFER_PLAYBACK( "ASYNC_UNLOCK_IB" );
 				HandleAsynchronousUnLockIBCommand( dptr );
 				dptr+=1+N_DWORDS_IN_PTR+N_DWORDS( LockedBufferContext )+1;
 				break;
@@ -649,7 +604,6 @@ void D3DDeviceWrapper::ExecutePushBuffer( PushBuffer const* pb)
 
 			case PBCMD_UNLOCK_VB:
 			{
-				VPROF_BUFFER_PLAYBACK( "UNLOCK_VB" );
 				IDirect3DVertexBuffer9 *p=(IDirect3DVertexBuffer9 *) FetchPtr(dptr+1);
 				p->Unlock();
 				dptr += 1+N_DWORDS_IN_PTR;
@@ -657,7 +611,6 @@ void D3DDeviceWrapper::ExecutePushBuffer( PushBuffer const* pb)
 			}
 			case PBCMD_UNLOCK_IB:
 			{
-				VPROF_BUFFER_PLAYBACK( "UNLOCK_IB" );
 				IDirect3DIndexBuffer9 *p=(IDirect3DIndexBuffer9 *) FetchPtr(dptr+1);
 				p->Unlock();
 				dptr += 1+N_DWORDS_IN_PTR;
@@ -665,14 +618,12 @@ void D3DDeviceWrapper::ExecutePushBuffer( PushBuffer const* pb)
 			}
 			case PBCMD_SET_VERTEX_SHADER_CONSTANT:
 			{
-				VPROF_BUFFER_PLAYBACK( "SET_VERTEX_SHADER_CONSTANT" );
 				Dx9Device()->SetVertexShaderConstantF( dptr[1], (float const *) dptr+3, dptr[2]);
 				dptr += 3+4*dptr[2];
 				break;
 			}
 			case PBCMD_SET_BOOLEAN_VERTEX_SHADER_CONSTANT:
 			{
-				VPROF_BUFFER_PLAYBACK( "SET_BOOLEAN_VERTEX_SHADER_CONSTANT" );
 				Dx9Device()->SetVertexShaderConstantB( dptr[1], (int const *) dptr+3, dptr[2]);
 				dptr += 3+dptr[2];
 				break;
@@ -680,7 +631,6 @@ void D3DDeviceWrapper::ExecutePushBuffer( PushBuffer const* pb)
 
 			case PBCMD_SET_INTEGER_VERTEX_SHADER_CONSTANT:
 			{
-				VPROF_BUFFER_PLAYBACK( "SET_INTEGER_VERTEX_SHADER_CONSTANT" );
 				Dx9Device()->SetVertexShaderConstantI( dptr[1], (int const *) dptr+3, dptr[2]);
 				dptr += 3+4*dptr[2];
 				break;
@@ -688,14 +638,12 @@ void D3DDeviceWrapper::ExecutePushBuffer( PushBuffer const* pb)
 
 			case PBCMD_SET_PIXEL_SHADER_CONSTANT:
 			{
-				VPROF_BUFFER_PLAYBACK( "SET_PIXEL_SHADER_CONSTANT" );
 				Dx9Device()->SetPixelShaderConstantF( dptr[1], (float const *) dptr+3, dptr[2]);
 				dptr += 3+4*dptr[2];
 				break;
 			}
 			case PBCMD_SET_BOOLEAN_PIXEL_SHADER_CONSTANT:
 			{
-				VPROF_BUFFER_PLAYBACK( "SET_BOOLEAN_PIXEL_SHADER_CONSTANT" );
 				Dx9Device()->SetPixelShaderConstantB( dptr[1], (int const *) dptr+3, dptr[2]);
 				dptr += 3+dptr[2];
 				break;
@@ -703,7 +651,6 @@ void D3DDeviceWrapper::ExecutePushBuffer( PushBuffer const* pb)
 
 			case PBCMD_SET_INTEGER_PIXEL_SHADER_CONSTANT:
 			{
-				VPROF_BUFFER_PLAYBACK( "SET_INTEGER_PIXEL_SHADER_CONSTANT" );
 				Dx9Device()->SetPixelShaderConstantI( dptr[1], (int const *) dptr+3, dptr[2]);
 				dptr += 3+4*dptr[2];
 				break;
@@ -711,7 +658,6 @@ void D3DDeviceWrapper::ExecutePushBuffer( PushBuffer const* pb)
 
 			case PBCMD_BEGIN_SCENE:
 			{
-				VPROF_BUFFER_PLAYBACK( "BEGIN_SCENE" );
 				Dx9Device()->BeginScene();
 				dptr++;
 				break;
@@ -719,7 +665,6 @@ void D3DDeviceWrapper::ExecutePushBuffer( PushBuffer const* pb)
 			
 			case PBCMD_END_SCENE:
 			{
-				VPROF_BUFFER_PLAYBACK( "END_SCENE" );
 				Dx9Device()->EndScene();
 				dptr++;
 				break;
@@ -727,7 +672,6 @@ void D3DDeviceWrapper::ExecutePushBuffer( PushBuffer const* pb)
 
 			case PBCMD_CLEAR:
 			{
-				VPROF_BUFFER_PLAYBACK( "CLEAR" );
 				dptr++;
 				int count=*(dptr++);
 				D3DRECT const *pRects=0;
@@ -746,7 +690,6 @@ void D3DDeviceWrapper::ExecutePushBuffer( PushBuffer const* pb)
 
 			case PBCMD_SET_VERTEXDECLARATION:
 			{
-				VPROF_BUFFER_PLAYBACK( "SET_VERTEXDECLARATION" );
 				Dx9Device()->SetVertexDeclaration( (IDirect3DVertexDeclaration9 *) FetchPtr(dptr+1));
 				dptr += 1+N_DWORDS_IN_PTR;
 				break;
@@ -754,7 +697,6 @@ void D3DDeviceWrapper::ExecutePushBuffer( PushBuffer const* pb)
 
 			case PBCMD_SETCLIPPLANE:
 			{
-				VPROF_BUFFER_PLAYBACK( "SETCLIPPLANE" );
 				Dx9Device()->SetClipPlane( dptr[1], (float const *) dptr+2 );
 				dptr+=6;
 			}
@@ -762,7 +704,6 @@ void D3DDeviceWrapper::ExecutePushBuffer( PushBuffer const* pb)
 
 			case PBCMD_STRETCHRECT:
 			{
-				VPROF_BUFFER_PLAYBACK( "STRETCHRECT" );
 				dptr++;
 				IDirect3DSurface9 *pSourceSurface=(IDirect3DSurface9 *) FetchPtr(dptr);
 				dptr+=N_DWORDS_IN_PTR;
@@ -786,7 +727,6 @@ void D3DDeviceWrapper::ExecutePushBuffer( PushBuffer const* pb)
 			
 			case PBCMD_PRESENT:
 			{
-				VPROF_BUFFER_PLAYBACK( "PRESENT" );
 				dptr++;
 				RECT const *pSourceRect=0;
 				if (* (dptr++) )
@@ -802,15 +742,12 @@ void D3DDeviceWrapper::ExecutePushBuffer( PushBuffer const* pb)
 					pDirtyRegion= (RGNDATA const *) dptr;
 				dptr+=N_DWORDS( RGNDATA );
 
-				tmZone( TELEMETRY_LEVEL1, TMZF_NONE, "!D3DPresent" );
-
 				Dx9Device()->Present( pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion );
 				break;
 			}
 
 			case PBCMD_SET_SCISSOR_RECT:
 			{
-				VPROF_BUFFER_PLAYBACK( "SET_SCISSOR_RECT" );
 				dptr++;
 				const RECT *pRect = ( RECT * )FetchPtr( dptr );
 				dptr += sizeof( RECT );

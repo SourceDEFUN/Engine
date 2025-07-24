@@ -258,7 +258,6 @@ GetVolExit:
 // If sound has 'mono' radius, blend sound to mono over 50% of radius.
 void CAudioDeviceBase::SpatializeChannel( int volume[CCHANVOLUMES/2], int master_vol, const Vector& sourceDir, float gain, float mono )
 {
-	VPROF("CAudioDeviceBase::SpatializeChannel");
 	float rfscale, rrscale, lfscale, lrscale, fcscale;
 
 	fcscale = rfscale = lfscale = rrscale = lrscale = 0.0;	
@@ -412,7 +411,6 @@ SpatialExit:
 
 void CAudioDeviceBase::ApplyDSPEffects( int idsp, portable_samplepair_t *pbuffront, portable_samplepair_t *pbufrear, portable_samplepair_t *pbufcenter, int samplecount)
 {
-	VPROF("CAudioDeviceBase::ApplyDSPEffects");
 	DEBUG_StartSoundMeasure( 1, samplecount );
 
 	DSP_Process( idsp, pbuffront, pbufrear, pbufcenter, samplecount );

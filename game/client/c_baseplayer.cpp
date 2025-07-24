@@ -24,7 +24,7 @@
 #include "view_shared.h"
 #include "movevars_shared.h"
 #include "prediction.h"
-#include "tier0/vprof.h"
+
 #include "filesystem.h"
 #include "bitbuf.h"
 #include "KeyValues.h"
@@ -2052,10 +2052,7 @@ void C_BasePlayer::PostThink( void )
 //-----------------------------------------------------------------------------
 void C_BasePlayer::GetToolRecordingState( KeyValues *msg )
 {
-	if ( !ToolsEnabled() )
-		return;
-
-	VPROF_BUDGET( "C_BasePlayer::GetToolRecordingState", VPROF_BUDGETGROUP_TOOLS );
+	if ( !ToolsEnabled() ) return;
 
 	BaseClass::GetToolRecordingState( msg );
 
@@ -2271,7 +2268,6 @@ bool C_BasePlayer::ShouldPredict( void )
 void C_BasePlayer::PhysicsSimulate( void )
 {
 #if !defined( NO_ENTITY_PREDICTION )
-	VPROF( "C_BasePlayer::PhysicsSimulate" );
 	// If we've got a moveparent, we must simulate that first.
 	CBaseEntity *pMoveParent = GetMoveParent();
 	if (pMoveParent)

@@ -1753,16 +1753,7 @@ void CFuncTank::CalcPlayerCrosshairTarget( Vector *pVecTarget )
 	trace_t	tr;
 	
 	vecStart = pPlayer->EyePosition();
-
-	if ( !IsX360() )
-	{
-		vecDir = pPlayer->EyeDirection3D();
-	}
-	else
-	{
-		// Use autoaim as the eye dir.
-		vecDir = pPlayer->GetAutoaimVector( AUTOAIM_SCALE_DEFAULT );
-	}
+	vecDir = pPlayer->EyeDirection3D();
 	
 	// Make sure to start the trace outside of the player's bbox!
 	UTIL_TraceLine( vecStart + vecDir * 24, vecStart + vecDir * 8192, MASK_BLOCKLOS_AND_NPCS, this, COLLISION_GROUP_NONE, &tr );
@@ -2299,14 +2290,7 @@ void CFuncTank::Fire( int bulletCount, const Vector &barrelEnd, const Vector &fo
 
 	if( pAttacker && pAttacker->IsPlayer() )
 	{
-		if ( IsX360() )
-		{
-			UTIL_PlayerByIndex(1)->RumbleEffect( RUMBLE_AR2, 0, RUMBLE_FLAG_RESTART | RUMBLE_FLAG_RANDOM_AMPLITUDE );
-		}
-		else
-		{
 			CSoundEnt::InsertSound( SOUND_MOVE_AWAY, barrelEnd + forward * 32.0f, 32.0f, 0.2f, pAttacker, SOUNDENT_CHANNEL_WEAPON );
-		}
 	}
 
 

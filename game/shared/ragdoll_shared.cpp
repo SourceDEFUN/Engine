@@ -11,7 +11,7 @@
 #include "vphysics/collision_set.h"
 #include "vcollide_parse.h"
 #include "vphysics_interface.h"
-#include "tier0/vprof.h"
+
 #include "engine/ivdebugoverlay.h"
 #include "solidsetdefaults.h"
 //CLIENT
@@ -802,7 +802,6 @@ bool ShouldRemoveThisRagdoll( CBaseAnimating *pRagdoll )
 
 void CRagdollLRURetirement::Update( float frametime ) // EPISODIC VERSION
 {
-	VPROF( "CRagdollLRURetirement::Update" );
 	// Compress out dead items
 	int i, next;
 
@@ -939,7 +938,6 @@ void CRagdollLRURetirement::Update( float frametime ) // EPISODIC VERSION
 
 void CRagdollLRURetirement::Update( float frametime ) // Non-episodic version
 {
-	VPROF( "CRagdollLRURetirement::Update" );
 	// Compress out dead items
 	int i, next;
 

@@ -14,7 +14,6 @@
 #include "sv_rcon.h"
 #include "sv_filter.h"
 #include "sys.h"
-#include "vprof_engine.h"
 #include "PlayerState.h"
 #include "sv_log.h"
 #ifndef SWDS

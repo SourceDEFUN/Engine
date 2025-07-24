@@ -482,7 +482,7 @@ END_SHADER_PARAMS
 	SHADER_DRAW
 	{
 		bool bHasFlashlight = UsingFlashlight( params );
-		if ( bHasFlashlight && ( IsX360() || r_flashlight_version2.GetInt() ) )
+		if ( bHasFlashlight && r_flashlight_version2.GetInt() )
 		{
 			DrawPass( params, pShaderAPI, pShaderShadow, false, vertexCompression );
 			SHADOW_STATE

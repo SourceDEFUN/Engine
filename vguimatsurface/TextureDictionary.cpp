@@ -538,15 +538,6 @@ void CMatSystemTexture::SetSubTextureRGBAEx( int drawX, int drawY, unsigned cons
 	m_pRegen->UpdateBackingBits( subRect, rgba, textureSize, format );
 	pTexture->Download( &subRect );
 
-	if ( IsX360() )
-	{	
-		// xboxissue - no need to persist "backing bits", saves memory
-		// the texture (commonly font page) "backing bits" are allocated during UpdateBackingBits() which get blitted
-		// into by procedural regeneration in preparation for download() which then subrect blits
-		// out of and into target texture (d3d upload)
-		// the "backing bits" are then no longer required
-		m_pRegen->DeleteTextureBits();
-	}
 }
 
 void CMatSystemTexture::UpdateSubTextureRGBA( int drawX, int drawY, unsigned const char *rgba, int subTextureWide, int subTextureTall, ImageFormat imageFormat )
@@ -582,16 +573,6 @@ void CMatSystemTexture::UpdateSubTextureRGBA( int drawX, int drawY, unsigned con
 
 	m_pRegen->UpdateBackingBits( subRect, rgba, textureSize, imageFormat );
 	pTexture->Download( &subRect );
-
-	if ( IsX360() )
-	{	
-		// xboxissue - no need to persist "backing bits", saves memory
-		// the texture (commonly font page) "backing bits" are allocated during UpdateBackingBits() which get blitted
-		// into by procedural regeneration in preparation for download() which then subrect blits
-		// out of and into target texture (d3d upload)
-		// the "backing bits" are then no longer required
-		m_pRegen->DeleteTextureBits();
-	}
 }
 
 

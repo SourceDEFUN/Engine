@@ -69,7 +69,7 @@
 #include "collisionutils.h"
 #include "iviewrender.h"
 #include "ivrenderview.h"
-#include "tier0/vprof.h"
+
 #include "engine/ivmodelinfo.h"
 #include "view_shared.h"
 #include "engine/ivdebugoverlay.h"
@@ -1119,8 +1119,6 @@ void CVisibleShadowList::PrioritySort()
 //-----------------------------------------------------------------------------
 int CVisibleShadowList::FindShadows( const CViewSetup *pView, int nLeafCount, LeafIndex_t *pLeafList )
 {
-	VPROF_BUDGET( "CVisibleShadowList::FindShadows", VPROF_BUDGETGROUP_SHADOW_RENDERING );
-
 	m_ShadowsInView.RemoveAll();
 	ClientLeafSystem()->EnumerateShadowsInLeaves( nLeafCount, pLeafList, this );
 	int nCount = m_ShadowsInView.Count();
@@ -1305,8 +1303,6 @@ void CClientShadowMgr::Shutdown()
 //-----------------------------------------------------------------------------
 void CClientShadowMgr::InitDepthTextureShadows()
 {
-	VPROF_BUDGET( "CClientShadowMgr::InitDepthTextureShadows", VPROF_BUDGETGROUP_SHADOW_DEPTH_TEXTURING );
-
 	if( !m_bDepthTextureActive )
 	{
 		m_bDepthTextureActive = true;
@@ -1855,8 +1851,6 @@ ClientShadowHandle_t CClientShadowMgr::CreateShadow( ClientEntityHandle_t entity
 //-----------------------------------------------------------------------------
 void CClientShadowMgr::UpdateFlashlightState( ClientShadowHandle_t shadowHandle, const FlashlightState_t &flashlightState )
 {
-	VPROF_BUDGET( "CClientShadowMgr::UpdateFlashlightState", VPROF_BUDGETGROUP_SHADOW_DEPTH_TEXTURING );
-
 	BuildPerspectiveWorldToFlashlightMatrix( m_Shadows[shadowHandle].m_WorldToShadow, flashlightState );
 											
 	shadowmgr->UpdateFlashlightState( m_Shadows[shadowHandle].m_ShadowHandle, flashlightState );
@@ -1954,8 +1948,6 @@ void CClientShadowMgr::BuildWorldToShadowMatrix( VMatrix& matWorldToShadow,	cons
 
 void CClientShadowMgr::BuildPerspectiveWorldToFlashlightMatrix( VMatrix& matWorldToShadow, const FlashlightState_t &flashlightState )
 {
-	VPROF_BUDGET( "CClientShadowMgr::BuildPerspectiveWorldToFlashlightMatrix", VPROF_BUDGETGROUP_SHADOW_DEPTH_TEXTURING );
-
 	// Buildworld to shadow matrix, then perspective projection and concatenate
 	VMatrix matWorldToShadowView, matPerspective;
 	BuildWorldToShadowMatrix( matWorldToShadowView, flashlightState.m_vecLightOrigin,
@@ -2569,14 +2561,12 @@ void CClientShadowMgr::BuildFlashlight( ClientShadowHandle_t handle )
 	// For the 360, we just draw flashlights with the main geometry
 	// and bypass the entire shadow casting system.
 	ClientShadow_t &shadow = m_Shadows[handle];
-	if ( IsX360() || r_flashlight_version2.GetInt() )
+	if ( r_flashlight_version2.GetInt() )
 	{
 		// This will update the matrices, but not do work to add the flashlight to surfaces
 		shadowmgr->ProjectFlashlight( shadow.m_ShadowHandle, shadow.m_WorldToShadow, 0, NULL );
 		return;
 	}
-
-	VPROF_BUDGET( "CClientShadowMgr::BuildFlashlight", VPROF_BUDGETGROUP_SHADOW_DEPTH_TEXTURING );
 
 	bool bLightModels = r_flashlightmodels.GetBool();
 	bool bLightSpecificEntity = shadow.m_hTargetEntity.Get() != NULL;
@@ -2746,8 +2736,6 @@ void CClientShadowMgr::UpdateBrushShadow( IClientRenderable *pRenderable, Client
 	}
 	else
 	{
-		VPROF_BUDGET( "CClientShadowMgr::UpdateBrushShadow", VPROF_BUDGETGROUP_SHADOW_DEPTH_TEXTURING );
-
 		BuildFlashlight( handle );
 	}
 }
@@ -2816,47 +2804,42 @@ bool CClientShadowMgr::ShouldUseParentShadow( IClientRenderable *pRenderable )
 //-----------------------------------------------------------------------------
 void CClientShadowMgr::PreRender()
 {
-	VPROF_BUDGET( "CClientShadowMgr::PreRender", VPROF_BUDGETGROUP_SHADOW_RENDERING );
 	MDLCACHE_CRITICAL_SECTION();
 
 	//
 	// -- Shadow Depth Textures -----------------------
 	//
 
+
+	// If someone turned shadow depth mapping on but we can't do it, force it off
+	if ( r_flashlightdepthtexture.GetBool() && !materials->SupportsShadowDepthTextures() )
 	{
-		// VPROF scope
-		VPROF_BUDGET( "CClientShadowMgr::PreRender", VPROF_BUDGETGROUP_SHADOW_DEPTH_TEXTURING );
+		r_flashlightdepthtexture.SetValue( 0 );
+		ShutdownDepthTextureShadows();	
+	}
 
-		// If someone turned shadow depth mapping on but we can't do it, force it off
-		if ( r_flashlightdepthtexture.GetBool() && !materials->SupportsShadowDepthTextures() )
+	bool bDepthTextureActive     = r_flashlightdepthtexture.GetBool();
+	int  nDepthTextureResolution = r_flashlightdepthres.GetInt();
+
+	// If shadow depth texture size or enable/disable changed, do appropriate deallocation/(re)allocation
+	if ( ( bDepthTextureActive != m_bDepthTextureActive ) || ( nDepthTextureResolution != m_nDepthTextureResolution ) )
+	{
+		// If shadow depth texturing remains on, but resolution changed, shut down and reinitialize depth textures
+		if ( ( bDepthTextureActive == true ) && ( m_bDepthTextureActive == true ) &&
+			 ( nDepthTextureResolution != m_nDepthTextureResolution ) )
 		{
-			r_flashlightdepthtexture.SetValue( 0 );
 			ShutdownDepthTextureShadows();	
+			InitDepthTextureShadows();
 		}
-
-		bool bDepthTextureActive     = r_flashlightdepthtexture.GetBool();
-		int  nDepthTextureResolution = r_flashlightdepthres.GetInt();
-
-		// If shadow depth texture size or enable/disable changed, do appropriate deallocation/(re)allocation
-		if ( ( bDepthTextureActive != m_bDepthTextureActive ) || ( nDepthTextureResolution != m_nDepthTextureResolution ) )
+		else
 		{
-			// If shadow depth texturing remains on, but resolution changed, shut down and reinitialize depth textures
-			if ( ( bDepthTextureActive == true ) && ( m_bDepthTextureActive == true ) &&
-				 ( nDepthTextureResolution != m_nDepthTextureResolution ) )
+			if ( m_bDepthTextureActive && !bDepthTextureActive )		// Turning off shadow depth texturing
 			{
-				ShutdownDepthTextureShadows();	
-				InitDepthTextureShadows();
+				ShutdownDepthTextureShadows();
 			}
-			else
+			else if ( bDepthTextureActive && !m_bDepthTextureActive)	// Turning on shadow depth mapping
 			{
-				if ( m_bDepthTextureActive && !bDepthTextureActive )		// Turning off shadow depth texturing
-				{
-					ShutdownDepthTextureShadows();
-				}
-				else if ( bDepthTextureActive && !m_bDepthTextureActive)	// Turning on shadow depth mapping
-				{
-					InitDepthTextureShadows();
-				}
+				InitDepthTextureShadows();
 			}
 		}
 	}
@@ -2869,13 +2852,9 @@ void CClientShadowMgr::PreRender()
 	if ( bRenderToTextureActive != m_RenderToTextureActive )
 	{
 		if ( m_RenderToTextureActive )
-		{
 			ShutdownRenderToTextureShadows();
-		}
 		else
-		{
 			InitRenderToTextureShadows();
-		}
 
 		UpdateAllShadows();
 		return;
@@ -3123,8 +3102,6 @@ void CClientShadowMgr::UpdateProjectedTextureInternal( ClientShadowHandle_t hand
 
 	if( shadow.m_Flags & SHADOW_FLAGS_FLASHLIGHT )
 	{
-		VPROF_BUDGET( "CClientShadowMgr::UpdateProjectedTextureInternal", VPROF_BUDGETGROUP_SHADOW_DEPTH_TEXTURING );
-
 		Assert( ( shadow.m_Flags & SHADOW_FLAGS_SHADOW ) == 0 );
 		ClientShadow_t& shadow = m_Shadows[handle];
 
@@ -3147,10 +3124,7 @@ void CClientShadowMgr::UpdateProjectedTextureInternal( ClientShadowHandle_t hand
 //-----------------------------------------------------------------------------
 void CClientShadowMgr::UpdateProjectedTexture( ClientShadowHandle_t handle, bool force )
 {
-	VPROF_BUDGET( "CClientShadowMgr::UpdateProjectedTexture", VPROF_BUDGETGROUP_SHADOW_DEPTH_TEXTURING );
-
-	if ( handle == CLIENTSHADOW_INVALID_HANDLE )
-		return;
+	if ( handle == CLIENTSHADOW_INVALID_HANDLE ) return;
 
 	// NOTE: This can only work for flashlights, since UpdateProjectedTextureInternal
 	// depends on the falloff offset to cull shadows.
@@ -3247,8 +3221,6 @@ bool CClientShadowMgr::CullReceiver( ClientShadowHandle_t handle, IClientRendera
 	// check flags here instead and assert !pSourceRenderable
 	if( m_Shadows[handle].m_Flags & SHADOW_FLAGS_FLASHLIGHT )
 	{
-		VPROF_BUDGET( "CClientShadowMgr::CullReceiver", VPROF_BUDGETGROUP_SHADOW_DEPTH_TEXTURING );
-
 		Assert( !pSourceRenderable );	
 		const Frustum_t &frustum = shadowmgr->GetFlashlightFrustum( m_Shadows[handle].m_ShadowHandle );
 
@@ -3410,8 +3382,6 @@ void CClientShadowMgr::AddShadowToReceiver( ClientShadowHandle_t handle,
 
 		if( shadow.m_Flags & SHADOW_FLAGS_FLASHLIGHT )
 		{
-			VPROF_BUDGET( "CClientShadowMgr::AddShadowToReceiver", VPROF_BUDGETGROUP_SHADOW_DEPTH_TEXTURING );
-
 			if( (!shadow.m_hTargetEntity) || IsFlashlightTarget( handle, pRenderable ) )
 			{
 				shadowmgr->AddShadowToBrushModel( shadow.m_ShadowHandle, 
@@ -3443,8 +3413,6 @@ void CClientShadowMgr::AddShadowToReceiver( ClientShadowHandle_t handle,
 		}
 		else if( shadow.m_Flags & SHADOW_FLAGS_FLASHLIGHT )
 		{
-			VPROF_BUDGET( "CClientShadowMgr::AddShadowToReceiver", VPROF_BUDGETGROUP_SHADOW_DEPTH_TEXTURING );
-
 			if( (!shadow.m_hTargetEntity) || IsFlashlightTarget( handle, pRenderable ) )
 			{
 				staticpropmgr->AddShadowToStaticProp( shadow.m_ShadowHandle, pRenderable );
@@ -3457,8 +3425,6 @@ void CClientShadowMgr::AddShadowToReceiver( ClientShadowHandle_t handle,
 	case SHADOW_RECEIVER_STUDIO_MODEL:
 		if( shadow.m_Flags & SHADOW_FLAGS_FLASHLIGHT )
 		{
-			VPROF_BUDGET( "CClientShadowMgr::AddShadowToReceiver", VPROF_BUDGETGROUP_SHADOW_DEPTH_TEXTURING );
-
 			if( (!shadow.m_hTargetEntity) || IsFlashlightTarget( handle, pRenderable ) )
 			{
 				pRenderable->CreateModelInstance();
@@ -3710,7 +3676,7 @@ bool CClientShadowMgr::DrawRenderToTextureShadow( unsigned short clientShadowHan
 		// Sets the viewport state
 		int x, y, w, h;
 		m_ShadowAllocator.GetTextureRect( shadow.m_ShadowTexture, x, y, w, h );
-		pRenderContext->Viewport( IsX360() ? 0 : x, IsX360() ? 0 : y, w, h ); 
+		pRenderContext->Viewport( x, y, w, h ); 
 
 		// Clear the selected viewport only (don't need to clear depth)
 		pRenderContext->ClearBuffers( true, false );
@@ -3719,16 +3685,7 @@ bool CClientShadowMgr::DrawRenderToTextureShadow( unsigned short clientShadowHan
 		pRenderContext->LoadMatrix( shadowmgr->GetInfo( shadow.m_ShadowHandle ).m_WorldToShadow );
    
 		if ( DrawShadowHierarchy( pRenderable, shadow ) )
-		{
 			bDrewTexture = true;
-			if ( IsX360() )
-			{
-				// resolve render target to system memory texture
-				Rect_t srcRect = { 0, 0, w, h };
-				Rect_t dstRect = { x, y, w, h };
-				pRenderContext->CopyRenderTargetToTextureEx( m_ShadowAllocator.GetTexture(), 0, &srcRect, &dstRect );
-			}
-		}
 		else
 		{
 			// NOTE: Think the flags reset + texcoord set should only happen in DrawShadowHierarchy
@@ -3842,10 +3799,7 @@ int CClientShadowMgr::BuildActiveShadowDepthList( const CViewSetup &viewSetup, i
 //-----------------------------------------------------------------------------
 void CClientShadowMgr::SetViewFlashlightState( int nActiveFlashlightCount, ClientShadowHandle_t* pActiveFlashlights )
 {
-	// NOTE: On the 360, we render the entire scene with the flashlight state
-	// set and don't render flashlights additively in the shadow mgr at a far later time
-	// because the CPU costs are prohibitive
-	if ( !IsX360() && !r_flashlight_version2.GetInt() )
+	if ( !r_flashlight_version2.GetInt() )
 		return;
 
 	Assert( nActiveFlashlightCount<= 1 ); 
@@ -3866,8 +3820,6 @@ void CClientShadowMgr::SetViewFlashlightState( int nActiveFlashlightCount, Clien
 //-----------------------------------------------------------------------------
 void CClientShadowMgr::ComputeShadowDepthTextures( const CViewSetup &viewSetup )
 {
-	VPROF_BUDGET( "CClientShadowMgr::ComputeShadowDepthTextures", VPROF_BUDGETGROUP_SHADOW_DEPTH_TEXTURING );
-
 	CMatRenderContextPtr pRenderContext( materials );
 	PIXEVENT( pRenderContext, "Shadow Depth Textures" );
 
@@ -3947,8 +3899,6 @@ static void SetupBonesOnBaseAnimating( C_BaseAnimating *&pBaseAnimating )
 
 void CClientShadowMgr::ComputeShadowTextures( const CViewSetup &view, int leafCount, LeafIndex_t* pLeafList )
 {
-	VPROF_BUDGET( "CClientShadowMgr::ComputeShadowTextures", VPROF_BUDGETGROUP_SHADOW_RENDERING );
-
 	if ( !m_RenderToTextureActive || (r_shadows.GetInt() == 0) || r_shadows_gamecontrol.GetInt() == 0 )
 		return;
 
@@ -3987,7 +3937,7 @@ void CClientShadowMgr::ComputeShadowTextures( const CViewSetup &view, int leafCo
 
 	pRenderContext->PushRenderTargetAndViewport( m_ShadowAllocator.GetTexture() );
 
-	if ( !IsX360() && m_bRenderTargetNeedsClear )
+	if ( m_bRenderTargetNeedsClear )
 	{
 		// don't need to clear absent depth buffer
 		pRenderContext->ClearBuffers( true, false );

@@ -15,7 +15,7 @@
 #include "scriptevent.h"
 #include "npcevent.h"
 #include "eventlist.h"
-#include "tier0/vprof.h"
+
 
 #if !defined( CLIENT_DLL ) && !defined( MAKEXVCD )
 #include "util.h"
@@ -228,8 +228,6 @@ bool IsInPrediction()
 
 int SelectWeightedSequence( CStudioHdr *pstudiohdr, int activity, int curSequence )
 {
-	VPROF( "SelectWeightedSequence" );
-
 	if (! pstudiohdr)
 		return 0;
 
@@ -387,8 +385,6 @@ void GetEyePosition ( CStudioHdr *pstudiohdr, Vector &vecEyePosition )
 //-----------------------------------------------------------------------------
 int LookupActivity( CStudioHdr *pstudiohdr, const char *label )
 {
-	VPROF( "LookupActivity" );
-
 	if ( !pstudiohdr )
 	{
 		return 0;
@@ -414,10 +410,7 @@ int LookupActivity( CStudioHdr *pstudiohdr, const char *label )
 //-----------------------------------------------------------------------------
 int LookupSequence( CStudioHdr *pstudiohdr, const char *label )
 {
-	VPROF( "LookupSequence" );
-
-	if (! pstudiohdr)
-		return 0;
+	if (! pstudiohdr) return 0;
 
 	if (!pstudiohdr->SequencesAvailable())
 		return 0;

@@ -441,11 +441,8 @@ void S_FreeChannel(channel_t *ch)
 //		 we'll miss data if outputRate < SOUND_DMA_SPEED!
 void MIX_MixChannelsToPaintbuffer( CChannelList &list, int endtime, int flags, int rate, int outputRate )
 {
-	VPROF( "MixChannelsToPaintbuffer" );
 	int		i;
 	int		sampleCount;
-
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s c:%d %d/%d", __FUNCTION__, list.Count(), rate, outputRate );
 
 	// mix each channel into paintbuffer
 	// validate parameters
@@ -556,7 +553,6 @@ void MIX_MixChannelsToPaintbuffer( CChannelList &list, int endtime, int flags, i
 		}
 		else
 		{
-			tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "MixDataToDevice" );
 			ch->pMixer->MixDataToDevice( g_AudioDevice, ch, sampleCount, outputRate, 0 );
 		}
 
@@ -1156,7 +1152,6 @@ inline void MIX_CenterFromLeftRight( int *pl, int *pr, int *pc )
 
 void MIX_MixPaintbuffers(int ibuf1, int ibuf2, int ibuf3, int count, float fgain_out)
 {
-	VPROF("Mixpaintbuffers");
 	int i;
 	portable_samplepair_t *pbuf1, *pbuf2, *pbuf3, *pbuft;
 	portable_samplepair_t *pbufrear1, *pbufrear2, *pbufrear3, *pbufreart;
@@ -1704,7 +1699,6 @@ void SDEBUG_ShowAvgValue()
 
 void MIX_CompressPaintbuffer(int ipaint, int count)
 {
-	VPROF("CompressPaintbuffer");
 	int i;
 	paintbuffer_t *ppaint = MIX_GetPPaintFromIPaint(ipaint);
 	portable_samplepair_t *pbf;
@@ -1759,7 +1753,6 @@ void MIX_CompressPaintbuffer(int ipaint, int count)
 
 void MIX_MixUpsampleBuffer( CChannelList &list, int ipaintbuffer, int end, int count, int flags )
 {
-	VPROF("MixUpsampleBuffer");
 	int ipaintcur = MIX_GetCurrentPaintbufferIndex(); // save current paintbuffer
 
 	// reset paintbuffer upsampling filter index
@@ -1807,10 +1800,7 @@ void MIX_MixUpsampleBuffer( CChannelList &list, int ipaintbuffer, int end, int c
 
 void MIX_UpsampleAllPaintbuffers( CChannelList &list, int end, int count )
 {
-	VPROF( "MixUpsampleAll" );
-
 	// 'dry' and 'speaker' channel sounds mix 100% into their corresponding buffers
-
 	// mix and upsample all 'dry' sounds (channels) to 44khz SOUND_BUFFER_DRY paintbuffer
 
 	if ( list.m_hasDryChannels )
@@ -1967,7 +1957,6 @@ static int __cdecl ChannelVolComparator ( const void * a, const void * b )
 
 void CChannelCullList::Initialize( CChannelList &list )
 {
-	VPROF("CChannelCullList::Initialize");
 	// First, build a sorted list of channels by decreasing volume, and by a hash of their wavname.
 	m_numChans = list.Count();
 
@@ -2039,7 +2028,6 @@ ConVar snd_mute_losefocus("snd_mute_losefocus", "1", FCVAR_ARCHIVE);
 // remove all active channels that won't mix for some reason
 void MIX_BuildChannelList( CChannelList &list )
 {
-	VPROF("MIX_BuildChannelList");
 	g_ActiveChannels.GetActiveChannels( list );
 	list.m_nSpecialDSPs.RemoveAll();
 	list.m_hasDryChannels = false;
@@ -2249,9 +2237,6 @@ extern ConVar snd_soundmixer;
 
 void MIX_PaintChannels( int endtime, bool bIsUnderwater )
 {
-	VPROF("MIX_PaintChannels");
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 	int 	end;
 	int		count;
 	bool	b_spatial_delays = dsp_enhance_stereo.GetInt() != 0 ? true : false;
@@ -2305,7 +2290,6 @@ void MIX_PaintChannels( int endtime, bool bIsUnderwater )
 
 	while ( g_paintedtime < endtime )
 	{
-		VPROF("MIX_PaintChannels inner loop");
 		// mix a full 'paintbuffer' of sound
 		
 		// clamp at paintbuffer size

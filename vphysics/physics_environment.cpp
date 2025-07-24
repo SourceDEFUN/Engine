@@ -1122,11 +1122,6 @@ CPhysicsEnvironment::CPhysicsEnvironment( void )
     appl_env.collision_filter = m_pCollisionSolver;
 	appl_env.material_manager = physprops->GetIVPManager();
 	appl_env.anomaly_manager = m_pCollisionSolver;
-	// UNDONE: This would save another 45K of RAM on xbox, test perf
-	//	if ( IsXbox() )
-	//	{
-	//		appl_env.n_cache_object = 128;
-	//	}
 	
 
 	BEGIN_IVP_ALLOCATION();

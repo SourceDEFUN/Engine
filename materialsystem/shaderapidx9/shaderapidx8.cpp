@@ -55,7 +55,7 @@ mat_fullbright 1 doesn't work properly on alpha materials in testroom_standards
 #include "worldsize.h"
 #include "TransitionTable.h"
 #include "tier0/vcrmode.h"
-#include "tier0/vprof.h"
+
 #include "tier1/tier1.h"
 #include "tier1/utlbuffer.h"
 #include "vertexdecl.h"
@@ -2123,27 +2123,6 @@ bool CShaderAPIDx8::OnDeviceInit()
 
 	RECORD_COMMAND( DX8_BEGIN_SCENE, 0 );
 
-	// Apply mandatory initialization HW fixups, GPU state will be left as expected
-	if ( IsX360() )
-	{
-		// place the possible persisted display into the back buffer, ready for present()
-		RestorePersistedDisplay( false );
-
-		// 360 MUST perform an initial swap to stabilize the state
-		// this ensures any states (e.g. gamma) are respected
-		// without this, the 360 resets to internal default state on the first swap
-		OwnGPUResources( false );
-		Dx9Device()->Present( 0, 0, 0, 0 );
-
-		// present corrupts the GPU state and back buffer (according to docs)
-		// re-clear the back buffer in order to re-establish the expected contents
-		ResetRenderState( false );
-		ClearBuffers( true, true, true, -1, -1 );
-
-		// place the front buffer image in the back buffer, later systems will detect and grab
-		// other systems will detect and grab
-		RestorePersistedDisplay( true );
-	}
 
 	Dx9Device()->BeginScene();
 
@@ -2405,8 +2384,7 @@ void CShaderAPIDx8::ClearAllCommitFuncs( CommitFuncType_t func, CommitShaderType
 //-----------------------------------------------------------------------------
 void CShaderAPIDx8::CallCommitFuncs( CommitFuncType_t func, CommitShaderType_t shader, bool bForce )
 {
-	// 360 does not have have a FF pipe
-	Assert ( IsPC() || ( IsX360() && shader != COMMIT_FIXED_FUNCTION ) );
+	Assert ( IsPC() );
 
 	// Don't bother committing anything if we're deactivated
 	if ( IsDeactivated() )
@@ -2689,8 +2667,7 @@ void CShaderAPIDx8::SetStandardVertexShaderConstants( float fOverbright )
 			VERTEX_SHADER_LIGHTS + 5, 
 			// Use COLOR instead of UBYTE4 since Geforce3 does not support it
 			// vConst.w should be 3, but due to about hack, mul by 255 and add epsilon
-			// 360 supports UBYTE4, so no fixup required
-			(IsPC() || !IsX360()) ? 765.01f : 3.0f,
+			765.01f,
 			nModelIndex );	// DX8 has different constant packing
 
 		SetVertexShaderConstant( VERTEX_SHADER_LIGHT_INDEX, standardVertexShaderConstant.Base(), 1 );
@@ -2833,14 +2810,6 @@ void CShaderAPIDx8::InitVertexAndPixelShaders()
 				m_DesiredState.m_pIntegerVertexShaderConstant[i].Init();
 			}
 			SetIntegerVertexShaderConstant( 0, m_DesiredState.m_pIntegerVertexShaderConstant[0].Base(), g_pHardwareConfig->Caps().m_NumIntegerVertexShaderConstants, true );
-		}
-
-		if ( IsX360() )
-		{
-			// to init/update all constants, must disable ownership
-			bool bPreviousState = OwnGPUResources( false );
-			WriteShaderConstantsToGPU();
-			OwnGPUResources( bPreviousState );
 		}
 		SetStandardVertexShaderConstants( OVERBRIGHT );
 	}
@@ -3440,12 +3409,6 @@ void CShaderAPIDx8::ResetRenderState( bool bFullReset )
 	// Reset cached vertex decl
 	m_DynamicState.m_pVertexDecl = NULL;
 	
-	// Reset the render target to be the normal backbuffer
-	if ( IsX360() )
-	{
-		m_hCachedRenderTarget = INVALID_SHADERAPI_TEXTURE_HANDLE;
-		m_bUsingSRGBRenderTarget = false;
-	}
 	AcquireInternalRenderTargets();
 	SetRenderTarget();
 
@@ -3469,7 +3432,7 @@ void CShaderAPIDx8::ResetRenderState( bool bFullReset )
 		{
 			//Full resets init the values to defaults. Normal resets just leave them dirty.
 			if( g_pHardwareConfig->Caps().m_NumVertexShaderConstants != 0 )
-				SetVertexShaderConstant( 0, m_DesiredState.m_pVectorVertexShaderConstant[0].Base(), IsX360() ? 217 : g_pHardwareConfig->Caps().m_NumVertexShaderConstants, true ); //217 on X360 to play nice with fast blatting code
+				SetVertexShaderConstant( 0, m_DesiredState.m_pVectorVertexShaderConstant[0].Base(), g_pHardwareConfig->Caps().m_NumVertexShaderConstants, true ); //217 on X360 to play nice with fast blatting code
 			
 			if( g_pHardwareConfig->Caps().m_NumIntegerVertexShaderConstants != 0 )
 				SetIntegerVertexShaderConstant( 0, (int *)m_DesiredState.m_pIntegerVertexShaderConstant, g_pHardwareConfig->Caps().m_NumIntegerVertexShaderConstants, true );
@@ -3542,7 +3505,6 @@ void CShaderAPIDx8::SetDefaultState()
 //-----------------------------------------------------------------------------
 inline void CShaderAPIDx8::SetVertexDecl( VertexFormat_t vertexFormat, bool bHasColorMesh, bool bUsingFlex, bool bUsingMorph )
 {
-	VPROF("CShaderAPIDx8::SetVertexDecl");
 	IDirect3DVertexDeclaration9 *pDecl = FindOrCreateVertexDecl( vertexFormat, bHasColorMesh, bUsingFlex, bUsingMorph );
 	Assert( pDecl );
 
@@ -3622,9 +3584,7 @@ void CShaderAPIDx8::MarkUnusedVertexFields( unsigned int nFlags, int nTexCoordCo
 //-----------------------------------------------------------------------------
 void CShaderAPIDx8::DrawMesh( CMeshBase *pMesh )
 {
-	VPROF("CShaderAPIDx8::DrawMesh");
-	if ( ShaderUtil()->GetConfig().m_bSuppressRendering )
-		return;
+	if ( ShaderUtil()->GetConfig().m_bSuppressRendering ) return;
 
 #if defined( PIX_INSTRUMENTATION ) || defined( NVPERFHUD )
 	PIXifyName( s_pPIXMaterialName, sizeof( s_pPIXMaterialName ), m_pMaterial->GetName() );
@@ -3646,9 +3606,7 @@ void CShaderAPIDx8::DrawMesh( CMeshBase *pMesh )
 
 void CShaderAPIDx8::DrawWithVertexAndIndexBuffers( void )
 {
-	VPROF("CShaderAPIDx8::DrawWithVertexAndIndexBuffers");
-	if ( ShaderUtil()->GetConfig().m_bSuppressRendering )
-		return;
+	if ( ShaderUtil()->GetConfig().m_bSuppressRendering ) return;
 
 #if defined( PIX_INSTRUMENTATION ) || defined( NVPERFHUD )
 	PIXifyName( s_pPIXMaterialName, sizeof( s_pPIXMaterialName ), m_pMaterial->GetName());
@@ -3686,15 +3644,13 @@ void CShaderAPIDx8::DiscardVertexBuffers()
 
 void CShaderAPIDx8::ForceHardwareSync_WithManagedTexture()
 {
-	if ( IsX360() || !m_pFrameSyncTexture )
+	if ( !m_pFrameSyncTexture )
 		return;
 
 	// Set the default state for everything so we don't get more than we ask for here!
 	SetDefaultState();
 
 	D3DLOCKED_RECT rect;
-
-	tmZone( TELEMETRY_LEVEL1, TMZF_NONE, "%s", __FUNCTION__ );
 
 	HRESULT hr = m_pFrameSyncTexture->LockRect( 0, &rect, NULL, 0 );
 	if ( SUCCEEDED( hr ) )
@@ -3723,8 +3679,6 @@ void CShaderAPIDx8::ForceHardwareSync_WithManagedTexture()
 				unsigned short indices[3] = { 0, 1, 2 };
 				Vector verts[3] = {vec3_origin, vec3_origin, vec3_origin};
 				
-				tmZone( TELEMETRY_LEVEL1, TMZF_NONE, "DrawIndexedPrimitiveUP" );
-
 				Dx9Device()->DrawIndexedPrimitiveUP(
 					D3DPT_TRIANGLELIST,
 					0,				// Min vertex index
@@ -3751,8 +3705,6 @@ void CShaderAPIDx8::UpdateFrameSyncQuery( int queryIndex, bool bIssue )
 	// wait if already issued
 	if ( m_bQueryIssued[queryIndex] )
 	{
-		tmZone( TELEMETRY_LEVEL1, TMZF_NONE, "%s", __FUNCTION__ );
-
 		double flStartTime = Plat_FloatTime();
 		BOOL dummyData = 0;
 		HRESULT hr = S_OK;
@@ -3795,8 +3747,6 @@ void CShaderAPIDx8::UpdateFrameSyncQuery( int queryIndex, bool bIssue )
 void CShaderAPIDx8::ForceHardwareSync( void )
 {
 	LOCK_SHADERAPI();
-	VPROF( "CShaderAPIDx8::ForceHardwareSync" );
-
 #ifdef DX_TO_GL_ABSTRACTION
 	if ( true )
 #else
@@ -3916,53 +3866,45 @@ void CShaderAPIDx8::ExportTextureList()
 
 	m_nDebugDataExportFrame = m_CurrentFrame;
 
-	if ( IsPC() || !IsX360() )
+	if ( m_pDebugTextureList )
+		m_pDebugTextureList->deleteThis();
+
+	m_pDebugTextureList = new KeyValues( "TextureList" );
+
+	m_nTextureMemoryUsedTotal = 0;
+	m_nTextureMemoryUsedPicMip1 = 0;
+	m_nTextureMemoryUsedPicMip2 = 0;
+	for ( ShaderAPITextureHandle_t hTexture = m_Textures.Head() ; hTexture != m_Textures.InvalidIndex(); hTexture = m_Textures.Next( hTexture ) )
 	{
-		if ( m_pDebugTextureList )
-			m_pDebugTextureList->deleteThis();
-
-		m_pDebugTextureList = new KeyValues( "TextureList" );
-
-		m_nTextureMemoryUsedTotal = 0;
-		m_nTextureMemoryUsedPicMip1 = 0;
-		m_nTextureMemoryUsedPicMip2 = 0;
-		for ( ShaderAPITextureHandle_t hTexture = m_Textures.Head() ; hTexture != m_Textures.InvalidIndex(); hTexture = m_Textures.Next( hTexture ) )
-		{
-			Texture_t &tex = m_Textures[hTexture];
+		Texture_t &tex = m_Textures[hTexture];
 		
-			if ( !( tex.m_Flags & Texture_t::IS_ALLOCATED ) )
-				continue;
+		if ( !( tex.m_Flags & Texture_t::IS_ALLOCATED ) )
+			continue;
 
-			// Compute total texture memory usage
-			m_nTextureMemoryUsedTotal += tex.GetMemUsage();
+		// Compute total texture memory usage
+		m_nTextureMemoryUsedTotal += tex.GetMemUsage();
 
-			// Compute picmip memory usage
+		// Compute picmip memory usage
+		{
+			int numBytes = tex.GetMemUsage();
+
+			if ( tex.m_NumLevels > 1 )
 			{
-				int numBytes = tex.GetMemUsage();
-
-				if ( tex.m_NumLevels > 1 )
+				if ( tex.GetWidth() > 4 || tex.GetHeight() > 4 || tex.GetDepth() > 4 )
 				{
-					if ( tex.GetWidth() > 4 || tex.GetHeight() > 4 || tex.GetDepth() > 4 )
+					int topmipsize = ImageLoader::GetMemRequired( tex.GetWidth(), tex.GetHeight(), tex.GetDepth(), tex.GetImageFormat(), false );
+					numBytes -= topmipsize;
+
+					m_nTextureMemoryUsedPicMip1 += numBytes;
+
+					if ( tex.GetWidth() > 8 || tex.GetHeight() > 8 || tex.GetDepth() > 8 )
 					{
-						int topmipsize = ImageLoader::GetMemRequired( tex.GetWidth(), tex.GetHeight(), tex.GetDepth(), tex.GetImageFormat(), false );
-						numBytes -= topmipsize;
-
-						m_nTextureMemoryUsedPicMip1 += numBytes;
-
-						if ( tex.GetWidth() > 8 || tex.GetHeight() > 8 || tex.GetDepth() > 8 )
-						{
-							int othermipsizeRatio = ( ( tex.GetWidth() > 8 ) ? 2 : 1 ) * ( ( tex.GetHeight() > 8 ) ? 2 : 1 ) * ( ( tex.GetDepth() > 8 ) ? 2 : 1 );
-							int othermipsize = topmipsize / othermipsizeRatio;
-							numBytes -= othermipsize;
-						}
-
-						m_nTextureMemoryUsedPicMip1 += numBytes;
+						int othermipsizeRatio = ( ( tex.GetWidth() > 8 ) ? 2 : 1 ) * ( ( tex.GetHeight() > 8 ) ? 2 : 1 ) * ( ( tex.GetDepth() > 8 ) ? 2 : 1 );
+						int othermipsize = topmipsize / othermipsizeRatio;
+						numBytes -= othermipsize;
 					}
-					else
-					{
-						m_nTextureMemoryUsedPicMip1 += numBytes;
-						m_nTextureMemoryUsedPicMip2 += numBytes;
-					}
+
+					m_nTextureMemoryUsedPicMip1 += numBytes;
 				}
 				else
 				{
@@ -3970,52 +3912,42 @@ void CShaderAPIDx8::ExportTextureList()
 					m_nTextureMemoryUsedPicMip2 += numBytes;
 				}
 			}
-
-			if ( !m_bDebugGetAllTextures &&
-				  tex.m_LastBoundFrame != m_CurrentFrame )
-				continue;
-
-			if ( tex.m_LastBoundFrame != m_CurrentFrame )
-				tex.m_nTimesBoundThisFrame = 0;
-
-			KeyValues *pSubKey = m_pDebugTextureList->CreateNewKey();
-			pSubKey->SetString( "Name", tex.m_DebugName.String() );
-			pSubKey->SetString( "TexGroup", tex.m_TextureGroupName.String() );
-			pSubKey->SetInt( "Size", tex.GetMemUsage() );
-			if ( tex.GetCount() > 1 )
-				pSubKey->SetInt( "Count", tex.GetCount() );
-			pSubKey->SetString( "Format", ImageLoader::GetName( tex.GetImageFormat() ) );
-			pSubKey->SetInt( "Width", tex.GetWidth() );
-			pSubKey->SetInt( "Height", tex.GetHeight() );
-
-			pSubKey->SetInt( "BindsMax", tex.m_nTimesBoundMax );
-			pSubKey->SetInt( "BindsFrame", tex.m_nTimesBoundThisFrame );
+			else
+			{
+				m_nTextureMemoryUsedPicMip1 += numBytes;
+				m_nTextureMemoryUsedPicMip2 += numBytes;
+			}
 		}
 
-		D3DSURFACE_DESC desc;
-		m_pBackBufferSurface->GetDesc( &desc );
-		AddBufferToTextureList( "BACKBUFFER", desc );
-		AddBufferToTextureList( "FRONTBUFFER", desc );
-	//	ImageFormat imageFormat = ImageLoader::D3DFormatToImageFormat( desc.Format );
-	//	if( imageFormat >= 0 )
-		{
-			VPROF_INCREMENT_GROUP_COUNTER( "TexGroup_frame_" TEXTURE_GROUP_RENDER_TARGET, 
-				COUNTER_GROUP_TEXTURE_PER_FRAME, 
-	//			ImageLoader::SizeInBytes( imageFormat ) * desc.Width * desc.Height );
-				2 * 4 * desc.Width * desc.Height ); // hack (times 2 for front and back buffer)
-		}
+		if ( !m_bDebugGetAllTextures &&
+			  tex.m_LastBoundFrame != m_CurrentFrame )
+			continue;
 
-		m_pZBufferSurface->GetDesc( &desc );
-		AddBufferToTextureList( "DEPTHBUFFER", desc );
-	//	imageFormat = ImageLoader::D3DFormatToImageFormat( desc.Format );
-	//	if( imageFormat >= 0 )
-		{
-			VPROF_INCREMENT_GROUP_COUNTER( "TexGroup_frame_" TEXTURE_GROUP_RENDER_TARGET, 
-				COUNTER_GROUP_TEXTURE_PER_FRAME, 
-	//			ImageLoader::SizeInBytes( imageFormat ) * desc.Width * desc.Height );
-				4 * desc.Width * desc.Height ); // hack
-		}
+		if ( tex.m_LastBoundFrame != m_CurrentFrame )
+			tex.m_nTimesBoundThisFrame = 0;
+
+		KeyValues *pSubKey = m_pDebugTextureList->CreateNewKey();
+		pSubKey->SetString( "Name", tex.m_DebugName.String() );
+		pSubKey->SetString( "TexGroup", tex.m_TextureGroupName.String() );
+		pSubKey->SetInt( "Size", tex.GetMemUsage() );
+		if ( tex.GetCount() > 1 )
+			pSubKey->SetInt( "Count", tex.GetCount() );
+		pSubKey->SetString( "Format", ImageLoader::GetName( tex.GetImageFormat() ) );
+		pSubKey->SetInt( "Width", tex.GetWidth() );
+		pSubKey->SetInt( "Height", tex.GetHeight() );
+
+		pSubKey->SetInt( "BindsMax", tex.m_nTimesBoundMax );
+		pSubKey->SetInt( "BindsFrame", tex.m_nTimesBoundThisFrame );
 	}
+
+	D3DSURFACE_DESC desc;
+	m_pBackBufferSurface->GetDesc( &desc );
+	AddBufferToTextureList( "BACKBUFFER", desc );
+	AddBufferToTextureList( "FRONTBUFFER", desc );
+//	ImageFormat imageFormat = ImageLoader::D3DFormatToImageFormat( desc.Format );
+	m_pZBufferSurface->GetDesc( &desc );
+	AddBufferToTextureList( "DEPTHBUFFER", desc );
+//	imageFormat = ImageLoader::D3DFormatToImageFormat( desc.Format );
 }
 
 
@@ -4268,9 +4200,6 @@ bool CShaderAPIDx8::PIXError()
 //-----------------------------------------------------------------------------
 void CShaderAPIDx8::ChangeVideoMode( const ShaderDeviceInfo_t &info )
 {
-	if ( IsX360() )
-		return;
-
 	LOCK_SHADERAPI();
 
 	m_PendingVideoModeChangeConfig = info;
@@ -4289,12 +4218,6 @@ void CShaderAPIDx8::ChangeVideoMode( const ShaderDeviceInfo_t &info )
 //-----------------------------------------------------------------------------
 void CShaderAPIDx8::ComputeFillRate()
 {
-	if ( IsX360() )
-	{
-		// not valid
-		return;
-	}
-
 	static unsigned char* pBuf = 0;
 
 	int width, height;
@@ -4619,13 +4542,6 @@ MorphFormat_t CShaderAPIDx8::ComputeMorphFormat( int numSnapshots, StateSnapshot
 static void CommitVertexShaderConstantRange( IDirect3DDevice9 *pDevice, const DynamicState_t &desiredState,
 	DynamicState_t &currentState, bool bForce, int nFirstConstant, int nCount )
 {
-	if ( IsX360() )
-	{
-		// invalid code path for 360, not coded for 360 GPU contant awareness
-		Assert( 0 );
-		return;
-	}
-
 	int nFirstCommit = nFirstConstant;
 	int nCommitCount = 0;
 
@@ -4801,29 +4717,8 @@ void CShaderAPIDx8::EnableBuffer2FramesAhead( bool bEnable )
 void CShaderAPIDx8::SetDepthFeatheringPixelShaderConstant( int iConstant, float fDepthBlendScale )
 {
 	float fConstantValues[4];
-
-	if( IsX360() )
-	{
-		const D3DMATRIX &projMatrix = GetProjectionMatrix();
-
-		fConstantValues[0] = 50.0f / fDepthBlendScale;
-		fConstantValues[1] = 1.0f / projMatrix.m[2][2];
-		fConstantValues[2] = 1.0f / projMatrix.m[3][2];
-		fConstantValues[3] = projMatrix.m[2][2];
-
-		/*
-		D3DXMATRIX invProjMatrix;
-		D3DXMatrixInverse( &invProjMatrix, NULL, (D3DXMATRIX *)&projMatrix );
-		fConstantValues[1] = invProjMatrix.m[3][2];
-		fConstantValues[2] = invProjMatrix.m[3][3];
-		fConstantValues[3] = invProjMatrix.m[2][2];
-		*/
-	}
-	else
-	{
-		fConstantValues[0] = m_DynamicState.m_DestAlphaDepthRange / fDepthBlendScale;
-		fConstantValues[1] = fConstantValues[2] = fConstantValues[3] = 0.0f; //empty
-	}
+	fConstantValues[0] = m_DynamicState.m_DestAlphaDepthRange / fDepthBlendScale;
+	fConstantValues[1] = fConstantValues[2] = fConstantValues[3] = 0.0f; //empty
 
 	SetPixelShaderConstant( iConstant, fConstantValues );
 }
@@ -5576,7 +5471,7 @@ bool CShaderAPIDx8::ShouldUsePixelFogForMode( MaterialFogMode_t fogMode )
 	if( fogMode == MATERIAL_FOG_NONE )
 		return false;
 
-	if( IsX360() || IsPosix() ) // Always use pixel fog on X360 and Posix
+	if( IsPosix() ) // Always use pixel fog on Posix
 		return true;
 
 	if( g_pHardwareConfig->Caps().m_nDXSupportLevel < 90 ) //pixel fog not available until at least ps2.0
@@ -5601,12 +5496,6 @@ bool CShaderAPIDx8::ShouldUsePixelFogForMode( MaterialFogMode_t fogMode )
 void CShaderAPIDx8::FogMode( MaterialFogMode_t fogMode )
 {
 	bool bFogEnable;
-
-	if ( IsX360() )
-	{
-		// FF fog not applicable on 360
-		return;
-	}
 
 	m_DynamicState.m_SceneFog = fogMode;
 	switch( fogMode )
@@ -5864,9 +5753,6 @@ FORCEINLINE void CShaderAPIDx8::SetVertexShaderConstantInternal( int var, float 
 		Assert( var + numVecs <= g_pHardwareConfig->NumVertexShaderConstants() );
 	}
 
-	if ( IsX360() && var + numVecs > m_MaxVectorVertexShaderConstant )
-			m_MaxVectorVertexShaderConstant = var + numVecs;
-
 	memcpy( &m_DesiredState.m_pVectorVertexShaderConstant[var], pVec, numVecs * 4 * sizeof(float) );	
 }
 
@@ -5904,12 +5790,6 @@ void CShaderAPIDx8::SetBooleanVertexShaderConstant( int var, int const* pVec, in
 	}
 
 	memcpy( &m_DesiredState.m_pBooleanVertexShaderConstant[var], pVec, numBools * sizeof(BOOL) );
-
-	if ( IsX360() && var + numBools > m_MaxBooleanVertexShaderConstant )
-	{
-		m_MaxBooleanVertexShaderConstant = var + numBools;
-		Assert( m_MaxBooleanVertexShaderConstant <= 16 );
-	}
 }
 
 
@@ -5937,12 +5817,6 @@ void CShaderAPIDx8::SetIntegerVertexShaderConstant( int var, int const* pVec, in
 		memcpy( &m_DynamicState.m_pIntegerVertexShaderConstant[var], pVec, numIntVecs * sizeof(IntVector4D) );
 	}
 	memcpy( &m_DesiredState.m_pIntegerVertexShaderConstant[var], pVec, numIntVecs * sizeof(IntVector4D) );
-
-	if ( IsX360() && var + numIntVecs > m_MaxIntegerVertexShaderConstant )
-	{
-		m_MaxIntegerVertexShaderConstant = var + numIntVecs;
-		Assert( m_MaxIntegerVertexShaderConstant <= 16 );
-	}
 }
 
 FORCEINLINE void CShaderAPIDx8::SetPixelShaderConstantInternal( int nStartConst, float const* pValues, int nNumConsts, bool bForce )
@@ -5970,18 +5844,6 @@ FORCEINLINE void CShaderAPIDx8::SetPixelShaderConstantInternal( int nStartConst,
 		Dx9Device()->SetPixelShaderConstantF( nStartConst, pValues, nNumConsts );
 		memcpy( &m_DynamicState.m_pVectorPixelShaderConstant[nStartConst], pValues, nNumConsts * 4 * sizeof(float) );
 	}
-
-	if ( IsX360() && nStartConst + nNumConsts > m_MaxVectorPixelShaderConstant )
-	{
-		m_MaxVectorPixelShaderConstant = nStartConst + nNumConsts;
-		Assert( m_MaxVectorPixelShaderConstant <= 32 );
-		if ( m_MaxVectorPixelShaderConstant > 32 )
-		{
-			// NOTE!  There really are 224 pixel shader constants on the 360, but we do an optimization that only blasts the first 32 always.
-			Error( "Don't use more then the first 32 pixel shader constants on the 360!" );
-		}
-	}
-
 	memcpy( &m_DesiredState.m_pVectorPixelShaderConstant[nStartConst], pValues, nNumConsts * 4 * sizeof(float) );
 }
 
@@ -6186,12 +6048,6 @@ void CShaderAPIDx8::SetBooleanPixelShaderConstant( int var, int const* pVec, int
 	}
 
 	memcpy( &m_DesiredState.m_pBooleanPixelShaderConstant[var], pVec, numBools * sizeof(BOOL) );
-
-	if ( IsX360() && var + numBools > m_MaxBooleanPixelShaderConstant )
-	{
-		m_MaxBooleanPixelShaderConstant = var + numBools;
-		Assert( m_MaxBooleanPixelShaderConstant <= 16 );
-	}
 }
 
 
@@ -6216,11 +6072,6 @@ void CShaderAPIDx8::SetIntegerPixelShaderConstant( int var, int const* pVec, int
 
 	memcpy( &m_DesiredState.m_pIntegerPixelShaderConstant[var], pVec, numIntVecs * sizeof(IntVector4D) );
 
-	if ( IsX360() && var + numIntVecs > m_MaxIntegerPixelShaderConstant )
-	{
-		m_MaxIntegerPixelShaderConstant = var + numIntVecs;
-		Assert( m_MaxBooleanPixelShaderConstant <= 16 );
-	}
 }
 
 
@@ -6463,70 +6314,62 @@ void CShaderAPIDx8::ComputeStatsInfo( ShaderAPITextureHandle_t hTexture, bool is
 	textureData.m_SizeBytes = 0;
 	textureData.m_SizeTexels = 0;
 	textureData.m_LastBoundFrame = -1;
-	if ( IsX360() )
-	{
-		textureData.m_nTimesBoundThisFrame = 0;
-	}
 
 	IDirect3DBaseTexture* pD3DTex = CShaderAPIDx8::GetD3DTexture( hTexture );
-
-	if ( IsPC() || !IsX360() )
+	if ( isCubeMap )
 	{
-		if ( isCubeMap )
+		IDirect3DCubeTexture* pTex = static_cast<IDirect3DCubeTexture*>(pD3DTex);
+		if ( !pTex )
 		{
-			IDirect3DCubeTexture* pTex = static_cast<IDirect3DCubeTexture*>(pD3DTex);
-			if ( !pTex )
-			{
-				Assert( 0 );
-				return;
-			}
-
-			int numLevels = pTex->GetLevelCount();
-			for (int i = 0; i < numLevels; ++i)
-			{
-				D3DSURFACE_DESC desc;
-				HRESULT hr = pTex->GetLevelDesc( i, &desc );
-				Assert( !FAILED(hr) );
-				textureData.m_SizeBytes += 6 * ImageLoader::GetMemRequired( desc.Width, desc.Height, 1, textureData.GetImageFormat(), false );
-				textureData.m_SizeTexels += 6 * desc.Width * desc.Height;
-			}
+			Assert( 0 );
+			return;
 		}
-		else if ( isVolumeTexture )
-		{
-			IDirect3DVolumeTexture9* pTex = static_cast<IDirect3DVolumeTexture9*>(pD3DTex);
-			if ( !pTex )
-			{
-				Assert( 0 );
-				return;
-			}
-			int numLevels = pTex->GetLevelCount();
-			for (int i = 0; i < numLevels; ++i)
-			{
-				D3DVOLUME_DESC desc;
-				HRESULT hr = pTex->GetLevelDesc( i, &desc );
-				Assert( !FAILED( hr ) );
-				textureData.m_SizeBytes += ImageLoader::GetMemRequired( desc.Width, desc.Height, desc.Depth, textureData.GetImageFormat(), false );
-				textureData.m_SizeTexels += desc.Width * desc.Height;
-			}
-		}
-		else
-		{
-			IDirect3DTexture* pTex = static_cast<IDirect3DTexture*>(pD3DTex);
-			if ( !pTex )
-			{
-				Assert( 0 );
-				return;
-			}
 
-			int numLevels = pTex->GetLevelCount();
-			for (int i = 0; i < numLevels; ++i)
-			{
-				D3DSURFACE_DESC desc;
-				HRESULT hr = pTex->GetLevelDesc( i, &desc );
-				Assert( !FAILED( hr ) );
-				textureData.m_SizeBytes += ImageLoader::GetMemRequired( desc.Width, desc.Height, 1, textureData.GetImageFormat(), false );
-				textureData.m_SizeTexels += desc.Width * desc.Height;
-			}
+		int numLevels = pTex->GetLevelCount();
+		for (int i = 0; i < numLevels; ++i)
+		{
+			D3DSURFACE_DESC desc;
+			HRESULT hr = pTex->GetLevelDesc( i, &desc );
+			Assert( !FAILED(hr) );
+			textureData.m_SizeBytes += 6 * ImageLoader::GetMemRequired( desc.Width, desc.Height, 1, textureData.GetImageFormat(), false );
+			textureData.m_SizeTexels += 6 * desc.Width * desc.Height;
+		}
+	}
+	else if ( isVolumeTexture )
+	{
+		IDirect3DVolumeTexture9* pTex = static_cast<IDirect3DVolumeTexture9*>(pD3DTex);
+		if ( !pTex )
+		{
+			Assert( 0 );
+			return;
+		}
+		int numLevels = pTex->GetLevelCount();
+		for (int i = 0; i < numLevels; ++i)
+		{
+			D3DVOLUME_DESC desc;
+			HRESULT hr = pTex->GetLevelDesc( i, &desc );
+			Assert( !FAILED( hr ) );
+			textureData.m_SizeBytes += ImageLoader::GetMemRequired( desc.Width, desc.Height, desc.Depth, textureData.GetImageFormat(), false );
+			textureData.m_SizeTexels += desc.Width * desc.Height;
+		}
+	}
+	else
+	{
+		IDirect3DTexture* pTex = static_cast<IDirect3DTexture*>(pD3DTex);
+		if ( !pTex )
+		{
+			Assert( 0 );
+			return;
+		}
+
+		int numLevels = pTex->GetLevelCount();
+		for (int i = 0; i < numLevels; ++i)
+		{
+			D3DSURFACE_DESC desc;
+			HRESULT hr = pTex->GetLevelDesc( i, &desc );
+			Assert( !FAILED( hr ) );
+			textureData.m_SizeBytes += ImageLoader::GetMemRequired( desc.Width, desc.Height, 1, textureData.GetImageFormat(), false );
+			textureData.m_SizeTexels += desc.Width * desc.Height;
 		}
 	}
 }
@@ -6657,8 +6500,6 @@ ShaderAPITextureHandle_t CShaderAPIDx8::CreateTextureHandle( void )
 
 void CShaderAPIDx8::CreateTextureHandles( ShaderAPITextureHandle_t *handles, int count )
 {
-	TM_ZONE_DEFAULT( TELEMETRY_LEVEL0 );
-
 	if ( count <= 0 )
 		return;
 
@@ -6668,8 +6509,6 @@ void CShaderAPIDx8::CreateTextureHandles( ShaderAPITextureHandle_t *handles, int
 	ShaderAPITextureHandle_t hTexture;
 
 	{
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - Search", __FUNCTION__ );
-
 		for ( hTexture = m_Textures.Head(); hTexture != m_Textures.InvalidIndex(); hTexture = m_Textures.Next( hTexture ) )
 		{
 			if ( !( m_Textures[hTexture].m_Flags & Texture_t::IS_ALLOCATED ) )
@@ -6681,7 +6520,6 @@ void CShaderAPIDx8::CreateTextureHandles( ShaderAPITextureHandle_t *handles, int
 		}
 	}
 
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - Add", __FUNCTION__ );
 	while ( idxCreating < count )
 		handles[ idxCreating ++ ] = m_Textures.AddToTail();
 }
@@ -6719,11 +6557,7 @@ void CShaderAPIDx8::CreateTextures(
 	const char *pDebugName,
 	const char *pTextureGroupName )
 {
-	TM_ZONE_DEFAULT( TELEMETRY_LEVEL0 );
-
 	LOCK_SHADERAPI();
-
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - PostLock", __FUNCTION__ );
 
 	Assert( this == g_pShaderAPI );
 
@@ -6772,8 +6606,6 @@ void CShaderAPIDx8::CreateTextures(
 	usSetFlags |= ( IsPosix() || ( creationFlags & (TEXTURE_CREATE_DYNAMIC | TEXTURE_CREATE_MANAGED) ) ) ? Texture_t::IS_LOCKABLE : 0;
 	usSetFlags |= ( creationFlags & TEXTURE_CREATE_VERTEXTEXTURE) ? Texture_t::IS_VERTEX_TEXTURE : 0;
 
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - CreateFrames", __FUNCTION__ );
-
 	for ( int idxFrame = 0; idxFrame < count; ++ idxFrame )
 	{
 		arrTxp[ idxFrame ] = &GetTexture( pHandles[ idxFrame ] );
@@ -6808,20 +6640,14 @@ void CShaderAPIDx8::CreateTextures(
 		// Set the initial texture state
 		if ( numCopies <= 1 )
 		{
-			tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - CreateD3DTexture", __FUNCTION__ );
-
 			pTexture->m_NumCopies = 1;
 			pD3DTex = CreateD3DTexture( width, height, depth, dstImageFormat, numMipLevels, creationFlags, (char*)pDebugName );
 			pTexture->SetTexture( pD3DTex );
 		}
 		else
 		{
-			tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - CreateD3DTexture", __FUNCTION__ );
-
 			pTexture->m_NumCopies = numCopies;
 			{
-// X360TEMP
-//				MEM_ALLOC_CREDIT();
 				pTexture->GetTextureArray() = new IDirect3DBaseTexture* [numCopies];
 			}
 			for (int k = 0; k < numCopies; ++k)
@@ -6883,18 +6709,8 @@ void CShaderAPIDx8::SetupTextureGroup( ShaderAPITextureHandle_t hTexture, const 
 		pTexture->m_TextureGroupName = TEXTURE_GROUP_UNACCOUNTED;
 	}
 
-	// 360 cannot vprof due to multicore loading until vprof is reentrant and these counters are real.
-#if defined( VPROF_ENABLED )
-	char counterName[256];
-	Q_snprintf( counterName, sizeof( counterName ), "TexGroup_global_%s", pTexture->m_TextureGroupName.String() );
-	pTexture->m_pTextureGroupCounterGlobal = g_VProfCurrentProfile.FindOrCreateCounter( counterName, COUNTER_GROUP_TEXTURE_GLOBAL );
-
-	Q_snprintf( counterName, sizeof( counterName ), "TexGroup_frame_%s", pTexture->m_TextureGroupName.String() );
-	pTexture->m_pTextureGroupCounterFrame = g_VProfCurrentProfile.FindOrCreateCounter( counterName, COUNTER_GROUP_TEXTURE_PER_FRAME );
-#else
 	pTexture->m_pTextureGroupCounterGlobal = NULL;
 	pTexture->m_pTextureGroupCounterFrame  = NULL;
-#endif
 
 	if ( pTexture->m_pTextureGroupCounterGlobal )
 	{
@@ -7064,8 +6880,6 @@ void CShaderAPIDx8::WriteTextureToFile( ShaderAPITextureHandle_t hTexture, const
 		//render targets can't be locked, luckily we can copy the surface to system memory and lock that.
 		IDirect3DSurface *pSystemSurface;
 
-		Assert( !IsX360() );
-
 		hr = Dx9Device()->CreateOffscreenPlainSurface( surfaceDesc.Width, surfaceDesc.Height, surfaceDesc.Format, D3DPOOL_SYSTEMMEM, &pSystemSurface, NULL );
 		Assert( SUCCEEDED( hr ) );
 
@@ -7173,10 +6987,10 @@ IDirect3DSurface* CShaderAPIDx8::GetTextureSurface( ShaderAPITextureHandle_t tex
 		return NULL;
 	}
 
-	if ( IsX360() && ( tex.m_Flags & Texture_t::IS_RENDER_TARGET_SURFACE ) )
+	if ( 0 && ( tex.m_Flags & Texture_t::IS_RENDER_TARGET_SURFACE ) )
 	{
 		pSurface = tex.GetRenderTargetSurface( false );
-
+// Secton: What? Why would you put POSIX check if this if statement would be executed only on Xbox?!?
 #if POSIX
 		// dxabstract's AddRef/Release have optional args to help track usage
 		pSurface->AddRef( 0, "CShaderAPIDx8::GetTextureSurface public addref");
@@ -7346,8 +7160,6 @@ void CShaderAPIDx8::SetRenderTargetEx( int nRenderTargetID, ShaderAPITextureHand
 		Texture_t &tex = GetTexture( depthTextureHandle );
 
 		//Cannot use a depth/stencil surface derived from a texture. 
-		//Asserting helps get the whole call stack instead of letting the 360 report an error with a partial stack
-		Assert( !( IsX360() && (tex.m_Flags & Texture_t::IS_DEPTH_STENCIL_TEXTURE) ) );
 
 		if ( tex.m_Flags & Texture_t::IS_DEPTH_STENCIL )
 		{
@@ -7404,26 +7216,18 @@ void CShaderAPIDx8::SetRenderTargetEx( int nRenderTargetID, ShaderAPITextureHand
 	// NOTE: The documentation says that SetRenderTarget increases the refcount
 	// but it doesn't appear to in practice. If this somehow changes (perhaps
 	// in a device-specific manner, we're in trouble).
-	if ( IsPC() || !IsX360() )
+	if ( pColorSurface == m_pBackBufferSurface && nRenderTargetID > 0 )
 	{
-		if ( pColorSurface == m_pBackBufferSurface && nRenderTargetID > 0 )
-		{
-			// SetRenderTargetEx is overloaded so that if you pass NULL in for anything that
-			// isn't the zeroth render target, you effectively disable that MRT index.
-			// (Passing in NULL for the zeroth render target means that you want to use the backbuffer
-			// as the render target.)
-			// hack hack hack!!!!!  If the render target id > 0 and the user passed in NULL, disable the render target
-			Dx9Device()->SetRenderTarget( nRenderTargetID, NULL );
-		}
-		else
-		{
-			Dx9Device()->SetRenderTarget( nRenderTargetID, pColorSurface );
-		}
+		// SetRenderTargetEx is overloaded so that if you pass NULL in for anything that
+		// isn't the zeroth render target, you effectively disable that MRT index.
+		// (Passing in NULL for the zeroth render target means that you want to use the backbuffer
+		// as the render target.)
+		// hack hack hack!!!!!  If the render target id > 0 and the user passed in NULL, disable the render target
+		Dx9Device()->SetRenderTarget( nRenderTargetID, NULL );
 	}
 	else
 	{
-		Assert( nRenderTargetID == 0 );
-		SetRenderTargetInternalXbox( colorTextureHandle );
+		Dx9Device()->SetRenderTarget( nRenderTargetID, pColorSurface );
 	}
 
 	// The 0th render target defines which depth buffer we are using, so 
@@ -7529,8 +7333,6 @@ bool CShaderAPIDx8::DoRenderTargetsNeedSeparateDepthBuffer() const
 //-----------------------------------------------------------------------------
 void CShaderAPIDx8::ModifyTexture( ShaderAPITextureHandle_t textureHandle )
 {
-	tmZone( TELEMETRY_LEVEL2, TMZF_NONE, "%s", __FUNCTION__ );
-
 	LOCK_SHADERAPI();
 	// Can't do this if we're locked!
 	Assert( m_ModifyTextureLockedLevel < 0 );
@@ -7576,8 +7378,6 @@ void CShaderAPIDx8::AdvanceCurrentCopy( ShaderAPITextureHandle_t hTexture )
 bool CShaderAPIDx8::TexLock( int level, int cubeFaceID, int xOffset, int yOffset, 
 								int width, int height, CPixelWriter& writer )
 {
-	tmZone( TELEMETRY_LEVEL2, TMZF_NONE, "%s", __FUNCTION__ );
-
 	LOCK_SHADERAPI();
 
 	Assert( m_ModifyTextureLockedLevel < 0 );
@@ -7619,8 +7419,6 @@ bool CShaderAPIDx8::TexLock( int level, int cubeFaceID, int xOffset, int yOffset
 
 void CShaderAPIDx8::TexUnlock( )
 {
-	tmZone( TELEMETRY_LEVEL2, TMZF_NONE, "%s", __FUNCTION__ );
-
 	LOCK_SHADERAPI();
 	if ( m_ModifyTextureLockedLevel >= 0 )
 	{
@@ -8340,10 +8138,7 @@ static inline RECT* RectToRECT( Rect_t *pSrcRect, RECT &dstRect )
 void CShaderAPIDx8::CopyRenderTargetToTextureEx( ShaderAPITextureHandle_t textureHandle, int nRenderTargetID, Rect_t *pSrcRect, Rect_t *pDstRect )
 {
 	LOCK_SHADERAPI();
-	VPROF_BUDGET( "CShaderAPIDx8::CopyRenderTargetToTexture", "Refraction overhead" );
-
-	if ( !TextureIsAllocated( textureHandle ) )
-		return;
+	if ( !TextureIsAllocated( textureHandle ) )return;
 
 #if defined( PIX_INSTRUMENTATION )
 	{
@@ -8675,7 +8470,6 @@ void CShaderAPIDx8::CopyRenderTargetToTexture( ShaderAPITextureHandle_t textureH
 void CShaderAPIDx8::CopyTextureToRenderTargetEx( int nRenderTargetID, ShaderAPITextureHandle_t textureHandle, Rect_t *pSrcRect, Rect_t *pDstRect )
 {
 	LOCK_SHADERAPI();
-	VPROF( "CShaderAPIDx8::CopyRenderTargetToTexture" );
 
 	if ( !TextureIsAllocated( textureHandle ) )
 		return;
@@ -9171,9 +8965,7 @@ void CShaderAPIDx8::SpewBoardState()
 void CShaderAPIDx8::BeginPass( StateSnapshot_t snapshot )
 {
 	LOCK_SHADERAPI();
-	VPROF("CShaderAPIDx8::BeginPass");
-	if (IsDeactivated())
-		return;
+	if (IsDeactivated()) return;
 
 	m_nCurrentSnapshot = snapshot;
 //	Assert( m_pRenderMesh );
@@ -9422,7 +9214,7 @@ void CShaderAPIDx8::UpdateMatrixTransform( TransformType_t type )
 		CacheWorldSpaceCameraPosition();
 	}
 
-	if ( !IsX360() && m_CurrStack == MATERIAL_PROJECTION )
+	if ( m_CurrStack == MATERIAL_PROJECTION )
 	{
 		CachePolyOffsetProjectionMatrix();
 	}
@@ -9601,26 +9393,14 @@ void CShaderAPIDx8::LoadBoneMatrix( int boneIndex, const float *m )
 // Commits morph target factors
 //-----------------------------------------------------------------------------
 static void CommitFlexWeights( IDirect3DDevice9 *pDevice, const DynamicState_t &desiredState, 
-									 DynamicState_t &currentState, bool bForce )
+							   DynamicState_t &currentState, bool bForce )
 {
-	if ( IsX360() )
-	{
-		// not supporting for 360
-		return;
-	}
-
 	CommitVertexShaderConstantRange( pDevice, desiredState, currentState, bForce,
 		VERTEX_SHADER_FLEX_WEIGHTS, VERTEX_SHADER_MAX_FLEX_WEIGHT_COUNT );
 }
 
 void CShaderAPIDx8::SetFlexWeights( int nFirstWeight, int nCount, const MorphWeight_t* pWeights )
 {
-	if ( IsX360() )
-	{
-		// not supported for 360
-		return;
-	}
-
 	LOCK_SHADERAPI();
 	if ( g_pHardwareConfig->Caps().m_NumVertexShaderConstants < VERTEX_SHADER_FLEX_WEIGHTS + VERTEX_SHADER_MAX_FLEX_WEIGHT_COUNT )
 		return;
@@ -9906,7 +9686,6 @@ static void printmat4x4( char *label, float *m00 )
 
 void CShaderAPIDx8::SetVertexShaderViewProj()
 {
-	//GLM_FUNC;
 	//GLMPRINTF(( ">-M- SetVertexShaderViewProj" ));
 	
 	if (g_pHardwareConfig->Caps().m_SupportsPixelShaders)
@@ -9963,7 +9742,6 @@ void CShaderAPIDx8::SetVertexShaderViewProj()
 
 void CShaderAPIDx8::SetVertexShaderModelViewProjAndModelView( void )
 {
-	//GLM_FUNC;
 	//GLMPRINTF(( ">-M- SetVertexShaderModelViewProjAndModelView" ));
 	
 	if (g_pHardwareConfig->Caps().m_SupportsPixelShaders)
@@ -10023,7 +9801,6 @@ void CShaderAPIDx8::SetVertexShaderModelViewProjAndModelView( void )
 
 void CShaderAPIDx8::UpdateVertexShaderMatrix( int iMatrix )
 {
-	//GLM_FUNC;
 	if ( iMatrix == 0 )
 	{
 		int matrix = MATERIAL_MODEL;
@@ -10049,7 +9826,6 @@ void CShaderAPIDx8::UpdateVertexShaderMatrix( int iMatrix )
 
 void CShaderAPIDx8::SetVertexShaderStateSkinningMatrices()
 {
-	//GLM_FUNC;
 	// casting from 4x3 matrices to a 4x4 D3DXMATRIX, need 4 floats of overflow
 	float results[12+4];
 
@@ -10147,9 +9923,6 @@ void CShaderAPIDx8::CommitVertexShaderTransforms()
 
 void CShaderAPIDx8::UpdateFixedFunctionMatrix( int iMatrix )
 {
-	if ( IsX360() )
-		return;
-
 	int matrix = MATERIAL_MODEL + iMatrix;
 	if ( FixedFunctionTransformChanged( matrix ) )
 	{
@@ -10163,9 +9936,6 @@ void CShaderAPIDx8::UpdateFixedFunctionMatrix( int iMatrix )
 
 void CShaderAPIDx8::SetFixedFunctionStateSkinningMatrices()
 {
-	if ( IsX360() )
-		return;
-
 	for( int i=1; i < g_pHardwareConfig->MaxBlendMatrices(); i++ )
 	{
 		UpdateFixedFunctionMatrix( i );
@@ -10177,9 +9947,6 @@ void CShaderAPIDx8::SetFixedFunctionStateSkinningMatrices()
 //-----------------------------------------------------------------------------
 void CShaderAPIDx8::CommitPerPassFixedFunctionTransforms()
 {
-	if ( IsX360() )
-		return;
-
 	// Update projection
 	if ( FixedFunctionTransformChanged( MATERIAL_PROJECTION ) )
 	{
@@ -10198,9 +9965,6 @@ void CShaderAPIDx8::CommitPerPassFixedFunctionTransforms()
 
 void CShaderAPIDx8::CommitFixedFunctionTransforms()
 {
-	if ( IsX360() )
-		return;
-
 	// Update view + projection
 	int i;
 	for ( i = MATERIAL_VIEW; i <= MATERIAL_PROJECTION; ++i)
@@ -10242,7 +10006,7 @@ void CShaderAPIDx8::SetSkinningMatrices()
 	
 	uint nMaxVertexConstantIndex = 0;
 
-	if ( IsX360() || UsesVertexShader(m_pMaterial->GetVertexFormat()) )
+	if ( UsesVertexShader(m_pMaterial->GetVertexFormat()) )
 	{
 		SetVertexShaderStateSkinningMatrices();
 	}
@@ -10536,11 +10300,6 @@ void CShaderAPIDx8::CommitPixelShaderLighting( int pshReg )
 //-----------------------------------------------------------------------------
 void CShaderAPIDx8::CommitFixedFunctionLighting()
 {	
-	if ( IsX360() )
-	{
-		return;
-	}
-
 	// Commit each light
 	for (int i = 0; i < g_pHardwareConfig->MaxNumLights(); ++i)
 	{
@@ -10674,12 +10433,6 @@ void CShaderAPIDx8::CommitUserClipPlanes( bool bUsingFixedFunction )
 //-----------------------------------------------------------------------------
 void CShaderAPIDx8::CommitPerPassFogMode( bool bUsingVertexAndPixelShaders )
 {
-	if ( IsX360() )
-	{
-		// FF fog not applicable on 360
-		return;
-	}
-
 	D3DFOGMODE dxFogMode = D3DFOG_NONE;
 	if ( m_DynamicState.m_FogEnable )
 	{
@@ -10702,7 +10455,7 @@ void CShaderAPIDx8::CommitPerPassXboxFixups()
 //-----------------------------------------------------------------------------
 void CShaderAPIDx8::CommitPerPassStateChanges( StateSnapshot_t id )
 {
-	if ( IsX360() || UsesVertexAndPixelShaders(id) )
+	if ( UsesVertexAndPixelShaders(id) )
 	{
 		CommitPerPassVertexShaderTransforms();
 		CommitPerPassFogMode( true );
@@ -10727,15 +10480,14 @@ void CShaderAPIDx8::CommitPerPassStateChanges( StateSnapshot_t id )
 //-----------------------------------------------------------------------------
 void CShaderAPIDx8::CommitStateChanges()
 {
-	VPROF("CShaderAPIDx8::CommitStateChanges");
 	CommitFastClipPlane();
 
-	bool bUsingFixedFunction = !IsX360() && m_pMaterial && !UsesVertexShader( m_pMaterial->GetVertexFormat() );
+	bool bUsingFixedFunction = m_pMaterial && !UsesVertexShader( m_pMaterial->GetVertexFormat() );
 
 	// xboxissue - cannot support ff pipeline
-	Assert ( IsPC() || ( IsX360() && !bUsingFixedFunction ) );
+	Assert ( IsPC() );
 
-	if ( IsX360() || !bUsingFixedFunction )
+	if ( !bUsingFixedFunction )
 	{
 		CommitVertexShaderTransforms();
 
@@ -10947,11 +10699,6 @@ void CShaderAPIDx8::FlushHardware( )
 //-----------------------------------------------------------------------------
 void CShaderAPIDx8::HandleDeviceLost()
 {
-	if ( IsX360() )
-	{
-		return;
-	}
-
 	LOCK_SHADERAPI();
 
 	if ( !IsActive() )
@@ -10994,7 +10741,7 @@ void CShaderAPIDx8::ClearColor4ub( unsigned char r, unsigned char g, unsigned ch
 // Converts the clear color to be appropriate for HDR
 D3DCOLOR CShaderAPIDx8::GetActualClearColor( D3DCOLOR clearColor )
 {
-	bool bConvert = !IsX360() && m_TransitionTable.CurrentState().m_bLinearColorSpaceFrameBufferEnable;
+	bool bConvert = m_TransitionTable.CurrentState().m_bLinearColorSpaceFrameBufferEnable;
 
 	if ( bConvert )
 	{
@@ -11116,7 +10863,7 @@ void CShaderAPIDx8::ClearBuffers( bool bClearColor, bool bClearDepth, bool bClea
 
 	// SRGBWrite is disabled when clearing so that the clear color won't get gamma converted
 	bool bSRGBWriteEnable = false;
-	if ( !IsX360() && bClearColor && m_TransitionTable.CurrentShadowState() )
+	if ( bClearColor && m_TransitionTable.CurrentShadowState() )
 	{
 		bSRGBWriteEnable = m_TransitionTable.CurrentShadowState()->m_SRGBWriteEnable;
 	}
@@ -11533,8 +11280,6 @@ void CShaderAPIDx8::CopyBitsFromHostSurface( IDirect3DSurface* pSurfaceBits,
 	HRESULT hr;
 	int flags = D3DLOCK_READONLY | D3DLOCK_NOSYSLOCK;
 
-	tmZone( TELEMETRY_LEVEL1, TMZF_NONE, "%s", __FUNCTION__ );
-
 	hr = pSurfaceBits->LockRect( &lockedRect, &rect, flags );
 	if ( !FAILED( hr ) )
 	{
@@ -11555,26 +11300,23 @@ void CShaderAPIDx8::ReadPixels( Rect_t *pSrcRect, Rect_t *pDstRect, unsigned cha
 	LOCK_SHADERAPI();
 	Assert( pDstRect );
 	
-	if ( IsPC() || !IsX360() )
+	Rect_t srcRect;
+	if ( !pSrcRect )
 	{
-		Rect_t srcRect;
-		if ( !pSrcRect )
-		{
-			srcRect.x = srcRect.y = 0;
-			srcRect.width = m_nWindowWidth;
-			srcRect.height = m_nWindowHeight;
-			pSrcRect = &srcRect;
-		}
+		srcRect.x = srcRect.y = 0;
+		srcRect.width = m_nWindowWidth;
+		srcRect.height = m_nWindowHeight;
+		pSrcRect = &srcRect;
+	}
 
-		ImageFormat format;
-		IDirect3DSurface* pSurfaceBits = GetBackBufferImage( pSrcRect, pDstRect, format );
-		if ( pSurfaceBits )
-		{
-			CopyBitsFromHostSurface( pSurfaceBits, *pDstRect, pData, format, dstFormat, nDstStride );
-		
-			// Release the temporary surface
-			pSurfaceBits->Release();
-		}
+	ImageFormat format;
+	IDirect3DSurface* pSurfaceBits = GetBackBufferImage( pSrcRect, pDstRect, format );
+	if ( pSurfaceBits )
+	{
+		CopyBitsFromHostSurface( pSurfaceBits, *pDstRect, pData, format, dstFormat, nDstStride );
+	
+		// Release the temporary surface
+		pSurfaceBits->Release();
 	}
 }
 
@@ -11590,17 +11332,14 @@ void CShaderAPIDx8::ReadPixels( int x, int y, int width, int height, unsigned ch
 	rect.width = width;
 	rect.height = height;
 
-	if ( IsPC() || !IsX360() )
+	ImageFormat format;
+	IDirect3DSurface* pSurfaceBits = GetBackBufferImage( &rect, &rect, format );
+	if (pSurfaceBits)
 	{
-		ImageFormat format;
-		IDirect3DSurface* pSurfaceBits = GetBackBufferImage( &rect, &rect, format );
-		if (pSurfaceBits)
-		{
-			CopyBitsFromHostSurface( pSurfaceBits, rect, pData, format, dstFormat, 0 );
-		
-			// Release the temporary surface
-			pSurfaceBits->Release();
-		}
+		CopyBitsFromHostSurface( pSurfaceBits, rect, pData, format, dstFormat, 0 );
+	
+		// Release the temporary surface
+		pSurfaceBits->Release();
 	}
 }
 
@@ -12057,9 +11796,6 @@ void CShaderAPIDx8::RecordString( const char *pStr )
 
 void CShaderAPIDx8::EvictManagedResourcesInternal()
 {
-	if ( IsX360() )
-		return;
-
 	if ( !ThreadOwnsDevice() || !ThreadInMainThread() )
 	{
 		ShaderUtil()->OnThreadEvent( SHADER_THREAD_EVICT_RESOURCES );
@@ -12078,11 +11814,6 @@ void CShaderAPIDx8::EvictManagedResourcesInternal()
 
 void CShaderAPIDx8::EvictManagedResources( void )
 {
-	if ( IsX360() )
-	{
-		return;
-	}
-
 	LOCK_SHADERAPI();
 	Assert(ThreadOwnsDevice());
 	// Tell other material system applications to release resources
@@ -12183,8 +11914,6 @@ int CShaderAPIDx8::OcclusionQuery_GetNumPixelsRendered( ShaderAPIOcclusionQuery_
 {
 	LOCK_SHADERAPI();
 	IDirect3DQuery9 *pQuery = (IDirect3DQuery9 *)handle;
-
-	tmZone( TELEMETRY_LEVEL1, TMZF_NONE, "%s", __FUNCTION__ );
 
 	DWORD nPixels;
 	HRESULT hResult = pQuery->GetData( &nPixels, sizeof( nPixels ), bFlush ? D3DGETDATA_FLUSH : 0 );
@@ -12293,11 +12022,6 @@ const FlashlightState_t &CShaderAPIDx8::GetFlashlightStateEx( VMatrix &worldToTe
 
 bool CShaderAPIDx8::SupportsMSAAMode( int nMSAAMode )
 {
-	if ( IsX360() )
-	{
-		return false;
-	}
-
 	return ( D3D_OK == D3D()->CheckDeviceMultiSampleType( m_DisplayAdapter, m_DeviceType, 
 														   m_PresentParameters.BackBufferFormat,
 														   m_PresentParameters.Windowed,
@@ -12644,10 +12368,6 @@ float CShaderAPIDx8::GammaToLinear_HardwareSpecific( float fGamma ) const
 	{
 		return SrgbGammaToLinear( fGamma );
 	}
-	else if( IsX360() )
-	{
-		return SrgbGammaToLinear( fGamma );
-	}
 	else
 	{
 		// Unknown console
@@ -12658,10 +12378,6 @@ float CShaderAPIDx8::GammaToLinear_HardwareSpecific( float fGamma ) const
 float CShaderAPIDx8::LinearToGamma_HardwareSpecific( float fLinear ) const
 {
 	if ( IsPC() )
-	{
-		return SrgbLinearToGamma( fLinear );
-	}
-	else if ( IsX360() )
 	{
 		return SrgbLinearToGamma( fLinear );
 	}

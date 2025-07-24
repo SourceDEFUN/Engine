@@ -9,7 +9,7 @@
 #include "imeshdx8.h"
 #include "shaderapidx8_global.h"
 #include "materialsystem/IShader.h"
-#include "tier0/vprof.h"
+
 #include "studio.h"
 #include "tier1/fmtstr.h"
 
@@ -126,11 +126,6 @@ protected:
 	bool m_bIsDynamic : 1;
 	bool m_bFlush : 1;				// Used only for dynamic buffers, indicates to discard the next time
 
-#ifdef VPROF_ENABLED
-	int m_nVProfFrame;
-	int	*m_pFrameCounter;
-	int	*m_pGlobalCounter;
-#endif
 
 #ifdef _DEBUG
 	static int s_nBufferCount;
@@ -202,10 +197,6 @@ private:
 	void *m_pLockIndexBuffer;
 	int m_nLockIndexBufferSize;
 	int m_nLockIndexOffset;
-#endif
-
-#ifdef VPROF_ENABLED
-	int m_nVProfFrame;
 #endif
 
 #ifdef _DEBUG
@@ -1118,9 +1109,6 @@ CIndexBufferDx8::CIndexBufferDx8( ShaderBufferType_t bufferType, MaterialIndexFo
 	m_pShadowIndices = NULL;
 #endif
 
-#ifdef VPROF_ENABLED
-	m_nVProfFrame = -1;
-#endif
 }
 
 CIndexBufferDx8::~CIndexBufferDx8()
@@ -1180,17 +1168,6 @@ bool CIndexBufferDx8::Allocate()
 		return false;
 	}
 
-	if ( !m_bIsDynamic )
-	{
-		VPROF_INCREMENT_GROUP_COUNTER( "TexGroup_global_" TEXTURE_GROUP_STATIC_INDEX_BUFFER, 
-			COUNTER_GROUP_TEXTURE_GLOBAL, m_nBufferSize );
-	}
-	else
-	{
-		VPROF_INCREMENT_GROUP_COUNTER( "TexGroup_global_" TEXTURE_GROUP_DYNAMIC_INDEX_BUFFER, 
-			COUNTER_GROUP_TEXTURE_GLOBAL, m_nBufferSize );
-	}
-
 #ifdef CHECK_INDICES
 	Assert ( !m_pShadowIndices );
 	m_pShadowIndices = new unsigned char[ m_nBufferSize ];
@@ -1200,7 +1177,6 @@ bool CIndexBufferDx8::Allocate()
 #ifdef _DEBUG
 	++s_nBufferCount;
 #endif
-
 	return true;
 }
 
@@ -1215,17 +1191,6 @@ void CIndexBufferDx8::Free()
 
 		m_pIndexBuffer->Release();
 		m_pIndexBuffer = NULL;
-
-		if ( !m_bIsDynamic )
-		{
-			VPROF_INCREMENT_GROUP_COUNTER( "TexGroup_global_" TEXTURE_GROUP_STATIC_INDEX_BUFFER, 
-				COUNTER_GROUP_TEXTURE_GLOBAL, - m_nBufferSize );
-		}
-		else
-		{
-			VPROF_INCREMENT_GROUP_COUNTER( "TexGroup_global_" TEXTURE_GROUP_DYNAMIC_INDEX_BUFFER, 
-				COUNTER_GROUP_TEXTURE_GLOBAL, - m_nBufferSize );
-		}
 	}
 
 #ifdef CHECK_INDICES
@@ -1299,16 +1264,7 @@ unsigned short CIndexBufferDx8::GetShadowIndex( int i ) const
 // Used to measure how much static buffer memory is touched each frame 
 //-----------------------------------------------------------------------------
 void CIndexBufferDx8::HandlePerFrameTextureStats( int nFrame )
-{
-#ifdef VPROF_ENABLED
-	if ( m_nVProfFrame != nFrame && !m_bIsDynamic )
-	{
-		m_nVProfFrame = nFrame;
-		VPROF_INCREMENT_GROUP_COUNTER( "TexGroup_frame_" TEXTURE_GROUP_STATIC_INDEX_BUFFER, 
-			COUNTER_GROUP_TEXTURE_PER_FRAME, m_nBufferSize );
-	}
-#endif
-}
+{}
 
 
 //-----------------------------------------------------------------------------
@@ -1343,8 +1299,6 @@ bool CIndexBufferDx8::Lock( int nMaxIndexCount, bool bAppend, IndexDesc_t &desc 
 	// FIXME: Why do we need to sync matrices now?
 	ShaderUtil()->SyncMatrices();
 	g_ShaderMutex.Lock();
-
-	VPROF( "CIndexBufferX8::Lock" );		
 
 	void *pLockedData = NULL;
 	HRESULT hr;
@@ -1506,26 +1460,6 @@ CVertexBufferDx8::CVertexBufferDx8( ShaderBufferType_t type, VertexFormat_t fmt,
 	m_bIsLocked = false;
 	m_bIsDynamic = ( type == SHADER_BUFFER_TYPE_DYNAMIC ) || ( type == SHADER_BUFFER_TYPE_DYNAMIC_TEMP );
 	m_bFlush = false;
-
-#ifdef VPROF_ENABLED
-	if ( !m_bIsDynamic )
-	{
-		char name[256];
-		V_strcpy_safe( name, "TexGroup_global_" );
-		V_strcat_safe( name, pBudgetGroupName, sizeof(name) );
-		m_pGlobalCounter = g_VProfCurrentProfile.FindOrCreateCounter( name, COUNTER_GROUP_TEXTURE_GLOBAL );
-
-		V_strcpy_safe( name, "TexGroup_frame_" );
-		V_strcat_safe( name, pBudgetGroupName, sizeof(name) );
-		m_pFrameCounter = g_VProfCurrentProfile.FindOrCreateCounter( name, COUNTER_GROUP_TEXTURE_PER_FRAME );
-	}
-	else
-	{
-		m_pGlobalCounter = g_VProfCurrentProfile.FindOrCreateCounter( "TexGroup_global_" TEXTURE_GROUP_DYNAMIC_VERTEX_BUFFER, COUNTER_GROUP_TEXTURE_GLOBAL );
-		m_pFrameCounter = NULL;
-	}
-	m_nVProfFrame = -1;
-#endif
 }
 
 CVertexBufferDx8::~CVertexBufferDx8()
@@ -1592,14 +1526,6 @@ bool CVertexBufferDx8::Allocate()
 	// Track VB allocations
 	g_VBAllocTracker->CountVB( m_pVertexBuffer, m_bIsDynamic, m_nBufferSize, VertexSize(), GetVertexFormat() );
 
-#ifdef VPROF_ENABLED
-	if ( IsX360() || !m_bIsDynamic )
-	{
-		Assert( m_pGlobalCounter );
-		*m_pGlobalCounter += m_nBufferSize;
-	}
-#endif
-
 #ifdef _DEBUG
 		++s_nBufferCount;
 #endif
@@ -1618,17 +1544,8 @@ void CVertexBufferDx8::Free()
 
 	// Track VB allocations
 	g_VBAllocTracker->UnCountVB( m_pVertexBuffer );
-
-#ifdef VPROF_ENABLED
-		if ( IsX360() || !m_bIsDynamic )
-		{
-			Assert( m_pGlobalCounter );
-			*m_pGlobalCounter -= m_nBufferSize;
-		}
-#endif
-
-		m_pVertexBuffer->Release();
-		m_pVertexBuffer = NULL;
+	m_pVertexBuffer->Release();
+	m_pVertexBuffer = NULL;
 	}
 }
 
@@ -1734,8 +1651,6 @@ bool CVertexBufferDx8::Lock( int nMaxVertexCount, bool bAppend, VertexDesc_t &de
 	// FIXME: Why do we need to sync matrices now?
 	ShaderUtil()->SyncMatrices();
 	g_ShaderMutex.Lock();
-
-	VPROF( "CVertexBufferDx8::Lock" );		
 
 	void *pLockedData = NULL;
 	HRESULT hr;
@@ -1864,15 +1779,7 @@ void CVertexBufferDx8::Unlock( int nWrittenVertexCount, VertexDesc_t &desc )
 // Used to measure how much static buffer memory is touched each frame 
 //-----------------------------------------------------------------------------
 void CVertexBufferDx8::HandlePerFrameTextureStats( int nFrame )
-{
-#ifdef VPROF_ENABLED
-	if ( m_nVProfFrame != nFrame && !m_bIsDynamic )
-	{
-		m_nVProfFrame = nFrame;
-		m_pFrameCounter += m_nBufferSize;
-	}
-#endif
-}
+{}
 
 
 //-----------------------------------------------------------------------------
@@ -2684,7 +2591,6 @@ void CMeshDX8::LockMesh( int nVertexCount, int nIndexCount, MeshDesc_t& desc )
 	ShaderUtil()->SyncMatrices();
 
 	g_ShaderMutex.Lock();
-	VPROF( "CMeshDX8::LockMesh" );		
 	Lock( nVertexCount, false, *static_cast<VertexDesc_t*>( &desc ) );
 	if ( m_Type != MATERIAL_POINTS )
 	{
@@ -2702,7 +2608,6 @@ void CMeshDX8::LockMesh( int nVertexCount, int nIndexCount, MeshDesc_t& desc )
 
 void CMeshDX8::UnlockMesh( int nVertexCount, int nIndexCount, MeshDesc_t& desc )
 {
-	VPROF( "CMeshDX8::UnlockMesh" );
 
 	Assert( CBaseMeshDX8::m_bMeshLocked );
 
@@ -2726,8 +2631,6 @@ void CMeshDX8::UnlockMesh( int nVertexCount, int nIndexCount, MeshDesc_t& desc )
 //-----------------------------------------------------------------------------
 void CMeshDX8::ModifyBeginEx( bool bReadOnly, int nFirstVertex, int nVertexCount, int nFirstIndex, int nIndexCount, MeshDesc_t& desc )
 {
-	VPROF( "CMeshDX8::ModifyBegin" );
-
 	// Just give the app crap buffers to fill up while we're suppressed...
 	if ( g_pShaderDeviceDx8->IsDeactivated())
 	{
@@ -2765,7 +2668,6 @@ void CMeshDX8::ModifyBegin( int nFirstVertex, int nVertexCount, int nFirstIndex,
 
 void CMeshDX8::ModifyEnd( MeshDesc_t& desc )
 {
-	VPROF( "CMeshDX8::ModifyEnd" );
 	Unlock( 0, *static_cast<IndexDesc_t*>( &desc ) );
 	Unlock( 0, *static_cast<VertexDesc_t*>( &desc ) );
 }
@@ -2808,7 +2710,7 @@ void CMeshDX8::UseVertexBuffer( CVertexBuffer* pBuffer )
 //-----------------------------------------------------------------------------
 void CMeshDX8::SetPrimitiveType( MaterialPrimitiveType_t type )
 {
-	Assert( IsX360() || ( type != MATERIAL_INSTANCED_QUADS ) );
+	Assert( type != MATERIAL_INSTANCED_QUADS );
 	if ( !ShaderUtil()->OnSetPrimitiveType( this, type ) )
 	{
 		return;
@@ -3006,9 +2908,6 @@ bool CMeshDX8::IsValidVertexFormat( VertexFormat_t vertexFormat )
 void CMeshDX8::SetVertexIDStreamState()
 {
 	// FIXME: this method duplicates the code in CMeshMgr::SetVertexIDStreamState
-
-	if ( IsX360() )
-		return;
 
 	bool bUsingVertexID = IsUsingVertexID();
 	if ( bUsingVertexID != g_bUsingVertexID )
@@ -3348,7 +3247,6 @@ void CMeshDX8::CheckIndices( CPrimList *pPrim, int numPrimitives )
 void CMeshDX8::RenderPass()
 {
 	LOCK_SHADERAPI();
-	VPROF( "CMeshDX8::RenderPass" );
 
 	HandleLateCreation();
 
@@ -3372,8 +3270,6 @@ void CMeshDX8::RenderPass()
 
 		if ( ( m_Type == MATERIAL_POINTS ) || ( m_Type == MATERIAL_INSTANCED_QUADS ) )
 		{
-			tmZone( TELEMETRY_LEVEL1, TMZF_NONE, "Dx9Device_DrawPrimitive" );
-
 			// (For point/instanced-quad lists, we don't actually fill in indices, but we treat it as
 			// though there are indices for the list up until here).
 			Dx9Device()->DrawPrimitive( m_Mode, s_FirstVertex, pPrim->m_NumIndices );
@@ -3386,12 +3282,6 @@ void CMeshDX8::RenderPass()
 			CheckIndices( pPrim, numPrimitives );
 #endif // CHECK_INDICES
 			{
-				VPROF( "Dx9Device()->DrawIndexedPrimitive" );
-				VPROF_INCREMENT_COUNTER( "DrawIndexedPrimitive", 1 );
-				VPROF_INCREMENT_COUNTER( "numPrimitives", numPrimitives );
-				VPROF_INCREMENT_GROUP_COUNTER( "render/DrawIndexedPrimitive", COUNTER_GROUP_TELEMETRY, 1 );
-				VPROF_INCREMENT_GROUP_COUNTER( "render/numPrimitives", COUNTER_GROUP_TELEMETRY, 1 );
-
 				Dx9Device()->DrawIndexedPrimitive( 
 					m_Mode,			// Member of the D3DPRIMITIVETYPE enumerated type, describing the type of primitive to render. D3DPT_POINTLIST is not supported with this method.
 
@@ -3571,20 +3461,12 @@ void CDynamicMeshDX8::PreLock()
 //-----------------------------------------------------------------------------
 void CDynamicMeshDX8::LockMesh( int nVertexCount, int nIndexCount, MeshDesc_t& desc )
 {
-	tmZoneFiltered( TELEMETRY_LEVEL0, 50, TMZF_NONE, "%s %d %d", __FUNCTION__, nVertexCount, nIndexCount );
-
 	ShaderUtil()->SyncMatrices();
 
-	{
-		tmZoneFiltered( TELEMETRY_LEVEL0, 50, TMZF_NONE, "g_ShaderMutex.Lock" );
-		g_ShaderMutex.Lock();
-	}
+	g_ShaderMutex.Lock();
 
 	// Yes, this may well also be called from BufferedMesh but that's ok
-	{
-		tmZoneFiltered( TELEMETRY_LEVEL0, 50, TMZF_NONE, "PreLock" );
-		PreLock();
-	}
+	PreLock();
 
 	if (m_VertexOverride)
 	{
@@ -3596,10 +3478,7 @@ void CDynamicMeshDX8::LockMesh( int nVertexCount, int nIndexCount, MeshDesc_t& d
 		nIndexCount = 0;
 	}
 
-	{
-		tmZoneFiltered( TELEMETRY_LEVEL0, 50, TMZF_NONE, "Lock" );
-		Lock( nVertexCount, false, *static_cast<VertexDesc_t*>( &desc ) );
-	}
+	Lock( nVertexCount, false, *static_cast<VertexDesc_t*>( &desc ) );
 
 	if (m_nFirstVertex < 0)
 	{
@@ -3616,14 +3495,8 @@ void CDynamicMeshDX8::LockMesh( int nVertexCount, int nIndexCount, MeshDesc_t& d
 	if ( m_Type != MATERIAL_POINTS )
 	{
 		int nFirstIndex;
-		{
-			tmZoneFiltered( TELEMETRY_LEVEL0, 50, TMZF_NONE, "Lock nFirstIndex" );
-			nFirstIndex = Lock( false, -1, nIndexCount, *static_cast<IndexDesc_t*>( &desc ) );
-		}
-		if (m_FirstIndex < 0)
-		{
-			m_FirstIndex = nFirstIndex;
-		}
+		nFirstIndex = Lock( false, -1, nIndexCount, *static_cast<IndexDesc_t*>( &desc ) );
+		if (m_FirstIndex < 0) m_FirstIndex = nFirstIndex;
 	}
 	else
 	{
@@ -3665,8 +3538,6 @@ void CDynamicMeshDX8::Draw( int nFirstIndex, int nIndexCount )
 		MarkAsDrawn();
 		return;
 	}
-
-	VPROF( "CDynamicMeshDX8::Draw" );
 
 	m_HasDrawn = true;
 
@@ -3973,8 +3844,7 @@ void CTempMeshDX8::UnlockMesh( int nVertexCount, int nIndexCount, MeshDesc_t& de
 //-----------------------------------------------------------------------------
 void CTempMeshDX8::SetPrimitiveType( MaterialPrimitiveType_t type )
 {
-	// FIXME: Support MATERIAL_INSTANCED_QUADS for CTempMeshDX8 (X360 only)
-	Assert( ( type != MATERIAL_INSTANCED_QUADS ) /* || IsX360() */ );
+	Assert( ( type != MATERIAL_INSTANCED_QUADS ) );
 	m_Type = type;
 }
 
@@ -4591,7 +4461,7 @@ void CBufferedMeshDX8::Draw( int nFirstIndex, int nIndexCount )
 
 void CBufferedMeshDX8::SetPrimitiveType( MaterialPrimitiveType_t type )
 {
-	Assert( IsX360() || ( type != MATERIAL_INSTANCED_QUADS ) );
+	Assert( type != MATERIAL_INSTANCED_QUADS );
 	Assert( type != MATERIAL_HETEROGENOUS );
 
 	if (type != GetPrimitiveType())
@@ -4738,8 +4608,6 @@ void CBufferedMeshDX8::Flush( )
 
 	if ( m_pMesh && !m_IsFlushing && m_FlushNeeded )
 	{
-		VPROF( "CBufferedMeshDX8::Flush" );
-
 #ifdef DEBUG_BUFFERED_MESHES
 		if( m_BufferedStateSet )
 		{
@@ -4812,7 +4680,7 @@ void CMeshMgr::Init()
 
 	CreateZeroVertexBuffer();
 		
-	m_BufferedMode = !IsX360();
+	m_BufferedMode = true;
 }
 
 void CMeshMgr::Shutdown()
@@ -4865,9 +4733,6 @@ void CMeshMgr::CleanUp()
 //-----------------------------------------------------------------------------
 void CMeshMgr::FillVertexIDBuffer( CVertexBuffer *pVertexIDBuffer, int nCount )
 {
-	if ( IsX360() )
-		return;
-
 	// Fill the buffer with the values 0->(nCount-1)
 	int nBaseVertexIndex = 0;
 	float *pBuffer = (float*)pVertexIDBuffer->Lock( nCount, nBaseVertexIndex );	
@@ -4897,9 +4762,6 @@ void CMeshMgr::DestroyDynamicIndexBuffer()
 //-----------------------------------------------------------------------------
 void CMeshMgr::CreateVertexIDBuffer()
 {
-	if ( IsX360() )
-		return;
-
 	DestroyVertexIDBuffer();
 
 	// Track mesh allocations
@@ -5003,7 +4865,6 @@ bool CMeshMgr::IsDynamicIndexBuffer( IIndexBuffer *pIndexBuffer ) const
 //-----------------------------------------------------------------------------
 void CMeshMgr::DiscardVertexBuffers()
 {
-	VPROF_BUDGET( "CMeshMgr::DiscardVertexBuffers", VPROF_BUDGETGROUP_SWAP_BUFFERS );
 	// This shouldn't be necessary, but it seems to be on GeForce 2
 	// It helps when running WC and the engine simultaneously.
 	ResetMeshRenderState();
@@ -5121,8 +4982,6 @@ IMesh* CMeshMgr::GetActualDynamicMesh( VertexFormat_t format )
 void CMeshMgr::CopyStaticMeshIndexBufferToTempMeshIndexBuffer( CTempMeshDX8 *pDstIndexMesh,
 															   CMeshDX8 *pSrcIndexMesh )
 {
-	tmZoneFiltered( TELEMETRY_LEVEL0, 50, TMZF_NONE, "%s", __FUNCTION__ );
-
 	Assert( !pSrcIndexMesh->IsDynamic() );
 	int nIndexCount = pSrcIndexMesh->IndexCount();
 	
@@ -5163,14 +5022,7 @@ IMesh *CMeshMgr::GetFlexMesh()
 IMesh* CMeshMgr::GetDynamicMesh( IMaterial* pMaterial, VertexFormat_t vertexFormat, int nHWSkinBoneCount,
 	bool buffered, IMesh* pVertexOverride, IMesh* pIndexOverride )
 {
-	tmZoneFiltered( TELEMETRY_LEVEL0, 50, TMZF_NONE, "%s", __FUNCTION__ );
-
 	Assert( (pMaterial == NULL) || ((IMaterialInternal *)pMaterial)->IsRealTimeVersion() );
-
-	if ( IsX360() )
-	{
-		buffered = false;
-	}
 
 	// Can't be buffered if we're overriding the buffers
 	if ( pVertexOverride || pIndexOverride )
@@ -5549,11 +5401,6 @@ void CMeshMgr::DestroyIndexBuffer( IIndexBuffer *pIndexBuffer )
 // Do we need to specify the stream here in the case of locking multiple dynamic VBs on different streams?
 IVertexBuffer *CMeshMgr::GetDynamicVertexBuffer( int streamID, VertexFormat_t vertexFormat, bool bBuffered )
 {
-	if ( IsX360() )
-	{
-		bBuffered = false;
-	}
-
 	if ( CompressionType( vertexFormat ) != VERTEX_COMPRESSION_NONE )
 	{
 		// UNDONE: support compressed dynamic meshes if needed (pro: less VB memory, con: time spent compressing)
@@ -5611,11 +5458,6 @@ IVertexBuffer *CMeshMgr::GetDynamicVertexBuffer( int streamID, VertexFormat_t ve
 
 IIndexBuffer *CMeshMgr::GetDynamicIndexBuffer( MaterialIndexFormat_t fmt, bool bBuffered )
 {
-	if ( IsX360() )
-	{
-		bBuffered = false;
-	}
-
 	m_BufferedMode = bBuffered;
 
 	Assert( !m_BufferedMode );
@@ -5640,9 +5482,6 @@ IIndexBuffer *CMeshMgr::GetDynamicIndexBuffer( MaterialIndexFormat_t fmt, bool b
 
 void CMeshMgr::SetVertexIDStreamState()
 {
-	if ( IsX360() )
-		return;
-
 	// MESHFIXME : This path is only used for the new index/vertex buffer interfaces.
 	// MESHFIXME : This path is only used for the new index/vertex buffer interfaces.
 	bool bUsingVertexID = false;//IsUsingVertexID();
@@ -5802,8 +5641,6 @@ void CMeshMgr::Draw( MaterialPrimitiveType_t primitiveType, int nFirstIndex, int
 void CMeshMgr::RenderPassWithVertexAndIndexBuffers( void )
 {
 //	LOCK_SHADERAPI(); MESHFIXME
-	VPROF( "CShaderAPIDX8::RenderPassWithVertexAndIndexBuffers" );
-
 	Assert( m_PrimitiveType != MATERIAL_HETEROGENOUS );
 
 //	for ( int iPrim=0; iPrim < s_nPrims; iPrim++ )
@@ -5826,10 +5663,6 @@ void CMeshMgr::RenderPassWithVertexAndIndexBuffers( void )
 
 //			Warning( "CMeshMgr::RenderPassWithVertexAndIndexBuffers: DrawIndexedPrimitive: m_nFirstIndex = %d numPrimitives = %d\n", ( int )( ( CDynamiCIndexBufferDx8 * )m_pCurrentIndexBuffer )->m_FirstIndex, ( int )( m_nNumIndices / 3 ) );
 			{
-				VPROF( "Dx9Device()->DrawIndexedPrimitive" );
-//				VPROF_INCREMENT_COUNTER( "DrawIndexedPrimitive", 1 );
-//				VPROF_INCREMENT_COUNTER( "numPrimitives", numPrimitives );
-
 //				Dx9Device()->DrawIndexedPrimitive( 
 //					m_Mode,
 //					m_FirstIndex,

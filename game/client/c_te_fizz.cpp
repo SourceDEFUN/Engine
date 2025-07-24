@@ -13,7 +13,7 @@
 #include "cbase.h"
 #include "c_basetempentity.h"
 #include "c_te_legacytempents.h"
-#include "tier0/vprof.h"
+
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -63,8 +63,6 @@ C_TEFizz::~C_TEFizz( void )
 //-----------------------------------------------------------------------------
 void C_TEFizz::PostDataUpdate( DataUpdateType_t updateType )
 {
-	VPROF( "C_TEFizz::PostDataUpdate" );
-
 	C_BaseEntity *pEnt = cl_entitylist->GetEnt( m_nEntity );
 	if (pEnt != NULL)
 	{

@@ -986,7 +986,6 @@ $Project
 		$File	"$SRCDIR\public\vphysics_interface.h"
 		$File	"$SRCDIR\game\shared\vphysics_sound.h"
 		$File	"$SRCDIR\public\mathlib\vplane.h"
-		$File	"$SRCDIR\public\tier0\vprof.h"
 		$File	"$SRCDIR\public\vstdlib\vstdlib.h"
 		$File	"$SRCDIR\public\winlite.h"
 		$File	"$SRCDIR\public\worldsize.h"

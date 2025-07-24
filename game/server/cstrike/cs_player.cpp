@@ -27,7 +27,7 @@
 #include "weapon_parse.h"
 #include "weapon_knife.h"
 #include "movehelper_server.h"
-#include "tier0/vprof.h"
+
 #include "te_effect_dispatch.h"
 #include "vphysics/player_controller.h"
 #include "weapon_hegrenade.h"
@@ -635,8 +635,6 @@ void CCSPlayer::Precache()
 ConVar sv_runcmds( "sv_runcmds", "1" );
 void CCSPlayer::PlayerRunCommand( CUserCmd *ucmd, IMoveHelper *moveHelper )
 {
-	VPROF( "CCSPlayer::PlayerRunCommand" );
-
 	if ( !sv_runcmds.GetInt() )
 		return;
 

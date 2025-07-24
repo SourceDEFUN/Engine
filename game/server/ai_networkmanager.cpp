@@ -252,7 +252,7 @@ void CAI_NetworkManager::SaveNetworkGraph( void )
 	// Now add the real map filename.
 	Q_strncat( szNrpFilename, "/", sizeof( szNrpFilename ), COPY_ALL_CHARACTERS  );
 	Q_strncat( szNrpFilename, STRING( gpGlobals->mapname ), sizeof( szNrpFilename ), COPY_ALL_CHARACTERS );
-	Q_strncat( szNrpFilename, IsX360() ? ".360.ain" : ".ain", sizeof( szNrpFilename ), COPY_ALL_CHARACTERS  );
+	Q_strncat( szNrpFilename, ".ain", sizeof( szNrpFilename ), COPY_ALL_CHARACTERS  );
 
 	CUtlBuffer buf;
 
@@ -280,10 +280,6 @@ void CAI_NetworkManager::SaveNetworkGraph( void )
 		buf.PutFloat( pNode->GetYaw() );
 		buf.Put( pNode->m_flVOffset, sizeof( pNode->m_flVOffset ) );
 		buf.PutChar( pNode->GetType() );
-		if ( IsX360() )
-		{
-			buf.SeekPut( CUtlBuffer::SEEK_CURRENT, 3 );
-		}
 		buf.PutUnsignedShort( pNode->m_eNodeInfo );
 		buf.PutShort( pNode->GetZone() );
 
@@ -503,30 +499,13 @@ void CAI_NetworkManager::LoadNetworkGraph( void )
 
 	Q_strncat( szNrpFilename, "/", sizeof( szNrpFilename ), COPY_ALL_CHARACTERS );
 	Q_strncat( szNrpFilename, STRING( gpGlobals->mapname ), sizeof( szNrpFilename ), COPY_ALL_CHARACTERS );
-	Q_strncat( szNrpFilename, IsX360() ? ".360.ain" : ".ain", sizeof( szNrpFilename ), COPY_ALL_CHARACTERS );
+	Q_strncat( szNrpFilename, ".ain", sizeof( szNrpFilename ), COPY_ALL_CHARACTERS );
 
 	MEM_ALLOC_CREDIT();
 
 	// Read the file in one gulp
 	CUtlBuffer buf;
 	bool bHaveAIN = false;
-	if ( IsX360() && g_pQueuedLoader->IsMapLoading() )
-	{
-		// .ain was loaded anonymously by bsp, should be ready
-		void *pData;
-		int nDataSize;
-		if ( g_pQueuedLoader->ClaimAnonymousJob( szNrpFilename, &pData, &nDataSize ) )
-		{
-			if ( nDataSize != 0 )
-			{
-				buf.Put( pData, nDataSize );
-				bHaveAIN = true;
-			}
-			filesystem->FreeOptimalReadBuffer( pData );
-		}
-	}
-	
-
 
 	if ( !bHaveAIN && !filesystem->ReadFile( szNrpFilename, "game", buf ) )
 	{
@@ -633,10 +612,6 @@ void CAI_NetworkManager::LoadNetworkGraph( void )
 
 		buf.Get( new_node->m_flVOffset, sizeof(new_node->m_flVOffset) );
 		new_node->m_eNodeType = (NodeType_e)buf.GetChar();
-		if ( IsX360() )
-		{
-			buf.SeekGet( CUtlBuffer::SEEK_CURRENT, 3 );
-		}
 
 		new_node->m_eNodeInfo = buf.GetUnsignedShort();
 		new_node->m_zone = buf.GetShort();
@@ -971,12 +946,6 @@ bool CAI_NetworkManager::IsAIFileCurrent ( const char *szMapName )
 		return false;
 	}
 
-	if ( IsX360() && ( filesystem->GetDVDMode() == DVDMODE_STRICT ) )
-	{
-		// dvd build process validates and guarantees correctness, timestamps are allowed to be wrong
-		return true;
-	}
-	
 	{
 		const char *pGameDir = CommandLine()->ParmValue( "-game", "hl2" );		
 		char szLoweredGameDir[256];
@@ -990,8 +959,8 @@ bool CAI_NetworkManager::IsAIFileCurrent ( const char *szMapName )
 		}
 	}
 	
-	Q_snprintf( szBspFilename, sizeof( szBspFilename ), "maps/%s%s.bsp" ,szMapName, GetPlatformExt() );
-	Q_snprintf( szGraphFilename, sizeof( szGraphFilename ), "maps/graphs/%s%s.ain", szMapName, GetPlatformExt() );
+	Q_snprintf( szBspFilename, sizeof( szBspFilename ), "maps/%s.bsp" ,szMapName );
+	Q_snprintf( szGraphFilename, sizeof( szGraphFilename ), "maps/graphs/%s.ain", szMapName );
 	
 	int iCompare;
 	if ( engine->CompareFileTime( szBspFilename, szGraphFilename, &iCompare ) )
@@ -2237,8 +2206,6 @@ void CAI_NetworkBuilder::Build( CAI_Network *pNetwork )
 
 	CAI_NetworkBuildHelper *pHelper = (CAI_NetworkBuildHelper *)CreateEntityByName( "ai_network_build_helper" );
 
-	VPROF( "AINet" );
-
 	BeginBuild();
 
 	CFastTimer masterTimer;
@@ -2397,8 +2364,6 @@ CAI_NetworkBuilder g_AINetworkBuilder;
 //-----------------------------------------------------------------------------
 void CAI_NetworkBuilder::InitClimbNodePosition(CAI_Network *pNetwork, CAI_Node *pNode) 
 {
-	AI_PROFILE_SCOPE( CAI_Node_InitClimbNodePosition );
-
 	// If this is a node for mounting/dismounting the climb skip it
 	if ( pNode->m_eNodeInfo & (bits_NODE_CLIMB_OFF_FORWARD | bits_NODE_CLIMB_OFF_LEFT | bits_NODE_CLIMB_OFF_RIGHT) )
 	{
@@ -2523,8 +2488,6 @@ void CAI_NetworkBuilder::InitClimbNodePosition(CAI_Network *pNetwork, CAI_Node *
 //-----------------------------------------------------------------------------
 void CAI_NetworkBuilder::InitGroundNodePosition(CAI_Network *pNetwork, CAI_Node *pNode)
 {
-	AI_PROFILE_SCOPE( CAI_Node_InitGroundNodePosition );
-
 	if ( pNode->m_eNodeInfo & bits_DONT_DROP )
 		return;
 
@@ -2565,8 +2528,6 @@ void CAI_NetworkBuilder::InitGroundNodePosition(CAI_Network *pNetwork, CAI_Node 
 //-----------------------------------------------------------------------------
 void CAI_NetworkBuilder::InitNodePosition(CAI_Network *pNetwork, CAI_Node *pNode) 
 {
-	AI_PROFILE_SCOPE( CAI_Node_InitNodePosition );
-
 	if (pNode->m_eNodeType == NODE_AIR)
 	{
 		return;
@@ -2614,8 +2575,6 @@ void CAI_NetworkBuilder::InitNodePosition(CAI_Network *pNetwork, CAI_Node *pNode
 //-----------------------------------------------------------------------------
 void CAI_NetworkBuilder::InitVisibility(CAI_Network *pNetwork, CAI_Node *pNode)
 {
-	AI_PROFILE_SCOPE( CAI_Node_InitVisibility );
-	
 	// If a deleted node bail
 	if (pNode->m_eNodeType == NODE_DELETED)
 	{
@@ -2806,8 +2765,6 @@ void CAI_NetworkBuilder::InitNeighbors(CAI_Network *pNetwork, CAI_Node *pNode)
 	// Begin by establishing viewability to limit the number of nodes tested
 	InitVisibility( pNetwork, pNode );
 
-	AI_PROFILE_SCOPE_BEGIN( CAI_Node_InitNeighbors );
-
 	// Now check each neighbor against all other neighbors to see if one of
 	// them is a redundant connection
 	for (int checknode = 0; checknode < pNetwork->NumNodes(); checknode++ )
@@ -2910,8 +2867,6 @@ void CAI_NetworkBuilder::InitNeighbors(CAI_Network *pNetwork, CAI_Node *pNode)
 		}
 	}
 	
-	AI_PROFILE_SCOPE_END();
-
 	m_DidSetNeighborsTable.Set(pNode->m_iID);
 }
 
@@ -3001,8 +2956,6 @@ int CAI_NetworkBuilder::ComputeConnection( CAI_Node *pSrcNode, CAI_Node *pDestNo
 	// ==============================================================
 	if (pSrcNode->m_eNodeType == NODE_AIR || pDestNode->GetType() == NODE_AIR) 
 	{
-		AI_PROFILE_SCOPE( CAI_Node_InitLinks_Air );
-
 		// Air nodes only connect to other air nodes and nothing else
 		if (pSrcNode->m_eNodeType == NODE_AIR && pDestNode->GetType() == NODE_AIR)
 		{
@@ -3021,8 +2974,6 @@ int CAI_NetworkBuilder::ComputeConnection( CAI_Node *pSrcNode, CAI_Node *pDestNo
 	// and there is room for the hull to pass between them
 	else if ((pSrcNode->m_eNodeType == NODE_CLIMB) && (pDestNode->GetType() == NODE_CLIMB))
 	{
-		AI_PROFILE_SCOPE( CAI_Node_InitLinks_Climb );
-
 		Vector srcPos	 = pSrcNode->GetPosition(hull);
 		Vector destPos	 = pDestNode->GetPosition(hull);
 		
@@ -3070,8 +3021,6 @@ int CAI_NetworkBuilder::ComputeConnection( CAI_Node *pSrcNode, CAI_Node *pDestNo
 		bool fStandFailed = false;
 		bool fWalkFailed = true;
 
-		AI_PROFILE_SCOPE_BEGIN( CAI_Node_InitLinks_Ground );
-
 		Vector srcPos	 = pSrcNode->GetPosition(hull);
 		Vector destPos	 = pDestNode->GetPosition(hull);
 
@@ -3104,15 +3053,11 @@ int CAI_NetworkBuilder::ComputeConnection( CAI_Node *pSrcNode, CAI_Node *pDestNo
 			DebugConnectMsg( srcId, destId, "      Nodes connect for ground movement\n" );
 		}
 	
-		AI_PROFILE_SCOPE_END();
-
 		// =============================================================================
 		// > JUMPING : jump the space between the nodes, but only if walk failed
 		// =============================================================================
 		if (!fStandFailed && fWalkFailed && (pSrcNode->m_eNodeType == NODE_GROUND) && (pDestNode->GetType() == NODE_GROUND))
 		{
-			AI_PROFILE_SCOPE( CAI_Node_InitLinks_Jump );
-
 			Vector srcPos	 = pSrcNode->GetPosition(hull);
 			Vector destPos	 = pDestNode->GetPosition(hull);
 
@@ -3158,8 +3103,6 @@ int CAI_NetworkBuilder::ComputeConnection( CAI_Node *pSrcNode, CAI_Node *pDestNo
 
 void CAI_NetworkBuilder::InitLinks(CAI_Network *pNetwork, CAI_Node *pNode)
 {
-	AI_PROFILE_SCOPE( CAI_Node_InitLinks );
-
 	// -----------------------------------------------------
 	// Get test hull
 	// -----------------------------------------------------

@@ -1058,7 +1058,7 @@ void StudioModel::scaleMeshes (float scale)
 			SetupModel (i);
 
 			const mstudio_modelvertexdata_t *vertData = m_pmodel->GetVertexData();
-			Assert( vertData ); // This can only return NULL on X360 for now
+			Assert( vertData );
 
 			for (k = 0; k < m_pmodel->numvertices; k++)
 			{

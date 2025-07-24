@@ -6,7 +6,7 @@
 
 #include "cbase.h"
 #include "base_playeranimstate.h"
-#include "tier0/vprof.h"
+
 #include "animation.h"
 #include "studio.h"
 #include "apparent_velocity_helper.h"
@@ -120,8 +120,6 @@ float CBasePlayerAnimState::TimeSinceLastAnimationStateClear() const
 
 void CBasePlayerAnimState::Update( float eyeYaw, float eyePitch )
 {
-	VPROF( "CBasePlayerAnimState::Update" );
-
 	// Clear animation overlays because we're about to completely reconstruct them.
 	ClearAnimationLayers();
 
@@ -207,7 +205,6 @@ void CBasePlayerAnimState::SetOuterPoseParameter( int iParam, float flValue )
 
 void CBasePlayerAnimState::ClearAnimationLayers()
 {
-	VPROF( "CBasePlayerAnimState::ClearAnimationLayers" );
 	if ( !m_pOuter )
 		return;
 
@@ -233,8 +230,6 @@ void CBasePlayerAnimState::RestartMainSequence()
 
 void CBasePlayerAnimState::ComputeSequences( CStudioHdr *pStudioHdr )
 {
-	VPROF( "CBasePlayerAnimState::ComputeSequences" );
-
 	ComputeMainSequence();		// Lower body (walk/run/idle).
 	UpdateInterpolators();		// The groundspeed interpolator uses the main sequence info.
 
@@ -251,8 +246,6 @@ void CBasePlayerAnimState::ResetGroundSpeed( void )
 
 void CBasePlayerAnimState::ComputeMainSequence()
 {
-	VPROF( "CBasePlayerAnimState::ComputeMainSequence" );
-
 	CBaseAnimatingOverlay *pPlayer = GetOuter();
 
 	// Have our class or the mod-specific class determine what the current activity is.
@@ -431,8 +424,6 @@ bool CBasePlayerAnimState::ShouldBlendAimSequenceToIdle()
 
 void CBasePlayerAnimState::ComputeAimSequence()
 {
-	VPROF( "CBasePlayerAnimState::ComputeAimSequence" );
-
 	// Synchronize the lower and upper body cycles.
 	float flCycle = m_pOuter->GetCycle();
 
@@ -484,8 +475,6 @@ int CBasePlayerAnimState::CalcSequenceIndex( const char *pBaseName, ... )
 
 void CBasePlayerAnimState::UpdateInterpolators()
 {
-	VPROF( "CBasePlayerAnimState::UpdateInterpolators" );
-
 	// First, figure out their current max speed based on their current activity.
 	float flCurMaxSpeed = GetCurrentMaxGroundSpeed();
 	m_flMaxGroundSpeed = flCurMaxSpeed;
@@ -538,7 +527,6 @@ bool CBasePlayerAnimState::CanThePlayerMove()
 
 void CBasePlayerAnimState::ComputePlaybackRate()
 {
-	VPROF( "CBasePlayerAnimState::ComputePlaybackRate" );
 	if ( m_AnimConfig.m_LegAnimType != LEGANIM_9WAY && m_AnimConfig.m_LegAnimType != LEGANIM_8WAY )
 	{
 		// When using a 9-way blend, playback rate is always 1 and we just scale the pose params
@@ -586,8 +574,6 @@ void CBasePlayerAnimState::EstimateYaw()
 //-----------------------------------------------------------------------------
 void CBasePlayerAnimState::ComputePoseParam_MoveYaw( CStudioHdr *pStudioHdr )
 {
-	VPROF( "CBasePlayerAnimState::ComputePoseParam_MoveYaw" );
-
 	//Matt: Goldsrc style animations need to not rotate the model
 	if ( m_AnimConfig.m_LegAnimType == LEGANIM_GOLDSRC )
 	{
@@ -713,8 +699,6 @@ void CBasePlayerAnimState::ComputePoseParam_MoveYaw( CStudioHdr *pStudioHdr )
 //-----------------------------------------------------------------------------
 void CBasePlayerAnimState::ComputePoseParam_BodyPitch( CStudioHdr *pStudioHdr )
 {
-	VPROF( "CBasePlayerAnimState::ComputePoseParam_BodyPitch" );
-
 	// Get pitch from v_angle
 	float flPitch = m_flEyePitch;
 	if ( flPitch > 180.0f )
@@ -792,8 +776,6 @@ int CBasePlayerAnimState::ConvergeAngles( float goal,float maxrate, float maxgap
 
 void CBasePlayerAnimState::ComputePoseParam_BodyYaw()
 {
-	VPROF( "CBasePlayerAnimState::ComputePoseParam_BodyYaw" );
-
 	// Find out which way he's running (m_flEyeYaw is the way he's looking).
 	Vector vel;
 	GetOuterAbsVelocity( vel );

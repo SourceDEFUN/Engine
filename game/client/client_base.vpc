@@ -1086,7 +1086,6 @@ $Project
 		$File	"$SRCDIR\public\mathlib\vmatrix.h"
 		$File	"$SRCDIR\public\vphysics_interface.h"
 		$File	"$SRCDIR\public\mathlib\vplane.h"
-		$File	"$SRCDIR\public\tier0\vprof.h"
 		$File	"$SRCDIR\public\vstdlib\vstdlib.h"
 		$File	"$SRCDIR\public\vtf\vtf.h"
 		$File	"$SRCDIR\public\vgui_controls\WizardPanel.h"

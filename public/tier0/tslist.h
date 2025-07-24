@@ -219,7 +219,7 @@ public:
 		TSLHead_t oldHead;
 		TSLHead_t newHead;
 
-#if defined( PLATFORM_PS3 ) || defined( PLATFORM_X360 )
+#if defined( PLATFORM_PS3 )
 		__lwsync(); // write-release barrier
 #endif
 
@@ -271,7 +271,7 @@ public:
 
 			if ( ThreadInterlockedAssignIf64x128( &m_Head.value64x128, newHead.value64x128, oldHead.value64x128 ) )
 			{
-#if defined( PLATFORM_PS3 ) || defined( PLATFORM_X360 )
+#if defined( PLATFORM_PS3 )
 				__lwsync(); // read-acquire barrier
 #endif
 				break;

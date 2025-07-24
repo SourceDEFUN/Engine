@@ -313,14 +313,6 @@ SOURCE=.\snd_io.cpp
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\common\vgui\vgui_basebudgetpanel.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\common\vgui\vgui_basebudgetpanel.h
-# End Source File
-# Begin Source File
-
 SOURCE=.\vgui_BasePanel.cpp
 
 !IF  "$(CFG)" == "engine - Win32 Debug"
@@ -381,38 +373,6 @@ SOURCE=.\vgui_baseui_interface.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\common\vgui\vgui_budgetbargraphpanel.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\common\vgui\vgui_budgetbargraphpanel.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\common\vgui\vgui_budgethistorypanel.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\common\vgui\vgui_budgethistorypanel.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\vgui_budgetpanel.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\vgui_budgetpanel.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\common\vgui\vgui_budgetpanelshared.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\common\vgui\vgui_budgetpanelshared.h
-# End Source File
-# Begin Source File
-
 SOURCE=.\vgui_DebugSystemPanel.cpp
 
 !IF  "$(CFG)" == "engine - Win32 Debug"
@@ -439,31 +399,6 @@ SOURCE=.\vgui_drawtreepanel.cpp
 
 SOURCE=.\vgui_helpers.cpp
 # End Source File
-# Begin Source File
-
-SOURCE=.\vgui_texturebudgetpanel.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\vgui_texturebudgetpanel.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\vgui_vprofgraphpanel.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\vgui_vprofgraphpanel.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\vgui_vprofpanel.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\vgui_vprofpanel.h
-# End Source File
-# End Group
 # Begin Source File
 
 SOURCE=..\public\anorms.cpp
@@ -2446,14 +2381,6 @@ SOURCE=.\voiceserver_impl.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\vprof_engine.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\vprof_record.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=..\common\vstring.cpp
 # End Source File
 # Begin Source File
@@ -3410,14 +3337,6 @@ SOURCE=.\VIEW.H
 # End Source File
 # Begin Source File
 
-SOURCE=.\vprof_engine.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\vprof_record.h
-# End Source File
-# Begin Source File
-
 SOURCE=.\WINQUAKE.H
 # End Source File
 # Begin Source File
@@ -3950,10 +3869,6 @@ SOURCE=..\Public\ivoiceserver.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\common\ivprofexport.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\Public\ivrenderview.h
 # End Source File
 # Begin Source File
@@ -4339,10 +4254,6 @@ SOURCE=..\Public\vphysics_interface.h
 # Begin Source File
 
 SOURCE=..\Public\vplane.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\public\tier0\vprof.h
 # End Source File
 # Begin Source File
 

@@ -508,7 +508,6 @@ CGCBase::CGCBase( )
 	m_bIsShuttingDown( false ),
 	m_bStartProfiling( false ),
 	m_bStopProfiling( false ),
-	m_bDumpVprofImbalances( false ),
 	m_nStartPlayingJobCount( 0 ),
 	m_nRequestSessionJobsActive( 0 ),
 	m_nLogonSurgeFramesRemaining( k_nMillion * 10 / k_cMicroSecPerShellFrame ), // stay in "logon surge" mode for at least 10 seconds after boot.
@@ -535,8 +534,6 @@ CGCBase::~CGCBase()
 //-----------------------------------------------------------------------------
 bool CGCBase::BInit( AppId_t unAppID, const char *pchAppPath, IGameCoordinatorHost *pHost )
 {
-	VPROF_BUDGET( "CGCBase::BInit", VPROF_BUDGETGROUP_STEAM );
-
 // Make sure we can't deploy debug GCs outside the dev environment
 #ifdef _DEBUG
 	if ( pHost->GetUniverse() != k_EUniverseDev )
@@ -636,7 +633,6 @@ uint32 CGCBase::GetGCUpTime() const
 //-----------------------------------------------------------------------------
 void CGCBase::Shutdown()
 {
-	VPROF_BUDGET( "CGCBase::Shutdown", VPROF_BUDGETGROUP_STEAM );
 	m_DumpHTTPErrorsSchedule.Cancel();
 
 	CGCShutdownJob *pJob = new CGCShutdownJob( this );
@@ -649,8 +645,6 @@ void CGCBase::Shutdown()
 //-----------------------------------------------------------------------------
 void CGCBase::Uninit( )
 {
-	VPROF_BUDGET( "CGCBase::Uninit", VPROF_BUDGETGROUP_STEAM );
-
 	OnUninit();
 
 	// clean up all of the sessions and caches here so we can be sure it happens before the memory pools go away at static destruction time
@@ -815,44 +809,6 @@ bool CGCBase::BMainLoopOncePerFrame( uint64 ulLimitMicroseconds )
 	CRTime::UpdateRealTime();
 #endif
 
-
-#ifdef VPROF_ENABLED
-	// Make sure we end the frame at the root node
-	if ( !g_VProfCurrentProfile.AtRoot() && m_bDumpVprofImbalances )
-	{
-		EmitWarning( SPEW_GC, SPEW_ALWAYS, "VProf not at root at end of frame. Stack:\n" );
-	}
-
-	for( int i = 0; !g_VProfCurrentProfile.AtRoot() && i < 100; i++ )
-	{
-		if ( m_bDumpVprofImbalances )
-		{
-			EmitWarning( SPEW_GC, SPEW_ALWAYS, "  %s\n", g_VProfCurrentProfile.GetCurrentNode()->GetName() );
-		}
-		g_VProfCurrentProfile.ExitScope();
-	}
-
-	g_VProfCurrentProfile.MarkFrame();
-
-	if ( m_bStopProfiling || m_bStartProfiling )
-	{
-		while ( g_VProfCurrentProfile.IsEnabled() )
-		{
-			g_VProfCurrentProfile.Stop();
-		}
-		m_bStopProfiling = false;
-
-		if ( m_bStartProfiling )
-		{
-			g_VProfCurrentProfile.Reset();
-			g_VProfCurrentProfile.Start();
-			m_bStartProfiling = false;
-		}
-	}
-#endif
-
-	VPROF_BUDGET( "Main Loop", VPROF_BUDGETGROUP_STEAM );
-
 	CLimitTimer limitTimer;
 	limitTimer.SetLimit( ulLimitMicroseconds );
 	CJobTime::UpdateJobTime( k_cMicroSecPerShellFrame );
@@ -863,8 +819,6 @@ bool CGCBase::BMainLoopOncePerFrame( uint64 ulLimitMicroseconds )
 	GFrameFunctionMgr().RunFrame( limitTimer );
 
 	{
-		VPROF_BUDGET( "Run Sessions", VPROF_BUDGETGROUP_STEAM );
-
 		m_AccountDetailsManager.MarkFrame();
 		m_hashUserSessions.StartFrameSchedule( true );
 		m_hashGSSessions.StartFrameSchedule( true );
@@ -905,14 +859,11 @@ bool CGCBase::BMainLoopOncePerFrame( uint64 ulLimitMicroseconds )
 	}
 
 	{
-		VPROF_BUDGET( "UpdateSOCacheVersions", VPROF_BUDGETGROUP_STEAM );
 		UpdateSOCacheVersions();
 	}
 
 	if( m_llStartPlaying.Count() > 0 )
 	{
-		VPROF_BUDGET( "StartStartPlayingJobs", VPROF_BUDGETGROUP_STEAM );
-
 		int nJobsNeeded = min( m_llStartPlaying.Count(), cv_concurrent_start_playing_limit.GetInt() - m_nStartPlayingJobCount );
 		while( nJobsNeeded > 0 )
 		{
@@ -1000,8 +951,6 @@ bool CGCBase::BShouldThrottleLowServiceLevelWebAPIJobs() const
 
 bool CGCBase::BMainLoopUntilFrameCompletion( uint64 ulLimitMicroseconds )
 {
-	VPROF_BUDGET( "Main Loop", VPROF_BUDGETGROUP_STEAM );
-
 	CLimitTimer limitTimer;
 	limitTimer.SetLimit( ulLimitMicroseconds );
 	bool bRet = m_JobMgr.BFrameFuncRunYieldingJobs( limitTimer );
@@ -1016,8 +965,6 @@ bool CGCBase::BMainLoopUntilFrameCompletion( uint64 ulLimitMicroseconds )
 	bRet |= GFrameFunctionMgr().RunFrameTick( limitTimer );
 
 	{
-		VPROF_BUDGET( "Expire locks", VPROF_BUDGETGROUP_STEAM );
-
 		for ( CLock *pLock = m_hashSteamIDLocks.PvRecordRun(); NULL != pLock; pLock = m_hashSteamIDLocks.PvRecordRun() )
 		{
 			if ( !pLock->BIsLocked() && pLock->GetMicroSecondsSinceLock() > k_cMicroSecLockLifetime )
@@ -1183,12 +1130,10 @@ void CGCBase::YieldingExecuteNextStartPlaying()
 //-----------------------------------------------------------------------------
 void CGCBase::YieldingExecuteStartPlayingQueueEntryByIndex( int idxStartPlayingQueue )
 {
-	VPROF_BUDGET( "CGCBase::YieldingExecuteStartPlayingQueueEntryByIndex - LinkedList", VPROF_BUDGETGROUP_STEAM );
 	// Remove the entry from the queue
 	StartPlayingWork_t work = m_llStartPlaying[ idxStartPlayingQueue ];
 	m_llStartPlaying.Remove( idxStartPlayingQueue );
 
-	VPROF_BUDGET( "CGCBase::YieldingExecuteStartPlayingQueueEntryByIndex", VPROF_BUDGETGROUP_STEAM );
 	// Remove it from the Steam ID map, too.
 	int nMapIndex = m_mapStartPlayingQueueIndexBySteamID.Find( work.m_steamID );
 	if ( nMapIndex == m_mapStartPlayingQueueIndexBySteamID.InvalidIndex() )
@@ -1245,7 +1190,6 @@ void CGCBase::SetUserSessionDetails( CGCUserSession *pUserSession, KeyValues *pk
 //-----------------------------------------------------------------------------
 void CGCBase::YieldingStartPlaying( const CSteamID & steamID, const CSteamID & gsSteamID, uint32 unServerAddr, uint16 usServerPort, CUtlBuffer *pVarData )
 {
-	VPROF_BUDGET( "CGCBase::YieldingStartPlaying", VPROF_BUDGETGROUP_STEAM );
 	if ( m_bIsShuttingDown )
 		return;
 
@@ -1273,7 +1217,6 @@ void CGCBase::YieldingStartPlaying( const CSteamID & steamID, const CSteamID & g
 	if( !pSession )
 	{
 		// Load their SO cache.  Remember, we already have their steam ID locked.
-		VPROF_BUDGET( "CGCBase::YieldingStartPlaying - Load SOCache", VPROF_BUDGETGROUP_STEAM );
 		CGCSharedObjectCache *pSOCache = YieldingFindOrLoadSOCache( steamID );
 		if ( !pSOCache )
 		{
@@ -1282,7 +1225,6 @@ void CGCBase::YieldingStartPlaying( const CSteamID & steamID, const CSteamID & g
 		}
 
 		// Create session of app-specific type
-		VPROF_BUDGET( "CGCBase::YieldingStartPlaying - CreateUserSession", VPROF_BUDGETGROUP_STEAM );
 		pSession = CreateUserSession( steamID, pSOCache );
 		if ( !pSession )
 		{
@@ -1290,7 +1232,6 @@ void CGCBase::YieldingStartPlaying( const CSteamID & steamID, const CSteamID & g
 			return;
 		}
 
-		VPROF_BUDGET( "CGCBase::YieldingStartPlaying - LRU Update", VPROF_BUDGETGROUP_STEAM );
 		RemoveCacheFromLRU( pSOCache );
 
 		CGCUserSession **ppSession = m_hashUserSessions.PvRecordInsert( steamID.ConvertToUint64() );
@@ -1300,7 +1241,6 @@ void CGCBase::YieldingStartPlaying( const CSteamID & steamID, const CSteamID & g
 
 		// Do game-specific logic here.  Note that we're still holding the game server
 		// lock...
-		VPROF_BUDGET( "CGCBase::YieldingStartPlaying - Game-specific start playing", VPROF_BUDGETGROUP_STEAM );
 		YieldingSessionStartPlaying( pSession );
 	}
 	else if ( pSession->BIsShuttingDown() )
@@ -1321,7 +1261,6 @@ void CGCBase::YieldingStartPlaying( const CSteamID & steamID, const CSteamID & g
 		pkvDetails = NULL;
 	}
 
-	VPROF_BUDGET( "CGCBase::YieldingStartPlaying - Game Server binding", VPROF_BUDGETGROUP_STEAM );
 	// Make sure the server exists and then try to join it
 	if ( gsSteamID.IsValid() && gsSteamID.BGameServerAccount() && BYieldingLockSteamID( gsSteamID, __FILE__, __LINE__ ) )
 	{
@@ -1415,7 +1354,6 @@ void CGCBase::YieldingStopPlaying( const CSteamID & steamID )
 //-----------------------------------------------------------------------------
 void CGCBase::YieldingStartGameserver( const CSteamID & steamID, uint32 unServerAddr, uint16 usServerPort, const uint8 *pubVarData, uint32 cubVarData )
 {
-	VPROF_BUDGET( "CGCBase::YieldingStartGameserver", VPROF_BUDGETGROUP_STEAM );
 	if ( m_bIsShuttingDown )
 		return;
 
@@ -1480,7 +1418,6 @@ void CGCBase::YieldingStopGameserver( const CSteamID & steamID )
 
 IMsgNetPacket *CreateIMsgNetPacket( GCProtoBufMsgSrc eReplyType, const CSteamID senderID, uint32 nGCDirIndex, uint32 unMsgType, void *pubData, uint32 cubData )
 {
-	VPROF_BUDGET( "CreateIMsgNetPacket", VPROF_BUDGETGROUP_STEAM );
 
 	if( 0 != ( unMsgType & k_EMsgProtoBufFlag ) )
 	{
@@ -1558,12 +1495,9 @@ IMsgNetPacket *CreateIMsgNetPacket( GCProtoBufMsgSrc eReplyType, const CSteamID 
 //			CGCMsg and sending it on to a job.
 //-----------------------------------------------------------------------------
 void CGCBase::MessageFromClient( const CSteamID & senderID, uint32 unMsgType, void *pubData, uint32 cubData )
-{
-	VPROF_BUDGET( "CGCBase::MessageFromClient", VPROF_BUDGETGROUP_STEAM );
- 
+{ 
 	// if we don't have a GCHost yet, we won't be able to do much with this message
-	if( !GGCHost() )
-		return;
+	if( !GGCHost() ) return;
 
 	if ( OnMessageFromClient( senderID, unMsgType, pubData, cubData ) )
 		return;
@@ -1610,9 +1544,7 @@ void CGCBase::MessageFromClient( const CSteamID & senderID, uint32 unMsgType, vo
 bool CGCBase::BSendGCMsgToClient( const CSteamID & steamIDTarget, const CGCMsgBase& msg )
 {
 	g_theMessageList.TallySendMessage( msg.Hdr().m_eMsg, msg.CubPkt() - sizeof(GCMsgHdr_t) );
-	VPROF_BUDGET( "GCHost", VPROF_BUDGETGROUP_STEAM );
 	{
-		VPROF_BUDGET( "GCHost - SendMessageToClient", VPROF_BUDGETGROUP_STEAM );
 		return m_pHost->BSendMessageToClient( m_unAppID, steamIDTarget, msg.Hdr().m_eMsg, msg.PubPkt() + sizeof(GCMsgHdr_t), msg.CubPkt() - sizeof(GCMsgHdr_t) );
 	}
 }
@@ -1632,9 +1564,7 @@ public:
 		// !FIXME! DOTAMERGE
 		//return GGCInterface()->BProcessSystemMessage( eMsg | k_EMsgProtoBufFlag, pubMsgBytes, cubSize );
 		g_theMessageList.TallySendMessage( eMsg & ~k_EMsgProtoBufFlag, cubSize );
-		VPROF_BUDGET( "GCHost", VPROF_BUDGETGROUP_STEAM );
 		{
-			VPROF_BUDGET( "GCHost - SendMessageToClient (ProtoBuf)", VPROF_BUDGETGROUP_STEAM );
 			return GGCHost()->BSendMessageToClient( GGCBase()->GetAppID(), m_steamIDTarget, eMsg | k_EMsgProtoBufFlag, pubMsgBytes, cubSize );
 		}
 	}
@@ -1658,9 +1588,7 @@ public:
 		// !FIXME! DOTAMERGE
 		//return GGCInterface()->BProcessSystemMessage( eMsg | k_EMsgProtoBufFlag, pubMsgBytes, cubSize );
 		g_theMessageList.TallySendMessage( eMsg & ~k_EMsgProtoBufFlag, cubSize );
-		VPROF_BUDGET( "GCHost", VPROF_BUDGETGROUP_STEAM );
 		{
-			VPROF_BUDGET( "GCHost - SendMessageToSystem (ProtoBuf)", VPROF_BUDGETGROUP_STEAM );
 			return GGCHost()->BSendMessageToClient( GGCBase()->GetAppID(), CSteamID(), eMsg | k_EMsgProtoBufFlag, pubMsgBytes, cubSize );
 		}
 	}
@@ -2352,7 +2280,6 @@ CGCSession *CGCBase::FindUserOrGSSession( const CSteamID & steamID ) const
 //-----------------------------------------------------------------------------
 void CGCBase::SQLResults( GID_t gidContextID )
 {
-	VPROF_BUDGET( "CGCBase::SQLResults", VPROF_BUDGETGROUP_STEAM );
 	m_JobMgr.BResumeSQLJob( gidContextID );
 }
 
@@ -2431,7 +2358,6 @@ void CGCBase::RemoveSOCache( const CSteamID & steamID )
 //-----------------------------------------------------------------------------
 void CGCBase::FlushInventoryCache( AccountID_t unAccountID )
 {
-	VPROF_BUDGET( "FlushInventoryCache - enqueue", VPROF_BUDGETGROUP_STEAM );
 	m_rbFlushInventoryCacheAccounts.InsertIfNotFound( unAccountID );
 }
 
@@ -2440,8 +2366,6 @@ void CGCBase::FlushInventoryCache( AccountID_t unAccountID )
 //-----------------------------------------------------------------------------
 bool CGCBase::UnloadUnusedCaches( uint32 unMaxCacheCount, CLimitTimer *pLimitTimer )
 {
-	VPROF_BUDGET( "UnloadUnusedCaches", VPROF_BUDGETGROUP_STEAM );
-
 	uint32 unCachesUnloaded = 0;
 	for( uint32 unCache = m_listCachesToUnload.Head(), unNextCache = m_listCachesToUnload.InvalidIndex(); unCache != m_listCachesToUnload.InvalidIndex(); unCache = unNextCache )
 	{
@@ -3705,24 +3629,6 @@ void CGCBase::SetProfilingEnabled( bool bEnabled )
 
 
 //-----------------------------------------------------------------------------
-// Purpose: Sets whether to spew about vprof imbalances
-//-----------------------------------------------------------------------------
-void CGCBase::SetDumpVprofImbalances( bool bEnabled )
-{
-	m_bDumpVprofImbalances = bEnabled;
-}
-
-
-//-----------------------------------------------------------------------------
-// Purpose: Returns whether we are spewing vprof imbalances
-//-----------------------------------------------------------------------------
-bool CGCBase::GetVprofImbalances()
-{
-	return m_bDumpVprofImbalances;
-}
-
-
-//-----------------------------------------------------------------------------
 // Purpose: Returns a steam ID for a user-provided input. Works with accountID,
 //			steam account name, or steam ID.
 //-----------------------------------------------------------------------------
@@ -4290,8 +4196,6 @@ void CGCBase::AssertCallbackFunc( const char *pchFile, int nLine, const char *pc
 //-----------------------------------------------------------------------------
 void CGCBase::Validate( CValidator &validator, const char *pchName )
 {
-	VPROF_BUDGET( "CGCBase::Validate", VPROF_BUDGETGROUP_STEAM );
-
 	// these are INSIDE the function instead of outside so the interface 
 	// doesn't change
 #ifdef DBGFLAG_VALIDATE

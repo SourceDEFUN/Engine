@@ -29,7 +29,7 @@
 #include "materialsystem/ivballoctracker.h"
 #include "materialsystem/imesh.h"
 #include "lightcache.h"
-#include "tier0/vprof.h"
+
 #include "render.h"
 #include "cmodel_engine.h"
 #include "datacache/imdlcache.h"
@@ -970,10 +970,7 @@ void CStaticProp::DisplayStaticPropInfo( int nInfoType )
 int	CStaticProp::DrawModelSlow( int flags )
 {
 #ifndef SWDS
-	VPROF_BUDGET( "CStaticProp::DrawModel", VPROF_BUDGETGROUP_STATICPROP_RENDERING );
-
-	if ( !r_drawstaticprops.GetBool() )
-		return 0;
+	if ( !r_drawstaticprops.GetBool() ) return 0;
 
 	if ( r_drawstaticprops.GetInt() == 2 )
 	{
@@ -1066,10 +1063,7 @@ int	CStaticProp::DrawModelSlow( int flags )
 int CStaticProp::DrawModel( int flags )
 {
 #ifndef SWDS
-	VPROF_BUDGET( "CStaticProp::DrawModel", VPROF_BUDGETGROUP_STATICPROP_RENDERING );
-
-	if ( (m_Alpha == 0) || !m_pModel )
-		return 0;
+	if ( (m_Alpha == 0) || !m_pModel ) return 0;
 
 	if ( IsUsingStaticPropDebugModes() || (flags & STUDIO_WIREFRAME_VCOLLIDE) )
 		return DrawModelSlow(flags);
@@ -1962,10 +1956,7 @@ void CStaticPropMgr::DrawStaticProps_FastPipeline( IClientRenderable **pProps, i
 ConVar pipeline_static_props("pipeline_static_props", "1");
 void CStaticPropMgr::DrawStaticProps( IClientRenderable **pProps, int count, bool bShadowDepth, bool drawVCollideWireframe )
 {
-	VPROF_BUDGET( "CStaticPropMgr::DrawStaticProps", VPROF_BUDGETGROUP_STATICPROP_RENDERING );
-
-	if ( !r_drawstaticprops.GetBool() )
-		return;
+	if ( !r_drawstaticprops.GetBool() ) return;
 
 	if ( IsUsingStaticPropDebugModes() || drawVCollideWireframe )
 	{
@@ -2135,22 +2126,19 @@ void CStaticPropMgr::ComputePropOpacity( CStaticProp &prop )
 	}
 
 #ifndef SWDS
-	if ( !IsXbox() )
+	// Fade all props, if we have a default level setting
+	// But only change the fade if it's more translucent than any other fades we might have
+	unsigned char alpha = modelinfoclient->ComputeLevelScreenFade( prop.GetRenderOrigin(), prop.Radius(), prop.ForcedFadeScale() ); 
+	unsigned char nViewAlpha = modelinfoclient->ComputeViewScreenFade( prop.GetRenderOrigin(), prop.Radius(), prop.ForcedFadeScale() );
+	if ( nViewAlpha < alpha )
 	{
-		// Fade all props, if we have a default level setting
-		// But only change the fade if it's more translucent than any other fades we might have
-		unsigned char alpha = modelinfoclient->ComputeLevelScreenFade( prop.GetRenderOrigin(), prop.Radius(), prop.ForcedFadeScale() ); 
-		unsigned char nViewAlpha = modelinfoclient->ComputeViewScreenFade( prop.GetRenderOrigin(), prop.Radius(), prop.ForcedFadeScale() );
-		if ( nViewAlpha < alpha )
-		{
-			alpha = nViewAlpha;
-		}
+		alpha = nViewAlpha;
+	}
 
-		if ( alpha < prop.GetFxBlend() )
-		{
-			prop.SetAlpha( alpha );
-			ChangeRenderGroup( prop );
-		}
+	if ( alpha < prop.GetFxBlend() )
+	{
+		prop.SetAlpha( alpha );
+		ChangeRenderGroup( prop );
 	}
 #endif
 }

@@ -23,7 +23,7 @@
 #include "materialsystem/imaterialsystemhardwareconfig.h"
 #include "istudiorender.h"
 #include "staticpropmgr.h"
-#include "tier0/vprof.h"
+
 #include "IOcclusionSystem.h"
 #include "con_nprint.h"
 #include "debugoverlay.h"
@@ -606,9 +606,7 @@ void ComputeWorldToScreenMatrix( VMatrix *pWorldToScreen, const VMatrix &worldTo
 // Push, pop views
 //-----------------------------------------------------------------------------
 void CRender::Push3DView( const CViewSetup &view, int nFlags, ITexture* pRenderTarget, Frustum frustumPlanes, ITexture* pDepthTexture )
-{ // Secton TODO: Deal with it! Important!
-	Assert( !IsX360() || (pDepthTexture == NULL) ); //Don't render to a depth texture on the 360. Instead, render using a normal depth buffer and use IDirect3DDevice9::Resolve()
-
+{
 	int i = m_ViewStack.Push( );
 	m_ViewStack[i].m_View = view;
 	m_ViewStack[i].m_bIs2DView = false;
@@ -813,7 +811,6 @@ void CRender::EndUpdateLightmaps( void )
 	Assert( m_iLightmapUpdateDepth > 0 );
 	if ( --m_iLightmapUpdateDepth == 0 )
 	{
-		VPROF_BUDGET( "EndUpdateLightmaps", VPROF_BUDGETGROUP_DLIGHT_RENDERING );
 		if ( g_LightmapUpdateList.Count() && r_dynamiclighting.GetBool() && !r_unloadlightmaps.GetBool() )
 		{
 			CMatRenderContextPtr pRenderContext( materials );
@@ -1189,8 +1186,6 @@ void R_DrawLightmaps( IWorldRenderList *pList, int pageId )
 
 void R_CheckForLightingConfigChanges()
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 	UpdateStudioRenderConfig();
 	UpdateMaterialSystemConfig();
 	if( MaterialConfigLightingChanged() || g_RebuildLightmaps )

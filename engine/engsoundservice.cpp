@@ -28,7 +28,7 @@
 #include "datacache/idatacache.h"
 #include "sys_dll.h"
 #include "toolframework/itoolframework.h"
-#include "tier0/vprof.h"
+
 #include "cl_steamauth.h"
 #include "tier1/fmtstr.h"
 #include "MapReslistGenerator.h"
@@ -455,8 +455,6 @@ private:
 
 	virtual void OnSoundStarted( int guid, StartSoundParams_t& params, char const *soundname )
 	{
-		VPROF("OnSoundStarted");
-
 		if ( !toolframework->IsToolRecording() || params.suppressrecording )
 			return;
 
@@ -495,8 +493,6 @@ private:
 		// world, if the StartSound message was not sent, a StopSound message should not
 		// be sent for that guid either. This requires more plumbing, though, and
 		// for the moment, it's not necessary to do that plumbing.
-
-		VPROF("OnSoundStopped");
 
 		if ( !toolframework->IsToolRecording() ) return;
 

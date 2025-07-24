@@ -13,7 +13,7 @@
 #include "SkyCamera.h"
 #include "playernet_vars.h"
 #include "fogcontroller.h"
-#include "tier0/vprof.h"
+
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -240,7 +240,6 @@ void ClientData_Update( CBasePlayer *pl )
 //-----------------------------------------------------------------------------
 void UpdateAllClientData( void )
 {
-	VPROF( "UpdateAllClientData" );
 	int i;
 	CBasePlayer *pl;
 

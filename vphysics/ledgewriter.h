@@ -20,8 +20,6 @@ struct triangleledge_t
 };
 
 // minimum footprint convex hull rep.  Assume 8-bits of index space per edge/triangle/vert
-// NOTE: EACH ELEMENT OF THESE STRUCTS MUST BE 8-bits OR YOU HAVE TO WRITE SWAPPING CODE FOR 
-// THE X360 IMPLEMENTATION.  THERE IS NO SUCH CODE AS OF NOW.
 #pragma pack(1)
 struct packedtriangle_t
 {
@@ -89,8 +87,6 @@ struct virtualmeshhull_t
 
 #pragma pack()
 // end
-// NOTE: EACH ELEMENT OF THE ABOVE STRUCTS MUST BE 8-bits OR YOU HAVE TO WRITE SWAPPING CODE FOR 
-// THE X360 IMPLEMENTATION.  THERE IS NO SUCH CODE AS OF NOW.
 
 
 // These statics are grouped in a class so they can be friends of IVP_Compact_Ledge and access its private data

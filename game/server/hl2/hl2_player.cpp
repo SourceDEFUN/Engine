@@ -586,7 +586,6 @@ void CHL2_Player::PreThink(void)
 	// Riding a vehicle?
 	if ( IsInAVehicle() )	
 	{
-		VPROF( "CHL2_Player::PreThink-Vehicle" );
 		// make sure we update the client, check for timed damage and update suit even if we are in a vehicle
 		UpdateClientData();		
 		CheckTimeBasedDamage();
@@ -604,7 +603,6 @@ void CHL2_Player::PreThink(void)
 	// only affects you if sv_autojump is nonzero.
 	if( (GetFlags() & FL_ONGROUND) && sv_autojump.GetFloat() != 0 )
 	{
-		VPROF( "CHL2_Player::PreThink-Autojump" );
 		// check autojump
 		Vector vecCheckDir;
 
@@ -643,7 +641,6 @@ void CHL2_Player::PreThink(void)
 		}
 	}
 
-	VPROF_SCOPE_BEGIN( "CHL2_Player::PreThink-Speed" );
 	HandleSpeedChanges();
 #ifdef HL2_EPISODIC
 	HandleArmorReduction();
@@ -679,18 +676,12 @@ void CHL2_Player::PreThink(void)
 		}
 	}
 
-	VPROF_SCOPE_END();
 
 	if ( g_fGameOver || IsPlayerLockedInPlace() )
 		return;         // finale
 
-	VPROF_SCOPE_BEGIN( "CHL2_Player::PreThink-ItemPreFrame" );
 	ItemPreFrame( );
-	VPROF_SCOPE_END();
-
-	VPROF_SCOPE_BEGIN( "CHL2_Player::PreThink-WaterMove" );
 	WaterMove();
-	VPROF_SCOPE_END();
 
 	if ( g_pGameRules && g_pGameRules->FAllowFlashlight() )
 		m_Local.m_iHideHUD &= ~HIDEHUD_FLASHLIGHT;
@@ -698,31 +689,14 @@ void CHL2_Player::PreThink(void)
 		m_Local.m_iHideHUD |= HIDEHUD_FLASHLIGHT;
 
 	
-	VPROF_SCOPE_BEGIN( "CHL2_Player::PreThink-CommanderUpdate" );
 	CommanderUpdate();
-	VPROF_SCOPE_END();
-
 	// Operate suit accessories and manage power consumption/charge
-	VPROF_SCOPE_BEGIN( "CHL2_Player::PreThink-SuitPower_Update" );
 	SuitPower_Update();
-	VPROF_SCOPE_END();
-
 	// checks if new client data (for HUD and view control) needs to be sent to the client
-	VPROF_SCOPE_BEGIN( "CHL2_Player::PreThink-UpdateClientData" );
-	UpdateClientData();
-	VPROF_SCOPE_END();
-	
-	VPROF_SCOPE_BEGIN( "CHL2_Player::PreThink-CheckTimeBasedDamage" );
+	UpdateClientData();	
 	CheckTimeBasedDamage();
-	VPROF_SCOPE_END();
-
-	VPROF_SCOPE_BEGIN( "CHL2_Player::PreThink-CheckSuitUpdate" );
 	CheckSuitUpdate();
-	VPROF_SCOPE_END();
-
-	VPROF_SCOPE_BEGIN( "CHL2_Player::PreThink-CheckSuitZoom" );
 	CheckSuitZoom();
-	VPROF_SCOPE_END();
 
 	if (m_lifeState >= LIFE_DYING)
 	{
@@ -868,29 +842,15 @@ void CHL2_Player::PreThink(void)
 	UpdateWeaponPosture();
 
 	// Disallow shooting while zooming
-	if ( IsX360() )
+	if ( m_nButtons & IN_ZOOM )
 	{
-		if ( IsZooming() )
-		{
-			if( GetActiveWeapon() && !GetActiveWeapon()->IsWeaponZoomed() )
-			{
-				// If not zoomed because of the weapon itself, do not attack.
-				m_nButtons &= ~(IN_ATTACK|IN_ATTACK2);
-			}
-		}
-	}
-	else
-	{
-		if ( m_nButtons & IN_ZOOM )
-		{
-			//FIXME: Held weapons like the grenade get sad when this happens
-	#ifdef HL2_EPISODIC
-			// Episodic allows players to zoom while using a func_tank
-			CBaseCombatWeapon* pWep = GetActiveWeapon();
-			if ( !m_hUseEntity || ( pWep && pWep->IsWeaponVisible() ) )
-	#endif
-			m_nButtons &= ~(IN_ATTACK|IN_ATTACK2);
-		}
+		//FIXME: Held weapons like the grenade get sad when this happens
+#ifdef HL2_EPISODIC
+		// Episodic allows players to zoom while using a func_tank
+		CBaseCombatWeapon* pWep = GetActiveWeapon();
+		if ( !m_hUseEntity || ( pWep && pWep->IsWeaponVisible() ) )
+#endif
+		m_nButtons &= ~(IN_ATTACK|IN_ATTACK2);
 	}
 }
 
@@ -2497,59 +2457,6 @@ void CHL2_Player::NotifyScriptsOfDeath( void )
 void CHL2_Player::GetAutoaimVector( autoaim_params_t &params )
 {
 	BaseClass::GetAutoaimVector( params );
-
-	if ( IsX360() )
-	{
-		if( IsInAVehicle() )
-		{
-			if( m_hLockedAutoAimEntity && m_hLockedAutoAimEntity->IsAlive() && ShouldKeepLockedAutoaimTarget(m_hLockedAutoAimEntity) )
-			{
-				if( params.m_hAutoAimEntity && params.m_hAutoAimEntity != m_hLockedAutoAimEntity )
-				{
-					// Autoaim has picked a new target. Switch.
-					m_hLockedAutoAimEntity = params.m_hAutoAimEntity;
-				}
-
-				// Ignore autoaim and just keep aiming at this target.
-				params.m_hAutoAimEntity = m_hLockedAutoAimEntity;
-				Vector vecTarget = m_hLockedAutoAimEntity->BodyTarget( EyePosition(), false );
-				Vector vecDir = vecTarget - EyePosition();
-				VectorNormalize( vecDir );
-
-				params.m_vecAutoAimDir = vecDir;
-				params.m_vecAutoAimPoint = vecTarget;
-				return;		
-			}
-			else
-			{
-				m_hLockedAutoAimEntity = NULL;
-			}
-		}
-
-		// If the player manually gets his crosshair onto a target, make that target sticky
-		if( params.m_fScale != AUTOAIM_SCALE_DIRECT_ONLY )
-		{
-			// Only affect this for 'real' queries
-			//if( params.m_hAutoAimEntity && params.m_bOnTargetNatural )
-			if( params.m_hAutoAimEntity )
-			{
-				// Turn on sticky.
-				m_HL2Local.m_bStickyAutoAim = true;
-
-				if( IsInAVehicle() )
-				{
-					m_hLockedAutoAimEntity = params.m_hAutoAimEntity;
-				}
-			}
-			else if( !params.m_hAutoAimEntity )
-			{
-				// Turn off sticky only if there's no target at all.
-				m_HL2Local.m_bStickyAutoAim = false;
-
-				m_hLockedAutoAimEntity = NULL;
-			}
-		}
-	}
 }
 
 //-----------------------------------------------------------------------------
@@ -2926,7 +2833,6 @@ void CHL2_Player::UpdateWeaponPosture( void )
 	if ( pWeapon && m_LowerWeaponTimer.Expired() && pWeapon->CanLower() )
 	{
 		m_LowerWeaponTimer.Set( .3 );
-		VPROF( "CHL2_Player::UpdateWeaponPosture-CheckLower" );
 		Vector vecAim = BaseClass::GetAutoaimVector( AUTOAIM_SCALE_DIRECT_ONLY );
 
 		const float CHECK_FRIENDLY_RANGE = 50 * 12;
@@ -3016,8 +2922,6 @@ void CHL2_Player::UpdateWeaponPosture( void )
 
 		m_AutoaimTimer.Set( .1 );
 
-		VPROF( "hl2_x360_aiming" );
-
 		// Call the autoaim code to update the local player data, which allows the client to update.
 		autoaim_params_t params;
 		params.m_vecAutoAimPoint.Init();
@@ -3043,7 +2947,6 @@ void CHL2_Player::UpdateWeaponPosture( void )
 //-----------------------------------------------------------------------------
 bool CHL2_Player::Weapon_Lower( void )
 {
-	VPROF( "CHL2_Player::Weapon_Lower" );
 	// Already lowered?
 	if ( m_HL2Local.m_bWeaponLowered )
 		return true;
@@ -3064,8 +2967,6 @@ bool CHL2_Player::Weapon_Lower( void )
 //-----------------------------------------------------------------------------
 bool CHL2_Player::Weapon_Ready( void )
 {
-	VPROF( "CHL2_Player::Weapon_Ready" );
-
 	// Already ready?
 	if ( m_HL2Local.m_bWeaponLowered == false )
 		return true;

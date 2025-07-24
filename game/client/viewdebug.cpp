@@ -6,7 +6,7 @@
 
 #include "cbase.h"
 
-#include "tier0/vprof.h"
+
 
 #include "view_scene.h"
 #include "viewrender.h"
@@ -307,8 +307,6 @@ static void OverlayShowTexture( const char* textureName, float scale )
 //-----------------------------------------------------------------------------
 void CDebugViewRender::Draw3DDebuggingInfo( const CViewSetup &view )
 {
-	VPROF("CViewRender::Draw3DDebuggingInfo");
-
 	// Draw 3d overlays
 	render->Draw3DDebugOverlays();
 
@@ -322,9 +320,6 @@ void CDebugViewRender::Draw3DDebuggingInfo( const CViewSetup &view )
 //-----------------------------------------------------------------------------
 void CDebugViewRender::Draw2DDebuggingInfo( const CViewSetup &view )
 {
-	if ( IsX360() && IsRetail() )
-		return;
-
 	// HDRFIXME: Assert NULL rendertarget
 	if ( mat_yuv.GetInt() && (engine->GetDXSupportLevel() >= 80) )
 	{
@@ -441,9 +436,6 @@ CON_COMMAND_F( r_screenoverlay, "Draw specified material as an overlay", FCVAR_C
 // Used to verify frame syncing.
 void CDebugViewRender::GenerateOverdrawForTesting()
 {
-	if ( IsX360() )
-		return;
-
 	if ( !cl_overdraw_test.GetInt() )
 		return;
 

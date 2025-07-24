@@ -61,9 +61,4 @@ private:
 	vgui::VPANEL m_hParent;
 };
 
-
-class IVProfExport;
-extern IVProfExport *g_pVProfExport;
-
-
 #endif // AdminServer_H

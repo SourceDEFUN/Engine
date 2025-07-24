@@ -15,7 +15,7 @@
 #include "tier0/mem.h"
 #include "s3tc_decode.h"
 #include "utlvector.h"
-#include "vprof_telemetry.h"
+
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -332,12 +332,6 @@ CVTFTexture::~CVTFTexture()
 //-----------------------------------------------------------------------------
 int CVTFTexture::ComputeMipCount() const
 {
-	if ( IsX360() && ( m_nVersion[0] == VTF_X360_MAJOR_VERSION ) && ( m_nFlags & TEXTUREFLAGS_NOMIP ) )
-	{
-		// 360 vtf format culled unused mips at conversion time
-		return 1;
-	}
-
 	// NOTE: No matter what, all mip levels should be created because
 	// we have to worry about various fallbacks
 	return ImageLoader::GetNumMipMapLevels( m_nWidth, m_nHeight, m_nDepth );
@@ -940,35 +934,6 @@ static bool ReadHeaderFromBufferPastBaseHeader( CUtlBuffer &buf, VTFFileHeader_t
 
 bool CVTFTexture::ReadHeader( CUtlBuffer &buf, VTFFileHeader_t &header )
 {
-	if ( IsX360() && SetupByteSwap( buf ) )
-	{
-		VTFFileBaseHeader_t baseHeader;
-		m_Swap.SwapFieldsToTargetEndian( &baseHeader, (VTFFileBaseHeader_t*)buf.PeekGet() );
-
-		// Swap the header inside the UtlBuffer
-		if ( baseHeader.version[0] == VTF_MAJOR_VERSION )
-		{
-			if ( baseHeader.version[1] == 0 || baseHeader.version[1] == 1 )
-			{
-				// version 7.0 or 7.1
-				m_Swap.SwapFieldsToTargetEndian( (VTFFileHeaderV7_1_t*)buf.PeekGet() );
-			}
-			else if ( baseHeader.version[1] == 2 )
-			{
-				// version 7.2
-				m_Swap.SwapFieldsToTargetEndian( (VTFFileHeaderV7_2_t*)buf.PeekGet() );
-			}
-			else if ( baseHeader.version[1] == 3 )
-			{
-				m_Swap.SwapFieldsToTargetEndian( (VTFFileHeaderV7_3_t*)buf.PeekGet() );
-			}
-			else if ( baseHeader.version[1] >= 4 && baseHeader.version[1] <= VTF_MINOR_VERSION )
-			{
-				m_Swap.SwapFieldsToTargetEndian( (VTFFileHeader_t*)buf.PeekGet() );
-			}
-		}
-	}
-
 	memset( &header, 0, sizeof(VTFFileHeader_t) );
 	buf.Get( &header, sizeof(VTFFileBaseHeader_t) );
 	if ( !buf.IsValid() )
@@ -1027,8 +992,6 @@ bool CVTFTexture::Unserialize( CUtlBuffer &buf, bool bHeaderOnly, int nSkipMipLe
 
 bool CVTFTexture::UnserializeEx( CUtlBuffer &buf, bool bHeaderOnly, int nForceFlags, int nSkipMipLevels )
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s (header only: %d, nForceFlags: %d, skipMips: %d)", __FUNCTION__, bHeaderOnly ? 1 : 0, nForceFlags, nSkipMipLevels );
-
 	// When unserializing, we can skip a certain number of mip levels,
 	// and we also can just load everything but the image data
 	VTFFileHeader_t header;
@@ -1136,19 +1099,6 @@ bool CVTFTexture::UnserializeEx( CUtlBuffer &buf, bool bHeaderOnly, int nForceFl
 		buf.Get( m_arrResourcesInfo.Base(), m_arrResourcesInfo.Count() * sizeof( ResourceEntryInfo ) );
 		if ( !buf.IsValid() )
 			return false;
-
-		if ( IsX360() )
-		{
-			// Byte-swap the dictionary data offsets
-			for ( int k = 0; k < m_arrResourcesInfo.Count(); ++ k )
-			{
-				ResourceEntryInfo &rei = m_arrResourcesInfo[k];
-				if ( ( rei.eType & RSRCF_HAS_NO_DATA_CHUNK ) == 0 )
-				{
-					m_Swap.SwapBufferToTargetEndian( &rei.resData );
-				}
-			}
-		}
 	}
 	else
 	{
@@ -1406,13 +1356,6 @@ static int PadBuffer( CUtlBuffer &buf, int iAlignment )
 //-----------------------------------------------------------------------------
 bool CVTFTexture::Serialize( CUtlBuffer &buf )
 {
-	if ( IsX360() )
-	{
-		// Unsupported path, 360 has no reason and cannot serialize
-		Assert( 0 );
-		return false;
-	}
-
 	if ( !m_pImageData )
 	{
 		Warning("*** Unable to serialize... have no image data!\n");
@@ -1757,29 +1700,6 @@ int CVTFTexture::GetImageOffset( int iFrame, int iFace, int iMipLevel, ImageForm
 	int i;
 	int iOffset = 0;
 
-	if ( IsX360() && ( m_nVersion[0] == VTF_X360_MAJOR_VERSION ) )
-	{
-		// 360 data is stored same as disk, 1x1 up to NxN
-		// get to the right miplevel
-		int iMipWidth, iMipHeight, iMipDepth;
-		for ( i = m_nMipCount - 1; i > iMipLevel; --i )
-		{
-			ComputeMipLevelDimensions( i, &iMipWidth, &iMipHeight, &iMipDepth );
-			int iMipLevelSize = ImageLoader::GetMemRequired( iMipWidth, iMipHeight, iMipDepth, fmt, false );
-			iOffset += m_nFrameCount * m_nFaceCount * iMipLevelSize;
-		}
-
-		// get to the right frame
-		ComputeMipLevelDimensions( iMipLevel, &iMipWidth, &iMipHeight, &iMipDepth );
-		int nFaceSize = ImageLoader::GetMemRequired( iMipWidth, iMipHeight, iMipDepth, fmt, false );
-		iOffset += iFrame * m_nFaceCount * nFaceSize;
-		
-		// get to the right face
-		iOffset += iFace * nFaceSize;
-
-		return iOffset;
-	}
-
 	// get to the right frame
 	int iFaceSize = ComputeFaceSize( 0, fmt );
 	iOffset = iFrame * m_nFaceCount * iFaceSize;
@@ -1869,13 +1789,6 @@ void CVTFTexture::ConvertImageFormat( ImageFormat fmt, bool bNormalToDUDV )
 
 	if ( m_Format == fmt )
 	{
-		return;
-	}
-
-	if ( IsX360() && ( m_nVersion[0] == VTF_X360_MAJOR_VERSION ) )
-	{
-		// 360 textures should be baked in final format
-		Assert( 0 );
 		return;
 	}
 

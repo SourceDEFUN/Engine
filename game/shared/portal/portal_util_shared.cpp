@@ -1658,7 +1658,7 @@ bool FindClosestPassableSpace( CBaseEntity *pEntity, const Vector &vIndecisivePu
 	}
 
 	// X360TBD: Hits in portal devtest
-	AssertMsg( IsX360() || iFailCount != 100, "FindClosestPassableSpace() failure." );
+	AssertMsg( iFailCount != 100, "FindClosestPassableSpace() failure." );
 	return false;
 }
 

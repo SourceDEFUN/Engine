@@ -17,7 +17,7 @@
 #include "materialsystem/itexture.h"
 #include "materialsystem/imaterialvar.h"
 #include "clienteffectprecachesystem.h"
-#include "tier0/vprof.h"
+
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -257,16 +257,12 @@ void TE_PlayerDecal( IRecipientFilter& filter, float delay,
 //-----------------------------------------------------------------------------
 void C_TEPlayerDecal::PostDataUpdate( DataUpdateType_t updateType )
 {
-#ifndef _XBOX
-	VPROF( "C_TEPlayerDecal::PostDataUpdate" );
-
 	// Decals disabled?
 	if ( !r_decals.GetBool() )
 		return;
 
 	CLocalPlayerFilter filter;
 	TE_PlayerDecal(  filter, 0.0f, &m_vecOrigin, m_nPlayer, m_nEntity );
-#endif
 }
 
 IMPLEMENT_CLIENTCLASS_EVENT_DT(C_TEPlayerDecal, DT_TEPlayerDecal, CTEPlayerDecal)

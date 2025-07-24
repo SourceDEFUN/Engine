@@ -411,7 +411,7 @@ static char const* ConstructFileName( char const* pModelName )
 static CPhysConvex* ComputeConvexHull( mstudiomesh_t* pMesh, studiohdr_t *pStudioHdr  )
 {
 	const mstudio_meshvertexdata_t *vertData = pMesh->GetVertexData( (void *)pStudioHdr );
-	Assert( vertData ); // This can only return NULL on X360 for now
+	Assert( vertData );
 
 	// Generate a list of all verts in the mesh
 	Vector** ppVerts = (Vector**)_alloca(pMesh->numvertices * sizeof(Vector*) );
@@ -1365,7 +1365,7 @@ void CVradStaticPropMgr::ComputeLighting( CStaticProp &prop, int iThread, int pr
 				mstudiomesh_t *pStudioMesh = pStudioModel->pMesh( meshID );
 				const mstudio_meshvertexdata_t *vertData = pStudioMesh->GetVertexData((void *)pStudioHdr);
 
-				Assert(vertData); // This can only return NULL on X360 for now
+				Assert(vertData);
 				
 				// TODO: Move this into its own function. In fact, refactor this whole function.
 				if (withTexelLighting)
@@ -1917,7 +1917,7 @@ void CVradStaticPropMgr::AddPolysForRayTrace( void )
 
 					OptimizedModel::MeshHeader_t* pVtxMesh = pVtxLOD->pMesh( nMesh );
 					const mstudio_meshvertexdata_t *vertData = pMesh->GetVertexData( (void *)pStudioHdr );
-					Assert( vertData ); // This can only return NULL on X360 for now
+					Assert( vertData );
 
 					for ( int nGroup = 0; nGroup < pVtxMesh->numStripGroups; ++nGroup )
 					{
@@ -2101,7 +2101,7 @@ void CVradStaticPropMgr::BuildTriList( CStaticProp &prop )
 				mstudiomesh_t* pMesh = pStudioModel->pMesh( nMesh );
 				OptimizedModel::MeshHeader_t* pVtxMesh = pVtxLOD->pMesh( nMesh );
 				const mstudio_meshvertexdata_t *vertData = pMesh->GetVertexData( (void *)pStudioHdr );
-				Assert( vertData ); // This can only return NULL on X360 for now
+				Assert( vertData );
 
 				for ( int nGroup = 0; nGroup < pVtxMesh->numStripGroups; ++nGroup )
 				{
@@ -2293,7 +2293,7 @@ static void GenerateLightmapSamplesForMesh( const matrix3x4_t& _matPos, const ma
 	mstudiomesh_t* pMesh = _pStudioModel->pMesh(_meshID);
 	OptimizedModel::MeshHeader_t* pVtxMesh = pVtxLOD->pMesh(_meshID);
 	const mstudio_meshvertexdata_t *vertData = pMesh->GetVertexData((void *)_pStudioHdr);
-	Assert(vertData); // This can only return NULL on X360 for now
+	Assert(vertData);
 
 	for (int nGroup = 0; nGroup < pVtxMesh->numStripGroups; ++nGroup)
 	{

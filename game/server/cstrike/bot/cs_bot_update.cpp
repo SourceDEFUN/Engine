@@ -27,10 +27,7 @@ float CCSBot::GetMoveSpeed( void )
  */
 void CCSBot::Upkeep( void )
 {
-	VPROF_BUDGET( "CCSBot::Upkeep", VPROF_BUDGETGROUP_NPCS );
-
-	if (TheNavMesh->IsGenerating() || !IsAlive())
-		return;
+	if (TheNavMesh->IsGenerating() || !IsAlive()) return;
 	
 	// If bot_flipout is on, then generate some random commands.
 	if ( cv_bot_flipout.GetBool() )
@@ -239,11 +236,8 @@ void CCSBot::Upkeep( void )
  */
 void CCSBot::Update( void )
 {
-	VPROF_BUDGET( "CCSBot::Update", VPROF_BUDGETGROUP_NPCS );
-
 	// If bot_flipout is on, then we only do stuff in Upkeep().
-	if ( cv_bot_flipout.GetBool() )
-		return;
+	if ( cv_bot_flipout.GetBool() ) return;
 
 	Vector myOrigin = GetCentroid( this );
 

@@ -33,7 +33,6 @@
 #include "gl_cvars.h"
 #include "sv_filter.h"
 #include "ivideomode.h"
-#include "vprof_engine.h"
 #include "iengine.h"
 #include "tier2/tier2.h"
 #include "enginethreads.h"
@@ -83,7 +82,7 @@
 #include "tier1/strtools.h"
 #include "testscriptmgr.h"
 #include "tmessage.h"
-#include "tier0/vprof.h"
+
 #include "tier0/icommandline.h"
 #include "materialsystem/imaterialsystemhardwareconfig.h"
 #include "MapReslistGenerator.h"
@@ -368,77 +367,6 @@ static ConVar	cvarNext( "next", "0", FCVAR_CHEAT, "Set to 1 to advance to next f
 ConVar host_showcachemiss( "host_showcachemiss", "0", 0, "Print a debug message when the client or server cache is missed." );
 static ConVar mem_dumpstats( "mem_dumpstats", "0", 0, "Dump current and max heap usage info to console at end of frame ( set to 2 for continuous output )\n" );
 static ConVar host_ShowIPCCallCount( "host_ShowIPCCallCount", "0", 0, "Print # of IPC calls this number of times per second. If set to -1, the # of IPC calls is shown every frame." );
-
-#if defined( RAD_TELEMETRY_ENABLED )
-static void OnChangeTelemetryPause ( IConVar *var, const char *pOldValue, float flOldValue )
-{
-	tmPause( TELEMETRY_LEVEL0, 1 );
-}
-
-static void OnChangeTelemetryResume ( IConVar *var, const char *pOldValue, float flOldValue )
-{
-	tmPause( TELEMETRY_LEVEL0, 0 );
-}
-
-static void OnChangeTelemetryLevel ( IConVar *var, const char *pOldValue, float flOldValue )
-{
-	char* pIEnd;
-	const char *pLevel = (( ConVar* )var)->GetString();
-
-	TelemetrySetLevel( strtoul( pLevel, &pIEnd, 0 ) );
-}
-
-static void OnChangeTelemetryFrameCount ( IConVar *var, const char *pOldValue, float flOldValue )
-{
-	char* pIEnd;
-	const char *pFrameCount = (( ConVar* )var)->GetString();
-
-	g_Telemetry.FrameCount = strtoul( pFrameCount, &pIEnd, 0 );
-	Msg( " TELEMETRY: Setting Telemetry FrameCount: '%d'\n", g_Telemetry.FrameCount );
-}
-
-static void OnChangeTelemetryServer ( IConVar *var, const char *pOldValue, float flOldValue )
-{
-	const char *pServerAddress = (( ConVar* )var)->GetString();
-
-	Q_strncpy( g_Telemetry.ServerAddress, pServerAddress, ARRAYSIZE( g_Telemetry.ServerAddress ) );
-	Msg( " TELEMETRY: Setting Telemetry server: '%s'\n", pServerAddress );
-}
-
-static void OnChangeTelemetryDemoStart ( IConVar *var, const char *pOldValue, float flOldValue )
-{
-	char* pIEnd;
-	const char *pVal = (( ConVar* )var)->GetString();
-
-	g_Telemetry.DemoTickStart = strtoul( pVal, &pIEnd, 0 );
-	if( g_Telemetry.DemoTickStart > 2000 )
-	{
-		char cmd[ 256 ]; 
-
-		// If we're far away from the start of the demo file, then jump to ~1000 ticks before.
-		Q_snprintf( cmd, sizeof( cmd ), "demo_gototick %d", g_Telemetry.DemoTickStart - 1000 ); 
-		Cbuf_AddText( cmd ); 
-	}
-	Msg( " TELEMETRY: Setting Telemetry DemoTickStart: '%d'\n", g_Telemetry.DemoTickStart );
-}
-
-static void OnChangeTelemetryDemoEnd ( IConVar *var, const char *pOldValue, float flOldValue )
-{
-	char* pIEnd;
-	const char *pVal = (( ConVar* )var)->GetString();
-
-	g_Telemetry.DemoTickEnd = strtoul( pVal, &pIEnd, 0 );
-	Msg( " TELEMETRY: Setting Telemetry DemoTickEnd: '%d'\n", g_Telemetry.DemoTickEnd );
-}
-
-ConVar telemetry_pause( "telemetry_pause", "0", 0, "Pause Telemetry", OnChangeTelemetryPause );
-ConVar telemetry_resume( "telemetry_resume", "0", 0, "Resume Telemetry", OnChangeTelemetryResume );
-ConVar telemetry_framecount( "telemetry_framecount", "0", 0, "Set Telemetry count of frames to capture", OnChangeTelemetryFrameCount );
-ConVar telemetry_level( "telemetry_level", "0", 0, "Set Telemetry profile level: 0 being off.", OnChangeTelemetryLevel );
-ConVar telemetry_server( "telemetry_server", "localhost", 0, "Set Telemetry server", OnChangeTelemetryServer );
-ConVar telemetry_demostart( "telemetry_demostart", "0", 0, "When playing demo, start telemetry on tick #", OnChangeTelemetryDemoStart );
-ConVar telemetry_demoend( "telemetry_demoend", "0", 0, "When playing demo, stop telemetry on tick #", OnChangeTelemetryDemoEnd );
-#endif
 
 extern bool gfBackground;
 
@@ -1824,7 +1752,6 @@ void CL_SendVoicePacket(bool bFinal)
 
 void CL_ProcessVoiceData()
 {
-	VPROF_BUDGET( "CL_ProcessVoiceData", VPROF_BUDGETGROUP_OTHER_NETWORKING );
 
 #if !defined( NO_VOICE )
 	Voice_Idle(host_frametime);
@@ -2235,8 +2162,6 @@ Runs all active servers
 
 void _Host_RunFrame_Input( float accumulated_extra_samples, bool bFinalTick )
 {
-	VPROF_BUDGET( "_Host_RunFrame_Input", _T("Input") );
-
 	// Run a test script?
 	static bool bFirstFrame = true;
 	if ( bFirstFrame )
@@ -2275,10 +2200,6 @@ void _Host_RunFrame_Input( float accumulated_extra_samples, bool bFinalTick )
 
 void _Host_RunFrame_Server( bool finaltick )
 {
-	VPROF_BUDGET( "_Host_RunFrame_Server", VPROF_BUDGETGROUP_GAME );
-	VPROF_INCREMENT_COUNTER( "ticks", 1 );
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 	// Run the Server frame ( read, run physics, respond )
 	g_HostTimes.StartFrameSegment( FRAME_SEGMENT_SERVER );
 	SV_Frame ( finaltick );
@@ -2290,8 +2211,6 @@ void _Host_RunFrame_Server( bool finaltick )
 
 void _Host_RunFrame_Server_Async( int numticks )
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s %d", __FUNCTION__, numticks );
-
 	for ( int tick = 0; tick < numticks; tick++ )
 	{ 
 		g_ServerGlobalVariables.tickcount = sv.m_nTickCount;
@@ -2305,9 +2224,6 @@ void _Host_RunFrame_Server_Async( int numticks )
 void _Host_RunFrame_Client( bool framefinished )
 {
 #ifndef SWDS
-	VPROF( "_Host_RunFrame_Client" );
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s %d", __FUNCTION__, framefinished );
-
 	g_HostTimes.StartFrameSegment( FRAME_SEGMENT_CLIENT );
 
 	// Get any current state update from server, etc.
@@ -2374,9 +2290,6 @@ void CheckSpecialCheatVars()
 void _Host_RunFrame_Render()
 {
 #ifndef SWDS
-	VPROF( "_Host_RunFrame_Render" );
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "_Host_RunFrame_Render" );
-
 	CheckSpecialCheatVars();
 
 	int nOrgNoRendering = mat_norendering.GetInt();
@@ -2392,16 +2305,8 @@ void _Host_RunFrame_Render()
 
 	CL_LatchInterpolationAmount();
 
-	{
-		VPROF( "_Host_RunFrame_Render - UpdateScreen" );
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "_Host_RunFrame_Render - UpdateScreen" );
-		Host_UpdateScreen();
-	}
-	{
-		VPROF( "_Host_RunFrame_Render - CL_DecayLights" );
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "_Host_RunFrame_Render - CL_DecayLights" );
-		CL_DecayLights ();
-	}
+	Host_UpdateScreen();
+	CL_DecayLights();
 
 	g_HostTimes.EndFrameSegment( FRAME_SEGMENT_RENDER );
 
@@ -2484,8 +2389,6 @@ void CL_DiscardOldAddAngleEntries( float t )
 #ifndef SWDS
 void CL_ApplyAddAngle()
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 	float curtime = cl.GetTime() - host_state.interval_per_tick;
 
 	AddAngle *prev = NULL, *next = NULL;
@@ -2521,9 +2424,6 @@ void CL_ApplyAddAngle()
 void _Host_RunFrame_Sound()
 {
 #ifndef SWDS
-
-	VPROF_BUDGET( "_Host_RunFrame_Sound", VPROF_BUDGETGROUP_OTHER_SOUND );
-
 	g_HostTimes.StartFrameSegment( FRAME_SEGMENT_SOUND );
 
 	Host_UpdateSounds();
@@ -2663,18 +2563,9 @@ void _Host_RunFrame (float time)
 	double prevremainder;
 	bool shouldrender;
 
-#if defined( RAD_TELEMETRY_ENABLED )
-	if( g_Telemetry.DemoTickEnd == ( uint32 )-1 )
-	{
-		Cbuf_AddText( "quit\n" );
-	}
-#endif
-
 	int numticks;
 	{
 		// Profile scope specific to the top of this function, protect from setjmp() problems
-		VPROF( "_Host_RunFrame_Upto_MarkFrame" );
-
 		if ( host_checkheap )
 		{
 #if defined(_WIN32)
@@ -2750,8 +2641,6 @@ void _Host_RunFrame (float time)
 
 	{
 		// Profile scope, protect from setjmp() problems
-		VPROF( "_Host_RunFrame" );
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "_Host_RunFrame" );
 
 		g_HostTimes.StartFrameSegment( FRAME_SEGMENT_CMD_EXECUTE );
 
@@ -2876,13 +2765,11 @@ void _Host_RunFrame (float time)
 			// run HLTV if active
 			if ( hltv )
 			{
-				tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "hltv->RunFrame()" );
 				hltv->RunFrame();
 			}
 
 			if ( hltvtest )
 			{
-				tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "hltvtest->RunFrame()" );
 				hltvtest->RunFrame();
 			}
 
@@ -2911,8 +2798,6 @@ void _Host_RunFrame (float time)
 
 			if ( !sv.IsDedicated() )
 			{
-				tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "Host_SetClientInSimulation" );
-
 				// This causes cl.gettime() to return the true clock being used for rendering (tickcount * rate + remainder)
 				Host_SetClientInSimulation( false );
 				// Now allow for interpolation on client
@@ -3113,8 +2998,6 @@ void _Host_RunFrame (float time)
 		}
 		else
 		{
-			tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "modelloader->UpdateDynamicModels" );
-			VPROF( "UpdateDynamicModels" );
 			CMDLCacheCriticalSection critsec( g_pMDLCache );
 			modelloader->UpdateDynamicModels();
 		}
@@ -3126,9 +3009,6 @@ void _Host_RunFrame (float time)
 #ifndef SWDS
 		if ( !sv.IsDedicated() )
 		{
-			VPROF( "_Host_RunFrame - ClientDLL_Update" );
-			tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "_Host_RunFrame - ClientDLL_Update" );
-
 			// Client-side simulation
 			g_HostTimes.StartFrameSegment( FRAME_SEGMENT_CLDLL );
 
@@ -3140,7 +3020,6 @@ void _Host_RunFrame (float time)
 		if ( pGameJob )
 		{
 			{
-				VPROF_BUDGET( "WaitForAsyncServer", "AsyncServer" );
 				if ( Host_IsSinglePlayerGame() )
 				{
 					// This should change to a YieldWait if the server starts wanting to parallel process. If
@@ -3845,8 +3724,6 @@ void Host_Init( bool bDedicated )
 	// Deal with Gore Settings
 	Host_CheckGore();
 
-	TelemetryTick();
-
 	// Initialize processor subsystem, and print relevant information:
 	Host_InitProcessor();
 
@@ -4220,7 +4097,6 @@ SERVER TRANSITIONS
 */
 bool Host_NewGame( char *mapName, bool loadGame, bool bBackgroundLevel, const char *pszOldMap, const char *pszLandmark, bool bOldSave )
 {
-	VPROF( "Host_NewGame" );
 	COM_TimestampedLog( "Host_NewGame" );
 
 	char previousMapName[MAX_PATH] = { 0 };
@@ -4273,12 +4149,10 @@ bool Host_NewGame( char *mapName, bool loadGame, bool bBackgroundLevel, const ch
 
 	if ( !loadGame )
 	{
-		VPROF( "Host_NewGame_HostState_RunGameInit" );
 		HostState_RunGameInit();
 	}
 
 	// init network mode
-	VPROF_SCOPE_BEGIN( "Host_NewGame_SpawnServer" );
 
 	NET_SetMutiplayer( sv.IsMultiplayer() );
 
@@ -4296,8 +4170,6 @@ bool Host_NewGame( char *mapName, bool loadGame, bool bBackgroundLevel, const ch
 	}
 
 	sv.m_bIsLevelMainMenuBackground = bBackgroundLevel;
-
-	VPROF_SCOPE_END();
 
 	// make sure the time is set
 	g_ServerGlobalVariables.curtime = sv.GetTime();
@@ -4480,10 +4352,6 @@ void Host_Shutdown(void)
 	CM_FreeMap();
 
 	host_initialized = false;
-
-#if defined(VPROF_ENABLED)
-	VProfRecord_Shutdown();
-#endif
 
 #if !defined SWDS
 	if ( !sv.IsDedicated() )

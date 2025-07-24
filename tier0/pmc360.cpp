@@ -1,7 +1,6 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 //
-// Purpose: Inner workings of Performance Monitor Counters on the xbox 360; 
-// they let vprof track L2 dcache misses, LHS, etc.
+// Purpose: Inner workings of Performance Monitor Counters on the xbox 360.
 //
 //=============================================================================//
 
@@ -10,7 +9,7 @@
 #error Support for XBox 360 has been removed.
 
 #include "tier0/platform.h"
-#include "tier0/vprof.h"
+
 #include <pmcpbsetup.h>
 #include "tier0/dbg.h"
 #include "pmc360.h"

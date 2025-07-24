@@ -12,7 +12,7 @@
 #ifndef _NAV_PATHFIND_H_
 #define _NAV_PATHFIND_H_
 
-#include "tier0/vprof.h"
+
 #include "mathlib/ssemath.h"
 #include "nav_area.h"
 
@@ -101,8 +101,6 @@ public:
 template< typename CostFunctor >
 bool NavAreaBuildPath( CNavArea *startArea, CNavArea *goalArea, const Vector *goalPos, CostFunctor &costFunc, CNavArea **closestArea = NULL, float maxPathLength = 0.0f, int teamID = TEAM_ANY, bool ignoreNavBlockers = false )
 {
-	VPROF_BUDGET( "NavAreaBuildPath", "NextBotSpiky" );
-
 	if ( closestArea )
 	{
 		*closestArea = startArea;
@@ -233,11 +231,6 @@ bool NavAreaBuildPath( CNavArea *startArea, CNavArea *goalArea, const Vector *go
 				length = floorConnect.length;
 				how = (NavTraverseType)dir;
 				++searchIndex;
-
-				if ( IsX360() && searchIndex < floorList->Count() )
-				{
-					PREFETCH360( floorList->Element( searchIndex ).area, 0  );
-				}
 			}
 			else if ( searchWhere == SEARCH_LADDERS )
 			{

@@ -26,10 +26,10 @@
 //
 //==================================================================================================
 #include "togl/rendermechanism.h"
-#include "tier0/vprof_telemetry.h"
+
 #include "tier0/dbg.h"
 #include "tier0/threadtools.h"
-#include "tier0/vprof.h"
+
 #include "tier1/strtools.h"
 #include "tier1/utlbuffer.h"
 #include "dx9asmtogl2.h"
@@ -2079,7 +2079,6 @@ HRESULT IDirect3DVertexBuffer9::Lock(UINT OffsetToLock,UINT SizeToLock,void** pp
 {
 	GL_BATCH_PERF_CALL_TIMER;
 	GL_PUBLIC_ENTRYPOINT_CHECKS( m_device );
-	tmZoneFiltered( TELEMETRY_LEVEL2, 25, TMZF_NONE, "VB Lock" );
 
 	// FIXME would be good to have "can't lock twice" logic
 
@@ -2103,8 +2102,6 @@ HRESULT IDirect3DVertexBuffer9::Unlock()
 	GL_BATCH_PERF_CALL_TIMER;
 	GL_PUBLIC_ENTRYPOINT_CHECKS( m_device );
 	
-	tmZoneFiltered( TELEMETRY_LEVEL2, 25, TMZF_NONE, "VB Unlock" );
-
 	m_vtxBuffer->Unlock();
 	return S_OK;
 }
@@ -2113,7 +2110,6 @@ void IDirect3DVertexBuffer9::UnlockActualSize( uint nActualSize, const void *pAc
 {
 	GL_BATCH_PERF_CALL_TIMER;
 	GL_PUBLIC_ENTRYPOINT_CHECKS( m_device );
-	tmZoneFiltered( TELEMETRY_LEVEL2, 25, TMZF_NONE, "VB UnlockActualSize" );
 
 	m_vtxBuffer->Unlock( nActualSize, pActualData );
 }
@@ -2200,8 +2196,6 @@ HRESULT IDirect3DIndexBuffer9::Lock(UINT OffsetToLock,UINT SizeToLock,void** ppb
 	GL_PUBLIC_ENTRYPOINT_CHECKS( m_device );
 	// FIXME would be good to have "can't lock twice" logic
 
-	tmZoneFiltered( TELEMETRY_LEVEL2, 25, TMZF_NONE, "IB Lock" );
-	
 	GLMBuffLockParams lockreq;
 	lockreq.m_nOffset		= OffsetToLock;
 	lockreq.m_nSize			= SizeToLock;
@@ -2218,8 +2212,6 @@ HRESULT IDirect3DIndexBuffer9::Unlock()
 	GL_BATCH_PERF_CALL_TIMER;
 	GL_PUBLIC_ENTRYPOINT_CHECKS( m_device );
 
-	tmZoneFiltered( TELEMETRY_LEVEL2, 25, TMZF_NONE, "IB Unlock" );
-
 	m_idxBuffer->Unlock();
 
 	return S_OK;
@@ -2229,7 +2221,6 @@ void IDirect3DIndexBuffer9::UnlockActualSize( uint nActualSize, const void *pAct
 { 
 	GL_BATCH_PERF_CALL_TIMER;
 	GL_PUBLIC_ENTRYPOINT_CHECKS( m_device );
-	tmZoneFiltered( TELEMETRY_LEVEL2, 25, TMZF_NONE, "IB UnlockActualSize" );
 
 	m_idxBuffer->Unlock( nActualSize, pActualData );
 }
@@ -3305,7 +3296,6 @@ HRESULT IDirect3DDevice9::SetRenderTarget(DWORD RenderTargetIndex,IDirect3DSurfa
 {
 	GL_BATCH_PERF_CALL_TIMER;
 	GL_PUBLIC_ENTRYPOINT_CHECKS( this );
-	tmZone( TELEMETRY_LEVEL2, TMZF_NONE, "%s", __FUNCTION__ );
 	
 	Assert( RenderTargetIndex < 4 );
 
@@ -5331,7 +5321,6 @@ HRESULT IDirect3DDevice9::DrawPrimitiveUP(D3DPRIMITIVETYPE PrimitiveType,UINT Pr
 
 HRESULT IDirect3DDevice9::DrawIndexedPrimitive( D3DPRIMITIVETYPE Type, INT BaseVertexIndex, UINT MinVertexIndex, UINT NumVertices, UINT startIndex, UINT primCount )
 {
-	tmZone( TELEMETRY_LEVEL2, TMZF_NONE, "%s", __FUNCTION__ );
 	Assert( m_ctx->m_nCurOwnerThreadId == ThreadGetCurrentId() );
 		
 	TOGL_NULL_DEVICE_CHECK;
@@ -5366,9 +5355,6 @@ HRESULT IDirect3DDevice9::DrawIndexedPrimitive( D3DPRIMITIVETYPE Type, INT BaseV
 		m_ctx->FlushDrawStates( MinVertexIndex, MinVertexIndex + NumVertices - 1, BaseVertexIndex );
 
 		{
-#if !GL_TELEMETRY_ZONES && GL_BATCH_TELEMETRY_ZONES
-			tmZone( TELEMETRY_LEVEL2, TMZF_NONE, "glDrawRangeElements %u", primCount );
-#endif
 			Assert( ( D3DPT_LINELIST == 2 ) && ( D3DPT_TRIANGLELIST == 4 ) && ( D3DPT_TRIANGLESTRIP == 5 ) );
 
 			static const struct prim_t

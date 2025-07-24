@@ -15,7 +15,7 @@
 #include "interface.h"
 #include "filesystem_engine.h"
 #include "tier0/icommandline.h"
-#include "tier0/vprof.h"
+
 #include "host.h"
 #include "cmd.h"
 #include "common.h"
@@ -222,7 +222,6 @@ void CSteam3Client::CancelAuthTicket()
 void CSteam3Client::RunFrame()
 {
 #if !defined( NO_STEAM )
-	VPROF_BUDGET( "CSteam3Client::RunFrame", VPROF_BUDGETGROUP_STEAM );
 	SteamAPI_RunCallbacks();
 #endif
 }

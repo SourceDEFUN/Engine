@@ -392,14 +392,6 @@ void CJob::Continue()
 
 	// continue the coroutine, with the profiling if necessary
 	bool bJobStillActive;
-#if defined( VPROF_ENABLED )
-	if ( g_VProfCurrentProfile.IsEnabled() )
-	{
-		VPROF_BUDGET( GetName(), VPROF_BUDGETGROUP_JOBS_COROUTINES ); 
-		bJobStillActive = Coroutine_Continue( m_hCoroutine, pchRawName );
-	}
-	else
-#endif
 	{
 		bJobStillActive = Coroutine_Continue( m_hCoroutine, pchRawName );
 	}

@@ -372,68 +372,29 @@ CNewGameDialog::CNewGameDialog(vgui::Panel *parent, bool bCommentaryMode) : Base
 	char szFullFileName[MAX_PATH];
 	int chapterIndex = 0;
 
-	if ( IsPC() || !IsX360() )
+	FileFindHandle_t findHandle = FILESYSTEM_INVALID_FIND_HANDLE;
+	const char *fileName = "cfg/chapter*.cfg";
+	fileName = g_pFullFileSystem->FindFirst( fileName, &findHandle );
+	while ( fileName && chapterIndex < MAX_CHAPTERS )
 	{
-		FileFindHandle_t findHandle = FILESYSTEM_INVALID_FIND_HANDLE;
-		const char *fileName = "cfg/chapter*.cfg";
-		fileName = g_pFullFileSystem->FindFirst( fileName, &findHandle );
-		while ( fileName && chapterIndex < MAX_CHAPTERS )
+		if ( fileName[0] )
 		{
-			if ( fileName[0] )
-			{
-				// Only load chapter configs from the current mod's cfg dir
-				// or else chapters appear that we don't want!
-				Q_snprintf( szFullFileName, sizeof(szFullFileName), "cfg/%s", fileName );
-				FileHandle_t f = g_pFullFileSystem->Open( szFullFileName, "rb", "MOD" );
-				if ( f )
-				{	
-					// don't load chapter files that are empty, used in the demo
-					if ( g_pFullFileSystem->Size(f) > 0	)
-					{
-						Q_strncpy(chapters[chapterIndex].filename, fileName, sizeof(chapters[chapterIndex].filename));
-						++chapterIndex;
-					}
-					g_pFullFileSystem->Close( f );
-				}
-			}
-			fileName = g_pFullFileSystem->FindNext(findHandle);
-		}
-	}
-	else if ( IsX360() )
-	{
-		int ChapterStringIndex = 0;
-		bool bExists = true;
-		while ( bExists && chapterIndex < MAX_CHAPTERS )
-		{
-			Q_snprintf( szFullFileName, sizeof( szFullFileName ), "cfg/chapter%d.cfg", ChapterStringIndex+1 );
-
+			// Only load chapter configs from the current mod's cfg dir
+			// or else chapters appear that we don't want!
+			Q_snprintf( szFullFileName, sizeof(szFullFileName), "cfg/%s", fileName );
 			FileHandle_t f = g_pFullFileSystem->Open( szFullFileName, "rb", "MOD" );
 			if ( f )
-			{		
-				Q_strncpy(chapters[chapterIndex].filename, szFullFileName + 4, sizeof(chapters[chapterIndex].filename));
-				++chapterIndex;
-				++ChapterStringIndex;
+			{	
+				// don't load chapter files that are empty, used in the demo
+				if ( g_pFullFileSystem->Size(f) > 0	)
+				{
+					Q_strncpy(chapters[chapterIndex].filename, fileName, sizeof(chapters[chapterIndex].filename));
+					++chapterIndex;
+				}
 				g_pFullFileSystem->Close( f );
 			}
-			else
-			{
-				bExists = false;
-			}	
-			//Hack to account for xbox360 missing chapter9a
-			if ( ChapterStringIndex == 10 )
-			{				
-				Q_snprintf( szFullFileName, sizeof( szFullFileName ), "cfg/chapter9a.cfg" );
-				FileHandle_t fChap = g_pFullFileSystem->Open( szFullFileName, "rb", "MOD" );
-				if ( fChap )
-				{		
-					Q_strncpy(chapters[chapterIndex].filename, szFullFileName + 4, sizeof(chapters[chapterIndex].filename));
-					++chapterIndex;
-					g_pFullFileSystem->Close( fChap );
-				}		
-			}
-
 		}
-		
+		fileName = g_pFullFileSystem->FindNext(findHandle);
 	}
 
 	bool bBonusesUnlocked = false;
@@ -1412,40 +1373,6 @@ void CNewGameDialog::StartGame( void )
 				// start map
 				BasePanel()->FadeToBlackAndRunEngineCommand( mapcommand );
 			}
-		}
-		else if ( IsX360() )
-		{
-			if ( m_ChapterPanels[m_iSelectedChapter]->HasBonus() && m_iBonusSelection > 0 )
-			{
-				if ( m_iBonusSelection == 1 )
-				{
-					// Run the advanced chamber instead of the config file
-					char *pLastSpace = Q_strrchr( mapcommand, '\n' );
-					pLastSpace[ 0 ] = '\0';
-					pLastSpace = Q_strrchr( mapcommand, '\n' );
-
-					Q_snprintf( pLastSpace, sizeof( mapcommand ) - Q_strlen( mapcommand ), "\nmap %s_advanced\n", m_pBonusMapDescription->szMapFileName );
-				}
-				else
-				{
-					char sz[ 256 ];
-
-					int iChallenge = m_iBonusSelection - 1;
-
-					// Set up the challenge mode
-					Q_snprintf( sz, sizeof( sz ), "sv_bonus_challenge %i\n", iChallenge );
-					engine->ClientCmd_Unrestricted( sz );
-
-					ChallengeDescription_t *pChallengeDescription = &((*m_pBonusMapDescription->m_pChallenges)[ iChallenge - 1 ]);
-
-					// Set up medal goals
-					BonusMapsDatabase()->SetCurrentChallengeObjectives( pChallengeDescription->iBronze, pChallengeDescription->iSilver, pChallengeDescription->iGold );
-					BonusMapsDatabase()->SetCurrentChallengeNames( m_pBonusMapDescription->szFileName, m_pBonusMapDescription->szMapName, pChallengeDescription->szName );
-				}
-			}
-
-			m_bMapStarting = true;
-			BasePanel()->FadeToBlackAndRunEngineCommand( mapcommand );
 		}
 
 		OnClose();

@@ -12,7 +12,7 @@
 #include "enginesprite.h"
 #include "engine/ivmodelinfo.h"
 #include "util_shared.h"
-#include "tier0/vprof.h"
+
 #include "materialsystem/imaterial.h"
 #include "materialsystem/imaterialvar.h"
 #include "view_shared.h"
@@ -369,8 +369,6 @@ int C_SpriteRenderer::DrawSprite(
 	float flHDRColorScale
 	)
 {
-	VPROF_BUDGET( "C_SpriteRenderer::DrawSprite", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
-
 	if ( !r_drawsprites.GetBool() || !model || modelinfo->GetModelType( model ) != mod_sprite )
 	{
 		return 0;
@@ -453,10 +451,7 @@ int C_SpriteRenderer::DrawSprite(
 //-----------------------------------------------------------------------------
 void CSprite::GetToolRecordingState( KeyValues *msg )
 {
-	if ( !ToolsEnabled() )
-		return;
-
-	VPROF_BUDGET( "CSprite::GetToolRecordingState", VPROF_BUDGETGROUP_TOOLS );
+	if ( !ToolsEnabled() ) return;
 
 	BaseClass::GetToolRecordingState( msg );
 

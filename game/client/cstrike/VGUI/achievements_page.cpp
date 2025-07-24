@@ -161,7 +161,7 @@ void CSUpdateProgressBarForPage( vgui::EditablePanel* pPanel, CCSBaseAchievement
             pPercentageBar->SetFillColor( clrProgressBar );
             pPercentageBar->SetWide( pPercentageBarBkg->GetWide() * flCompletion );
 
-            pPanel->SetControlVisible( "PercentageBarBackground", IsX360() ? bShowProgress : true );
+            pPanel->SetControlVisible( "PercentageBarBackground", true );
             pPanel->SetControlVisible( "PercentageBar", true );
         }
     }

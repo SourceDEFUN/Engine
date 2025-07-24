@@ -15,7 +15,7 @@
 #include <vgui/IInput.h>
 #include "../vgui2/src/VPanel.h"
 #include "convar.h"
-#include "tier0/vprof.h"
+
 #include "vgui_baseui_interface.h"
 #include "vgui_helpers.h"
 
@@ -535,8 +535,6 @@ void VGui_FillKeyValues( KeyValues *pCurrentParent )
 
 void VGui_DrawHierarchy( void )
 {
-	VPROF( "VGui_DrawHierarchy" );
-
 	if ( vgui_drawtree.GetInt() <= 0 )
 	{
 		g_pDrawTreeFrame->SetVisible( false );

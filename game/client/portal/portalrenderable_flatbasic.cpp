@@ -21,7 +21,7 @@
 #include "prop_portal_shared.h"
 #include "view_scene.h"
 #include "materialsystem/imaterialvar.h"
-#include "tier0/vprof.h"
+
 
 
 #define PORTALRENDERABLE_FLATBASIC_MINPIXELVIS 0.0f
@@ -100,10 +100,7 @@ CPortalRenderable_FlatBasic::CPortalRenderable_FlatBasic( void )
 
 void CPortalRenderable_FlatBasic::GetToolRecordingState( bool bActive, KeyValues *msg )
 {
-	if ( !ToolsEnabled() )
-		return;
-
-	VPROF_BUDGET( "CPortalRenderable_FlatBasic::GetToolRecordingState", VPROF_BUDGETGROUP_TOOLS );
+	if ( !ToolsEnabled() ) return;
 
 	BaseClass::GetToolRecordingState( msg );
 	CPortalRenderable::GetToolRecordingState( bActive, msg );
@@ -421,8 +418,6 @@ bool CPortalRenderable_FlatBasic::CalcFrustumThroughPortal( const Vector &ptCurr
 
 void CPortalRenderable_FlatBasic::RenderPortalViewToBackBuffer( CViewRender *pViewRender, const CViewSetup &cameraView )
 {
-	VPROF( "CPortalRenderable_FlatBasic::RenderPortalViewToBackBuffer" );
-
 	if( m_fStaticAmount == 1.0f )
 		return; //not going to see anything anyways
 

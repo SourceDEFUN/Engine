@@ -58,15 +58,9 @@
 #ifndef _VTUNEAPI_H_
 #define _VTUNEAPI_H_
 
-#ifndef _XBOX
 #include <windows.h>
-#else
-#include <XTL.h>
-#endif //!_XBOX
 
-#ifdef _XBOX
-#define VTUNEAPI
-#elif !defined(_VTUNEAPI_)
+#if !defined(_VTUNEAPI_)
 #define VTUNEAPI __declspec(dllimport)
 #else
 #define VTUNEAPI __declspec(dllexport)

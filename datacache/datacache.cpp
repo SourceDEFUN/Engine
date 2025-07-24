@@ -10,7 +10,7 @@
 #include <malloc.h>
 #endif
 
-#include "tier0/vprof.h"
+
 #include "basetypes.h"
 #include "convar.h"
 #include "interface.h"
@@ -148,8 +148,6 @@ void CDataCacheSection::GetStatus( DataCacheStatus_t *pStatus, DataCacheLimits_t
 //-----------------------------------------------------------------------------
 void CDataCacheSection::EnsureCapacity( unsigned nBytes, unsigned nItems )
 {
-	VPROF( "CDataCacheSection::EnsureCapacity" );
-
 	if ( m_limits.nMaxItems != (unsigned)-1 || m_limits.nMaxBytes != (unsigned)-1 )
 	{
 		unsigned nNewSectionBytes = GetNumBytes() + nBytes;
@@ -181,8 +179,6 @@ bool CDataCacheSection::Add( DataCacheClientID_t clientId, const void *pItemData
 //-----------------------------------------------------------------------------
 bool CDataCacheSection::AddEx( DataCacheClientID_t clientId, const void *pItemData, unsigned size, unsigned flags, DataCacheHandle_t *pHandle )
 {
-	VPROF( "CDataCacheSection::Add" );
-
 	if ( mem_force_flush.GetBool() )
 	{
 		m_pSharedCache->Flush();
@@ -241,8 +237,6 @@ bool CDataCacheSection::AddEx( DataCacheClientID_t clientId, const void *pItemDa
 //-----------------------------------------------------------------------------
 DataCacheHandle_t CDataCacheSection::Find( DataCacheClientID_t clientId )
 {
-	VPROF( "CDataCacheSection::Find" );
-
 	m_status.nFindRequests++;
 
 	DataCacheHandle_t hResult = DoFind( clientId );
@@ -294,8 +288,6 @@ DataCacheHandle_t CDataCacheSection::DoFind( DataCacheClientID_t clientId )
 //-----------------------------------------------------------------------------
 DataCacheRemoveResult_t CDataCacheSection::Remove( DataCacheHandle_t handle, const void **ppItemData, unsigned *pItemSize, bool bNotify )
 {
-	VPROF( "CDataCacheSection::Remove" );
-
 	if ( handle != DC_INVALID_HANDLE )
 	{
 		memhandle_t lruHandle = (memhandle_t)handle;
@@ -343,8 +335,6 @@ bool CDataCacheSection::IsPresent( DataCacheHandle_t handle )
 //-----------------------------------------------------------------------------
 void *CDataCacheSection::Lock( DataCacheHandle_t handle )
 {
-	VPROF( "CDataCacheSection::Lock" );
-
 	if ( mem_force_flush.GetBool() && !g_iDontForceFlush)
 		Flush();
 
@@ -370,8 +360,6 @@ void *CDataCacheSection::Lock( DataCacheHandle_t handle )
 //-----------------------------------------------------------------------------
 int CDataCacheSection::Unlock( DataCacheHandle_t handle )
 {
-	VPROF( "CDataCacheSection::Unlock" );
-
 	int iNewLockCount = 0;
 	if ( handle != DC_INVALID_HANDLE )
 	{
@@ -418,8 +406,6 @@ void CDataCacheSection::UnlockMutex()
 //-----------------------------------------------------------------------------
 void *CDataCacheSection::Get( DataCacheHandle_t handle, bool bFrameLock )
 {
-	VPROF( "CDataCacheSection::Get" );
-
 	if ( mem_force_flush.GetBool() && !g_iDontForceFlush)
 		Flush();
 
@@ -445,8 +431,6 @@ void *CDataCacheSection::Get( DataCacheHandle_t handle, bool bFrameLock )
 //-----------------------------------------------------------------------------
 void *CDataCacheSection::GetNoTouch( DataCacheHandle_t handle, bool bFrameLock )
 {
-	VPROF( "CDataCacheSection::GetNoTouch" );
-
 	if ( handle != DC_INVALID_HANDLE )
 	{
 		if ( bFrameLock && IsFrameLocking() )
@@ -505,8 +489,6 @@ bool CDataCacheSection::IsFrameLocking()
 //-----------------------------------------------------------------------------
 void *CDataCacheSection::FrameLock( DataCacheHandle_t handle )
 {
-	VPROF( "CDataCacheSection::FrameLock" );
-
 	if ( mem_force_flush.GetBool() && !g_iDontForceFlush)
 		Flush();
 
@@ -545,8 +527,6 @@ int CDataCacheSection::EndFrameLocking()
 
 	if ( pFrameLock->m_iLock == 1 )
 	{
-		VPROF( "CDataCacheSection::EndFrameLocking" );
-
 		DataCacheItem_t *pItem = pFrameLock->m_pFirst;
 		DataCacheItem_t *pNext;
 		int iThread = pFrameLock->m_iThread;
@@ -621,8 +601,6 @@ bool CDataCacheSection::Age( DataCacheHandle_t handle )
 //-----------------------------------------------------------------------------
 unsigned CDataCacheSection::Flush( bool bUnlockedOnly, bool bNotify )
 {
-	VPROF( "CDataCacheSection::Flush" );
-
 	AUTO_LOCK( m_mutex );
 
 	DataCacheNotificationType_t notificationType = ( bNotify )? DC_FLUSH_DISCARD : DC_NONE;
@@ -673,8 +651,6 @@ unsigned CDataCacheSection::Flush( bool bUnlockedOnly, bool bNotify )
 //-----------------------------------------------------------------------------
 unsigned CDataCacheSection::Purge( unsigned nBytes )
 {
-	VPROF( "CDataCacheSection::Purge" );
-
 	AUTO_LOCK( m_mutex );
 
 	unsigned nBytesPurged = 0;
@@ -1162,8 +1138,6 @@ IDataCacheSection *CDataCache::FindSection( const char *pszClientName )
 //-----------------------------------------------------------------------------
 void CDataCache::EnsureCapacity( unsigned nBytes )
 {
-	VPROF( "CDataCache::EnsureCapacity" );
-
 	m_LRU.EnsureCapacity( nBytes );
 }
 
@@ -1173,8 +1147,6 @@ void CDataCache::EnsureCapacity( unsigned nBytes )
 //-----------------------------------------------------------------------------
 unsigned CDataCache::Purge( unsigned nBytes )
 {
-	VPROF( "CDataCache::Purge" );
-
 	return m_LRU.Purge( nBytes );
 }
 
@@ -1184,8 +1156,6 @@ unsigned CDataCache::Purge( unsigned nBytes )
 //-----------------------------------------------------------------------------
 unsigned CDataCache::Flush( bool bUnlockedOnly, bool bNotify )
 {
-	VPROF( "CDataCache::Flush" );
-
 	unsigned result;
 
 	if ( m_bInFlush )

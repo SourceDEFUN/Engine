@@ -20,7 +20,7 @@
 #include "dod_ammo_box.h"
 #include "effect_dispatch_data.h"
 #include "movehelper_server.h"
-#include "tier0/vprof.h"
+
 #include "te_effect_dispatch.h"
 #include "vphysics/player_controller.h"
 #include <KeyValues.h>
@@ -444,8 +444,6 @@ void CDODPlayer::Precache()
 ConVar sv_runcmds( "sv_runcmds", "1" );
 void CDODPlayer::PlayerRunCommand( CUserCmd *ucmd, IMoveHelper *moveHelper )
 {
-	VPROF( "CDODPlayer::PlayerRunCommand" );
-
 	if ( !sv_runcmds.GetInt() )
 		return;
 
@@ -3879,8 +3877,6 @@ void CDODPlayer::PickUpWeapon( CWeaponDODBase *pWeapon )
 //-----------------------------------------------------------------------------
 void CDODPlayer::SetupBones( matrix3x4_t *pBoneToWorld, int boneMask )
 {
-	VPROF_BUDGET( "CBaseAnimating::SetupBones", VPROF_BUDGETGROUP_SERVER_ANIM );
-
 	// Set the mdl cache semaphore.
 	MDLCACHE_CRITICAL_SECTION();
 

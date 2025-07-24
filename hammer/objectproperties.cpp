@@ -169,8 +169,6 @@ CObjectProperties::~CObjectProperties()
 //-----------------------------------------------------------------------------
 void CObjectProperties::CreatePages(void)
 {
-	//VPROF_BUDGET( "CObjectProperties::CreatePages", "Object Properties" );
-
 	m_pEntity = new COP_Entity;
 	m_pEntity->SetObjectList(&m_DstObjects);
 
@@ -209,8 +207,6 @@ void CObjectProperties::CreatePages(void)
 //-----------------------------------------------------------------------------
 PVOID CObjectProperties::GetEditObject(CRuntimeClass *pType)
 {
-	//VPROF_BUDGET( "CObjectProperties::GetEditObject", "Object Properties" );
-
 	if (pType == RUNTIME_CLASS(editCMapClass))
 	{
 		return PVOID((CMapClass*)&e_CMapClass);
@@ -232,8 +228,6 @@ PVOID CObjectProperties::GetEditObject(CRuntimeClass *pType)
 //-----------------------------------------------------------------------------
 PVOID CObjectProperties::GetEditObjectFromMapObject(CMapClass *pobj, CRuntimeClass *pType)
 {
-	//VPROF_BUDGET( "CObjectProperties::GetEditObjectFromMapObject", "Object Properties" );
-
 	if (pType == RUNTIME_CLASS(editCMapClass))
 	{
 		return PVOID(pobj);
@@ -261,8 +255,6 @@ PVOID CObjectProperties::GetEditObjectFromMapObject(CMapClass *pobj, CRuntimeCla
 //-----------------------------------------------------------------------------
 void CObjectProperties::CopyDataToEditObjects(CMapClass *pobj)
 {
-	//VPROF_BUDGET( "CObjectProperties::CopyDataToEditObjects", "Object Properties" );
-
 	//
 	// All copies here are done without updating object dependencies, because
 	// we're copying to a place that is outside of the world.
@@ -285,8 +277,6 @@ void CObjectProperties::CopyDataToEditObjects(CMapClass *pobj)
 //------------------------------------------------------------------------------
 void CObjectProperties::SetOutputButtonState(int nState)
 {
-	//VPROF_BUDGET( "CObjectProperties::SetOutputButtonState", "Object Properties" );
-
 	if (nState == CONNECTION_GOOD)
 	{
 		m_pOutputButton->SetIcon(m_hIconOutputGood);
@@ -316,8 +306,6 @@ void CObjectProperties::SetOutputButtonState(int nState)
 //------------------------------------------------------------------------------
 void CObjectProperties::SetInputButtonState(int nState)
 {
-	//VPROF_BUDGET( "CObjectProperties::SetInputButtonState", "Object Properties" );
-
 	if (nState == CONNECTION_GOOD)
 	{
 		m_pInputButton->SetIcon(m_hIconInputGood);
@@ -346,12 +334,7 @@ void CObjectProperties::SetInputButtonState(int nState)
 //------------------------------------------------------------------------------
 void CObjectProperties::UpdateOutputButton(void)
 {
-	//VPROF_BUDGET( "CObjectProperties::UpdateOutputButton", "Object Properties" );
-
-	if (!m_pOutputButton)
-	{
-		return;
-	}
+	if (!m_pOutputButton) return;
 
 	bool bHaveConnection = false;
 	bool bIgnoreHiddenTargets = false;
@@ -393,12 +376,7 @@ void CObjectProperties::UpdateOutputButton(void)
 //------------------------------------------------------------------------------
 void CObjectProperties::UpdateInputButton()
 {
-	//VPROF_BUDGET( "CObjectProperties::UpdateInputButton", "Object Properties" );
-
-	if (!m_pInputButton)
-	{
-		return;
-	}
+	if (!m_pInputButton) return;
 
 	bool bHaveConnection = false;
 
@@ -437,8 +415,6 @@ void CObjectProperties::UpdateInputButton()
 //-----------------------------------------------------------------------------
 void CObjectProperties::CreateButtons(void)
 {
-	//VPROF_BUDGET( "CObjectProperties::CreateButtons", "Object Properties" );
-
 #if 0
 	// Get the screen location of the hidden apply button(ID_APPLY_NOW)
 	rect	rcButton;
@@ -503,8 +479,6 @@ void CObjectProperties::CreateButtons(void)
 //-----------------------------------------------------------------------------
 void CObjectProperties::GetTabsForLayout(LayoutType_t eLayoutType, bool &bEntity, bool &bGroups, bool &bFlags, bool &bModel)
 {
-	//VPROF_BUDGET( "CObjectProperties::GetTabsForLayout", "Object Properties" );
-
 	bEntity = bGroups = bFlags = bModel = false;
 
 	switch (eLayoutType)
@@ -547,8 +521,6 @@ void CObjectProperties::GetTabsForLayout(LayoutType_t eLayoutType, bool &bEntity
 //-----------------------------------------------------------------------------
 LayoutType_t CObjectProperties::GetLayout(void)
 {
-	//VPROF_BUDGET( "CObjectProperties::GetLayout", "Object Properties" );
-
 	LayoutType_t eLayoutType = ltNone;
 
 	if ((m_DstObjects.Count() == 0) || (CMapDoc::GetActiveMapDoc() == NULL))
@@ -624,8 +596,6 @@ LayoutType_t CObjectProperties::GetLayout(void)
 //-----------------------------------------------------------------------------
 void CObjectProperties::RestoreActivePage(void)
 {
-	//VPROF_BUDGET( "CObjectProperties::RestoreActivePage", "Object Properties" );
-
 	//
 	// Try to restore the previously active page. If it is not in the page list
 	// just activate page zero.
@@ -653,8 +623,6 @@ void CObjectProperties::RestoreActivePage(void)
 //-----------------------------------------------------------------------------
 void CObjectProperties::SaveActivePage(void)
 {
-	//VPROF_BUDGET( "CObjectProperties::SaveActivePage", "Object Properties" );
-
 	CObjectPage *pPage = (CObjectPage *)GetActivePage();
 	if (pPage != NULL)
 	{
@@ -669,8 +637,6 @@ void CObjectProperties::SaveActivePage(void)
 //-----------------------------------------------------------------------------
 BOOL CObjectProperties::SetupPages(void)
 {
-	//VPROF_BUDGET( "CObjectProperties::SetupPages", "Object Properties" );
-
 	static bool bFirstTime = true;
 	static LayoutType_t eLastLayoutType = ltZero;
 	static LayoutType_t eLastValidLayoutType = ltZero;
@@ -820,7 +786,6 @@ BOOL CObjectProperties::SetupPages(void)
 
 	CObjectPage::s_bRESTRUCTURING = FALSE;
 
-	//VPROF_BUDGET( "CObjectProperties::RestoreActivePage", "Object Properties" );
 	RestoreActivePage();
 
 	//
@@ -877,15 +842,10 @@ void CObjectProperties::SetPageToInput(CEntityConnection *pConnection)
 //-----------------------------------------------------------------------------
 void CObjectProperties::SaveData(void)
 {
-	//VPROF_BUDGET( "CObjectProperties::SaveData", "Object Properties" );
-
 	//
 	// Make sure window is visible - don't want to save otherwise.
 	//
-	if (!IsWindowVisible())
-	{
-		return;
-	}
+	if (!IsWindowVisible()) return;
 
 	// we should never save in a dirty state
 	if ( m_bDataDirty )
@@ -944,12 +904,7 @@ void CObjectProperties::SaveData(void)
 //-----------------------------------------------------------------------------
 void CObjectProperties::LoadDataForPages(int iPage)
 {
-	//VPROF_BUDGET( "CObjectProperties::LoadDataForPages", "Object Properties" );
-	
-	if (m_bDummy)
-	{
-		return;
-	}
+	if (m_bDummy) return;
 
 	//
 	// Determine whether we are editing multiple objects or not.
@@ -1047,8 +1002,6 @@ void CObjectProperties::LoadDataForPages(int iPage)
 //-----------------------------------------------------------------------------
 void CObjectProperties::AddObjectExpandGroups(CMapClass *pObject)
 {
-	//VPROF_BUDGET( "CObjectProperties::AddObjectExpandGroups", "Object Properties" );
-
 	if (pObject->IsGroup())
 	{
 		const CMapObjectList *pChildren = pObject->GetChildren();
@@ -1071,8 +1024,6 @@ void CObjectProperties::AddObjectExpandGroups(CMapClass *pObject)
 //-----------------------------------------------------------------------------
 void CObjectProperties::ReloadData()
 {
-	//VPROF_BUDGET( "CObjectProperties::LoadData", "Object Properties" );
-
 	CMapDoc *pDoc = CMapDoc::GetActiveMapDoc();
 
 	//
@@ -1215,7 +1166,6 @@ void CObjectProperties::UpdateAnchors( CWnd *pPage )
 //-----------------------------------------------------------------------------
 void CObjectProperties::OnClose(void)
 {
-	//VPROF_BUDGET( "CObjectProperties::OnClose", "Object Properties" );
 	OnApply();
 
 	ShowWindow(SW_HIDE);
@@ -1236,8 +1186,6 @@ void CObjectProperties::OnPaint()
 //-----------------------------------------------------------------------------
 void CObjectProperties::OnShowWindow(BOOL bShow, UINT nStatus) 
 {
-	//VPROF_BUDGET( "CObjectProperties::OnShowWindow", "Object Properties" );
-
 	// Forget the last active page when the window is hidden or shown.
 	// FIXME: SetupPages calls SaveActivePage, so we must switch to page 0 here
 	SetActivePage(0);
@@ -1263,12 +1211,7 @@ void CObjectProperties::OnSize( UINT nType, int cx, int cy )
 //-----------------------------------------------------------------------------
 void CObjectProperties::OnApply(void)
 {
-	//VPROF_BUDGET( "CObjectProperties::OnApply", "Object Properties" );
-
-	if ( !m_bCanEdit )
-	{
-		return;
-	}
+	if ( !m_bCanEdit ) return;
 
 	CMapDoc *pDoc = CMapDoc::GetActiveMapDoc();
 	if ( !pDoc )
@@ -1315,7 +1258,6 @@ void CObjectProperties::OnApply(void)
 //-----------------------------------------------------------------------------
 void CObjectProperties::OnOK(void)
 {
-	//VPROF_BUDGET( "CObjectProperties::OnClose", "Object Properties" );
 	OnApply();
 }
 
@@ -1388,14 +1330,9 @@ void CObjectProperties::OnEditInstance(void)
 //-----------------------------------------------------------------------------
 int CObjectProperties::OnCreate(LPCREATESTRUCT lpCreateStruct) 
 {
-	//VPROF_BUDGET( "CObjectProperties::OnCreate", "Object Properties" );
-
 	lpCreateStruct->dwExStyle |= WS_EX_TOOLWINDOW;
 
-	if (CPropertySheet::OnCreate(lpCreateStruct) == -1)
-	{
-		return -1;
-	}
+	if (CPropertySheet::OnCreate(lpCreateStruct) == -1) return -1;
 
 	return 0;
 }
@@ -1412,8 +1349,6 @@ void CObjectProperties::SetObjectList(const CMapObjectList *pObjectList)
 //-----------------------------------------------------------------------------
 void CObjectProperties::MarkDataDirty()
 {
-	//VPROF_BUDGET( "CObjectProperties::RefreshData", "Object Properties" );
-
 	// if flag already set, dont touch anything
 	if ( m_bDataDirty )
 		return;
@@ -1428,9 +1363,6 @@ void CObjectProperties::MarkDataDirty()
 	}
 
 	Invalidate( false );
-
 	m_DstObjects.RemoveAll();
-
 	m_bDataDirty = true;
 }
-

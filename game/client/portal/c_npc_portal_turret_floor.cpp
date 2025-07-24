@@ -126,7 +126,7 @@ void C_NPC_Portal_FloorTurret::LaserOn( void )
 		m_pBeam->SetColor( 255, 32, 32 );
 		m_pBeam->SetBrightness( 255 );
 		m_pBeam->SetNoise( 0 );
-		m_pBeam->SetWidth( IsX360() ? ( 1.5f ) : ( 0.75f ) );	// On low end TVs these lasers are very hard to see at a distance
+		m_pBeam->SetWidth( 0.75f );
 		m_pBeam->SetEndWidth( 0 );
 		m_pBeam->SetScrollRate( 0 );
 		m_pBeam->SetFadeLength( 0 );
@@ -164,5 +164,5 @@ void C_NPC_Portal_FloorTurret::LaserOn( void )
 
 float C_NPC_Portal_FloorTurret::LaserEndPointSize( void )
 {
-	return ( ( MAX( 0.0f, sinf( gpGlobals->curtime * M_PI + m_fPulseOffset ) ) ) * FLOOR_TURRET_PORTAL_END_POINT_PULSE_SCALE + 3.0f ) * ( IsX360() ? ( 3.0f ) : ( 1.5f ) );
+	return ( ( MAX( 0.0f, sinf( gpGlobals->curtime * M_PI + m_fPulseOffset ) ) ) * FLOOR_TURRET_PORTAL_END_POINT_PULSE_SCALE + 3.0f ) * 1.5f;
 }

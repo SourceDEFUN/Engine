@@ -209,7 +209,6 @@ protected:
 	case version: \
 	bFoundVersion = true; \
 	{ \
-	VPROF_BUDGET( #funcname, VPROF_BUDGETGROUP_JOBS_COROUTINES ); \
 	bResult = this->##funcname( pRequest, pWebAPIResponse ); \
 	} \
 	break; 
@@ -219,7 +218,6 @@ protected:
 	bFoundVersion = true; \
 	pWebAPIResponse->SetExtendedArrays( true ); \
 	{ \
-	VPROF_BUDGET( #funcname, VPROF_BUDGETGROUP_JOBS_COROUTINES ); \
 	bResult = this->##funcname( pRequest, pWebAPIResponse ); \
 	} \
 	break; 

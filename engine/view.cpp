@@ -20,7 +20,7 @@
 #include "demo.h"
 #include "istudiorender.h"
 #include "materialsystem/imesh.h"
-#include "tier0/vprof.h"
+
 #include "host.h"
 #include "view.h"
 #include "client.h"
@@ -86,8 +86,6 @@ FIXME:  Define this as a change function to the ConVar's below rather than polli
 */
 bool V_CheckGamma( void )
 {
-	tmZoneFiltered( TELEMETRY_LEVEL0, 50, TMZF_NONE, "%s", __FUNCTION__ );
-
 	static int lastLightmap = -1;
 	extern void GL_RebuildLightmaps( void );
 	
@@ -125,8 +123,6 @@ void V_Shutdown( void )
 //-----------------------------------------------------------------------------
 void V_RenderVGuiOnly_NoSwap()
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 	// Need to clear the screen in this case, cause we're not drawing
 	// the loading screen.
 	UpdateMaterialSystemConfig();
@@ -220,7 +216,6 @@ void FullViewColorAdjustment( )
 //-----------------------------------------------------------------------------
 void V_RenderView( void )
 {
-	VPROF( "V_RenderView" );
 	MDLCACHE_COARSE_LOCK_(g_pMDLCache);
 
 	bool bCanRenderWorld = ( host_state.worldmodel != NULL ) && cl.IsActive();
@@ -236,8 +231,6 @@ void V_RenderView( void )
 
 	if ( IsPC() && bCanRenderWorld && g_bTextMode )
 	{	
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "SysSleep()" );
-
 		// Sleep to let the other textmode clients get some cycles.
 		Sys_Sleep( 15 );
 		bCanRenderWorld = false;
@@ -465,7 +458,6 @@ public:
 
 	void ViewDrawFade( byte *color, IMaterial* pFadeMaterial )
 	{
-		VPROF_BUDGET( "ViewDrawFade", VPROF_BUDGETGROUP_WORLD_RENDERING );
 		g_EngineRenderer->ViewDrawFade( color, pFadeMaterial );
 	}
 

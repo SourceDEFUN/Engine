@@ -94,8 +94,6 @@ void CFrameFunctionMgr::Deregister( CBaseFrameFunction* pFrameFunc )
 //-------------------------------------------------------------------------
 void CFrameFunctionMgr::RunFrame( const CLimitTimer& limitTimer )
 {
-	VPROF_BUDGET( "CFrameFunctionMgr::RunFrame", VPROF_BUDGETGROUP_STEAM );
-
 	//track the number of frames we've profiled
 	m_nNumProfileFrames++;
 	m_bCompletedHighPri = false;
@@ -107,8 +105,6 @@ void CFrameFunctionMgr::RunFrame( const CLimitTimer& limitTimer )
 //-------------------------------------------------------------------------
 bool CFrameFunctionMgr::RunFrameTick( const CLimitTimer& limitTimer )
 {
-	VPROF_BUDGET( "CFrameFunctionMgr::RunFrameTick", VPROF_BUDGETGROUP_STEAM );
-
 	//run high priority if we haven't finished it yet
 	if( !m_bCompletedHighPri )
 	{
@@ -141,7 +137,6 @@ bool CFrameFunctionMgr::RunFrameList( CBaseFrameFunction::EFrameType eType, cons
 		uint64 nTimeStart = limitTimer.CMicroSecLeft();
 
 		{
-			VPROF_BUDGET( pFunc->m_sName.Get(), VPROF_BUDGETGROUP_STEAM );
 			bResult |= pFunc->BRun( limitTimer );
 		}
 

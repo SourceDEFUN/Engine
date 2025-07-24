@@ -12,7 +12,7 @@
 #include "tier0/threadtools.h"
 #include "stringpool.h"
 #include "generichash.h"
-#include "tier0/vprof.h"
+
 #include <stddef.h>
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -242,9 +242,7 @@ CUtlSymbolTable::~CUtlSymbolTable()
 
 CUtlSymbol CUtlSymbolTable::Find( const char* pString ) const
 {	
-	VPROF( "CUtlSymbol::Find" );
-	if (!pString)
-		return CUtlSymbol();
+	if (!pString) return CUtlSymbol();
 	
 	// Store a special context used to help with insertion
 	m_pUserSearchString = pString;
@@ -285,9 +283,7 @@ int CUtlSymbolTable::FindPoolWithSpace( int len )	const
 
 CUtlSymbol CUtlSymbolTable::AddString( const char* pString )
 {
-	VPROF("CUtlSymbol::AddString");
-	if (!pString) 
-		return CUtlSymbol( UTL_INVAL_SYMBOL );
+	if (!pString) return CUtlSymbol( UTL_INVAL_SYMBOL );
 
 	CUtlSymbol id = Find( pString );
 	

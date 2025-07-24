@@ -20,7 +20,7 @@
 #include "engine/ivdebugoverlay.h"
 #include "clienteffectprecachesystem.h"
 #include "collisionutils.h"
-#include "tier0/vprof.h"
+
 #include "viewrender.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -1890,10 +1890,6 @@ void CSnowFallManager::FindSnowVolumes( Vector &vecCenter, float flRadius, Vecto
 //-----------------------------------------------------------------------------
 void CSnowFallManager::CreateSnowFall( void )
 {
-#if 1
-	VPROF_BUDGET( "SnowFall", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
-#endif
-
 	// Check to see if we have a local player before starting the snow around a local player.
 	C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
 	if ( pPlayer == NULL )

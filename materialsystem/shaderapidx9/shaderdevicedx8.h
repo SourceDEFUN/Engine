@@ -31,7 +31,6 @@
     
 
 // PC:    By default, PIX profiling is explicitly disallowed using the D3DPERF_SetOptions(1) API on PC
-// X360:  PIX_INSTRUMENTATION will only generate PIX events in RELEASE builds on 360
 // Uncomment to use PIX instrumentation:
 #if PIX_ENABLE
 #define	PIX_INSTRUMENTATION

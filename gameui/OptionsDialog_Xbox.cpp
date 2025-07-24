@@ -481,15 +481,6 @@ void COptionsDialogXbox::OnClose( void )
 //-----------------------------------------------------------------------------
 void COptionsDialogXbox::OnKeyCodePressed( vgui::KeyCode code )
 {
-	if ( IsX360() )
-	{
-		if ( GetAlpha() != 255 )
-		{
-			// inhibit key activity during transitions
-			return;
-		}
-	}
-
 	if ( !m_bSelectionActive )
 		HandleInactiveKeyCodePressed( code );
 	else if ( m_pSelectedOption->eOptionType != OPTION_TYPE_BIND )

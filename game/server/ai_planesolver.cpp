@@ -24,14 +24,6 @@
 const float PLANE_SOLVER_THINK_FREQUENCY[2] = { 0.0f, 0.2f };
 const float MAX_PROBE_DIST[2] = { (10.0f*12.0f), (8.0f*12.0f) };
 
-//#define PROFILE_PLANESOLVER 1
-
-#ifdef PROFILE_PLANESOLVER
-#define PLANESOLVER_PROFILE_SCOPE( tag ) AI_PROFILE_SCOPE( tag )
-#else
-#define PLANESOLVER_PROFILE_SCOPE( tag ) ((void)0)
-#endif
-
 #define ProbeForNpcs() 0
 
 //#define TESTING_SUGGESTIONS
@@ -89,8 +81,6 @@ inline const Vector &CAI_PlaneSolver::GetLocalOrigin()
 
 bool CAI_PlaneSolver::MoveLimit( Navigation_t navType, const Vector &target, bool ignoreTransients, bool fCheckStep, int contents, AIMoveTrace_t *pMoveTrace )
 {
-	AI_PROFILE_SCOPE( CAI_PlaneSolver_MoveLimit );
-
 	int flags = ( navType == NAV_GROUND ) ? AIMLF_2D : AIMLF_DEFAULT;
 
 	if ( ignoreTransients )
@@ -418,8 +408,6 @@ AI_SuggestorResult_t CAI_PlaneSolver::GenerateObstacleSuggestions( const AILocal
 {
 	Assert( nProbes % 2 == 1 );
 	
-	PLANESOLVER_PROFILE_SCOPE( CAI_PlaneSolver_GenerateObstacleSuggestions );
-	
 	AI_SuggestorResult_t seekResult = SR_NONE;
 	bool				 fNewTarget = ( !m_fSolvedPrev || m_PrevTarget != goal.target );
 	
@@ -633,8 +621,6 @@ unsigned CAI_PlaneSolver::ComputeTurnBiasFlags( const AILocalMoveGoal_t &goal, c
 bool CAI_PlaneSolver::RunMoveSolver( const AILocalMoveGoal_t &goal, const AIMoveTrace_t &directTrace, float degreesPositiveArc, 
 									 bool fDeterOscillation, Vector *pResult )
 {
-	PLANESOLVER_PROFILE_SCOPE( CAI_PlaneSolver_RunMoveSolver );
-		
 	AI_MoveSolution_t solution;
 	
 	if ( m_Solver.HaveRegulations() )

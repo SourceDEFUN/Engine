@@ -10,7 +10,7 @@
 #include "fx_quad.h"
 #include "fx_sparks.h"
 
-#include "tier0/vprof.h"
+
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -85,8 +85,6 @@ DECLARE_CLIENT_EFFECT( "ImpactGauss", ImpactGaussCallback );
 //-----------------------------------------------------------------------------
 void ImpactCallback( const CEffectData &data )
 {
-	VPROF_BUDGET( "ImpactCallback", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
-
 	trace_t tr;
 	Vector vecOrigin, vecStart, vecShotDir;
 	int iMaterial, iDamageType, iHitbox;
@@ -203,8 +201,6 @@ void FX_AirboatGunImpact( const Vector &origin, const Vector &normal, float scal
 //-----------------------------------------------------------------------------
 void ImpactAirboatGunCallback( const CEffectData &data )
 {
-	VPROF_BUDGET( "ImpactAirboatGunCallback", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
-
 	trace_t tr;
 	Vector vecOrigin, vecStart, vecShotDir;
 	int iMaterial, iDamageType, iHitbox;
@@ -239,8 +235,6 @@ DECLARE_CLIENT_EFFECT( "AirboatGunImpact", ImpactAirboatGunCallback );
 //-----------------------------------------------------------------------------
 void ImpactHelicopterCallback( const CEffectData &data )
 {
-	VPROF_BUDGET( "ImpactHelicopterCallback", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
-
 	trace_t tr;
 	Vector vecOrigin, vecStart, vecShotDir;
 	int iMaterial, iDamageType, iHitbox;
@@ -259,7 +253,7 @@ void ImpactHelicopterCallback( const CEffectData &data )
 	// If we hit, perform our custom effects and play the sound. Don't create decals
 	if ( Impact( vecOrigin, vecStart, iMaterial, iDamageType, iHitbox, pEntity, tr, IMPACT_NODECAL | IMPACT_REPORT_RAGDOLL_IMPACTS ) )
 	{
-		FX_AirboatGunImpact( vecOrigin, tr.plane.normal, IsXbox() ? 1 : 2 );
+		FX_AirboatGunImpact( vecOrigin, tr.plane.normal, 2 );
 
 		// Only do metal + computer custom effects
 		if ( (iMaterial == CHAR_TEX_METAL) || (iMaterial == CHAR_TEX_COMPUTER) )

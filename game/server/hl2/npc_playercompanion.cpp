@@ -1913,7 +1913,6 @@ bool CNPC_PlayerCompanion::PickTacticalLookTarget( AILookTargetArgs_t *pArgs )
 	hintCriteria.AddIncludePosition( GetAbsOrigin(), COMPANION_MAX_TACTICAL_TARGET_DIST );
 
 	{
-		AI_PROFILE_SCOPE( CNPC_PlayerCompanion_FindHint_PickTacticalLookTarget );
   		pHint = CAI_HintManager::FindHint( this, hintCriteria );
 	}
 	
@@ -2512,8 +2511,6 @@ void CNPC_PlayerCompanion::CleanupCoverSearch()
 //-----------------------------------------------------------------------------
 bool CNPC_PlayerCompanion::FindCoverPos( CBaseEntity *pEntity, Vector *pResult)
 {
-	AI_PROFILE_SCOPE(CNPC_PlayerCompanion_FindCoverPos);
-
 	ASSERT_NO_REENTRY();
 
 	bool result = false;
@@ -2539,8 +2536,6 @@ bool CNPC_PlayerCompanion::FindCoverPos( CBaseEntity *pEntity, Vector *pResult)
 
 bool CNPC_PlayerCompanion::FindCoverPosInRadius( CBaseEntity *pEntity, const Vector &goalPos, float coverRadius, Vector *pResult )
 {
-	AI_PROFILE_SCOPE(CNPC_PlayerCompanion_FindCoverPosInRadius);
-
 	ASSERT_NO_REENTRY();
 
 	bool result = false;
@@ -2568,8 +2563,6 @@ bool CNPC_PlayerCompanion::FindCoverPosInRadius( CBaseEntity *pEntity, const Vec
 
 bool CNPC_PlayerCompanion::FindCoverPos( CSound *pSound, Vector *pResult )
 {
-	AI_PROFILE_SCOPE(CNPC_PlayerCompanion_FindCoverPos);
-
 	bool result = false;
 	bool bIsMortar = ( pSound->SoundContext() == SOUND_CONTEXT_MORTAR );
 
@@ -2760,7 +2753,6 @@ int CNPC_PlayerCompanion::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 //-----------------------------------------------------------------------------
 void CNPC_PlayerCompanion::OnFriendDamaged( CBaseCombatCharacter *pSquadmate, CBaseEntity *pAttackerEnt )
 {
-	AI_PROFILE_SCOPE( CNPC_PlayerCompanion_OnFriendDamaged );
 	BaseClass::OnFriendDamaged( pSquadmate, pAttackerEnt );
 
 	CAI_BaseNPC *pAttacker = pAttackerEnt->MyNPCPointer();

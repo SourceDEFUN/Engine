@@ -439,9 +439,6 @@ void CBaseClient::SetName(const char * playerName)
 
 	val = m_Name;
 
-	// Don't care about duplicate names on the xbox. It can only occur when a player
-	// is reconnecting after crashing, and we don't want to ever show the (X) then.
-	// Check to see if another user by the same name exists
 	while ( true )
 	{
 		for ( i = 0; i < m_Server->GetClientCount(); i++ )
@@ -506,10 +503,8 @@ void CBaseClient::ActivatePlayer()
 
 	m_nSignonState = SIGNONSTATE_FULL;
 	MapReslistGenerator().OnPlayerSpawn();
-#ifndef _XBOX
 	// update the UI
 	NotifyDedicatedServerUI("UpdatePlayers");
-#endif
 }
 
 void CBaseClient::SpawnPlayer( void )
@@ -610,9 +605,7 @@ void CBaseClient::Disconnect( const char *fmt, ... )
 	SV_NotifyRPTOfDisconnect( m_nClientSlot );
 #endif
 
-#ifndef _XBOX
 	Steam3Server().NotifyClientDisconnect( this );
-#endif
 	m_nSignonState = SIGNONSTATE_NONE;
 
 	// clear user info 
@@ -635,16 +628,12 @@ void CBaseClient::Disconnect( const char *fmt, ... )
 	}
 
 	Clear(); // clear state
-#ifndef _XBOX
 	NotifyDedicatedServerUI("UpdatePlayers");
-#endif
 	Steam3Server().SendUpdatedServerDetails(); // Update the master server.
 }
 
 void CBaseClient::FireGameEvent( IGameEvent *event )
 {
-	tmZoneFiltered( TELEMETRY_LEVEL0, 50, TMZF_NONE, "%s", __FUNCTION__ );
-
 	char buffer_data[MAX_EVENT_BYTES];
 
 	SVC_GameEvent eventMsg;
@@ -1050,9 +1039,7 @@ void CBaseClient::StartTrace( bf_write &msg )
 
 void CBaseClient::EndTrace( bf_write &msg )
 {
-	if ( m_iTracing == 0 )
-		return;
-	VPROF_BUDGET( "CBaseClient::EndTrace", VPROF_BUDGETGROUP_OTHER_NETWORKING );
+	if ( m_iTracing == 0 ) return;
 
 	int bits = m_Trace.m_nCurBit - m_Trace.m_nStartBit;
 	float flElapsedMs = ( Plat_FloatTime() - m_Trace.m_StartSendTime ) * 1000.0;
@@ -1099,9 +1086,7 @@ void CBaseClient::EndTrace( bf_write &msg )
 
 void CBaseClient::TraceNetworkData( bf_write &msg, char const *fmt, ... )
 {
-	if ( !IsTracing() )
-		return;
-	VPROF_BUDGET( "CBaseClient::TraceNetworkData", VPROF_BUDGETGROUP_OTHER_NETWORKING );
+	if ( !IsTracing() ) return;
 	char buf[ 64 ];
 	va_list argptr;
 	va_start( argptr, fmt );
@@ -1117,9 +1102,7 @@ void CBaseClient::TraceNetworkData( bf_write &msg, char const *fmt, ... )
 
 void CBaseClient::TraceNetworkMsg( int nBits, char const *fmt, ... )
 {
-	if ( !IsTracing() )
-		return;
-	VPROF_BUDGET( "CBaseClient::TraceNetworkMsg", VPROF_BUDGETGROUP_OTHER_NETWORKING );
+	if ( !IsTracing() ) return;
 	char buf[ 64 ];
 	va_list argptr;
 	va_start( argptr, fmt );
@@ -1149,9 +1132,6 @@ void CBaseClient::SendSnapshot( CClientFrame *pFrame )
 		m_NetChannel->Transmit();	
 		return;
 	}
-
-	VPROF_BUDGET( "SendSnapshot", VPROF_BUDGETGROUP_OTHER_NETWORKING );
-	tmZoneFiltered( TELEMETRY_LEVEL0, 50, TMZF_NONE, "%s", __FUNCTION__ );
 
 	bool bFailedOnce = false;
 write_again:
@@ -1273,8 +1253,6 @@ write_again:
 	// is this is a full entity update (no delta) ?
 	if ( !deltaFrame )
 	{
-		VPROF_BUDGET( "SendSnapshot Transmit Full", VPROF_BUDGETGROUP_OTHER_NETWORKING );
-
 		// transmit snapshot as reliable data chunk
 		bSendOK = m_NetChannel->SendData( msg );
 		bSendOK = bSendOK && m_NetChannel->Transmit();
@@ -1285,8 +1263,6 @@ write_again:
 	}
 	else
 	{
-		VPROF_BUDGET( "SendSnapshot Transmit Delta", VPROF_BUDGETGROUP_OTHER_NETWORKING );
-
 		// just send it as unreliable snapshot
 		bSendOK = m_NetChannel->SendDatagram( &msg ) > 0;
 	}
@@ -1497,8 +1473,6 @@ bool CBaseClient::IsNameChangeOnCooldown( bool bShowStatusMessage /*= false*/ )
 
 void CBaseClient::OnRequestFullUpdate()
 {
-	VPROF_BUDGET( "CBaseClient::OnRequestFullUpdate", VPROF_BUDGETGROUP_OTHER_NETWORKING );
-
 	// client requests a full update 
 	m_pLastSnapshot = NULL;
 

@@ -9,7 +9,7 @@
 #include "cbase.h"
 #include "c_basetempentity.h"
 #include "IEffects.h"
-#include "tier0/vprof.h"
+
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -68,8 +68,6 @@ void C_TEEnergySplash::Precache( void )
 //-----------------------------------------------------------------------------
 void C_TEEnergySplash::PostDataUpdate( DataUpdateType_t updateType )
 {
-	VPROF( "C_TEEnergySplash::PostDataUpdate" );
-
 	g_pEffects->EnergySplash( m_vecPos, m_vecDir, m_bExplosive );
 }
 

@@ -596,8 +596,6 @@ int CAudioMixerWave::MixDataToDevice_( IAudioDevice *pDevice, channel_t *pChanne
 	if ( m_finished )
 		return 0;
 
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 	// save this to compute total output
 	int startingOffset = outputOffset;
 
@@ -643,8 +641,6 @@ int CAudioMixerWave::MixDataToDevice_( IAudioDevice *pDevice, channel_t *pChanne
 		double fsample_index_prev = m_fsample_index;		// save so we can modify in LoadMixBuffer
 		bool bInterpolated_pitch = FUseHighQualityPitch( pChannel );
 		double rate;
-
-		VPROF_( bInterpolated_pitch ? "CAudioMixerWave::MixData innerloop interpolated" : "CAudioMixerWave::MixData innerloop not interpolated", 2, VPROF_BUDGETGROUP_OTHER_SOUND, false, BUDGETFLAG_OTHER );
 
 		// process samples in paintbuffer-sized batches
 		int sampleCountOut = min( sampleCount, PAINTBUFFER_SIZE );

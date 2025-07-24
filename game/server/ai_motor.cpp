@@ -883,8 +883,6 @@ float CAI_Motor::GetFacingDirection( Vector &vecDir )
 
 AIMoveResult_t CAI_Motor::MoveNormalExecute( const AILocalMoveGoal_t &move )
 {
-	AI_PROFILE_SCOPE(CAI_Motor_MoveNormalExecute);
-	
 	// --------------------------------
 
 	AIMotorMoveResult_t fMotorResult;

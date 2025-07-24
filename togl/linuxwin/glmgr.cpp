@@ -29,7 +29,7 @@
 
 #include "tier0/icommandline.h"
 
-#include "tier0/vprof.h"
+
 #include "glmtexinlines.h"
 
 #include "materialsystem/IShader.h"
@@ -494,7 +494,6 @@ GLMContext *GLMgr::GetCurrentContext( void )
 // GLMContext public methods
 void GLMContext::MakeCurrent( bool bRenderThread )
 {
-	tmZone( TELEMETRY_LEVEL0, 0, "GLMContext::MakeCurrent" );
 	Assert( m_nCurOwnerThreadId == 0 || m_nCurOwnerThreadId == ThreadGetCurrentId() );
 		
 #if defined( USE_SDL )
@@ -539,7 +538,6 @@ void GLMContext::MakeCurrent( bool bRenderThread )
 
 void GLMContext::ReleaseCurrent( bool bRenderThread )
 {
-	tmZone( TELEMETRY_LEVEL0, 0, "GLMContext::ReleaseCurrent" );
 	Assert( m_nCurOwnerThreadId == ThreadGetCurrentId() );
 		
 #if defined( USE_SDL )
@@ -1811,8 +1809,6 @@ void GLMContext::PreloadTex( CGLMTex *tex, bool force )
 
 CGLMFBO	*GLMContext::NewFBO( void )
 {
-	GLM_FUNC;
-
 	CGLMFBO *fbo = new CGLMFBO( this );
 
 	m_fboTable.AddToTail( fbo );
@@ -1822,8 +1818,6 @@ CGLMFBO	*GLMContext::NewFBO( void )
 
 void GLMContext::DelFBO( CGLMFBO *fbo )
 {
-	GLM_FUNC;
-
 	if (m_drawingFBO == fbo)
 	{
 		m_drawingFBO = NULL;	//poof!
@@ -1855,8 +1849,6 @@ void GLMContext::DelFBO( CGLMFBO *fbo )
 
 CGLMProgram	*GLMContext::NewProgram( EGLMProgramType type, char *progString, const char *pShaderName )
 {
-	//hushed GLM_FUNC;
-
 	CGLMProgram *prog = new CGLMProgram( this, type );
 	
 	prog->SetProgramText( progString );
@@ -1868,8 +1860,6 @@ CGLMProgram	*GLMContext::NewProgram( EGLMProgramType type, char *progString, con
 
 void GLMContext::DelProgram( CGLMProgram *pProg )
 {
-	GLM_FUNC;
-
 	if ( m_drawingProgram[ pProg->m_type ] == pProg )
 	{
 		SetProgram( pProg->m_type, ( pProg->m_type == kGLMFragmentProgram ) ? m_pNullFragmentProgram : NULL );
@@ -1955,8 +1945,6 @@ void GLMContext::QueryShaderPair( int index, GLMShaderPairInfo *infoOut )
 
 CGLMBuffer *GLMContext::NewBuffer( EGLMBufferType type, uint size, uint options )
 {
-	//hushed GLM_FUNC;
-
 	CGLMBuffer *prog = new CGLMBuffer( this, type, size, options );
 
 	return prog;
@@ -1964,8 +1952,6 @@ CGLMBuffer *GLMContext::NewBuffer( EGLMBufferType type, uint size, uint options 
 
 void GLMContext::DelBuffer( CGLMBuffer *buff )
 {
-	GLM_FUNC;
-
 	for( int index = 0; index < kGLMVertexAttributeIndexMax; index++ )
 	{
 		if ( m_drawVertexSetup.m_attrs[index].m_pBuffer == buff )
@@ -1984,8 +1970,6 @@ GLMVertexSetup g_blank_setup;
 
 void GLMContext::Clear( bool color, unsigned long colorValue, bool depth, float depthValue, bool stencil, unsigned int stencilValue, GLScissorBox_t *box )
 {
-	GLM_FUNC;
-		
 	++m_nBatchCounter;
 
 #if GLMDEBUG
@@ -2147,8 +2131,6 @@ static	ConVar gl_texlayoutstats ("gl_texlayoutstats", "0" );
 
 void GLMContext::BeginFrame( void )
 {
-	GLM_FUNC;
-
 	m_debugFrameIndex++;
 	
 	// check for lang change at TOF
@@ -2222,8 +2204,6 @@ void GLMContext::BeginFrame( void )
 
 void GLMContext::EndFrame( void )
 {
-	GLM_FUNC;
-
 #if GLMDEBUG
 	// init debug hook information
 	GLMDebugHookInfo info;
@@ -2263,8 +2243,6 @@ extern ConVar gl_blitmode;
 
 void GLMContext::Present( CGLMTex *tex )
 {
-	GLM_FUNC;
-	
 	{
 #if GL_TELEMETRY_GPU_ZONES
 		CScopedGLMPIXEvent glmPIXEvent( "GLMContext::Present" );
@@ -2406,7 +2384,6 @@ void GLMContext::Present( CGLMTex *tex )
 	m_nCurFrame++;
 
 #if GL_BATCH_PERF_ANALYSIS
-	tmMessage( TELEMETRY_LEVEL2, TMMF_ICON_EXCLAMATION, "VS Uniform Calls: %u, VS Uniforms: %u|VS Uniform Bone Calls: %u, VS Bone Uniforms: %u|PS Uniform Calls: %u, PS Uniforms: %u", m_nTotalVSUniformCalls, m_nTotalVSUniformsSet, m_nTotalVSUniformBoneCalls, m_nTotalVSUniformsBoneSet, m_nTotalPSUniformCalls, m_nTotalPSUniformsSet );
 	m_nTotalVSUniformCalls = 0, m_nTotalVSUniformBoneCalls = 0, m_nTotalVSUniformsSet = 0, m_nTotalVSUniformsBoneSet = 0, m_nTotalPSUniformCalls = 0, m_nTotalPSUniformsSet = 0;
 #endif
 
@@ -2927,10 +2904,6 @@ GLMContext::~GLMContext	()
 // This method is no longer called from any performance sensitive code paths.
 void GLMContext::BindTexToTMU( CGLMTex *pTex, int tmu )
 {
-#if GLMDEBUG
-	GLM_FUNC;
-#endif
-
 	GLMPRINTF(("--- GLMContext::BindTexToTMU tex %p GL name %d -> TMU %d ", pTex, pTex ? pTex->m_texName : -1, tmu ));
 
 	CheckCurrent();
@@ -2959,9 +2932,6 @@ void GLMContext::BindTexToTMU( CGLMTex *pTex, int tmu )
 
 void GLMContext::BindFBOToCtx( CGLMFBO *fbo, GLenum bindPoint )
 {
-#if GLMDEBUG
-	GLM_FUNC;
-#endif
 	GLMPRINTF(( "--- GLMContext::BindFBOToCtx fbo %p, GL name %d", fbo, (fbo) ? fbo->m_name : -1 ));
 
 	CheckCurrent();
@@ -3014,9 +2984,6 @@ void GLMContext::BindFBOToCtx( CGLMFBO *fbo, GLenum bindPoint )
 
 void GLMContext::BindBufferToCtx( EGLMBufferType type, CGLMBuffer *pBuff, bool bForce )
 {
-#if GLMDEBUG
-	GLM_FUNC;
-#endif
 	GLMPRINTF(( "--- GLMContext::BindBufferToCtx buff %p, GL name %d", pBuff, (pBuff) ? pBuff->m_nHandle : -1 ));
 
 	CheckCurrent();
@@ -3047,8 +3014,6 @@ void GLMContext::BindBufferToCtx( EGLMBufferType type, CGLMBuffer *pBuff, bool b
 
 GLuint GLMContext::CreateTex( GLenum texBind, GLenum internalFormat )
 {
-	GLM_FUNC;
-
 	// If we're not doing batch create, just return one here.
 	if ( !gl_batch_tex_creates.GetBool() )
 	{
@@ -3114,8 +3079,6 @@ void GLMContext::CleanupTex( GLenum texBind, GLMTexLayout* pLayout, GLuint tex )
 
 void GLMContext::DestroyTex( GLenum texBind, GLMTexLayout* pLayout, GLuint tex )
 {
-	GLM_FUNC;
-
 	// Code only handles 2D for now.
 	if ( texBind != GL_TEXTURE_2D || !gl_batch_tex_destroys.GetBool() )
 	{
@@ -3175,8 +3138,6 @@ GLuint GLMContext::FillTexCache( bool holdOne, int newTextures )
 
 void GLMContext::PurgeTexCache()
 {
-	GLM_FUNC;
-
 	int textureCount = m_availableTextures.Count();
 
 	if ( textureCount == 0 )
@@ -3216,8 +3177,6 @@ void GLMContext::MarkAllSamplersDirty()
 void GLMContext::FlushDrawStatesNoShaders( )
 {
 	Assert( ( m_drawingFBO == m_boundDrawFBO ) && ( m_drawingFBO == m_boundReadFBO ) ); // this check MUST succeed
-
-	GLM_FUNC;
 
 	GL_BATCH_PERF( m_FlushStats.m_nTotalBatchFlushes++; )
 			
@@ -4958,7 +4917,7 @@ void GLMgrSelfTests( void )
 
 void GLMContext::SetDefaultStates( void )
 {
-	GLM_FUNC;
+	
 	CheckCurrent();
 
 	m_AlphaTestEnable.Default();
@@ -5006,7 +4965,7 @@ void GLMContext::SetDefaultStates( void )
 
 void GLMContext::VerifyStates		( void )
 {
-	GLM_FUNC;
+	
 	CheckCurrent();
 
 	// bare bones sanity check, head over to the debugger if our sense of the current context state is not correct
@@ -5086,12 +5045,6 @@ static inline uint GetDataTypeSizeInBytes( GLenum dataType )
 
 void GLMContext::DrawRangeElementsNonInline( GLenum mode, GLuint start, GLuint end, GLsizei count, GLenum type, const GLvoid *indices, uint baseVertex, CGLMBuffer *pIndexBuf )
 {
-#if GLMDEBUG
-	GLM_FUNC;
-#else
-	//tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s %d-%d count:%d mode:%d type:%d", __FUNCTION__, start, end, count, mode, type );
-#endif
-
 	++m_nBatchCounter;
 
 	SetIndexBuffer( pIndexBuf );
@@ -5200,7 +5153,7 @@ void GLMContext::DrawRangeElementsNonInline( GLenum mode, GLuint start, GLuint e
 // support for OSX 10.6 (no support for glDrawRangeElementsBaseVertex)
 void GLMContext::DrawRangeElements(GLenum mode, GLuint start, GLuint end, GLsizei count, GLenum type, const GLvoid *indices, CGLMBuffer *pIndexBuf)
 {
-	GLM_FUNC;
+	
 
 	//	CheckCurrent();
 	++m_nBatchCounter;				// batch index increments unconditionally on entry

@@ -19,10 +19,9 @@
 #include "host_state.h"
 #include "cdll_engine_int.h"
 #include "sys_dll.h"
-#include "tier0/vprof.h"
+
 #include "profile.h"
 #include "gl_matsysiface.h"
-#include "vprof_engine.h"
 #include "server.h"
 #include "cl_demo.h"
 #include "toolframework/itoolframework.h"
@@ -293,11 +292,7 @@ void CEngine::Frame( void )
 	// FIXME:  Move this to main windows message pump?
 	if ( IsPC() && !game->IsActiveApp() && !sv.IsDedicated() && engine_no_focus_sleep.GetInt() > 0 )
 	{
-		VPROF_BUDGET( "Sleep", VPROF_BUDGETGROUP_SLEEPING );
-#if defined( RAD_TELEMETRY_ENABLED )
-		if( !g_Telemetry.Level )
-#endif
-			g_pInputSystem->SleepUntilInput( engine_no_focus_sleep.GetInt() );
+		g_pInputSystem->SleepUntilInput( engine_no_focus_sleep.GetInt() );
 	}
 
 	if ( m_flPreviousTime == 0 )
@@ -389,11 +384,6 @@ void CEngine::Frame( void )
 			pSyncReportConVar->SetValue( reportLevel );
 		}
 	}
-
-#ifdef VPROF_ENABLED
-	PreUpdateProfile( m_flFrameTime );
-#endif
-	
 	// Reset swallowed time...
 	m_flFilteredTime = 0.0f;
 
@@ -404,21 +394,6 @@ void CEngine::Frame( void )
 		ETWRenderFrameMark( false );
 	}
 #endif
-
-#ifdef VPROF_ENABLED
-	PostUpdateProfile();
-#endif
-	TelemetryTick();
-
-	{ // profile scope
-
-	VPROF_BUDGET( "CEngine::Frame", VPROF_BUDGETGROUP_OTHER_UNACCOUNTED );
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-#ifdef RAD_TELEMETRY_ENABLED
-	TmU64 time0 = tmFastTime();
-#endif
-
-
 	switch( m_nDLLState )
 	{
 	case DLL_PAUSED:			// paused, in hammer
@@ -449,23 +424,8 @@ void CEngine::Frame( void )
 			break;
 		}
 	}
-
-#ifdef RAD_TELEMETRY_ENABLED
-	float time = ( tmFastTime() - time0 ) * g_Telemetry.flRDTSCToMilliSeconds;
-	if( time > 0.5f )
-	{
-		tmPlot( TELEMETRY_LEVEL0, TMPT_TIME_MS, 0, time, "CEngine::Frame" );
-	}
-#endif
-	} // profile scope
-
-
 	// Remember old time
 	m_flPreviousTime = m_flCurrentTime;
-
-#if defined( VPROF_ENABLED )
-	UpdateVXConsoleProfile();
-#endif
 }
 
 

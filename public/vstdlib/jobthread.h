@@ -33,7 +33,7 @@
 #include "tier1/utllinkedlist.h"
 #include "tier1/utlvector.h"
 #include "tier1/functors.h"
-#include "tier0/vprof_telemetry.h"
+
 
 #include "vstdlib/vstdlib.h"
 
@@ -858,15 +858,8 @@ public:
 
 	void Run( ITEM_TYPE *pItems, unsigned nItems, int nMaxParallel = INT_MAX, IThreadPool *pThreadPool = NULL )
 	{
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "Run %s %d", m_szDescription, nItems );
-
-		if ( nItems == 0 )
-			return;
-
-		if ( !pThreadPool )
-		{
-			pThreadPool = g_pThreadPool;
-		}
+		if ( nItems == 0  ) return;
+		if ( !pThreadPool ) pThreadPool = g_pThreadPool;
 
 		m_pItems = pItems;
 		m_pLimit = pItems + nItems;
@@ -920,8 +913,6 @@ public:
 private:
 	void DoExecute()
 	{
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "DoExecute %s", m_szDescription );
-
 		if ( m_pItems < m_pLimit )
 		{
 			m_ItemProcessor.Begin();
@@ -1021,8 +1012,6 @@ public:
 private:
 	void DoExecute()
 	{
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "DoExecute %s", m_szDescription );
-
 		m_ItemProcessor.Begin();
 
 		long lLimit = m_lLimit;
@@ -1124,8 +1113,6 @@ protected:
 private:
 	void DoExecute()
 	{
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "DoExecute %s", m_szDescription );
-
 		static_cast<Derived *>( this )->OnBegin();
 
 		while ( static_cast<Derived *>( this )->OnProcess() )
@@ -1231,12 +1218,7 @@ inline bool IThreadPool::YieldWait( CJob *pJob, unsigned timeout )
 
 inline JobStatus_t CJob::Execute()
 {
-	if ( IsFinished() )
-	{
-		return m_status;
-	}
-
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s %s %d", __FUNCTION__, Describe(), m_status );
+	if ( IsFinished() ) return m_status;
 
 	AUTO_LOCK( m_mutex );
 	AddRef();
@@ -1280,8 +1262,6 @@ inline JobStatus_t CJob::Execute()
 
 inline JobStatus_t CJob::TryExecute()
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s %s %d", __FUNCTION__, Describe(), m_status );
-
 	// TryLock() would only fail if another thread has entered
 	// Execute() or Abort()
 	if ( !IsFinished() && TryLock() )
@@ -1297,12 +1277,7 @@ inline JobStatus_t CJob::TryExecute()
 
 inline JobStatus_t CJob::Abort( bool bDiscard )
 {
-	if ( IsFinished() )
-	{
-		return m_status;
-	}
-
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s %s %d", __FUNCTION__, Describe(), m_status );
+	if ( IsFinished() ) return m_status;
 
 	AUTO_LOCK( m_mutex );
 	AddRef();
@@ -1314,8 +1289,6 @@ inline JobStatus_t CJob::Abort( bool bDiscard )
 	case JOB_STATUS_UNSERVICED:
 	case JOB_STATUS_PENDING:
 		{
-			tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "CJob::DoAbort" );
-
 			result = m_status = DoAbort( bDiscard );
 			if ( bDiscard )
 				DoCleanup();

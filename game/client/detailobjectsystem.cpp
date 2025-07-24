@@ -14,7 +14,7 @@
 #include "clientmode.h"
 #include "iviewrender.h"
 #include "bsptreedata.h"
-#include "tier0/vprof.h"
+
 #include "engine/ivmodelinfo.h"
 #include "materialsystem/imesh.h"
 #include "model_types.h"
@@ -1961,7 +1961,6 @@ void CDetailObjectSystem::RenderOpaqueDetailObjects( int nLeafCount, LeafIndex_t
 //-----------------------------------------------------------------------------
 int CDetailObjectSystem::CountSpritesInLeafList( int nLeafCount, LeafIndex_t *pLeafList ) const
 {
-	VPROF_BUDGET( "CDetailObjectSystem::CountSpritesInLeafList", VPROF_BUDGETGROUP_DETAILPROP_RENDERING );
 	int nPropCount = 0;
 	int nFirstDetailObject, nDetailObjectCount;
 	for ( int i = 0; i < nLeafCount; ++i )
@@ -1981,7 +1980,6 @@ int CDetailObjectSystem::CountSpritesInLeafList( int nLeafCount, LeafIndex_t *pL
 int CDetailObjectSystem::CountFastSpritesInLeafList( int nLeafCount, LeafIndex_t const *pLeafList,
 													 int *nMaxFoundInLeaf ) const
 {
-	VPROF_BUDGET( "CDetailObjectSystem::CountSpritesInLeafList", VPROF_BUDGETGROUP_DETAILPROP_RENDERING );
 	int nCount = 0;
 	int nMax = 0;
 	for ( int i = 0; i < nLeafCount; ++i )
@@ -2005,7 +2003,6 @@ int CDetailObjectSystem::CountFastSpritesInLeafList( int nLeafCount, LeafIndex_t
 int CDetailObjectSystem::CountSpriteQuadsInLeafList( int nLeafCount, LeafIndex_t *pLeafList ) const
 {
 #ifdef USE_DETAIL_SHAPES
-	VPROF_BUDGET( "CDetailObjectSystem::CountSpritesInLeafList", VPROF_BUDGETGROUP_DETAILPROP_RENDERING );
 	int nQuadCount = 0;
 	int nFirstDetailObject, nDetailObjectCount;
 	for ( int i = 0; i < nLeafCount; ++i )
@@ -2040,7 +2037,6 @@ inline bool CDetailObjectSystem::SortLessFunc( const CDetailObjectSystem::SortIn
 
 int CDetailObjectSystem::SortSpritesBackToFront( int nLeaf, const Vector &viewOrigin, const Vector &viewForward, SortInfo_t *pSortInfo )
 {
-	VPROF_BUDGET( "CDetailObjectSystem::SortSpritesBackToFront", VPROF_BUDGETGROUP_DETAILPROP_RENDERING );
 	int nFirstDetailObject, nDetailObjectCount;
 	ClientLeafSystem()->GetDetailObjectsInLeaf( nLeaf, nFirstDetailObject, nDetailObjectCount );
 
@@ -2107,7 +2103,6 @@ int CDetailObjectSystem::SortSpritesBackToFront( int nLeaf, const Vector &viewOr
 
 	if ( nCount )
 	{
-		VPROF( "CDetailObjectSystem::SortSpritesBackToFront -- Sort" );
 		std::make_heap( pSortInfo, pSortInfo + nCount, SortLessFunc ); 
 		std::sort_heap( pSortInfo, pSortInfo + nCount, SortLessFunc ); 
 	}
@@ -2224,7 +2219,6 @@ int CDetailObjectSystem::BuildOutSortedSprites( CFastDetailLeafSpriteList *pData
 	// part 2 - sort
 	if ( nCount )
 	{
-		VPROF( "CDetailObjectSystem::SortSpritesBackToFront -- Sort" );
 		std::make_heap( m_pFastSortInfo, m_pFastSortInfo + nCount, SortLessFunc ); 
 		std::sort_heap( m_pFastSortInfo, m_pFastSortInfo + nCount, SortLessFunc ); 
 	}
@@ -2377,9 +2371,7 @@ void CDetailObjectSystem::RenderFastSprites( const Vector &viewOrigin, const Vec
 //-----------------------------------------------------------------------------
 void CDetailObjectSystem::RenderTranslucentDetailObjects( const Vector &viewOrigin, const Vector &viewForward, const Vector &viewRight, const Vector &viewUp, int nLeafCount, LeafIndex_t *pLeafList )
 {
-	VPROF_BUDGET( "CDetailObjectSystem::RenderTranslucentDetailObjects", VPROF_BUDGETGROUP_DETAILPROP_RENDERING );
-	if (nLeafCount == 0)
-		return;
+	if (nLeafCount == 0) return;
 
 	// We better not have any partially drawn leaf of detail sprites!
 	Assert( m_nSpriteCount == m_nFirstSprite );
@@ -2391,8 +2383,7 @@ void CDetailObjectSystem::RenderTranslucentDetailObjects( const Vector &viewOrig
 
 	// Count the total # of detail quads we possibly could render
 	int nQuadCount = CountSpriteQuadsInLeafList( nLeafCount, pLeafList );
-	if ( nQuadCount == 0 )
-		return;
+	if ( nQuadCount == 0 ) return;
 
 	CMatRenderContextPtr pRenderContext( materials );
 	pRenderContext->MatrixMode( MATERIAL_MODEL );
@@ -2621,8 +2612,6 @@ void CDetailObjectSystem::RenderFastTranslucentDetailObjectsInLeaf( const Vector
 //-----------------------------------------------------------------------------
 void CDetailObjectSystem::RenderTranslucentDetailObjectsInLeaf( const Vector &viewOrigin, const Vector &viewForward, const Vector &viewRight, const Vector &viewUp, int nLeaf, const Vector *pVecClosestPoint )
 {
-	VPROF_BUDGET( "CDetailObjectSystem::RenderTranslucentDetailObjectsInLeaf", VPROF_BUDGETGROUP_DETAILPROP_RENDERING );
-
 	RenderFastTranslucentDetailObjectsInLeaf( viewOrigin, viewForward, viewRight, viewUp, nLeaf, pVecClosestPoint );
 	// We may have already sorted this leaf. If not, sort the leaf.
 	if ( m_nSortedLeaf != nLeaf )
@@ -2730,7 +2719,6 @@ void CDetailObjectSystem::RenderTranslucentDetailObjectsInLeaf( const Vector &vi
 //-----------------------------------------------------------------------------
 bool CDetailObjectSystem::EnumerateLeaf( int leaf, intp context )
 {
-	VPROF_BUDGET( "CDetailObjectSystem::EnumerateLeaf", VPROF_BUDGETGROUP_DETAILPROP_RENDERING );
 	Vector v;
 	int firstDetailObject, detailObjectCount;
 
@@ -2777,10 +2765,7 @@ bool CDetailObjectSystem::EnumerateLeaf( int leaf, intp context )
 //-----------------------------------------------------------------------------
 void CDetailObjectSystem::BuildDetailObjectRenderLists( const Vector &vViewOrigin )
 {
-	VPROF_BUDGET( "CDetailObjectSystem::BuildDetailObjectRenderLists", VPROF_BUDGETGROUP_DETAILPROP_RENDERING );
-	
-	if (!g_pClientMode->ShouldDrawDetailObjects() || (r_DrawDetailProps.GetInt() == 0))
-		return;
+	if (!g_pClientMode->ShouldDrawDetailObjects() || (r_DrawDetailProps.GetInt() == 0)) return;
 
 	// Don't bother doing any of this if the level doesn't have detail props.
 	if ( ( ! m_pFastSpriteData ) && ( m_DetailObjects.Count() == 0 ) )

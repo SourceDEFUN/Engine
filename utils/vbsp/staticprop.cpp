@@ -198,7 +198,7 @@ static CPhysConvex* ComputeConvexHull( mstudiomesh_t* pMesh )
 	// Generate a list of all verts in the mesh
 	Vector** ppVerts = (Vector**)stackalloc(pMesh->numvertices * sizeof(Vector*) );
 	const mstudio_meshvertexdata_t *vertData = pMesh->GetVertexData();
-	Assert( vertData ); // This can only return NULL on X360 for now
+	Assert( vertData );
 	for (int i = 0; i < pMesh->numvertices; ++i)
 	{
 		ppVerts[i] = vertData->Position(i);

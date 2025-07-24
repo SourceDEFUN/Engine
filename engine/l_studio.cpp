@@ -33,7 +33,7 @@
 #include "filesystem_engine.h"
 #include "ModelInfo.h"
 #include "cl_main.h"
-#include "tier0/vprof.h"
+
 #include "r_decal.h"
 #include "vstdlib/random.h"
 #include "datacache/idatacache.h"
@@ -1025,7 +1025,7 @@ class CResourcePreloadPropLighting : public CResourcePreload
 		char szBasename[MAX_PATH];
 		char szFilename[MAX_PATH];
 		V_FileBase( pName, szBasename, sizeof( szBasename ) );
-		V_snprintf( szFilename, sizeof( szFilename ), "%s%s.vhv", szBasename, GetPlatformExt() );
+		V_snprintf( szFilename, sizeof( szFilename ), "%s.vhv", szBasename );
 
 		// static props have the same name across maps
 		// can check if loading the same map and early out if data present
@@ -1821,8 +1821,6 @@ void CModelRender::SetupLighting( const Vector &vecCenter )
 //-----------------------------------------------------------------------------
 void CModelRender::ForcedMaterialOverride( IMaterial *newMaterial, OverrideType_t nOverrideType )
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
-
 	g_pStudioRender->ForcedMaterialOverride( newMaterial, nOverrideType );
 }
 
@@ -3628,11 +3626,11 @@ void CModelRender::ValidateStaticPropColorData( ModelInstanceHandle_t handle )
 	char fileName[MAX_PATH];
 	if ( !g_pMaterialSystemHardwareConfig->GetHDREnabled() || g_bBakedPropLightingNoSeparateHDR )
 	{
-		Q_snprintf( fileName, sizeof( fileName ), "sp_%d%s.vhv", StaticPropMgr()->GetStaticPropIndex( pProp ), GetPlatformExt() );
+		Q_snprintf( fileName, sizeof( fileName ), "sp_%d.vhv", StaticPropMgr()->GetStaticPropIndex( pProp ) );
 	}
 	else
 	{
-		Q_snprintf( fileName, sizeof( fileName ), "sp_hdr_%d%s.vhv", StaticPropMgr()->GetStaticPropIndex( pProp ), GetPlatformExt() );
+		Q_snprintf( fileName, sizeof( fileName ), "sp_hdr_%d.vhv", StaticPropMgr()->GetStaticPropIndex( pProp ) );
 	}
 
 	if ( !g_pFileSystem->ReadFile( fileName, "GAME", utlBuf, sizeof( HardwareVerts::FileHeader_t ), 0 ) )
@@ -3876,11 +3874,11 @@ bool CModelRender::LoadStaticPropColorData( IHandleEntity *pProp, DataCacheHandl
 	char fileName[MAX_PATH];
 	if ( !g_pMaterialSystemHardwareConfig->GetHDREnabled() || g_bBakedPropLightingNoSeparateHDR )
 	{
-	        Q_snprintf( fileName, sizeof( fileName ), "sp_%d%s.vhv", StaticPropMgr()->GetStaticPropIndex( pProp ), GetPlatformExt() );
+	        Q_snprintf( fileName, sizeof( fileName ), "sp_%d.vhv", StaticPropMgr()->GetStaticPropIndex( pProp ) );
 	}
 	else
 	{
-        	Q_snprintf( fileName, sizeof( fileName ), "sp_hdr_%d%s.vhv", StaticPropMgr()->GetStaticPropIndex( pProp ), GetPlatformExt() );
+        	Q_snprintf( fileName, sizeof( fileName ), "sp_hdr_%d.vhv", StaticPropMgr()->GetStaticPropIndex( pProp ) );
 	}
 
 	// mark as invalid, async callback will set upon completion

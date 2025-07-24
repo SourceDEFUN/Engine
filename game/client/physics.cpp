@@ -15,7 +15,7 @@
 #include "movevars_shared.h"
 #include "engine/ivmodelinfo.h"
 #include "fx.h"
-#include "tier0/vprof.h"
+
 #include "c_world.h"
 #include "vphysics/object_hash.h"
 #include "vphysics/collision_set.h"
@@ -150,11 +150,6 @@ bool PhysicsDLLInit( CreateInterfaceFn physicsFactory )
 		return false;
 	}
 
-	if ( IsX360() )
-	{
-		// Reduce timescale to save perf on 360
-		cl_phys_timescale.SetValue(0.9f);
-	}
 	PhysParseSurfaceData( physprops, filesystem );
 	return true;
 }
@@ -177,7 +172,7 @@ void PhysicsLevelInit( void )
 	physenv->SetGravity( Vector(0, 0, -GetCurrentGravity() ) );
 	// 15 ms per tick
 	// NOTE: Always run client physics at this rate - helps keep ragdolls stable
-	physenv->SetSimulationTimestep( IsXbox() ? DEFAULT_XBOX_CLIENT_VPHYSICS_TICK : DEFAULT_TICK_INTERVAL );
+	physenv->SetSimulationTimestep( DEFAULT_TICK_INTERVAL );
 	physenv->SetCollisionEventHandler( &g_Collisions );
 	physenv->SetCollisionSolver( &g_Collisions );
 
@@ -433,13 +428,10 @@ void CPhysicsSystem::Update( float frametime )
 
 void CPhysicsSystem::PhysicsSimulate()
 {
-	VPROF_BUDGET( "CPhysicsSystem::PhysicsSimulate", VPROF_BUDGETGROUP_PHYSICS );
 	float frametime = gpGlobals->frametime;
 
 	if ( physenv )
 	{
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s %d", __FUNCTION__, physenv->GetActiveObjectCount() );
-
 		g_Collisions.BufferTouchEvents( true );
 #ifdef _DEBUG
 		physenv->DebugCheckContacts();

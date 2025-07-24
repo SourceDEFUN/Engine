@@ -11,7 +11,7 @@
 
 #include "cbase.h"
 
-#include "tier0/vprof.h"
+
 #include "tier0/tslist.h"
 #include "tier1/utlhash.h"
 #include "vstdlib/jobthread.h"
@@ -1329,8 +1329,6 @@ bool CNavArea::IsConnected( const CNavArea *area, NavDirType dir ) const
  */
 float CNavArea::ComputeGroundHeightChange( const CNavArea *area )
 {
-	VPROF_BUDGET( "CNavArea::ComputeHeightChange", "NextBot" );
-
 	Vector closeFrom, closeTo;
 	area->GetClosestPointOnArea( GetCenter(), &closeTo );
 	GetClosestPointOnArea( area->GetCenter(), &closeFrom );
@@ -2555,8 +2553,6 @@ void CNavArea::ComputeClosestPointInPortal( const CNavArea *to, NavDirType dir, 
  */
 bool CNavArea::IsContiguous( const CNavArea *other ) const
 {
-	VPROF_BUDGET( "CNavArea::IsContiguous", "NextBot" );
-
 	// find which side it is connected on
 	int dir;
 	for( dir=0; dir<NUM_DIRECTIONS; ++dir )
@@ -2586,8 +2582,6 @@ bool CNavArea::IsContiguous( const CNavArea *other ) const
  */
 float CNavArea::ComputeAdjacentConnectionHeightChange( const CNavArea *destinationArea ) const
 {
-	VPROF_BUDGET( "CNavArea::ComputeAdjacentConnectionHeightChange", "NextBot" );
-
 	// find which side it is connected on
 	int dir;
 	for( dir=0; dir<NUM_DIRECTIONS; ++dir )
@@ -4704,7 +4698,6 @@ void CNavArea::MarkAsBlocked( int teamID, CBaseEntity *blocker, bool bGenerateEv
 // checks if any func_nav_blockers are still blocking the area
 void CNavArea::UpdateBlockedFromNavBlockers( void )
 {
-	VPROF( "CNavArea::UpdateBlockedFromNavBlockers" );
 	Extent bounds;
 	GetExtent( &bounds );
 
@@ -4801,7 +4794,6 @@ void CNavArea::UnblockArea( int teamID )
  */
 void CNavArea::UpdateBlocked( bool force, int teamID )
 {
-	VPROF( "CNavArea::UpdateBlocked" );
 	if ( !force && !m_blockedTimer.IsElapsed() )
 	{
 		return;
@@ -4844,7 +4836,6 @@ void CNavArea::UpdateBlocked( bool force, int teamID )
 #endif
 	trace_t tr;
 	{
-	VPROF( "CNavArea::UpdateBlocked-Trace" );
 	UTIL_TraceHull(
 		origin,
 		origin,
@@ -4897,7 +4888,6 @@ void CNavArea::UpdateBlocked( bool force, int teamID )
 
 	if ( wasBlocked != isBlocked )
 	{
-		VPROF( "CNavArea::UpdateBlocked-Event" );
 		IGameEvent * event = gameeventmanager->CreateEvent( "nav_blocked" );
 		if ( event )
 		{
@@ -5695,8 +5685,6 @@ bool CNavArea::IsPartiallyVisible( const Vector &eye, CBaseEntity *ignore ) cons
 //--------------------------------------------------------------------------------------------------------
 bool CNavArea::IsPotentiallyVisible( const CNavArea *viewedArea ) const
 {
-	VPROF_BUDGET( "CNavArea::IsPotentiallyVisible", "NextBot" );
-
 	if ( viewedArea == NULL )
 	{
 		return false;
@@ -5740,8 +5728,6 @@ bool CNavArea::IsPotentiallyVisible( const CNavArea *viewedArea ) const
 //--------------------------------------------------------------------------------------------------------
 bool CNavArea::IsCompletelyVisible( const CNavArea *viewedArea ) const
 {
-	VPROF_BUDGET( "CNavArea::IsCompletelyVisible", "NextBot" );
-
 	if ( viewedArea == NULL )
 	{
 		return false;
@@ -5787,8 +5773,6 @@ bool CNavArea::IsCompletelyVisible( const CNavArea *viewedArea ) const
  */
 bool CNavArea::IsPotentiallyVisibleToTeam( int teamIndex ) const
 {
-	VPROF_BUDGET( "CNavArea::IsPotentiallyVisibleToTeam", "NextBot" );
-
 	CTeam *team = GetGlobalTeam( teamIndex );
 
 	for( int i = 0; i < team->GetNumPlayers(); ++i )
@@ -5814,8 +5798,6 @@ bool CNavArea::IsPotentiallyVisibleToTeam( int teamIndex ) const
  */
 bool CNavArea::IsCompletelyVisibleToTeam( int teamIndex ) const
 {
-	VPROF_BUDGET( "CNavArea::IsCompletelyVisibleToTeam", "NextBot" );
-
 	CTeam *team = GetGlobalTeam( teamIndex );
 
 	for( int i = 0; i < team->GetNumPlayers(); ++i )

@@ -16,9 +16,7 @@ def configure(conf):
 
 def build(bld):
 	source = [
-		'convert_x360.cpp',
 		'vtf.cpp'
-		#$File	"vtf_x360.cpp"#		[$X360]
 	]
 
 	if bld.env.DEST_OS == 'win32':

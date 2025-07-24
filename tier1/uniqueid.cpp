@@ -26,7 +26,7 @@ void CreateUniqueId( UniqueId_t *pDest )
 	Assert( sizeof( UUID ) == sizeof( *pDest ) );
 	UuidCreate( (UUID *)pDest );
 #else
-	// X360/linux TBD: Need a real UUID Implementation
+	// Linux TBD: Need a real UUID Implementation
 	Q_memset( pDest, 0, sizeof( UniqueId_t ) );
 #endif
 }

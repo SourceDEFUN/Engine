@@ -12,7 +12,7 @@
 #include "ivp_compact_ledge.hxx"
 #include "ivp_compact_ledge_solver.hxx"
 #include "ivp_compact_surface.hxx"
-#include "tier0/vprof.h"
+
 #include "mathlib/ssemath.h"
 #include "tier0/tslist.h"
 // memdbgon must be the last include file in a .cpp file!!!
@@ -673,7 +673,6 @@ bool CTraceIVP::BuildLeafmapCache( const leafmap_t * RESTRICT pLeafmap )
 static const fltx4 g_IndexBase = {0,1,2,3};
 int CTraceIVP::SupportMapCached( const Vector &dir, Vector *pOut ) const
 {
-	VPROF("SupportMapCached");
 #if USE_VERT_CACHE
 	FourVectors fourDir;
 	fourDir.DuplicateVector(dir);
@@ -721,7 +720,6 @@ int CTraceIVP::SupportMap( const Vector &dir, Vector *pOut ) const
 
 	if ( m_pLeafmap && m_pLeafmap->HasSingleVertexSpan() )
 	{
-		VPROF("SupportMap_Leaf");
 		const IVP_U_Float_Point *pPoints = m_pLedge->get_point_array();
 		IVP_U_Float_Point mapdir;
 		TransformDirectionToLocal( dir, mapdir );
@@ -745,7 +743,6 @@ int CTraceIVP::SupportMap( const Vector &dir, Vector *pOut ) const
 	}
 	else
 	{
-		VPROF("SupportMap_Walk");
 		const IVP_U_Float_Point *pPoints = m_pLedge->get_point_array();
 		IVP_U_Float_Point mapdir;
 		TransformDirectionToLocal( dir, mapdir );
@@ -1282,7 +1279,6 @@ void CTraceSolverSweptObject::InitOSRay( void )
 
 void CTraceSolverSweptObject::DoSweep( void )
 {
-	VPROF("TraceSolver::DoSweep");
 	InitOSRay();
 
 	// iterate ledge tree of obstacle
@@ -1403,7 +1399,6 @@ static void CalculateSeparatingPlane( trace_t *ptr, ITraceObject *sweepObject, C
 
 bool CTraceSolver::SweepSingleConvex( void )
 {
-	VPROF("TraceSolver::SweepSingleConvex");
 	simplex_t simplex;
 	simplexvert_t	vert;
 	Vector tmp;
@@ -1432,7 +1427,6 @@ bool CTraceSolver::SweepSingleConvex( void )
 		// found a separating axis, no intersection
 		if ( testLen < 0 )
 		{
-			VPROF("SolveSeparation");
 			// make sure we're separated by at least m_epsilon
 			testLen = fabs(testLen);
 			if ( testLen < m_epsilon && m_ray->m_length > 0 )
@@ -1504,7 +1498,6 @@ bool CTraceSolver::SweepSingleConvex( void )
 		// contains the origin
 		if ( simplex.SolveGJKSet( vert, &m_pointClosestToIntersection ) )
 		{
-			VPROF("TraceSolver::SolveMeshIntersection");
 			CM_ClearTrace( &m_trace );
 			// now solve for t along the sweep
 			if ( m_ray->m_length != 0 )
@@ -1898,8 +1891,6 @@ bool simplex_t::SolveVoronoiRegion4( const simplexvert_t &newPoint, Vector *pOut
 
 bool simplex_t::SolveGJKSet( const simplexvert_t &w, Vector *pOut )
 {
-	VPROF("TraceSolver::simplex::SolveGJKSet");
-
 #if 0
 	for ( int v = 0; v < vertCount; v++ )
 	{

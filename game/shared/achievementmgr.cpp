@@ -34,7 +34,7 @@
 #include "tier3/tier3.h"
 #include "vgui/ILocalize.h"
 #include "engine/imatchmaking.h"
-#include "tier0/vprof.h"
+
 
 #if defined(TF_DLL) || defined(TF_CLIENT_DLL)
 #include "tf_gamerules.h"
@@ -81,15 +81,7 @@ static void WriteAchievementGlobalState( KeyValues *pKV, bool bPersistToSteamClo
 //=============================================================================
 {
 	char szFilename[_MAX_PATH];
-
-	if ( IsX360() )
-	{
-		Q_snprintf( szFilename, sizeof( szFilename ), "cfg:/%s_GameState.txt", COM_GetModDirectory() );
-	}
-	else
-	{
-		Q_snprintf( szFilename, sizeof( szFilename ), "GameState.txt" );
-	}
+	Q_snprintf( szFilename, sizeof( szFilename ), "GameState.txt" );
 
 	// Never call pKV->SaveToFile!!!!
 	// Save to a buffer instead.
@@ -106,14 +98,7 @@ static void WriteAchievementGlobalState( KeyValues *pKV, bool bPersistToSteamClo
     if ( bPersistToSteamCloud )
     {
 #ifndef NO_STEAM
-		if ( IsX360() )
-        {
-            Q_snprintf( szFilename, sizeof( szFilename ), "cfg:/%s_GameState.txt", COM_GetModDirectory() );
-        }
-        else
-        {
-            Q_snprintf( szFilename, sizeof( szFilename ), "GameState.txt" );
-        }
+        Q_snprintf( szFilename, sizeof( szFilename ), "GameState.txt" );
 
         ISteamRemoteStorage *pRemoteStorage = SteamClient()?(ISteamRemoteStorage *)SteamClient()->GetISteamGenericInterface(
             SteamAPI_GetHSteamUser(), SteamAPI_GetHSteamPipe(), STEAMREMOTESTORAGE_INTERFACE_VERSION ):NULL;
@@ -320,12 +305,6 @@ void CAchievementMgr::PostInit()
 	if ( !g_AchievementSaveThread.IsAlive() )
 	{
 		g_AchievementSaveThread.Start();
-#ifdef WIN32
-		if ( IsX360() )
-		{
-			ThreadSetAffinity( (ThreadHandle_t)g_AchievementSaveThread.GetThreadHandle(), XBOX_PROCESSOR_3 );
-		}
-#endif // WIN32
 	}
 
 	// get current game dir
@@ -499,16 +478,6 @@ void CAchievementMgr::LevelInitPreEntity()
 	Q_strncpy( m_szMap, gpGlobals->mapname.ToCStr(), ARRAYSIZE( m_szMap ) );
 #endif // CLIENT_DLL
 
-	if ( IsX360() )
-	{
-		// need to remove the .360 extension on the end of the map name
-		char *pExt = Q_stristr( m_szMap, ".360" );
-		if ( pExt )
-		{
-			*pExt = '\0';
-		}
-	}
-
 	// look through all achievements, see which ones we want to have listen for events
 	FOR_EACH_MAP( m_mapAchievement, iAchievement )
 	{
@@ -585,7 +554,6 @@ CBaseAchievement *CAchievementMgr::GetAchievementByID( int iAchievementID )
 //-----------------------------------------------------------------------------
 CBaseAchievement *CAchievementMgr::GetAchievementByName( const char *pchName )
 {
-	VPROF("GetAchievementByName");
 	FOR_EACH_MAP_FAST( m_mapAchievement, i )
 	{
 		CBaseAchievement *pAchievement = m_mapAchievement[i];
@@ -607,7 +575,7 @@ bool CAchievementMgr::HasAchieved( const char *pchName )
 }
 
 //-----------------------------------------------------------------------------
-// Purpose: downloads user data from Steam or XBox Live
+// Purpose: downloads user data from Steam
 //-----------------------------------------------------------------------------
 void CAchievementMgr::DownloadUserData()
 {
@@ -621,8 +589,6 @@ void CAchievementMgr::DownloadUserData()
 		}
 #endif
 	}
-	else if ( IsX360() )
-	{}
 }
 
 const char *COM_GetModDirectory()
@@ -667,19 +633,8 @@ void CAchievementMgr::UploadUserData()
 //-----------------------------------------------------------------------------
 void CAchievementMgr::LoadGlobalState()
 {
-	if ( IsX360() )
-	{}
-
 	char	szFilename[_MAX_PATH];
-
-	if ( IsX360() )
-	{
-		Q_snprintf( szFilename, sizeof( szFilename ), "cfg:/%s_GameState.txt", COM_GetModDirectory() );
-	}
-	else
-	{
-		Q_snprintf( szFilename, sizeof( szFilename ), "GameState.txt" );
-	}
+	Q_snprintf( szFilename, sizeof( szFilename ), "GameState.txt" );
 
     //=============================================================================
     // HPE_BEGIN
@@ -763,8 +718,6 @@ void CAchievementMgr::LoadGlobalState()
 
 void CAchievementMgr::SaveGlobalState( bool bAsync )
 {
-	VPROF_BUDGET( "CAchievementMgr::SaveGlobalState", "Achievements" );
-
 	KeyValues *pKV = new KeyValues("GameState" );
 	FOR_EACH_MAP( m_mapAchievement, i )
 	{
@@ -878,7 +831,6 @@ void CAchievementMgr::AwardAchievement( int iAchievementID )
 #ifndef DISABLE_STEAM
 		if ( steamapicontext->SteamUserStats() )
 		{
-			VPROF_BUDGET( "AwardAchievement", VPROF_BUDGETGROUP_STEAM );
 			// set this achieved in the Steam client
 			bool bRet = steamapicontext->SteamUserStats()->SetAchievement( pAchievement->GetName() );
 			//		Assert( bRet );
@@ -890,8 +842,6 @@ void CAchievementMgr::AwardAchievement( int iAchievementID )
 		m_AchievementsAwarded.AddToTail( iAchievementID );
 #endif
 	}
-	else if ( IsX360() )
-	{}
 }
 
 //-----------------------------------------------------------------------------
@@ -1075,13 +1025,6 @@ bool CalcPlayersOnFriendsList( int iMinFriends )
 			return false;
 
 	}
-	else if ( IsX360() )
-	{
-		if ( !matchmaking )
-			return false;
-
-		XPlayerUid = XBX_GetPrimaryUserId();
-	}
 	else
 	{
 		// other platforms...?
@@ -1107,14 +1050,6 @@ bool CalcPlayersOnFriendsList( int iMinFriends )
 				if ( !steamapicontext->SteamFriends()->HasFriend( steamID, /*k_EFriendFlagImmediate*/ 0x04 ) )
 					continue;
 #endif
-			}
-			else if ( IsX360() )
-			{
-				uint64 XUid[1];
-				XUid[0] = matchmaking->PlayerIdToXuid( iPlayerIndex );
-				BOOL bFriend;
-				if ( !bFriend )
-					continue;
 			}
 
 			iTotalFriends++;
@@ -1170,11 +1105,6 @@ bool CalcHasNumClanPlayers( int iClanTeammates )
 				}
 			}
 		}
-		return false;
-	}
-	else if ( IsX360() )
-	{
-		// TODO: implement for 360
 		return false;
 	}
 	else 
@@ -1342,7 +1272,6 @@ void CAchievementMgr::PrintAchievementStatus()
 //-----------------------------------------------------------------------------
 void CAchievementMgr::FireGameEvent( IGameEvent *event )
 {
-	VPROF_( "CAchievementMgr::FireGameEvent", 1, VPROF_BUDGETGROUP_STEAM, false, 0 );
 	const char *name = event->GetName();
 	if ( name == NULL ) { return; }
 	if ( 0 == Q_strcmp( name, "entity_killed" ) )

@@ -13,7 +13,7 @@
 #include "tier1/strtools.h"
 #include "tier1/KeyValues.h"
 #include "tier1/convar.h"
-#include "tier0/vprof.h"
+
 #include "tier1/tier1.h"
 #include "tier1/utlbuffer.h"
 
@@ -502,8 +502,6 @@ ConCommandBase *CCvar::FindCommandBase( const char *name )
 //-----------------------------------------------------------------------------
 const ConVar *CCvar::FindVar( const char *var_name ) const
 {
-	VPROF_INCREMENT_COUNTER( "CCvar::FindVar", 1 );
-	VPROF( "CCvar::FindVar" );
 	const ConCommandBase *var = FindCommandBase( var_name );
 	if ( !var || var->IsCommand() )
 		return NULL;
@@ -513,8 +511,6 @@ const ConVar *CCvar::FindVar( const char *var_name ) const
 
 ConVar *CCvar::FindVar( const char *var_name )
 {
-	VPROF_INCREMENT_COUNTER( "CCvar::FindVar", 1 );
-	VPROF( "CCvar::FindVar" );
 	ConCommandBase *var = FindCommandBase( var_name );
 	if ( !var || var->IsCommand() )
 		return NULL;

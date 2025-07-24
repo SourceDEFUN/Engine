@@ -838,10 +838,7 @@ CHudCloseCaption::CHudCloseCaption( const char *pElementName )
 
 	vgui::ivgui()->AddTickSignal( GetVPanel(), 0 );
 
-	if ( !IsX360() )
-	{
-		g_pVGuiLocalize->AddFile( "resource/closecaption_%language%.txt", "GAME", true );
-	}
+	g_pVGuiLocalize->AddFile( "resource/closecaption_%language%.txt", "GAME", true );
 
 	HOOK_HUD_MESSAGE( CHudCloseCaption, CloseCaption );
 
@@ -2504,7 +2501,7 @@ void CHudCloseCaption::MsgFunc_CloseCaption(bf_read &msg)
 	bool bIsMale = flagbyte & CLOSE_CAPTION_GENDER_MALE ? true : false;
 	bool bIsFemale = flagbyte & CLOSE_CAPTION_GENDER_FEMALE ? true : false;
 
-	if ( warnonmissing && !IsX360() )
+	if ( warnonmissing )
 	{
 		wchar_t *pcheck = g_pVGuiLocalize->Find( tokenname );
 		if ( !pcheck )
@@ -2571,22 +2568,9 @@ void CHudCloseCaption::InitCaptionDictionary( const char *dbfile )
 
 	for ( char *path = strtok( searchPaths, ";" ); path; path = strtok( NULL, ";" ) )
 	{
-		if ( IsX360() && ( filesystem->GetDVDMode() == DVDMODE_STRICT ) && !V_stristr( path, ".zip" ) )
-		{
-			// only want zip paths
-			continue;
-		} 
-
 		char fullpath[MAX_PATH];
 		Q_snprintf( fullpath, sizeof( fullpath ), "%s%s", path, dbfile );
 		Q_FixSlashes( fullpath );
-
-		if ( IsX360() )
-		{
-			char fullpath360[MAX_PATH];
-			UpdateOrCreateCaptionFile( fullpath, fullpath360, sizeof( fullpath360 ) );
-			Q_strncpy( fullpath, fullpath360, sizeof( fullpath ) );
-		}
 
         FileHandle_t fh = filesystem->Open( fullpath, "rb" );
 		if ( FILESYSTEM_INVALID_HANDLE != fh )
@@ -2640,8 +2624,7 @@ void CHudCloseCaption::OnFinishAsyncLoad( int nFileIndex, int nBlockNum, AsyncCa
 //-----------------------------------------------------------------------------
 void CHudCloseCaption::Lock( void )
 {
-	if ( !IsXbox() )
-		m_bLocked = true;
+	m_bLocked = true;
 }
 
 //-----------------------------------------------------------------------------
@@ -2655,7 +2638,7 @@ void CHudCloseCaption::Unlock( void )
 static int EmitCaptionCompletion( const char *partial, char commands[ COMMAND_COMPLETION_MAXITEMS ][ COMMAND_COMPLETION_ITEM_LENGTH ] )
 {
 	int current = 0;
-	if ( !g_pVGuiLocalize || IsX360() )
+	if ( !g_pVGuiLocalize )
 		return current;
 
 	const char *cmdname = "cc_emit";
@@ -2749,10 +2732,7 @@ void OnCaptionLanguageChanged( IConVar *pConVar, const char *pOldString, float f
 	Q_snprintf( fn, sizeof( fn ), "resource/closecaption_%s.txt", var.GetString() );
 
 	// Re-adding the file, even if it's "english" will overwrite the tokens as needed
-	if ( !IsX360() )
-	{
-		g_pVGuiLocalize->AddFile( "resource/closecaption_%language%.txt", "GAME", true );
-	}
+	g_pVGuiLocalize->AddFile( "resource/closecaption_%language%.txt", "GAME", true );
 
 	char uilanguage[ 64 ];
 	engine->GetUILanguage( uilanguage, sizeof( uilanguage ) );
@@ -2762,20 +2742,17 @@ void OnCaptionLanguageChanged( IConVar *pConVar, const char *pOldString, float f
 	// If it's not the default, load the language on top of the user's default language
 	if ( Q_strlen( var.GetString() ) > 0 && Q_stricmp( var.GetString(), uilanguage ) )
 	{
-		if ( !IsX360() )
+		if ( g_pFullFileSystem->FileExists( fn ) )
 		{
-			if ( g_pFullFileSystem->FileExists( fn ) )
-			{
-				g_pVGuiLocalize->AddFile( fn, "GAME", true );
-			}
-			else
-			{
-				char fallback[ 512 ];
-				Q_snprintf( fallback, sizeof( fallback ), "resource/closecaption_%s.txt", uilanguage );
+			g_pVGuiLocalize->AddFile( fn, "GAME", true );
+		}
+		else
+		{
+			char fallback[ 512 ];
+			Q_snprintf( fallback, sizeof( fallback ), "resource/closecaption_%s.txt", uilanguage );
 
-				Msg( "%s not found\n", fn );
-				Msg( "%s will be used\n", fallback );
-			}
+			Msg( "%s not found\n", fn );
+			Msg( "%s will be used\n", fallback );
 		}
 
 		if ( hudCloseCaption )

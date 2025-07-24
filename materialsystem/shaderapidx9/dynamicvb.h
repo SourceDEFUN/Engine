@@ -90,15 +90,7 @@ public:
 	}
 
 	void HandlePerFrameTextureStats( int frame )
-	{
-#ifdef VPROF_ENABLED
-		if ( m_Frame != frame && !m_bDynamic )
-		{
-			m_Frame = frame;
-			m_pFrameCounter += m_nBufferSize;
-		}
-#endif
-	}
+	{}
 	
 	// Do we have enough room without discarding?
 	bool HasEnoughRoom( int numVertices ) const;
@@ -172,12 +164,6 @@ private:
 	unsigned char	m_bSoftwareVertexProcessing : 1;
 	unsigned char	m_bLateCreateShouldDiscard : 1;
 
-#ifdef VPROF_ENABLED
-	int				m_Frame;
-	int				*m_pFrameCounter;
-	int				*m_pGlobalCounter;
-#endif
-
 #ifdef _DEBUG
 	static int		s_BufferCount;
 #endif
@@ -206,9 +192,6 @@ inline CVertexBuffer::CVertexBuffer(IDirect3DDevice9 * pD3D, VertexFormat_t fmt,
 		m_bDynamic(dynamic),
 		m_VertexBufferFormat( fmt ),
 		m_bLateCreateShouldDiscard( false )
-#ifdef VPROF_ENABLED
-		,m_Frame( -1 )
-#endif
 {
 	MEM_ALLOC_CREDIT_( pTextureBudgetName );
 
@@ -222,24 +205,6 @@ inline CVertexBuffer::CVertexBuffer(IDirect3DDevice9 * pD3D, VertexFormat_t fmt,
 	++s_BufferCount;
 #endif
 
-#ifdef VPROF_ENABLED
-	if ( !m_bDynamic )
-	{
-		char name[256];
-		V_strcpy_safe( name, "TexGroup_global_" );
-		V_strcat_safe( name, pTextureBudgetName, sizeof(name) );
-		m_pGlobalCounter = g_VProfCurrentProfile.FindOrCreateCounter( name, COUNTER_GROUP_TEXTURE_GLOBAL );
-
-		V_strcpy_safe( name, "TexGroup_frame_" );
-		V_strcat_safe( name, pTextureBudgetName, sizeof(name) );
-		m_pFrameCounter = g_VProfCurrentProfile.FindOrCreateCounter( name, COUNTER_GROUP_TEXTURE_PER_FRAME );
-	}
-	else
-	{
-		m_pGlobalCounter = g_VProfCurrentProfile.FindOrCreateCounter( "TexGroup_global_" TEXTURE_GROUP_DYNAMIC_VERTEX_BUFFER, COUNTER_GROUP_TEXTURE_GLOBAL );
-	}
-#endif
-
 	if ( !g_pShaderUtil->IsRenderThreadSafe() )
 	{
 		m_pSysmemBuffer = ( byte * )MemAlloc_AllocAligned( m_nBufferSize, 16 );
@@ -250,14 +215,6 @@ inline CVertexBuffer::CVertexBuffer(IDirect3DDevice9 * pD3D, VertexFormat_t fmt,
 		m_pSysmemBuffer = NULL;
 		Create( pD3D );
 	}
-
-#ifdef VPROF_ENABLED
-	if ( IsX360() || !m_bDynamic )
-	{
-		Assert( m_pGlobalCounter );
-		*m_pGlobalCounter += m_nBufferSize;
-	}
-#endif
 }
 
 
@@ -335,9 +292,6 @@ void CVertexBuffer::Create( IDirect3DDevice9 *pD3D )
 
 #ifdef MEASURE_DRIVER_ALLOCATIONS
 	int nMemUsed = 1024;
-	VPROF_INCREMENT_GROUP_COUNTER( "vb count", COUNTER_GROUP_NO_RESET, 1 );
-	VPROF_INCREMENT_GROUP_COUNTER( "vb driver mem", COUNTER_GROUP_NO_RESET, nMemUsed );
-	VPROF_INCREMENT_GROUP_COUNTER( "total driver mem", COUNTER_GROUP_NO_RESET, nMemUsed );
 #endif
 	// Track VB allocations
 	g_VBAllocTracker->CountVB( m_pVB, m_bDynamic, m_nBufferSize, m_VertexSize, m_VertexBufferFormat );
@@ -355,17 +309,6 @@ inline CVertexBuffer::~CVertexBuffer()
 	{
 #ifdef MEASURE_DRIVER_ALLOCATIONS
 		int nMemUsed = 1024;
-		VPROF_INCREMENT_GROUP_COUNTER( "vb count", COUNTER_GROUP_NO_RESET, -1 );
-		VPROF_INCREMENT_GROUP_COUNTER( "vb driver mem", COUNTER_GROUP_NO_RESET, -nMemUsed );
-		VPROF_INCREMENT_GROUP_COUNTER( "total driver mem", COUNTER_GROUP_NO_RESET, -nMemUsed );
-#endif
-
-#ifdef VPROF_ENABLED
-		if ( IsX360() || !m_bDynamic )
-		{
-			Assert( m_pGlobalCounter );
-			*m_pGlobalCounter -= m_nBufferSize;
-		}
 #endif
 
 #ifdef _DEBUG
@@ -429,7 +372,7 @@ inline unsigned char* CVertexBuffer::Lock( int numVerts, int& baseVertexIndex )
 	baseVertexIndex = 0;
 	int nBufferSize = numVerts * m_VertexSize;
 
-	Assert( IsPC() || ( IsX360() && !m_bLocked ) );
+	Assert( IsPC() );
 
 	// Ensure there is enough space in the VB for this data
 	if ( numVerts > m_VertexCount ) 
@@ -438,7 +381,7 @@ inline unsigned char* CVertexBuffer::Lock( int numVerts, int& baseVertexIndex )
 		return 0; 
 	}
 	
-	if ( !IsX360() && !m_pVB && !m_pSysmemBuffer )
+	if ( !m_pVB && !m_pSysmemBuffer )
 		return 0;
 
 	DWORD dwFlags;
@@ -464,13 +407,6 @@ inline unsigned char* CVertexBuffer::Lock( int numVerts, int& baseVertexIndex )
 		// Since we are a static VB, always lock the beginning of the buffer.
 		dwFlags = D3DLOCK_NOSYSLOCK;
 		m_Position = 0;
-	}
-
-	if ( IsX360() && m_bDynamic )
-	{
-		// Block until we have enough room in the buffer, this affects the result of NextLockOffset() in wrap conditions.
-		BlockUntilUnused( nBufferSize );
-		m_pVB = NULL;
 	}
 
 	int nLockOffset = NextLockOffset( );
@@ -507,14 +443,7 @@ inline unsigned char* CVertexBuffer::Lock( int numVerts, int& baseVertexIndex )
 
 	Assert( pLockedData != 0 );
 	m_bLocked = true;
-	if ( !IsX360() )
-	{
-		baseVertexIndex = nLockOffset / m_VertexSize;
-	}
-	else
-	{
-		baseVertexIndex = 0;
-	}
+	baseVertexIndex = nLockOffset / m_VertexSize;
 	return pLockedData;
 }
 
@@ -572,7 +501,7 @@ inline void CVertexBuffer::Unlock( int numVerts )
 	if ( !m_bLocked )
 		return;
 
-	if ( !IsX360() && !m_pVB && !m_pSysmemBuffer )
+	if ( !m_pVB && !m_pSysmemBuffer )
 		return;
 
 	int nLockOffset = NextLockOffset();

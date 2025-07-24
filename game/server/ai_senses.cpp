@@ -21,15 +21,6 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-// Use this to disable caching and other optimizations in senses
-#define DEBUG_SENSES 1
-
-#ifdef DEBUG_SENSES
-#define AI_PROFILE_SENSES(tag) AI_PROFILE_SCOPE(tag)
-#else
-#define AI_PROFILE_SENSES(tag) ((void)0)
-#endif
-
 const float AI_STANDARD_NPC_SEARCH_TIME = .25;
 const float AI_EFFICIENT_NPC_SEARCH_TIME = .35;
 const float AI_HIGH_PRIORITY_SEARCH_TIME = 0.15;
@@ -393,7 +384,6 @@ int CAI_Senses::LookForHighPriorityEntities( int iDistance )
 	int nSeen = 0;
 	if ( gpGlobals->curtime - m_TimeLastLookHighPriority > AI_HIGH_PRIORITY_SEARCH_TIME )
 	{
-		AI_PROFILE_SENSES(CAI_Senses_LookForHighPriorityEntities);
 		m_TimeLastLookHighPriority = gpGlobals->curtime;
 		
 		BeginGather();
@@ -451,8 +441,6 @@ int CAI_Senses::LookForNPCs( int iDistance )
 	float timeNPCs = ( efficiency < AIE_VERY_EFFICIENT ) ? AI_STANDARD_NPC_SEARCH_TIME : AI_EFFICIENT_NPC_SEARCH_TIME;
 	if ( gpGlobals->curtime - m_TimeLastLookNPCs > timeNPCs )
 	{
-		AI_PROFILE_SENSES(CAI_Senses_LookForNPCs);
-
 		m_TimeLastLookNPCs = gpGlobals->curtime;
 
 		if ( efficiency < AIE_SUPER_EFFICIENT )
@@ -512,7 +500,6 @@ int CAI_Senses::LookForObjects( int iDistance )
 
 	if ( gpGlobals->curtime - m_TimeLastLookMisc > AI_MISC_SEARCH_TIME )
 	{
-		AI_PROFILE_SENSES(CAI_Senses_LookForObjects);
 		m_TimeLastLookMisc = gpGlobals->curtime;
 		
 		BeginGather();
@@ -651,8 +638,6 @@ CSound *CAI_Senses::GetClosestSound( bool fScent, int validTypes, bool bUsePrior
 
 void CAI_Senses::PerformSensing( void )
 {
-	AI_PROFILE_SCOPE	(CAI_BaseNPC_PerformSensing);
-		
 	// -----------------
 	//  Look	
 	// -----------------

@@ -19,7 +19,6 @@
 #include <tier0/dbg.h>
 #include "utlbuffer.h"
 #include "cl_rcon.h"
-#include "vprof_engine.h"
 #include "proto_oob.h" // PORT_RCON define
 #include "cmd.h"
 #include "tier2/fileutils.h"
@@ -44,8 +43,7 @@ public:
 	{
 		BaseClass::OnSocketAccepted( hSocket, netAdr, ppData );
 
-		// Immediately try to start vprofiling
-		// Also, enable cheats on this client only
+		// enable cheats on this client only
 		Cmd_SetRptActive( true );
 	}
 

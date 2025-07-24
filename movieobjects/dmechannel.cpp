@@ -10,7 +10,7 @@
 #include "datamodel/dmelementfactoryhelper.h"
 #include "datamodel/dmehandle.h"
 #include "datamodel/dmattribute.h"
-#include "tier0/vprof.h"
+
 #include "tier1/KeyValues.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -477,8 +477,6 @@ bool CDmeChannel::IsDirty()
 
 void CDmeChannel::Operate()
 {
-	VPROF( "CDmeChannel::Operate" );
-
 	switch ( GetMode() )
 	{
 	case CM_OFF:
@@ -875,8 +873,6 @@ static int FindSpanningLayerAndSetIntensity( DmeLog_TimeSelection_t &ts, LayerSe
 
 void CDmeChannel::Record()
 {
-	VPROF( "CDmeChannel::Record" );
-
 	CDmAttribute *pFromAttr = GetFromAttribute();
 	if ( pFromAttr == NULL )
 		return; // or clear out the log?
