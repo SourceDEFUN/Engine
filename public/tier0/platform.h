@@ -225,10 +225,14 @@ typedef signed char int8;
 #else
 	#define IsAndroid()	false
 #endif
+
+
 // From steam/steamtypes.h
 // RTime32
 // We use this 32 bit time representing real world time.
 // It offers 1 second resolution beginning on January 1, 1970 (Unix time)
+
+// Secton TODO: Set it to 64 bits before 19 January 2038 03:14:07 UTC!!1
 typedef uint32 RTime32;
 
 typedef float				float32;
