@@ -16,7 +16,7 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-#if defined( WIN32 ) || defined( _PS3 )
+#ifdef WIN32
 // This strptime implementation is taken from the Goolge Site Map Generator project:
 
 // Copyright 2009 Google Inc.

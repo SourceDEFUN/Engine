@@ -54,8 +54,6 @@ const int nMaxCPUs = 32;
 // This loop spins spinCount times and should take about 50 times spinCount
 // cycles to execute. This should be true on any reasonable modern processor
 // since the latency of integer add is almost always one cycle.
-// The Xbox 360 and PS3 CPUs are the one known exception but this code will
-// never run on them.
 static void SpinALot( int spinCount )
 {
 	__asm

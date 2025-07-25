@@ -347,21 +347,6 @@ void CWorkThreadPool::StopWorkThreads()
 		// Keep waking up threads until they're all dead.
 		m_EventNewWorkItem.Set();
 		
-#ifdef _PS3
-		// call to abort any running call to gethostbyname().
-		// this is called over all the remaining work threads, while
-		// waiting for the rest of the work threads to finish so that they won't
-		// spuriously block on new calls to gethostbyname() as the
-		// sys_net_abort_resolver call only stops the next call to the 
-		// network API, not any future calls.
-
-		FOR_EACH_VEC( m_WorkThreads, iPS3 )
-		{
-			// PS3 hack to abort gethostbyname() calls that may be blocking...
-			sys_net_abort_resolver( m_WorkThreads[ iPS3 ]->GetThreadID(), SYS_NET_ABORT_STRICT_CHECK );
-		}
-#endif
-
 		const uint k_uJoinTimeoutMillisec = 10000; // 10 seconds seems pretty arbitrary.
 
 		CWorkThread *pWorkThread = m_WorkThreads[0];

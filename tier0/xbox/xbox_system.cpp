@@ -265,26 +265,11 @@ bool XBX_NotifyCreateListener( ULONG64 categories )
 //-----------------------------------------------------------------------------
 const char* XBX_GetLanguageString( void )
 {
-	switch( XGetLanguage() )
-	{
-	case XC_LANGUAGE_FRENCH:
-		return "french";
-	case XC_LANGUAGE_GERMAN:
-		return "german";
-	}
-
 	return "english";
 }
 
 bool XBX_IsLocalized( void )
 {
-	switch( XGetLanguage() )
-	{
-	case XC_LANGUAGE_FRENCH:
-	case XC_LANGUAGE_GERMAN:
-		return true;
-	}
-
 	return false;
 }
 

@@ -983,7 +983,6 @@ bool C_DODPlayer::ShouldDraw( void )
 //-----------------------------------------------------------------------------
 void C_DODPlayer::GetToolRecordingState( KeyValues *msg )
 {
-#ifndef _XBOX
 	BaseClass::GetToolRecordingState( msg );
 	BaseEntityRecordingState_t *pBaseEntityState = (BaseEntityRecordingState_t*)msg->GetPtr( "baseentity" );
 	if ( IsLocalPlayer() )
@@ -991,7 +990,6 @@ void C_DODPlayer::GetToolRecordingState( KeyValues *msg )
 		pBaseEntityState->m_bVisible = !IsDormant() && IsAlive() && ( GetTeamNumber() != TEAM_SPECTATOR ) &&
 			( GetRenderMode() != kRenderNone ) && (GetObserverMode() != OBS_MODE_DEATHCAM) && !IsEffectActive(EF_NODRAW);
 	}
-#endif
 }
 
 

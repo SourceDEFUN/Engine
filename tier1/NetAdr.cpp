@@ -313,11 +313,6 @@ bool netadr_t::SetFromString( const char *pch, bool bUseDNS )
 
 	if ( bUseDNS )
 	{
-// X360TBD:
-	// dgoodenough - since this is skipped on X360, seems reasonable to skip as well on PS3
-	// PS3_BUILDFIX
-	// FIXME - Leap of faith, this works without asserting on X360, so I assume it will on PS3
-#if !defined( _PS3 )
 		// Null out the colon if there is one
 		char *pchColon = strchr( address, ':' );
 		if ( pchColon )
@@ -338,10 +333,6 @@ bool netadr_t::SetFromString( const char *pch, bool bUseDNS )
 			SetPort( V_atoi( ++pchColon ) );
 		}
 		return true;
-#else
-		Assert( 0 );
-		return false;
-#endif
 	}
 
 	return false;
@@ -359,10 +350,6 @@ bool netadr_t::operator<(const netadr_t &netadr) const
 
 void netadr_t::SetFromSocket( int hSocket )
 {	
-	// dgoodenough - since this is skipped on X360, seems reasonable to skip as well on PS3
-	// PS3_BUILDFIX
-	// FIXME - Leap of faith, this works without asserting on X360, so I assume it will on PS3
-#if !defined( _PS3 )
 	Clear();
 	type = NA_IP;
 
@@ -372,7 +359,4 @@ void netadr_t::SetFromSocket( int hSocket )
 	{
 		SetFromSockadr( &address );
 	}
-#else
-	Assert(0);
-#endif
 }

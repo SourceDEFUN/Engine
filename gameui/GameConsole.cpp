@@ -53,7 +53,6 @@ CGameConsole::~CGameConsole()
 //-----------------------------------------------------------------------------
 void CGameConsole::Initialize()
 {
-#ifndef _XBOX
 	m_pConsole = vgui::SETUP_PANEL( new CGameConsoleDialog() ); // we add text before displaying this so set it up now!
 
 	// set the console to taking up most of the right-half of the screen
@@ -69,7 +68,6 @@ void CGameConsole::Initialize()
 		(IsAndroid() ? 0.5f : 1.f )*(stall - (offsety * 2)));
 
 	m_bInitialized = true;
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -77,13 +75,11 @@ void CGameConsole::Initialize()
 //-----------------------------------------------------------------------------
 void CGameConsole::Activate()
 {
-#ifndef _XBOX
 	if (!m_bInitialized)
 		return;
 
 	vgui::surface()->RestrictPaintToSinglePanel(NULL);
 	m_pConsole->Activate();
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -91,12 +87,10 @@ void CGameConsole::Activate()
 //-----------------------------------------------------------------------------
 void CGameConsole::Hide()
 {
-#ifndef _XBOX
 	if (!m_bInitialized)
 		return;
 
 	m_pConsole->Hide();
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -104,12 +98,10 @@ void CGameConsole::Hide()
 //-----------------------------------------------------------------------------
 void CGameConsole::Clear()
 {
-#ifndef _XBOX
 	if (!m_bInitialized)
 		return;
 
 	m_pConsole->Clear();
-#endif
 }
 
 
@@ -118,14 +110,10 @@ void CGameConsole::Clear()
 //-----------------------------------------------------------------------------
 bool CGameConsole::IsConsoleVisible()
 {
-#ifndef _XBOX
 	if (!m_bInitialized)
 		return false;
 	
 	return m_pConsole->IsVisible();
-#else
-	return false;
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -133,17 +121,13 @@ bool CGameConsole::IsConsoleVisible()
 //-----------------------------------------------------------------------------
 void CGameConsole::ActivateDelayed(float time)
 {
-#ifndef _XBOX
-	if (!m_bInitialized)
-		return;
+	if (!m_bInitialized) return;
 
 	m_pConsole->PostMessage(m_pConsole, new KeyValues("Activate"), time);
-#endif
 }
 
 void CGameConsole::SetParent( intp parent )
 {	
-#ifndef _XBOX
 	if (!m_bInitialized)
 		return;
 
@@ -155,7 +139,6 @@ void CGameConsole::SetParent( intp parent )
 		m_pConsole->SetProportional(true);
 		m_pConsole->InvalidateLayout(true, true);
 	}
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -163,14 +146,10 @@ void CGameConsole::SetParent( intp parent )
 //-----------------------------------------------------------------------------
 void CGameConsole::OnCmdCondump()
 {
-#ifndef _XBOX
 	g_GameConsole.m_pConsole->DumpConsoleTextToFile();
-#endif
 }
 
-#ifndef _XBOX
 CON_COMMAND( condump, "dump the text currently in the console to condumpXX.log" )
 {
 	g_GameConsole.OnCmdCondump();
 }
-#endif

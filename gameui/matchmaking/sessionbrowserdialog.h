@@ -39,7 +39,7 @@ public:
 	CUtlVector< int >					m_SearchIndices;
 	CUtlVector< int >					m_GameStates;
 	CUtlVector< int >					m_GameTimes;
-	CUtlVector< XUID >					m_XUIDs;
+	CUtlVector< uint64 >					m_XUIDs;
 };
 
 

@@ -279,11 +279,6 @@ void R_LevelInit( void )
 	// Build the overlay fragments.
 	OverlayMgr()->CreateFragments();
 
-#ifdef _XBOX
-	extern void CompactTextureHeap();
-	CompactTextureHeap();
-#endif
-
 	COM_TimestampedLog( "R_LevelInit: Finish" );
 }
 

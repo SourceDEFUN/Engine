@@ -89,7 +89,6 @@ public:
 };
 
 XBXCONSOLE_INTERFACE IXboxConsole *g_pXboxConsole;
-XBXCONSOLE_INTERFACE void XboxConsoleInit();
 
 #define XBX_SendRemoteCommand			if ( !g_pXboxConsole ) ; else g_pXboxConsole->SendRemoteCommand
 #define XBX_DebugString					if ( !g_pXboxConsole ) ; else g_pXboxConsole->DebugString

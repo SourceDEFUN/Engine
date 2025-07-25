@@ -343,11 +343,6 @@ void CMatchmakingBasePanel::OnCommand( const char *pCommand )
 		PopDialog();
 		matchmaking->CancelCurrentOperation();
 	}
-	else if ( !Q_stricmp( pCommand, "StorageDeviceDenied" ) )
-	{
-		// Set us as declined
-		XBX_SetStorageDeviceId( XBX_STORAGE_DECLINED );
-	}
 	else
 	{
 		if ( !Q_stricmp( "ResumeGame", pCommand ) )

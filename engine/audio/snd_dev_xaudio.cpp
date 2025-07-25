@@ -680,11 +680,11 @@ void CXboxVoice::RemovePlayerFromVoiceList( CClientInfo *pClient, bool bLocal )
 	}
 }
 
-void CXboxVoice::PlayIncomingVoiceData( XUID xuid, const byte *pbData, DWORD pdwSize )
+void CXboxVoice::PlayIncomingVoiceData( uint64 xuid, const byte *pbData, DWORD pdwSize )
 {
-	XUID localXUID;
+	uint64 localXUID;
 
-	XUserGetXUID( XBX_GetPrimaryUserId(), &localXUID );
+	XUserGetXUID( 0, &localXUID );
 
 	//Hack: Don't play stuff that comes from ourselves.
 	if ( localXUID == xuid )
@@ -701,7 +701,7 @@ void CXboxVoice::UpdateHUDVoiceStatus( void )
 		bool bSelf = (cl.m_nPlayerSlot == iClient);
 
 		int iIndex = iClient + 1;
-		XUID id =  g_pMatchmaking->PlayerIdToXuid( iIndex );
+		uint64 id =  g_pMatchmaking->PlayerIdToXuid( iIndex );
 		
 		if ( id != 0 )
 		{	
@@ -714,7 +714,7 @@ void CXboxVoice::UpdateHUDVoiceStatus( void )
 
 				iIndex = -1;
 
-				if ( IsPlayerTalking( XBX_GetPrimaryUserId(), true ) )
+				if ( IsPlayerTalking( 0, true ) )
 				{
 					bTalking = true;
 				}
@@ -750,7 +750,7 @@ bool CXboxVoice::VoiceUpdateData( void  )
 	for ( uint i = 0; i < XUSER_MAX_COUNT; ++i )
 	{
 		// We currently only allow one player per console
-		if ( i != XBX_GetPrimaryUserId() )
+		if ( i != 0 )
 		{
 			continue;
 		}
@@ -787,12 +787,12 @@ bool CXboxVoice::VoiceUpdateData( void  )
 		( GetTickCount() - m_dwLastVoiceSend ) > MAX_VOICE_BUFFER_TIME );
 }
 
-void CXboxVoice::SetPlaybackPriority( XUID remoteTalker, DWORD dwUserIndex, XHV_PLAYBACK_PRIORITY playbackPriority )
+void CXboxVoice::SetPlaybackPriority( uint64 remoteTalker, DWORD dwUserIndex, XHV_PLAYBACK_PRIORITY playbackPriority )
 {
 	m_pXHVEngine->SetPlaybackPriority( remoteTalker, dwUserIndex, playbackPriority );
 }
 
-void CXboxVoice::GetRemoteTalkers( int *pNumTalkers, XUID *pRemoteTalkers )
+void CXboxVoice::GetRemoteTalkers( int *pNumTalkers, uint64 *pRemoteTalkers )
 {
 	m_pXHVEngine->GetRemoteTalkers( (DWORD*)pNumTalkers, pRemoteTalkers );
 }
@@ -801,7 +801,7 @@ void CXboxVoice::GetVoiceData( CLC_VoiceData *pMessage )
 {
 	byte *puchVoiceData = NULL;
 	pMessage->m_nLength = m_wLocalDataSize;
-	XUserGetXUID( XBX_GetPrimaryUserId(), &pMessage->m_xuid );
+	XUserGetXUID( 0, &pMessage->m_xuid );
 
 	puchVoiceData = m_ChatBuffer;
 
@@ -829,15 +829,15 @@ void CXboxVoice::VoiceResetLocalData( void )
 	Q_memset( m_ChatBuffer, 0, m_ChatBufferSize );
 }
 
-bool CXboxVoice::IsPlayerTalking( XUID uid, bool bLocal )
+bool CXboxVoice::IsPlayerTalking( uint64 uid, bool bLocal )
 {
 	if ( bLocal == true )
 	{
-		return m_pXHVEngine->IsLocalTalking( XBX_GetPrimaryUserId() );
+		return m_pXHVEngine->IsLocalTalking( 0 );
 	}
 	else
 	{
-		return !g_pMatchmaking->IsPlayerMuted( XBX_GetPrimaryUserId(), uid ) && m_pXHVEngine->IsRemoteTalking( uid );
+		return !g_pMatchmaking->IsPlayerMuted( 0, uid ) && m_pXHVEngine->IsRemoteTalking( uid );
 	}
 
 	return false;
@@ -851,7 +851,7 @@ bool CXboxVoice::IsHeadsetPresent( int id )
 void CXboxVoice::RemoveAllTalkers( CClientInfo *pLocal )
 {
 	int numRemoteTalkers;
-	XUID remoteTalkers[MAX_PLAYERS];
+	uint64 remoteTalkers[MAX_PLAYERS];
 	GetRemoteTalkers( &numRemoteTalkers, remoteTalkers );
 
 	for ( int iRemote = 0; iRemote < numRemoteTalkers; iRemote++ )

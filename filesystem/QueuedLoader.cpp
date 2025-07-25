@@ -676,14 +676,6 @@ bool CQueuedLoader::CResourceNameLessFunc::Less( const FileNameHandle_t &hFilena
 int CQueuedLoader::CFileJobsLessFunc::GetLayoutOrderForFilename( const char *pFilename )
 {
 	bool bIsLocalizedZip = false;
-	if ( XBX_IsLocalized() )
-	{
-		if ( V_stristr( pFilename, "\\zip" ) && V_stristr( pFilename, XBX_GetLanguageString() ) )
-		{
-			bIsLocalizedZip = true;
-		}
-	}
-
 	int order;
 	if ( V_stristr( pFilename, "\\maps\\" ) )
 	{
@@ -1697,19 +1689,6 @@ bool CQueuedLoader::BeginMapLoading( const char *pMapName, bool bLoadForHDR, boo
 		DevWarning( "QueuedLoader: Failed to get reslist '%s', Non-Optimal Loading.\n", szFilename );
 		m_bActive = false;
 		return false;
-	}
-
-	if ( XBX_IsLocalized() )
-	{
-		// find optional localized reslist fixup
-		V_snprintf( szFilename, sizeof( szFilename ), "reslists_xbox/%s.lst", XBX_GetLanguageString() );
-		CUtlBuffer localizedBuffer( 0, 0, CUtlBuffer::TEXT_BUFFER );
-		if ( g_pFullFileSystem->ReadFile( szFilename, "GAME", localizedBuffer, 0, 0 ) )
-		{
-			// append it
-			resListBuffer.EnsureCapacity( resListBuffer.TellPut() + localizedBuffer.TellPut() );
-			resListBuffer.Put( localizedBuffer.PeekGet(), localizedBuffer.TellPut() );
-		}
 	}
 
 	m_pProgress->UpdateProgress( PROGRESS_GOTRESLIST );

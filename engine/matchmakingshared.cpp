@@ -203,7 +203,6 @@ void CMatchmaking::AddSessionPropertyInternal( KeyValues *pProperty )
 			{
 				// Set the scenario in our host data structure
 				Q_strncpy( m_HostData.scenario, szBuffer, sizeof( m_HostData.scenario ) );
-				UpdateSessionReplyData( XNET_QOS_LISTEN_SET_DATA );
 			}
 		}
 		break;
@@ -228,7 +227,7 @@ void CMatchmaking::AddSessionPropertyInternal( KeyValues *pProperty )
 			if ( !Q_stricmp( pProperty->GetString( "valuetype" ), "int" ) )
 			{
 				prop.value.nData = atoi( pValue );
-				prop.value.type = XUSER_DATA_TYPE_INT32;
+				prop.value.type = 0;
 			}
 
 			// Build out the property keyvalues for gameUI
@@ -249,7 +248,6 @@ void CMatchmaking::AddSessionPropertyInternal( KeyValues *pProperty )
 			{
 				// Set the game time in our host data structure
 				m_HostData.gameTime = prop.value.nData;
-				UpdateSessionReplyData( XNET_QOS_LISTEN_SET_DATA );
 			}
 		}
 		break;
@@ -372,9 +370,9 @@ CClientInfo *CMatchmaking::FindClient( netadr_t *adr )
 }
 
 //-----------------------------------------------------------------------------
-// Purpose: Find a specific client by his XUID
+// Purpose: Find a specific client by his uint64
 //-----------------------------------------------------------------------------
-CClientInfo *CMatchmaking::FindClientByXUID( XUID xuid )
+CClientInfo *CMatchmaking::FindClientByXUID( uint64 xuid )
 {
 	CClientInfo *pClient = NULL;
 
@@ -517,7 +515,7 @@ void CMatchmaking::SendMessage( INetMessage *msg, CClientInfo *pClient, bool bVo
 //-----------------------------------------------------------------------------
 // Purpose: Send a net message to all remote clients
 //-----------------------------------------------------------------------------
-void CMatchmaking::SendToRemoteClients( INetMessage *msg, bool bVoice, XUID excludeXUID )
+void CMatchmaking::SendToRemoteClients( INetMessage *msg, bool bVoice, uint64 excludeXUID )
 {
 	for ( int i = 0; i < m_Remote.Count(); ++i )
 	{
@@ -728,7 +726,7 @@ bool CMatchmaking::InitializeLocalClient( bool bIsHost )
 //-----------------------------------------------------------------------------
 void CMatchmaking::AddLocalPlayersToTeams()
 {
-	if ( !m_bInitialized || XBX_GetPrimaryUserId() == INVALID_USER_ID )
+	if ( !m_bInitialized || 0 == INVALID_USER_ID )
 		return;
 
 	if ( m_Local.m_iTeam[0] == -1 )
@@ -775,7 +773,6 @@ void CMatchmaking::OnLevelLoadingFinished()
 		{
 			// Re-enable response to probes
 			m_HostData.gameState = GAMESTATE_INPROGRESS;
-			UpdateSessionReplyData( XNET_QOS_LISTEN_ENABLE|XNET_QOS_LISTEN_SET_DATA );
 		}
 
 		// Reset netchannel timeouts for any clients that are also finished loading
@@ -1153,7 +1150,7 @@ void CMatchmaking::RemovePlayersFromSession( CClientInfo *pClient )
 //-----------------------------------------------------------------------------
 // Purpose: Check if a client is muted
 //-----------------------------------------------------------------------------
-bool CMatchmaking::IsPlayerMuted( int iUserId, XUID playerId )
+bool CMatchmaking::IsPlayerMuted( int iUserId, uint64 playerId )
 {
 	for ( int i = 0; i < MAX_PLAYERS; ++i )
 	{
@@ -1461,7 +1458,6 @@ bool CMatchmaking::ProcessCheckpoint( MM_Checkpoint *pMsg )
 			{
 				// Make ourselves available to queries again
 				m_HostData.gameState = GAMESTATE_INLOBBY;
-				UpdateSessionReplyData( XNET_QOS_LISTEN_ENABLE|XNET_QOS_LISTEN_SET_DATA );
 			}
 
 			// Tell gameui to activate the lobby
@@ -1814,7 +1810,6 @@ void CMatchmaking::RunFrame()
 	case MMSTATE_ACCEPTING_CONNECTIONS:
 		// Host is sitting in the Lobby waiting for connection requests. Once the game
 		// is full enough (player count >= min players) the host will be able to start the game.
-		UpdateAcceptingConnections();
 		break;
 
 	case MMSTATE_SEARCHING:

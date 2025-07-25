@@ -1471,10 +1471,7 @@ bool COptionsDialogXbox::ShouldSkipOption( KeyValues *pKey )
 	// Skip if it's the vocal language option but we're not in german or french
 	if ( pKey->GetInt( "vocalslanguage", 0 ) != 0 )
 	{
-		if ( !XBX_IsLocalized() )
-		{
-			return true;
-		}
+		return true;
 	}
 
 	// Don't create options if there's already an entry by the same name
@@ -1612,7 +1609,7 @@ void COptionsDialogXbox::ReadOptionsFromFile( const char *pchFileName )
 					pNewOptionChoice = &((*pNewOption)->m_Choices[ iChoice ]);
 
 					char szLanguage[ 256 ];
-					Q_snprintf( szLanguage, sizeof( szLanguage ), "#GameUI_Language_%s", XBX_GetLanguageString() );
+					Q_snprintf( szLanguage, sizeof( szLanguage ), "#GameUI_Language_" );
 					Q_strncpy( pNewOptionChoice->szName, szLanguage, sizeof( pNewOptionChoice->szName ) );
 					Q_strncpy( pNewOptionChoice->szValue, "0", sizeof( pNewOptionChoice->szValue ) );
 				}

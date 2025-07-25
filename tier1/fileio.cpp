@@ -42,12 +42,8 @@
 #include <unistd.h> // for unlink
 #include <limits.h> // defines PATH_MAX
 #include <alloca.h> // 'cause we like smashing the stack
-#if defined( _PS3 )
-#include <fcntl.h>
-#else
 #include <sys/fcntl.h>
 #include <sys/statvfs.h>
-#endif
 #include <sched.h>
 #define int64 int64_t
 
@@ -77,8 +73,6 @@
 #if defined( ASYNC_FILEIO )
 #ifdef _WIN32
 #include "winlite.h"
-#elif defined(_PS3)
-// bugbug ps3 - see some aio files under libfs.. skipping for the moment
 #elif defined(POSIX)
 #include <aio.h>
 #else
@@ -186,7 +180,6 @@ struct DirWatcherOverlapped : public OVERLAPPED
 };
 #endif
 
-#if !defined(_PS3)
 // a buffer full of file names
 static const int k_cubDirWatchBufferSize = 8 * 1024;
 
@@ -493,5 +486,3 @@ void CDirWatcher::Validate( CValidator &validator, const char *pchName )
 	}
 }
 #endif
-
-#endif // _PS3

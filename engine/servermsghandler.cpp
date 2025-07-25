@@ -137,7 +137,6 @@ void CClientState::FileRequested(const char *fileName, unsigned int transferID)
 
 void CClientState::FileReceived( const char * fileName, unsigned int transferID )
 {
-#ifndef _XBOX
 	// check if the client donwload manager requested this file
 	CL_FileReceived( fileName, transferID );
 	// notify client dll
@@ -145,15 +144,12 @@ void CClientState::FileReceived( const char * fileName, unsigned int transferID 
 	{
 		g_ClientDLL->FileReceived( fileName, transferID );
 	}
-#endif
 }
 
 void CClientState::FileDenied(const char *fileName, unsigned int transferID )
 {
-#ifndef _XBOX
 	// check if the file download manager requested that file
 	CL_FileDenied( fileName, transferID );
-#endif
 }
 
 void CClientState::FileSent( const char *fileName, unsigned int transferID )
@@ -199,9 +195,7 @@ void CClientState::PacketEnd()
 	// Let prediction copy off pristine data and report any errors, etc.
 	g_pClientSidePrediction->PostNetworkDataReceived( commands_acknowledged );
 
-#ifndef _XBOX
 	demoaction->DispatchEvents();
-#endif
 }
 
 #undef CreateEvent
@@ -244,10 +238,8 @@ void CClientState::Disconnect( const char *pszReason, bool bShowMainMenu )
 
 	CL_ClearState();
 
-#ifndef _XBOX
 	// End any in-progress downloads
 	CL_HTTPStop_f();
-#endif
 
 	// stop loading progress bar 
 	if (bShowMainMenu)
@@ -314,7 +306,6 @@ bool CClientState::ProcessServerInfo( SVC_ServerInfo *msg )
 		Disconnect( "CBaseClientState::ProcessServerInfo failed", true );
 		return false;
 	}
-#ifndef _XBOX
 	if ( demoplayer->IsPlayingBack() )
 	{
 		// Because a server doesn't run during
@@ -327,7 +318,6 @@ bool CClientState::ProcessServerInfo( SVC_ServerInfo *msg )
 		// it's signon data (will be written into extra demo header file)
 		demorecorder->SetSignonState( SIGNONSTATE_NEW );
 	}
-#endif
 	// is server a HLTV proxy ?
 	ishltv = msg->m_bIsHLTV;		
 
@@ -394,9 +384,7 @@ bool CClientState::ProcessClassInfo( SVC_ClassInfo *msg )
 {
 	if ( msg->m_bCreateOnClient )
 	{
-#ifndef _XBOX
 		if ( !demoplayer->IsPlayingBack() )
-#endif
 		{
 			// Create all of the send tables locally
 			DataTable_CreateClientTablesFromServerTables();
@@ -406,9 +394,7 @@ bool CClientState::ProcessClassInfo( SVC_ClassInfo *msg )
 
 			// store the current data tables in demo file to make sure
 			// they are the same during playback 
-#ifndef _XBOX
 			demorecorder->RecordServerClasses( serverGameDLL->GetAllServerClasses() );
-#endif
 		}
 
 		LinkClasses();	// link server and client classes
@@ -430,9 +416,7 @@ bool CClientState::ProcessClassInfo( SVC_ClassInfo *msg )
 		return false;
 	}
 
-#ifndef _XBOX
 	if ( !demoplayer->IsPlayingBack() )
-#endif
 	{
 		CLocalNetworkBackdoor::InitFastCopy();
 	}
@@ -456,7 +440,7 @@ bool CClientState::ProcessSetPauseTimed( SVC_SetPauseTimed *msg )
 
 bool CClientState::ProcessVoiceInit( SVC_VoiceInit *msg )
 {
-#if !defined( NO_VOICE )//#ifndef _XBOX
+#if !defined( NO_VOICE )
 	if ( msg->m_szVoiceCodec[0] == 0 )
 	{
 		Voice_Deinit();
@@ -476,7 +460,7 @@ bool CClientState::ProcessVoiceData( SVC_VoiceData *msg )
 	char chReceived[4096];
 	int bitsRead = msg->m_DataIn.ReadBitsClamped( chReceived, msg->m_nLength );
 
-#if !defined( NO_VOICE )//#ifndef _XBOX
+#if !defined( NO_VOICE )
 	int iEntity = msg->m_nFromClient + 1;
 	if ( iEntity == (m_nPlayerSlot + 1) )
 	{ 
@@ -811,10 +795,8 @@ bool CClientState::ProcessPacketEntities( SVC_PacketEntities *msg )
 	if ( !msg->m_bIsDelta )
 	{
 		// Delta too old or is initial message
-#ifndef _XBOX			
 		// we can start recording now that we've received an uncompressed packet
 		demorecorder->SetSignonState( SIGNONSTATE_FULL );
-#endif
 		// Tell prediction that we're recreating entities due to an uncompressed packet arriving
 		if ( g_pClientSidePrediction  )
 		{
@@ -863,14 +845,12 @@ bool CClientState::ProcessTempEntities( SVC_TempEntities *msg )
 
 	float fire_time = cl.GetTime();
 
-#ifndef _XBOX
 	// delay firing temp ents by cl_interp in multiplayer or demoplayback
 	if ( cl.m_nMaxClients > 1 || demoplayer->IsPlayingBack() )
 	{
 		float flInterpAmount = GetClientInterpAmount();
 		fire_time += flInterpAmount;
 	}
-#endif
 
 	if ( msg->m_nNumEntries == 0 )
 	{
@@ -881,12 +861,10 @@ bool CClientState::ProcessTempEntities( SVC_TempEntities *msg )
 	int flags = bReliable ? FEV_RELIABLE : 0;
 
 	// Don't actually queue unreliable events if playing a demo and skipping ahead
-#ifndef _XBOX
 	if ( !bReliable && demoplayer->IsSkipping() )
 	{
 		return true;
 	}
-#endif
 	bf_read &buffer = msg->m_DataIn; // shortcut
 
 	int classID = -1;

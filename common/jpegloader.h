@@ -40,17 +40,4 @@ bool BConvertRGBToRGBA( CUtlBuffer &bufRGB, int nWidth, int nHeight );
 
 // Convert an RGBA image to RGB using opacity against a given solid background
 bool BConvertRGBAToRGB( CUtlBuffer &bufRGB, int nWidth, int nHeight, Color colorBG = Color(255,255,255) );
-
-#ifdef _PS3
-// PS3 PSN Avatars are PNG, so we have to support some similar functions on them.  Should move
-// this to it's own pngloader.h someday when we really support PNG on all platforms.
-
-// Get dimensions out of PNG header
-bool GetPNGDimensions( const byte *pubData, int cubData, uint32 &width, uint32 &height );
-
-// Convert PNG data to raw RGBA, pubData is the PNG data, cubData is it's size, buf is for output, and width/height are output as well.
-bool ConvertPNGToRGBA( const byte *pubJpegData, int cubJpegData, CUtlBuffer &bufOutput, int &width, int &height );
-
-#endif // _PS3
-
 #endif // JPEGLOADER_H

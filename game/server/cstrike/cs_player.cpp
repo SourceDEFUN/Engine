@@ -2735,7 +2735,6 @@ void CCSPlayer::PreThink()
 			m_flLastMovement = gpGlobals->curtime;
 		}
 	}
-#ifndef _XBOX
 	// CS would like their players to continue to update their LastArea since it is displayed in the hud voice chat UI
 	// But we won't do the population tracking while dead.
 	CNavArea *area = TheNavMesh->GetNavArea( GetAbsOrigin(), 1000 );
@@ -2751,7 +2750,6 @@ void CCSPlayer::PreThink()
 			}
 		}
 	}
-#endif
 }
 
 void CCSPlayer::MoveToNextIntroCamera()

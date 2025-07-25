@@ -32,17 +32,17 @@ public:
 	virtual bool IsHeadsetPresent( int iController );
 	virtual bool IsLocalPlayerTalking( int iController );
 
-	virtual void AddPlayerToVoiceList( XUID xPlayer, int iController );
-	virtual void RemovePlayerFromVoiceList( XUID xPlayer, int iController );
+	virtual void AddPlayerToVoiceList( uint64 xPlayer, int iController );
+	virtual void RemovePlayerFromVoiceList( uint64 xPlayer, int iController );
 
-	virtual void GetRemoteTalkers( int *pNumTalkers, XUID *pRemoteTalkers );
+	virtual void GetRemoteTalkers( int *pNumTalkers, uint64 *pRemoteTalkers );
 
 	virtual bool VoiceUpdateData( int iController );
 	virtual void GetVoiceData( int iController, const byte **ppvVoiceDataBuffer, unsigned int *pnumVoiceDataBytes );
 	virtual void VoiceResetLocalData( int iController );
 
-	virtual void SetPlaybackPriority( XUID remoteTalker, int iController, int iAllowPlayback );
-	virtual void PlayIncomingVoiceData( XUID xuid, const byte *pbData, unsigned int dwDataSize, const bool *bAudiblePlayers = NULL );
+	virtual void SetPlaybackPriority( uint64 remoteTalker, int iController, int iAllowPlayback );
+	virtual void PlayIncomingVoiceData( uint64 xuid, const byte *pbData, unsigned int dwDataSize, const bool *bAudiblePlayers = NULL );
 
 	virtual void RemoveAllTalkers();
 
@@ -51,7 +51,7 @@ protected:
 
 public:
 	bool m_bLocalVoice[ XUSER_MAX_COUNT ];
-	CUtlVector< XUID > m_arrRemoteVoice;
+	CUtlVector< uint64 > m_arrRemoteVoice;
 	bool m_bInitializedAudio;
 	byte m_pbVoiceData[ 1024 * XUSER_MAX_COUNT ];
 };
@@ -83,7 +83,7 @@ bool CEngineVoiceSteam::IsLocalPlayerTalking( int iController )
 	}
 }
 
-void CEngineVoiceSteam::AddPlayerToVoiceList( XUID xPlayer, int iController )
+void CEngineVoiceSteam::AddPlayerToVoiceList( uint64 xPlayer, int iController )
 {
 	if ( !xPlayer && iController >= 0 && iController < XUSER_MAX_COUNT )
 	{
@@ -102,7 +102,7 @@ void CEngineVoiceSteam::AddPlayerToVoiceList( XUID xPlayer, int iController )
 	}
 }
 
-void CEngineVoiceSteam::RemovePlayerFromVoiceList( XUID xPlayer, int iController )
+void CEngineVoiceSteam::RemovePlayerFromVoiceList( uint64 xPlayer, int iController )
 {
 	if ( !xPlayer && iController >= 0 && iController < XUSER_MAX_COUNT )
 	{
@@ -122,7 +122,7 @@ void CEngineVoiceSteam::RemovePlayerFromVoiceList( XUID xPlayer, int iController
 	}
 }
 
-void CEngineVoiceSteam::GetRemoteTalkers( int *pNumTalkers, XUID *pRemoteTalkers )
+void CEngineVoiceSteam::GetRemoteTalkers( int *pNumTalkers, uint64 *pRemoteTalkers )
 {
 	if ( pNumTalkers )
 		*pNumTalkers = m_arrRemoteVoice.Count();
@@ -175,12 +175,12 @@ void CEngineVoiceSteam::VoiceResetLocalData( int iController )
 	memset( pbVoiceData, 0, size );
 }
 
-void CEngineVoiceSteam::SetPlaybackPriority( XUID remoteTalker, int iController, int iAllowPlayback )
+void CEngineVoiceSteam::SetPlaybackPriority( uint64 remoteTalker, int iController, int iAllowPlayback )
 {
 	;
 }
 
-void CEngineVoiceSteam::PlayIncomingVoiceData( XUID xuid, const byte *pbData, unsigned int dwDataSize, const bool *bAudiblePlayers /* = NULL */ )
+void CEngineVoiceSteam::PlayIncomingVoiceData( uint64 xuid, const byte *pbData, unsigned int dwDataSize, const bool *bAudiblePlayers /* = NULL */ )
 {
 	for ( DWORD dwSlot = 0; dwSlot < XBX_GetNumGameUsers(); ++ dwSlot )
 	{

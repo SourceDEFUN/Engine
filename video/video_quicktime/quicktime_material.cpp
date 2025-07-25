@@ -323,8 +323,6 @@ VideoResult_t CQuickTimeMaterial::SoundDeviceCommand( VideoSoundDeviceOperation_
 #endif		
 		}
 		
-		case VideoSoundDeviceOperation::SET_LIB_AUDIO_DEVICE:
-		case VideoSoundDeviceOperation::HOOK_X_AUDIO:
 		case VideoSoundDeviceOperation::SET_MILES_SOUND_DEVICE:
 		{
 			return SetResult( VideoResult::OPERATION_NOT_SUPPORTED );

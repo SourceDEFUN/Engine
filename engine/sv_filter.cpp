@@ -428,7 +428,6 @@ CON_COMMAND( writeip, "Save the ban list to " BANNED_IP_FILENAME "." )
 //-----------------------------------------------------------------------------
 bool Filter_IsUserBanned( const USERID_t& userid )
 {
-#ifndef _XBOX
 	if ( sv_filterban.GetInt() == 0 )
 		return false;
 
@@ -453,9 +452,6 @@ bool Filter_IsUserBanned( const USERID_t& userid )
 	}
 
 	return !bNegativeFilter;
-#else
-	return false;
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -714,7 +710,6 @@ CON_COMMAND( listid, "Lists banned users." )
 //-----------------------------------------------------------------------------
 CON_COMMAND( banid, "Add a user ID to the ban list." )
 {
-#ifndef _XBOX
 	int			i;
 	float		banTime;
 	USERID_t	localId;
@@ -937,7 +932,6 @@ CON_COMMAND( banid, "Add a user ID to the ban list." )
 		client->ClientPrintf ( "You have been kicked and banned %s by the server.\n", szDuration );
 		client->Disconnect( "Kicked and banned" );
 	}
-#endif
 }
 
 

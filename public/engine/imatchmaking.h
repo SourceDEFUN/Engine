@@ -60,7 +60,7 @@ struct hostData_s
 	char scenario[MAX_MAP_NAME];
 	int  gameState;
 	int	 gameTime;
-	XUID xuid; 
+	uint64 xuid; 
 };
 
 struct MM_QOS_t
@@ -100,7 +100,7 @@ public:
 
 	// For voice chat
 	virtual uint64	PlayerIdToXuid( int playerId ) = 0;
-	virtual bool	IsPlayerMuted( int iUserId, XUID id ) = 0;
+	virtual bool	IsPlayerMuted( int iUserId, uint64 id ) = 0;
 
 	// To determine host Quality-of-Service
 	virtual MM_QOS_t GetQosWithLIVE() = 0;

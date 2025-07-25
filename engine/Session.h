@@ -46,8 +46,8 @@ class CClientInfo
 public:
 	uint64		m_id;									// machine id
 	netadr_t	m_adr;									// IP and Port
-	XNADDR		m_xnaddr;								// XNADDR
-	XUID		m_xuids[MAX_PLAYERS_PER_CLIENT];		// XUIDs
+	int		m_xnaddr;								// XNADDR
+	uint64		m_xuids[MAX_PLAYERS_PER_CLIENT];		// XUIDs
 	bool		m_bInvited;								// use private slots
 	bool		m_bRegistered;							// registered for arbitration
 	bool		m_bMigrated;							// successfully completed migration

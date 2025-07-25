@@ -515,7 +515,6 @@ public:
 	virtual void			StartXboxExitingProcess() = 0;
 	virtual bool			IsSaveInProgress() = 0;
 	virtual uint			OnStorageDeviceAttached( void ) = 0;
-	virtual void			OnStorageDeviceDetached( void ) = 0;
 
 	virtual void			ResetDemoInterpolation( void ) = 0;
 

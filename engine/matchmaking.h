@@ -137,7 +137,7 @@ public:
 
 	// For voice chat
 	virtual uint64	PlayerIdToXuid( int playerId );
-	virtual bool	IsPlayerMuted( int iUserId, XUID id );
+	virtual bool	IsPlayerMuted( int iUserId, uint64 id );
 
 	// To determine host Quality-of-Service
 	virtual MM_QOS_t GetQosWithLIVE();
@@ -208,11 +208,10 @@ private:
 	// NetChannel send
 	void	SendMessage( INetMessage *msg, netadr_t *adr, bool bVoice = false );
 	void	SendMessage( INetMessage *msg, CClientInfo *pClient, bool bVoice = false );
-	void	SendToRemoteClients( INetMessage *msg, bool bVoice = false, XUID excludeXUID = -1 );
+	void	SendToRemoteClients( INetMessage *msg, bool bVoice = false, uint64 excludeXUID = -1 );
 
 	// Session Host
 	void	OnHostSessionCreated();
-	void	UpdateAcceptingConnections();
 	void	SendModifySessionMessage();
 	void	EndSessionModify();
 	bool	IsAcceptingConnections();
@@ -225,7 +224,6 @@ private:
 	void	UpdateSessionModify();
 	void	ProcessRegistrationResults();
 	void	UpdateServerNegotiation();
-	void	UpdateSessionReplyData( uint flags );
 	void	SwitchToNextOpenTeam( CClientInfo *pClient );
 	void	SetupTeams();
 	int		ChooseTeam();
@@ -283,7 +281,7 @@ private:
 	INetChannel *AddRemoteChannel( netadr_t *adr );
 	INetChannel *FindChannel( const unsigned int ip );
 	CClientInfo *FindClient( netadr_t *adr ); 
-	CClientInfo *FindClientByXUID( XUID xuid );
+	CClientInfo *FindClientByXUID( uint64 xuid );
 	void		SetChannelTimeout( netadr_t *adr, int timeout );
 	void		RemoveRemoteChannel( netadr_t *adr, const char *pReason );
 	void		MarkChannelForRemoval( netadr_t *adr );
@@ -303,7 +301,7 @@ private:
 		int						gameState;
 		int						gameTime;
 		int						iScenarioIndex;
-		XUID					xuid;
+		uint64					xuid;
 		XSESSION_SEARCHRESULT	Result;
 	};
 
@@ -318,14 +316,6 @@ private:
 
 	// Arbitration registration
 	XSESSION_REGISTRATION_RESULTS	*m_pRegistrationResults;
-
-	// QoS Data
-	BOOL               m_bQoSTesting;
-	XNQOS              m_QoSResult;
-	XNQOS*             m_pQoSResult;
-	const XNADDR*      m_QoSxnaddr[MAX_SEARCHRESULTS];
-	const XNKID*       m_QoSxnkid[MAX_SEARCHRESULTS];
-	const XNKEY*       m_QoSxnkey[MAX_SEARCHRESULTS];
 
 	CUtlMap< unsigned int, INetChannel* >m_Channels;
 	CUtlVector< unsigned int > m_ChannelsToRemove;
@@ -356,8 +346,8 @@ private:
 
 	int				CountPlayersOnTeam( int idxTeam );	// players on each team
 
-	XUID				m_Mutelist[MAX_PLAYERS_PER_CLIENT][MAX_PLAYERS];
-	CUtlVector< XUID >	m_MutedBy[MAX_PLAYERS_PER_CLIENT];
+	uint64				m_Mutelist[MAX_PLAYERS_PER_CLIENT][MAX_PLAYERS];
+	CUtlVector< uint64 >	m_MutedBy[MAX_PLAYERS_PER_CLIENT];
 
 	// Contexts and properties
 	CUtlVector< XUSER_CONTEXT >		m_SessionContexts;		// for session creation

@@ -33,10 +33,6 @@
 #include "host.h"
 #include "tier1/mempool.h"
 
-#ifdef _PS3
-#include "tls_ps3.h"
-#endif
-
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -196,11 +192,6 @@ public:
 	// Converts point into voxel index
 	inline Voxel_t VoxelIndexFromPoint( const Vector &vecWorldPoint );
 	inline void VoxelIndexFromPoint( const Vector &vecWorldPoint, int pPoint[3] );
-
-#if defined(_PS3)
-	inline Voxel_t VoxelIndexFromPoint( const fltx4 &vecWorldPoint );
-	inline void VoxelIndexFromPoint( const fltx4 &vecWorldPoint, int pPoint[3] );
-#endif
 
 	// Setup ray for iteration
 	void LeafListRaySetup( const Ray_t &ray, const Vector &vecEnd, const Vector &vecInvDelta, Voxel_t voxel, int *pStep, float *pMax, float *pDelta );
@@ -491,96 +482,6 @@ inline void CVoxelHash::PackVoxel( int iX, int iY, int iZ, Voxel_t &voxel )
 }
 
 
-#if defined(_PS3)
-
-// NOTE: This isn't supportable on SSE but it isn't necessary either
-inline double FloatConvertToIntegerFormat( double flVal )
-{
-#if defined( _PS3 )
-	return __builtin_fctiwz( flVal );
-#else
-	return __fctiwz( flVal );
-#endif
-}
-
-inline fltx4 ConvertToSignedIntegerSIMD( fltx4 fl4Data )
-{
-	return (fltx4)vec_cts( fl4Data, 0 );
-}
-
-inline fltx4 ShiftRightSIMD( const fltx4 &fl4Data, const fltx4 &fl4Shift )
-{
-	return (fltx4)vec_sr( (u32x4)fl4Data, (u32x4)fl4Shift );
-}
-
-union doublecnv_t
-{
-	double m_flConverted;
-	int32 m_nConverted[2];
-};
-
-// SIMD Versions - need more code changes to fully support this but there are enough benefits to use it on some of the code
-inline void CVoxelHash::VoxelIndexFromPoint( const fltx4 &fl4WorldPoint, int pPoint[3] )
-{
-	fltx4 fl4Shift = (fltx4)ReplicateIX4( m_nLevelShift );
-	fltx4 fl4VoxelOrigin = LoadUnaligned3SIMD( m_vecVoxelOrigin.Base() );
-	fltx4 fl4LocalOrigin = SubSIMD( fl4WorldPoint, fl4VoxelOrigin );
-	fltx4 fl4OriginInt = ConvertToSignedIntegerSIMD( fl4LocalOrigin );
-	fl4OriginInt = ShiftRightSIMD( fl4OriginInt, fl4Shift );
-	StoreUnaligned3SIMD( (float *)pPoint, fl4OriginInt );
-}
-
-inline void CVoxelHash::VoxelIndexFromPoint( const Vector &vecWorldPoint, int pPoint[3] )
-{
-	return VoxelIndexFromPoint( LoadUnaligned3SIMD( vecWorldPoint.Base() ), pPoint );
-}
-
-
-inline Voxel_t CVoxelHash::VoxelIndexFromPoint( const Vector &vecWorldPoint )
-{
-	Voxel_t voxel;
-
-	// This code manually schedules the float->int conversion to avoid LHS on PPC
-	// First we convert the float to int format within a float register
-	// then we write it back to memory
-	volatile union doublecnv_t cnvX, cnvY, cnvZ;
-	cnvX.m_flConverted = FloatConvertToIntegerFormat( vecWorldPoint.x - m_vecVoxelOrigin.x );
-	cnvY.m_flConverted = FloatConvertToIntegerFormat( vecWorldPoint.y - m_vecVoxelOrigin.y );
-	cnvZ.m_flConverted = FloatConvertToIntegerFormat( vecWorldPoint.z - m_vecVoxelOrigin.z );
-	// now we load that value back into an integer register.  This will LHS if there aren't enough
-	// cycles between the stores and the loads but this will allow the compiler to reorder the operations
-	// and when the conversions are implicit they don't get reordered (load instruction immediately follows the store)
-	int nX = cnvX.m_nConverted[1];
-	int nY = cnvY.m_nConverted[1];
-	int nZ = cnvZ.m_nConverted[1];
-	voxel.bitsVoxel.x = nX >> m_nLevelShift;
-	voxel.bitsVoxel.y = nY >> m_nLevelShift;
-	voxel.bitsVoxel.z = nZ >> m_nLevelShift;
-
-	return voxel;
-}
-
-inline Voxel_t CVoxelHash::VoxelIndexFromPoint( const fltx4 &fl4WorldPoint )
-{
-	Voxel_t voxel;
-
-	fltx4 fl4Shift = (fltx4)ReplicateIX4( m_nLevelShift );
-	fltx4 fl4VoxelOrigin = LoadUnaligned3SIMD( m_vecVoxelOrigin.Base() );
-	fltx4 fl4LocalOrigin = SubSIMD( fl4WorldPoint, fl4VoxelOrigin );
-	fltx4 fl4OriginInt = ConvertToSignedIntegerSIMD( fl4LocalOrigin );
-	fl4OriginInt = ShiftRightSIMD( fl4OriginInt, fl4Shift );
-
-	// UNDONE: Can probably pack these with shift, permute, or
-	int32 ALIGN16 tmp[4];
-	StoreAlignedIntSIMD( tmp, fl4OriginInt );
-	voxel.bitsVoxel.x = tmp[0];
-	voxel.bitsVoxel.y = tmp[1];
-	voxel.bitsVoxel.z = tmp[2];
-
-	return voxel;
-}
-
-#else
 
 inline void CVoxelHash::VoxelIndexFromPoint( const Vector &vecWorldPoint, int pPoint[3] )
 {
@@ -600,7 +501,6 @@ inline Voxel_t CVoxelHash::VoxelIndexFromPoint( const Vector &vecWorldPoint )
 
 	return voxel;
 }
-#endif
 
 //-----------------------------------------------------------------------------
 // Purpose:	Computes the voxel count at a particular level of the tree
@@ -2400,16 +2300,9 @@ bool CVoxelTree::EnumerateElementsAlongRay_ExtrudedRay( SpatialPartitionListMask
 
 	// Early out: Check to see if the range of voxels at the endpoint
 	// is the same as the range at the start point. If so, we're done.
-#if defined(_PS3)
-	fltx4 fl4RayEnd = LoadUnaligned3SIMD(vecEnd.Base());
-	fltx4 fl4Extents = LoadAlignedSIMD(ray.m_Extents.Base());
-	fltx4 vecEndMin = SubSIMD( fl4RayEnd, fl4Extents );
-	fltx4 vecEndMax = AddSIMD( fl4RayEnd, fl4Extents );
-#else
 	Vector vecEndMin, vecEndMax;
 	VectorSubtract( vecEnd, ray.m_Extents, vecEndMin );
 	VectorAdd( vecEnd, ray.m_Extents, vecEndMax );
-#endif
 
 	int endVoxelMin[3], endVoxelMax[3];
 	m_pVoxelHash[0].VoxelIndexFromPoint( vecEndMin, endVoxelMin );
@@ -2489,10 +2382,8 @@ bool CVoxelTree::EnumerateElementsAlongRay_ExtrudedRay( SpatialPartitionListMask
 	return true;
 }
 
-#ifndef _PS3
 #define THINK_TRACE_COUNTER_COMPILE_FUNCTIONS_ENGINE
 #include "engine/thinktracecounter.h"
-#endif
 
 #ifdef THINK_TRACE_COUNTER_COMPILED
 ConVar think_trace_limit( "think_trace_limit", "0", FCVAR_CHEAT | FCVAR_DEVELOPMENTONLY, "Break into the debugger if this many or more traces are performed in a single think function. Negative numbers mean that the same think function may be broken into many times (once per [x] may traces), positive numbers mean each think will break only once." );

@@ -279,12 +279,10 @@ void CLog::Reset( void )	// reset all logging streams
 	m_bActive = false;
 	m_flLastLogFlush = realtime;
 	m_bFlushLog = false;
-#ifndef _XBOX
 	if ( CommandLine()->CheckParm( "-flushlog" ) )
 	{
 		m_bFlushLog = true;
 	}
-#endif
 }
 
 void CLog::Init( void )

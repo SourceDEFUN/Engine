@@ -52,11 +52,7 @@ using namespace vgui;
 
 uint16 System_GetKeyState( int virtualKeyCode )
 {
-#ifndef _XBOX
 	return g_pVCR->Hook_GetKeyState(virtualKeyCode);
-#else
-	return 0;
-#endif
 }
 
 class CSystem : public ISystem

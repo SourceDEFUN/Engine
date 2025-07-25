@@ -14,13 +14,6 @@
 #define VMM_KB ( 1024 )
 #define VMM_MB ( 1024 * VMM_KB )
 
-#ifdef _PS3
-// Total virtual address space reserved by CVirtualMemoryManager on startup:
-#define VMM_VIRTUAL_SIZE ( 512 * VMM_MB )
-#define VMM_PAGE_SIZE ( 64 * VMM_KB )
-#endif
-
-
 
 // Allocate virtual sections via IMemAlloc::AllocateVirtualMemorySection
 abstract_class IVirtualMemorySection

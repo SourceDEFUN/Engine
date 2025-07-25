@@ -129,7 +129,6 @@ static void BuildUploadDataMessage( bf_write& buf, char const *tablename, KeyVal
 //-----------------------------------------------------------------------------
 bool UploadData( char const *cserIP, char const *tablename, KeyValues *fields )
 {
-#ifndef _XBOX
 	bf_write	buf;
 	ALIGN4 byte		data[ 2048 ] ALIGN4_POST;
 		
@@ -156,9 +155,6 @@ bool UploadData( char const *cserIP, char const *tablename, KeyValues *fields )
 	}
 
 	return false;
-#else
-	return true;
-#endif
 }
 
 /*

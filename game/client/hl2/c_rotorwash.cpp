@@ -20,8 +20,6 @@
 //  Rotorwash particle emitter
 // ==============================================
 
-#ifndef _XBOX
-
 class WashEmitter : public CSimpleEmitter
 {
 public:
@@ -66,8 +64,6 @@ private:
 	WashEmitter( const WashEmitter & );
 };
 
-#endif // !_XBOX
-
 // ==============================================
 //  Rotorwash entity
 // ==============================================
@@ -92,10 +88,8 @@ protected:
 
 	PMaterialHandle m_hWaterMaterial[2];
 
-#ifndef _XBOX
 	void InitSpawner( void );
 	CSmartPtr<WashEmitter>	m_pSimple;
-#endif // !XBOX
 };
 
 IMPLEMENT_CLIENTCLASS_DT( C_RotorWashEmitter, DT_RotorWashEmitter, CRotorWashEmitter)
@@ -107,14 +101,11 @@ END_RECV_TABLE()
 //-----------------------------------------------------------------------------
 C_RotorWashEmitter::C_RotorWashEmitter( void )
 {
-#ifndef _XBOX
 	m_pSimple =  NULL;
 	m_hWaterMaterial[0] = NULL;
 	m_hWaterMaterial[1] = NULL;
-#endif // !_XBOX
 }
 
-#ifndef _XBOX
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -126,7 +117,6 @@ void C_RotorWashEmitter::InitSpawner( void )
 	m_pSimple = WashEmitter::Create( "wash" );
 	m_pSimple->SetNearClip( 128, 256 );
 }
-#endif // !XBOX
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -139,10 +129,7 @@ void C_RotorWashEmitter::OnDataChanged( DataUpdateType_t updateType )
 	if ( updateType == DATA_UPDATE_CREATED )
 	{
 		SetNextClientThink( gpGlobals->curtime + ROTORWASH_THINK_INTERVAL );
-
-#ifndef _XBOX
 		InitSpawner();
-#endif // !XBOX
 	}
 }
 
@@ -186,8 +173,6 @@ void C_RotorWashEmitter::ClientThink( void )
 		vecDustColor.z = 0.25f;
 	}
 
-#ifndef _XBOX
-
 	InitSpawner();
 
 	if ( m_pSimple.IsValid() == false )
@@ -211,8 +196,6 @@ void C_RotorWashEmitter::ClientThink( void )
 	{
 		hMaterial = g_Mat_DustPuff;
 	}
-
-#endif // !XBOX
 
 	// If we're above water, make ripples
 	if ( tr.contents & (CONTENTS_WATER|CONTENTS_SLIME) )
@@ -243,7 +226,6 @@ void C_RotorWashEmitter::ClientThink( void )
 		}
 	}
 
-#ifndef _XBOX
 	int		numRingSprites = 32;
 	float	yaw = random->RandomFloat( 0, 2*M_PI ); // Randomly placed on the unit circle
 	float	yawIncr = (2*M_PI) / numRingSprites;
@@ -302,5 +284,4 @@ void C_RotorWashEmitter::ClientThink( void )
 			pParticle->m_flRollDelta	= random->RandomFloat( -16.0f, 16.0f );
 		}
 	}
-#endif // !XBOX
 }

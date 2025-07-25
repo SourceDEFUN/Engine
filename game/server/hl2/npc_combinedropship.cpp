@@ -454,10 +454,6 @@ void CCombineDropshipContainer::Spawn()
 
 	BaseClass::Spawn();
 
-#ifdef _XBOX
-	AddEffects( EF_NOSHADOW );
-#endif //_XBOX
-
 	m_iHealth = m_iMaxHealth = sk_dropship_container_health.GetFloat();
 }
 
@@ -849,10 +845,6 @@ void CNPC_CombineDropship::Spawn( void )
 {
 	Precache( );
 	SetModel( "models/combine_dropship.mdl" );
-
-#ifdef _XBOX
-	AddEffects( EF_NOSHADOW );
-#endif //_XBOX
 
 	InitPathingData( DROPSHIP_ARRIVE_DIST, DROPSHIP_MIN_CHASE_DIST_DIFF, DROPSHIP_AVOID_DIST );
 

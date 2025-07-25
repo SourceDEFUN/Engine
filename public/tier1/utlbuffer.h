@@ -213,9 +213,7 @@ public:
 
 
 	FORCEINLINE void ActivateByteSwappingIfBigEndian( void )
-	{
-		if ( IsPS3() ) ActivateByteSwapping( true );
-	}
+	{}
 
 
 	// Controls endian-ness of binary utlbufs - default matches the current platform
@@ -723,18 +721,7 @@ inline void CUtlBuffer::GetTypeBin< float >( float &dest )
 	if ( CheckGet( sizeof( float ) ) )
 	{
 		uintp pData = (uintp)PeekGet();
-		if ( IsPS3() && ( pData & 0x03 ) )
-		{
-			// handle unaligned read
-			((unsigned char*)&dest)[0] = ((unsigned char*)pData)[0];
-			((unsigned char*)&dest)[1] = ((unsigned char*)pData)[1];
-			((unsigned char*)&dest)[2] = ((unsigned char*)pData)[2];
-			((unsigned char*)&dest)[3] = ((unsigned char*)pData)[3];
-		}
-		else
-		{
-			memcpy( &dest, (void*)pData, sizeof(float) );
-		}
+		memcpy( &dest, (void*)pData, sizeof(float) );
 		if ( m_Byteswap.IsSwappingBytes() )
 		{
 			m_Byteswap.SwapBufferToTargetEndian< float >( &dest, &dest );
@@ -753,23 +740,8 @@ inline void CUtlBuffer::GetTypeBin< double >( double &dest )
 	if ( CheckGet( sizeof( double ) ) )
 	{
 		uintp pData = (uintp)PeekGet();
-		if ( IsPS3() && ( pData & 0x07 ) )
-		{
-			// handle unaligned read
-			((unsigned char*)&dest)[0] = ((unsigned char*)pData)[0];
-			((unsigned char*)&dest)[1] = ((unsigned char*)pData)[1];
-			((unsigned char*)&dest)[2] = ((unsigned char*)pData)[2];
-			((unsigned char*)&dest)[3] = ((unsigned char*)pData)[3];
-			((unsigned char*)&dest)[4] = ((unsigned char*)pData)[4];
-			((unsigned char*)&dest)[5] = ((unsigned char*)pData)[5];
-			((unsigned char*)&dest)[6] = ((unsigned char*)pData)[6];
-			((unsigned char*)&dest)[7] = ((unsigned char*)pData)[7];
-		}
-		else
-		{
-			// aligned read
-			dest = *(double *)pData;
-		}
+		// aligned read
+		dest = *(double *)pData;
 		if ( m_Byteswap.IsSwappingBytes() )
 		{
 			m_Byteswap.SwapBufferToTargetEndian< double >( &dest, &dest );
@@ -829,11 +801,11 @@ inline uint32 StringToNumber( char *pString, char **ppEnd, int nRadix )
 template <>
 inline int64 StringToNumber( char *pString, char **ppEnd, int nRadix )
 {
-#if defined(_PS3) || defined(POSIX)
+#if defined(POSIX)
 	return ( int64 )strtoll( pString, ppEnd, nRadix );
-#else // !_PS3
+#else
 	return ( int64 )_strtoi64( pString, ppEnd, nRadix );
-#endif // _PS3
+#endif
 }
 
 template <>

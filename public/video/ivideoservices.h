@@ -150,12 +150,12 @@ typedef VideoSystemFeature::EVideoSystemFeature_t VideoSystemFeature_t;
 namespace VideoSoundDeviceOperation
 {
 	enum EVideoSoundDeviceOperation_t
-	{
+	{ // Secton: Again, very risky to comment enum's stuff out.
 		SET_DIRECT_SOUND_DEVICE = 0,			// Windows option
 		SET_MILES_SOUND_DEVICE,					// Supported by RAD
-		HOOK_X_AUDIO,							// Xbox Option
+		// HOOK_X_AUDIO,							// Xbox Option
 		SET_SOUND_MANAGER_DEVICE,				// OSX Option
-		SET_LIB_AUDIO_DEVICE,					// PS3 Option
+		// SET_LIB_AUDIO_DEVICE,					// PS3 Option
 		SET_SDL_SOUND_DEVICE,					// SDL Audio
 		SET_SDL_PARAMS,							// SDL Audio params
 		SDLMIXER_CALLBACK,						// SDLMixer callback

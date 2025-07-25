@@ -91,11 +91,8 @@ void CHudChat::CreateChatInputLine( void )
 
 void CHudChat::CreateChatLines( void )
 {
-#ifndef _XBOX
 	m_ChatLine = new CHudChatLine( this, "ChatLine1" );
 	m_ChatLine->SetVisible( false );		
-
-#endif
 }
 
 void CHudChat::Init( void )

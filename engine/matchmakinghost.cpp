@@ -47,7 +47,7 @@ void CMatchmaking::StartHost( bool bSystemLink )
 
 	m_Session.SetIsSystemLink( bSystemLink );
 	m_Session.SetIsHost( true );
-	m_Session.SetOwnerId( XBX_GetPrimaryUserId() );
+	m_Session.SetOwnerId( 0 );
 
 	// Session creation is asynchronous
 	if ( !m_Session.CreateSession() )
@@ -79,8 +79,6 @@ void CMatchmaking::OnHostSessionCreated()
 	{
 		m_HostData.gameTime = pTime->GetInt( "valuestring", 0 );
 	}
-	UpdateSessionReplyData( XNET_QOS_LISTEN_ENABLE|XNET_QOS_LISTEN_SET_DATA );
-
 	int iTeam = ChooseTeam();
 	for ( int i = 0; i < m_Local.m_cPlayers; ++i )
 	{
@@ -226,7 +224,7 @@ void CMatchmaking::HandleJoinRequest( netpacket_t *pPacket )
 			joinResponse.m_id				= m_Local.m_id;
 			joinResponse.m_Nonce			= m_Session.GetSessionNonce();
 			joinResponse.m_SessionFlags		= m_Session.GetSessionFlags();
-			joinResponse.m_nOwnerId			= XBX_GetPrimaryUserId();
+			joinResponse.m_nOwnerId			= 0;
 			joinResponse.m_nTotalTeams		= m_nTotalTeams;
 			joinResponse.m_ContextCount		= m_SessionContexts.Count();
 			joinResponse.m_PropertyCount	= m_SessionProperties.Count();
@@ -333,23 +331,6 @@ void CMatchmaking::HandleJoinRequest( netpacket_t *pPacket )
 		RemoveRemoteChannel( pFromAdr, "Join request denied" );
 	}
 }
-
-//-----------------------------------------------------------------------------
-// Purpose: Check the state of the lobby
-//-----------------------------------------------------------------------------
-void CMatchmaking::UpdateAcceptingConnections()
-{
-	// Update host status
-	UpdateSessionReplyData( XNET_QOS_LISTEN_SET_DATA );
-
-	// Do nothing else
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: Set the host data that gets sent in replies to client searches
-//-----------------------------------------------------------------------------
-void CMatchmaking::UpdateSessionReplyData( uint flags )
-{}
 
 //-----------------------------------------------------------------------------
 // Purpose: Change properties of the current session
@@ -554,9 +535,6 @@ void CMatchmaking::StartCountdown()
 		m_Local.m_bRegistered = false;
 	}
 
-	// Block searches while we're loading the game, because we can't reply anyway
-	UpdateSessionReplyData( XNET_QOS_LISTEN_DISABLE );
-
 	// Send the start game message to everyone
 	MM_Checkpoint msg;
 	msg.m_Checkpoint = MM_Checkpoint::CHECKPOINT_PREGAME;
@@ -569,9 +547,6 @@ void CMatchmaking::StartCountdown()
 //-----------------------------------------------------------------------------
 void CMatchmaking::CancelCountdown()
 {
-	// Accept searches again
-	UpdateSessionReplyData( XNET_QOS_LISTEN_ENABLE|XNET_QOS_LISTEN_SET_DATA );
-
 	MM_Checkpoint msg;
 	msg.m_Checkpoint = MM_Checkpoint::CHECKPOINT_GAME_LOBBY;
 	SendToRemoteClients( &msg );

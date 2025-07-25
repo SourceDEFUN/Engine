@@ -1138,12 +1138,6 @@ void CShadowMgr::AddSurfaceToShadow( ShadowHandle_t handle, SurfaceHandle_t surf
 	if ( !bIsFlashlight && MSurf_Flags(surfID) & (SURFDRAW_TRANS | SURFDRAW_ALPHATEST | SURFDRAW_NOSHADOWS) )
 		return;
 
-#ifdef _XBOX
-	// Don't let the flashlight get on water on XBox
-	if ( bIsFlashlight && ( MSurf_Flags(surfID) & SURFDRAW_WATERSURFACE ) )
-		return;
-#endif
-
 #if 0
 	// Make sure the surface has the shadow on it exactly once...
 	ShadowDecalHandle_t	dh = MSurf_ShadowDecals( surfID );

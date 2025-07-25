@@ -113,9 +113,7 @@ CNPC_Barnacle::CNPC_Barnacle(void)
 {
 	m_flRestUnitsAboveGround = 16.0f;
 	m_flNextBloodTime = -1.0f;
-#ifndef _XBOX
 	m_nBloodColor = BLOOD_COLOR_YELLOW;
-#endif
 	m_bPlayerWasStanding = false;
 }
 
@@ -164,9 +162,7 @@ BEGIN_DATADESC( CNPC_Barnacle )
 	DEFINE_FIELD( m_hLastSpitEnemy, FIELD_EHANDLE ),
 	DEFINE_FIELD( m_nShakeCount, FIELD_INTEGER ),
 	DEFINE_FIELD( m_flNextBloodTime, FIELD_TIME ),
-#ifndef _XBOX
 	DEFINE_FIELD( m_nBloodColor, FIELD_INTEGER ),
-#endif
 	DEFINE_FIELD( m_vecBloodPos, FIELD_POSITION_VECTOR ),
 	DEFINE_FIELD( m_flBarnaclePullSpeed, FIELD_FLOAT ),
 	DEFINE_FIELD( m_flLocalTimer, FIELD_TIME ),
@@ -1678,9 +1674,7 @@ void CNPC_Barnacle::BitePrey( void )
 	if ( enemyClass == CLASS_ANTLION )
 	{
 		
-#ifndef _XBOX
 		m_nBloodColor = pVictim->BloodColor(); 
-#endif
 		m_flNextBloodTime = 0.0f;
 		SprayBlood();
 
@@ -1736,9 +1730,7 @@ void CNPC_Barnacle::BitePrey( void )
 	m_flNextBloodTime = 0.0f;
 	
 	// NOTE: This was too confusing to people with the more recognizable blood -- jdw
-#ifndef _XBOX
 	m_nBloodColor = pVictim->BloodColor(); 
-#endif
 	CollisionProp()->NormalizedToWorldSpace( Vector( 0.5f, 0.5f, 0.0f ), &m_vecBloodPos );
 
 	// m_hRagdoll->SetOverlaySequence( ACT_DIE_BARNACLE_SWALLOW );
@@ -1763,13 +1755,8 @@ void CNPC_Barnacle::SprayBlood()
 	Vector jitterPos = RandomVector( -8, 8 );
 	jitterPos.z = 0.0f;
 
-#ifndef _XBOX
 	UTIL_BloodSpray( m_vecBloodPos + jitterPos, Vector( 0,0,-1),
 		m_nBloodColor, RandomInt( 4, 8 ), RandomInt(0,2) == 0 ? FX_BLOODSPRAY_ALL : FX_BLOODSPRAY_CLOUD );
-#else
-	UTIL_BloodSpray( m_vecBloodPos + jitterPos, Vector( 0,0,-1),
-		BLOOD_COLOR_YELLOW, RandomInt( 4, 8 ), RandomInt(0,2) == 0 ? FX_BLOODSPRAY_ALL : FX_BLOODSPRAY_CLOUD );
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -2063,11 +2050,7 @@ void CNPC_Barnacle::Event_Killed( const CTakeDamageInfo &info )
 	}
 
 	// Puke blood
-#ifdef _XBOX
-	UTIL_BloodSpray( GetAbsOrigin(), Vector(0,0,-1), BLOOD_COLOR_YELLOW, 8, FX_BLOODSPRAY_ALL );
-#else
 	UTIL_BloodSpray( GetAbsOrigin(), Vector(0,0,-1), BLOOD_COLOR_RED, 8, FX_BLOODSPRAY_ALL );
-#endif
 
 	// Put blood on the ground if near enough
 	trace_t bloodTrace;
@@ -2075,11 +2058,7 @@ void CNPC_Barnacle::Event_Killed( const CTakeDamageInfo &info )
 	
 	if ( bloodTrace.fraction < 1.0f )
 	{
-#ifdef _XBOX
-		UTIL_BloodDecalTrace( &bloodTrace, BLOOD_COLOR_YELLOW );
-#else
 		UTIL_BloodDecalTrace( &bloodTrace, BLOOD_COLOR_RED );
-#endif
 	}
 
 	EmitSound( "NPC_Barnacle.Die" );

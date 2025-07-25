@@ -185,7 +185,6 @@ VideoResult_t CWebMVideoSubSystem::VideoSoundDeviceCMD( VideoSoundDeviceOperatio
 		}
 		
 		case VideoSoundDeviceOperation::SET_MILES_SOUND_DEVICE:
-		case VideoSoundDeviceOperation::HOOK_X_AUDIO:
 		{
 			return SetResult( VideoResult::OPERATION_NOT_SUPPORTED );
 		}

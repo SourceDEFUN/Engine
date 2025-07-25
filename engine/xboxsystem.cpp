@@ -15,8 +15,8 @@
 #include "tier0/memdbgon.h"
 
 
-static wchar_t g_szModSaveContainerDisplayName[XCONTENT_MAX_DISPLAYNAME_LENGTH] = L"";
-static char g_szModSaveContainerName[XCONTENT_MAX_FILENAME_LENGTH] = "";
+static wchar_t g_szModSaveContainerDisplayName[128] = L"";
+static char g_szModSaveContainerName[42] = "";
 
 //-----------------------------------------------------------------------------
 // Implementation of IXboxSystem interface
@@ -54,14 +54,14 @@ public:
 	virtual uint			SessionStart( XboxHandle_t hSession, uint nFlags, bool bAsync, AsyncHandle_t *pAsyncHandle );
 	virtual uint			SessionEnd( XboxHandle_t hSession, bool bAsync, AsyncHandle_t *pAsyncHandle );
 	virtual int				SessionJoinLocal( XboxHandle_t hSession, uint nUserCount, const uint *pUserIndexes, const bool *pPrivateSlots, bool bAsync, AsyncHandle_t *pAsyncHandle );
-	virtual int				SessionJoinRemote( XboxHandle_t hSession, uint nUserCount, const XUID *pXuids, const bool *pPrivateSlot, bool bAsync, AsyncHandle_t *pAsyncHandle );
+	virtual int				SessionJoinRemote( XboxHandle_t hSession, uint nUserCount, const uint64 *pXuids, const bool *pPrivateSlot, bool bAsync, AsyncHandle_t *pAsyncHandle );
 	virtual int				SessionLeaveLocal( XboxHandle_t hSession, uint nUserCount, const uint *pUserIndexes, bool bAsync, AsyncHandle_t *pAsyncHandle );
-	virtual int				SessionLeaveRemote( XboxHandle_t hSession, uint nUserCount, const XUID *pXuids, bool bAsync, AsyncHandle_t *pAsyncHandle );
+	virtual int				SessionLeaveRemote( XboxHandle_t hSession, uint nUserCount, const uint64 *pXuids, bool bAsync, AsyncHandle_t *pAsyncHandle );
 	virtual int				SessionMigrate( XboxHandle_t hSession, uint nUserIndex, void *pSessionInfo, bool bAsync, AsyncHandle_t *pAsyncHandle );
 	virtual int				SessionArbitrationRegister( XboxHandle_t hSession, uint nFlags, uint64 nonce, uint *pBytes, void *pBuffer, bool bAsync, AsyncHandle_t *pAsyncHandle );
 
 	// Stats
-	virtual int				WriteStats( XboxHandle_t hSession, XUID xuid, uint nViews, void* pViews, bool bAsync, AsyncHandle_t *pAsyncHandle );
+	virtual int				WriteStats( XboxHandle_t hSession, uint64 xuid, uint nViews, void* pViews, bool bAsync, AsyncHandle_t *pAsyncHandle );
 
 	// Achievements
 	virtual int				EnumerateAchievements( uint nUserIdx, uint64 xuid, uint nStartingIdx, uint nCount, void *pBuffer, uint nBufferBytes, bool bAsync, AsyncHandle_t *pAsyncHandle );
@@ -82,7 +82,7 @@ private:
 static CXboxSystem s_XboxSystem;
 IXboxSystem *g_pXboxSystem = &s_XboxSystem;
 
-EXPOSE_SINGLE_INTERFACE_GLOBALVAR( CXboxSystem, IXboxSystem, XBOXSYSTEM_INTERFACE_VERSION, s_XboxSystem );
+EXPOSE_SINGLE_INTERFACE_GLOBALVAR( CXboxSystem, IXboxSystem, "XboxSystemInterface001", s_XboxSystem );
 
 #define ASYNC_RESULT(ph) 	((AsyncResult_t*)*ph);
 
@@ -111,12 +111,12 @@ uint			CXboxSystem::SessionSearch( uint nProcedureIndex, uint nUserIndex, uint n
 uint			CXboxSystem::SessionStart( XboxHandle_t hSession, uint nFlags, bool bAsync, AsyncHandle_t *pAsyncHandle ) { return 0; };
 uint			CXboxSystem::SessionEnd( XboxHandle_t hSession, bool bAsync, AsyncHandle_t *pAsyncHandle ) { return 0; };
 int				CXboxSystem::SessionJoinLocal( XboxHandle_t hSession, uint nUserCount, const uint *pUserIndexes, const bool *pPrivateSlots, bool bAsync, AsyncHandle_t *pAsyncHandle ) { return 0; }
-int				CXboxSystem::SessionJoinRemote( XboxHandle_t hSession, uint nUserCount, const XUID *pXuids, const bool *pPrivateSlot, bool bAsync, AsyncHandle_t *pAsyncHandle ) { return 0; }
+int				CXboxSystem::SessionJoinRemote( XboxHandle_t hSession, uint nUserCount, const uint64 *pXuids, const bool *pPrivateSlot, bool bAsync, AsyncHandle_t *pAsyncHandle ) { return 0; }
 int				CXboxSystem::SessionLeaveLocal( XboxHandle_t hSession, uint nUserCount, const uint *pUserIndexes, bool bAsync, AsyncHandle_t *pAsyncHandle ) { return 0; }
-int				CXboxSystem::SessionLeaveRemote( XboxHandle_t hSession, uint nUserCount, const XUID *pXuids, bool bAsync, AsyncHandle_t *pAsyncHandle ) { return 0; }
+int				CXboxSystem::SessionLeaveRemote( XboxHandle_t hSession, uint nUserCount, const uint64 *pXuids, bool bAsync, AsyncHandle_t *pAsyncHandle ) { return 0; }
 int				CXboxSystem::SessionMigrate( XboxHandle_t hSession, uint nUserIndex, void *pSessionInfo, bool bAsync, AsyncHandle_t *pAsyncHandle ) { return 0; }
 int				CXboxSystem::SessionArbitrationRegister( XboxHandle_t hSession, uint nFlags, uint64 nonce, uint *pBytes, void *pBuffer, bool bAsync, AsyncHandle_t *pAsyncHandle ) { return 0; }
-int				CXboxSystem::WriteStats( XboxHandle_t hSession, XUID xuid, uint nViews, void* pViews, bool bAsync, AsyncHandle_t *pAsyncHandle ) { return 0; }
+int				CXboxSystem::WriteStats( XboxHandle_t hSession, uint64 xuid, uint nViews, void* pViews, bool bAsync, AsyncHandle_t *pAsyncHandle ) { return 0; }
 int				CXboxSystem::EnumerateAchievements( uint nUserIdx, uint64 xuid, uint nStartingIdx, uint nCount, void *pBuffer, uint nBufferBytes, bool bAsync, AsyncHandle_t *pAsyncHandle ) { return 0; }
 void			CXboxSystem::AwardAchievement( uint nUserIdx, uint nAchievementId ) {}
 void			CXboxSystem::FinishContainerWrites( void ) {}

@@ -138,22 +138,6 @@ void SCR_EndLoadingPlaque( void )
 }
 
 //-----------------------------------------------------------------------------
-// Places TCR required defective media message and halts 
-//-----------------------------------------------------------------------------
-#ifdef _XBOX
-void SCR_FatalDiskError()
-{
-	EngineVGui()->OnDiskError();
-	while ( 1 )
-	{
-		// run the minimal frame to update and paint
-		EngineVGui()->Simulate();
-		V_RenderVGuiOnly();
-	}
-}
-#endif
-
-//-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
 void SCR_CenterPrint (char *str)

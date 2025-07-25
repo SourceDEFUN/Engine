@@ -2035,9 +2035,6 @@ void SV_CreateBaseline (void)
 	// Send SendTable info.
 	if ( sv_sendtables.GetInt() )
 	{
-#ifdef _XBOX
-		Error( "sv_sendtables not allowed on XBOX." );
-#endif
 		sv.m_FullSendTablesBuffer.EnsureCapacity( NET_MAX_PAYLOAD );
 		sv.m_FullSendTables.StartWriting( sv.m_FullSendTablesBuffer.Base(), sv.m_FullSendTablesBuffer.Count() );
 		

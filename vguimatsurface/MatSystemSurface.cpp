@@ -385,7 +385,6 @@ InitReturnVal_t CMatSystemSurface::Init( void )
 	}
 	else
 	{
-		Q_strncpy( language, XBX_GetLanguageString(), sizeof( language ) );
 		bValid = true;
 	}
 

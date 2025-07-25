@@ -43,8 +43,6 @@ enum EPlatform_t
 	PLATFORM_NONE		= 0,
 	PLATFORM_WIN32		= 0x01,
 	PLATFORM_OSX		= 0x02,
-	PLATFORM_XBOX_360	= 0x04,
-	PLATFORM_PS3		= 0x08,
 	PLATFORM_LINUX		= 0x10
 };
 
@@ -54,8 +52,6 @@ DEFINE_ENUM_BITWISE_OPERATORS( EPlatform_t );
 	const EPlatform_t	thisPlatform = PLATFORM_WIN32;
 #elif defined( OSX )
 	const EPlatform_t	thisPlatform = PLATFORM_OSX;
-#elif defined( _PS3 )
-	const EPlatform_t	thisPlatform = PLATFORM_PS3;
 #elif defined ( _LINUX ) || defined(PLATFORM_BSD)
 	const EPlatform_t	thisPlatform = PLATFORM_LINUX;
 #else
@@ -78,8 +74,8 @@ struct VideoSystemInfo_t
 
 static VideoSystemInfo_t s_VideoAppSystems[] = 
 {
-	{ VideoSystem::QUICKTIME,	PLATFORM_WIN32 | PLATFORM_OSX,							"video_quicktime",  VIDEO_SUBSYSTEM_INTERFACE_VERSION },
-	{ VideoSystem::BINK,		PLATFORM_WIN32 | PLATFORM_OSX | PLATFORM_XBOX_360 | PLATFORM_LINUX,		"video_bink",	    VIDEO_SUBSYSTEM_INTERFACE_VERSION },
+	{ VideoSystem::QUICKTIME,	PLATFORM_WIN32 | PLATFORM_OSX,						"video_quicktime",  VIDEO_SUBSYSTEM_INTERFACE_VERSION },
+	{ VideoSystem::BINK,		PLATFORM_WIN32 | PLATFORM_OSX | PLATFORM_LINUX,	"video_bink",	    VIDEO_SUBSYSTEM_INTERFACE_VERSION },
 	//{ VideoSystem::AVI,			PLATFORM_WIN32,											"avi",				VIDEO_SUBSYSTEM_INTERFACE_VERSION },
 	//{ VideoSystem::WMV,			PLATFORM_WIN32,											"wmv",				VIDEO_SUBSYSTEM_INTERFACE_VERSION },
 	{ VideoSystem::WEBM,	PLATFORM_LINUX,							"video_webm",  VIDEO_SUBSYSTEM_INTERFACE_VERSION },

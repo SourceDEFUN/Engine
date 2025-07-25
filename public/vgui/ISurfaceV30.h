@@ -176,12 +176,6 @@ namespace SurfaceV30
 	virtual bool IsTextureIDValid(int id) = 0;
 
 	virtual int CreateNewTextureID( bool procedural = false ) = 0;
-#ifdef _XBOX
-	virtual void DestroyTextureID( int id ) = 0;
-	virtual bool IsCachedForRendering( int id, bool bSyncWait ) = 0;
-	virtual void CopyFrontBufferToBackBuffer() = 0;
-	virtual void UncacheUnusedMaterials() = 0;
-#endif
 
 	virtual void GetScreenSize(int &wide, int &tall) = 0;
 	virtual void SetAsTopMost(vgui::VPANEL panel, bool state) = 0;
@@ -332,9 +326,7 @@ namespace SurfaceV30
 
 	// video mode changing
 	virtual void OnScreenSizeChanged( int nOldWidth, int nOldHeight ) = 0;
-#if !defined( _XBOX )
 	virtual vgui::HCursor	CreateCursorFromFile( char const *curOrAniFile, char const *pPathID = 0 ) = 0;
-#endif
 	// create IVguiMatInfo object ( IMaterial wrapper in VguiMatSurface, NULL in CWin32Surface )
 	virtual IVguiMatInfo *DrawGetTextureMatInfoFactory( int id ) = 0;
 

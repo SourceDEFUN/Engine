@@ -2026,10 +2026,6 @@ void CProtoSniper::StartTask( const Task_t *pTask )
 			if( GetEnemy()->IsPlayer() )
 			{
 				float delay = 0;
-#ifdef _XBOX
-				delay += sniper_xbox_delay.GetFloat();
-#endif
-
 				if( gpGlobals->curtime - m_flTimeLastAttackedPlayer <= SNIPER_FASTER_ATTACK_PERIOD )
 				{
 					SetWait( SNIPER_SUBSEQUENT_PAINT_TIME + delay );

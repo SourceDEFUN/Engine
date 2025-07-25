@@ -145,7 +145,7 @@ bool CMatchmaking::SearchForSession()
 	// Call once to get the necessary buffer size
 	ret = g_pXboxSystem->SessionSearch( 
 		SESSION_MATCH_QUERY_PLAYER_MATCH,
-		XBX_GetPrimaryUserId(),
+		0,
 		MAX_SEARCHRESULTS,
 		1,
 		0,
@@ -163,7 +163,7 @@ bool CMatchmaking::SearchForSession()
 	m_pSearchResults = (XSESSION_SEARCHRESULT_HEADER*)malloc( cbResultsBytes );
 	ret = g_pXboxSystem->SessionSearch( 
 		SESSION_MATCH_QUERY_PLAYER_MATCH,	// Procedure index
-		XBX_GetPrimaryUserId(),				// User index
+		0,				// User index
 		MAX_SEARCHRESULTS,					// Maximum results
 		m_Local.m_cPlayers,					// Number of local players
  		m_SessionProperties.Count(),		// Number of properties

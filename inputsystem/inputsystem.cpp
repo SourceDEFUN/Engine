@@ -939,9 +939,6 @@ void CInputSystem::SetPrimaryUserId( int userId )
 	{
 		m_PrimaryUserId = userId;
 	}
-#if !defined(POSIX)
-	XBX_SetPrimaryUserId( m_PrimaryUserId );
-#endif
 	ConMsg("PrimaryUserId is %d\n", m_PrimaryUserId );
 }
 

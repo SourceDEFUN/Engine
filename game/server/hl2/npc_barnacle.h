@@ -184,9 +184,7 @@ private:
 	int							m_nShakeCount;
 
 	float						m_flNextBloodTime;
-#ifndef _XBOX
 	int							m_nBloodColor;
-#endif
 	Vector						m_vecBloodPos;
 
 	float						m_flBarnaclePullSpeed;

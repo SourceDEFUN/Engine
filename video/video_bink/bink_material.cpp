@@ -406,8 +406,6 @@ VideoResult_t CBinkMaterial::SoundDeviceCommand( VideoSoundDeviceOperation_t ope
 			return SetResult( VideoResult::OPERATION_NOT_SUPPORTED );
 #endif
 		}
-		case VideoSoundDeviceOperation::SET_LIB_AUDIO_DEVICE:
-		case VideoSoundDeviceOperation::HOOK_X_AUDIO:
 		case VideoSoundDeviceOperation::SET_MILES_SOUND_DEVICE:
 		{
 			return SetResult( VideoResult::OPERATION_NOT_SUPPORTED );

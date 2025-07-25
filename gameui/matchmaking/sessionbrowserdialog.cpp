@@ -261,7 +261,7 @@ void CSessionBrowserDialog::SwapMenuItems( int iOne, int iTwo )
 	Swap( m_GameTimes, iOne, iTwo );
 
 	// swap the XUIDs, too
-	XUID temp = m_XUIDs[iOne];
+	uint64 temp = m_XUIDs[iOne];
 	m_XUIDs[iOne] = m_XUIDs[iTwo];
 	m_XUIDs[iTwo] = temp;
 }

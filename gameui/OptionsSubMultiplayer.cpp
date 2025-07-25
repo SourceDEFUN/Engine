@@ -1212,13 +1212,11 @@ void COptionsSubMultiplayer::OnCommand( const char *command )
 {
 	if ( !stricmp( command, "Advanced" ) )
 	{
-#ifndef _XBOX
 		if (!m_hMultiplayerAdvancedDialog.Get())
 		{
 			m_hMultiplayerAdvancedDialog = new CMultiplayerAdvancedDialog( this );
 		}
 		m_hMultiplayerAdvancedDialog->Activate();
-#endif
 	}
 	else if (!stricmp( command, "ImportSprayImage" ) )
 	{
@@ -1318,7 +1316,6 @@ void COptionsSubMultiplayer::ConversionError( ConversionErrorType nError )
 
 void COptionsSubMultiplayer::OnFileSelected(const char *fullpath)
 {
-#ifndef _XBOX
 	// this can take a while, put up a waiting cursor
 	surface()->SetCursor(dc_hourglass);
 
@@ -1342,7 +1339,6 @@ void COptionsSubMultiplayer::OnFileSelected(const char *fullpath)
 
 	// change the cursor back to normal
 	surface()->SetCursor(dc_user);
-#endif
 }
 
 struct ValveJpegErrorHandler_t 

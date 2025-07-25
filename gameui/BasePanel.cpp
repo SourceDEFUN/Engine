@@ -2005,8 +2005,6 @@ void CBasePanel::RunMenuCommand(const char *command)
 		m_bUserRefusedStorageDevice = true;
 		IssuePostPromptCommand();
 
-		// Set us as declined
-		XBX_SetStorageDeviceId( XBX_STORAGE_DECLINED );
 		m_iStorageID = XBX_INVALID_STORAGE_ID;
 
 		if ( m_pStorageDeviceValidatedNotify )
@@ -2014,10 +2012,6 @@ void CBasePanel::RunMenuCommand(const char *command)
 			*m_pStorageDeviceValidatedNotify = 2;
 			m_pStorageDeviceValidatedNotify = NULL;
 		}
-	}
-	else if ( !Q_stricmp( command, "clear_storage_deviceID" ) )
-	{
-		XBX_SetStorageDeviceId( XBX_STORAGE_DECLINED );
 	}
 	else if ( !Q_stricmp( command, "RestartWithNewLanguage" ) )
 	{
@@ -2286,9 +2280,6 @@ void CBasePanel::OnCompletedAsyncDeviceAttached( CAsyncCtxOnDeviceAttached *job 
 	uint nRet = job->GetContainerOpenResult();
 	if ( nRet != ERROR_SUCCESS )
 	{
-		// Invalidate the device
-		XBX_SetStorageDeviceId( XBX_INVALID_STORAGE_ID );
-
 		// FIXME: We don't know which device failed!
 		// Pop a dialog explaining that the user's data is corrupt
 		BasePanel()->ShowMessageDialog( MD_STORAGE_DEVICES_CORRUPT );
@@ -2378,8 +2369,9 @@ bool CBasePanel::HandleStorageDeviceRequest( const char *command )
 		return true;
 
 	// If we have a valid storage device, there's nothing to prompt for
-	if ( XBX_GetStorageDeviceId() != XBX_INVALID_STORAGE_ID && XBX_GetStorageDeviceId() != XBX_STORAGE_DECLINED )
-		return true;
+	return true;
+	// Secton TODO: so, it returns true, because of stub it'll do so anyway,
+	//              so maybe remove the latter lines?
 
 	// If we have a post-prompt command, we're coming back into the call from that prompt
 	bool bQueuedCall = ( m_strPostPromptCommand.IsEmpty() == false );
@@ -2403,18 +2395,6 @@ bool CBasePanel::HandleStorageDeviceRequest( const char *command )
 		// If the user refused the sign-in and we respect that on this command, we're done
 		if ( m_bUserRefusedStorageDevice && CommandRespectsSignInDenied( command ) )
 			return true;
-
-#if 0 // This attempts to find user data, but may not be cert-worthy even though it's a bit nicer for the user
-		// Attempt to automatically find a device
-		DWORD nFoundDevice = xboxsystem->DiscoverUserData( XBX_GetPrimaryUserId(), COM_GetModDirectory() );
-		if ( nFoundDevice != XBX_INVALID_STORAGE_ID )
-		{
-			// Take this device
-			XBX_SetStorageDeviceId( nFoundDevice );
-			OnDeviceAttached();
-			return true;
-		}
-#endif // 
 
 		// If the message is required first, then do that instead
 		if ( CommandRequiresStorageDevice( command ) )
@@ -3221,9 +3201,6 @@ void CBasePanel::SystemNotification( const int notification )
 					else
 					{
 						m_bNeedStorageDeviceHandle = false;
-
-						// Set the storage device
-						XBX_SetStorageDeviceId( m_iStorageID );
 						OnDeviceAttached();
 					}
 				}

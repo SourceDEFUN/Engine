@@ -61,7 +61,6 @@ void CTGAImagePanel::Paint()
 
 		// load the file
 		CUtlMemory<unsigned char> tga;
-#ifndef _XBOX
 		if ( TGALoader::LoadRGBA8888( m_szTGAName, tga, m_iImageWidth, m_iImageHeight ) )
 		{
 			// set the textureID
@@ -82,7 +81,6 @@ void CTGAImagePanel::Paint()
 			SetSize(m_iImageWidth, m_iImageHeight);
 		}
 		else
-#endif
 		{
 			m_bHasValidTexture = false;
 		}

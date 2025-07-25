@@ -11,10 +11,10 @@ public:
 	virtual bool IsHeadsetPresent( int iController ) { return false; }
 	virtual bool IsLocalPlayerTalking( int iController ) { return false; }
 
-	virtual void AddPlayerToVoiceList( XUID xPlayer, int iController ) {}
-	virtual void RemovePlayerFromVoiceList( XUID xPlayer, int iController ) {}
+	virtual void AddPlayerToVoiceList( uint64 xPlayer, int iController ) {}
+	virtual void RemovePlayerFromVoiceList( uint64 xPlayer, int iController ) {}
 
-	virtual void GetRemoteTalkers( int *pNumTalkers, XUID *pRemoteTalkers )
+	virtual void GetRemoteTalkers( int *pNumTalkers, uint64 *pRemoteTalkers )
 	{
 		if ( pNumTalkers )
 			*pNumTalkers = 0;
@@ -30,8 +30,8 @@ public:
 	}
 	virtual void VoiceResetLocalData( int iController ) {}
 
-	virtual void SetPlaybackPriority( XUID remoteTalker, int iController, int iAllowPlayback ) {}
-	virtual void PlayIncomingVoiceData( XUID xuid, const byte *pbData, unsigned int dwDataSize, const bool *bAudiblePlayers = NULL ) {}
+	virtual void SetPlaybackPriority( uint64 remoteTalker, int iController, int iAllowPlayback ) {}
+	virtual void PlayIncomingVoiceData( uint64 xuid, const byte *pbData, unsigned int dwDataSize, const bool *bAudiblePlayers = NULL ) {}
 
 	virtual void RemoveAllTalkers() {}
 };

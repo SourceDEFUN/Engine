@@ -203,7 +203,7 @@ CON_COMMAND( BindToggle, "Performs a bind <key> \"increment var <cvar> 0 1 1\"" 
 	Q_snprintf( newCmd, sizeof(newCmd), "bind %s \"incrementvar %s 0 1 1\"\n", args[1], args[2] );
 
 	Cbuf_InsertText( newCmd );
-
+}
 
 //-----------------------------------------------------------------------------
 // Init, shutdown

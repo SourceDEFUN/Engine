@@ -146,7 +146,7 @@ void CBasePresence::DebugUserSetContext( const CCommand &args )
 {
 	if ( args.ArgC() == 3 )
 	{
-		UserSetContext( XBX_GetPrimaryUserId(), atoi( args.Arg( 1 ) ), atoi( args.Arg( 2 ) ) );
+		UserSetContext( 0, atoi( args.Arg( 1 ) ), atoi( args.Arg( 2 ) ) );
 	}
 	else
 	{
@@ -158,7 +158,7 @@ void CBasePresence::DebugUserSetProperty( const CCommand &args )
 	if ( args.ArgC() == 3 )
 	{
 		int value = atoi( args.Arg( 2 ) );
-		UserSetProperty( XBX_GetPrimaryUserId(), strtoul( args.Arg( 1 ), NULL, 0 ), sizeof(int), &value );
+		UserSetProperty( 0, strtoul( args.Arg( 1 ), NULL, 0 ), sizeof(int), &value );
 	}
 	else
 	{

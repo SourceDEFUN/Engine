@@ -44,7 +44,6 @@ float GUST_LIFETIME_MAX = 3;
 
 float MIN_SCREENSPACE_RAIN_WIDTH = 1;
 
-#ifndef _XBOX
 ConVar r_RainHack( "r_RainHack", "0", FCVAR_CHEAT );
 ConVar r_RainRadius( "r_RainRadius", "1500", FCVAR_CHEAT );
 ConVar r_RainSideVel( "r_RainSideVel", "130", FCVAR_CHEAT, "How much sideways velocity rain gets." );
@@ -1160,14 +1159,6 @@ public:
 	bool m_bLevelInitted;
 };
 CPrecipHack g_PrecipHack( "CPrecipHack" );
-
-#else
-
-void DrawPrecipitation()
-{
-}
-
-#endif	// _XBOX
 
 //-----------------------------------------------------------------------------
 // EnvWind - global wind info

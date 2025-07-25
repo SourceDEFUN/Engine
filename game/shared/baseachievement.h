@@ -134,7 +134,7 @@ protected:
 	int	m_iGoal;										// goal # of steps to award this achievement
 	int m_iProgressMsgIncrement;						// after how many steps show we show a progress notification
 	int m_iProgressMsgMinimum;							// the minimum progress needed before showing progress notification
-	int m_iPointValue;									// # of points this achievement is worth (currently only used for XBox Live)
+	int m_iPointValue;									// # of points this achievement is worth
 	bool m_bHideUntilAchieved;							// should this achievement be hidden until achieved?
 	bool m_bStoreProgressInSteam;						// should incremental progress be stored in Steam.  A counter with same name as achievement must be set up in Steam.
 	const char *m_pInflictorClassNameFilter;			// if non-NULL, inflictor class name to filter with

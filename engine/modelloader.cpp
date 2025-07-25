@@ -3747,10 +3747,8 @@ void CModelLoader::ReloadFilesInList( IFileList *pFilesToReload )
 			// Get the studiohdr into the cache
 			g_pMDLCache->GetStudioHdr( pModel->studio );
 
-#ifndef _XBOX
 			// force the collision to load
 			g_pMDLCache->GetVCollide( pModel->studio );
-#endif
 		}
 		else
 		{

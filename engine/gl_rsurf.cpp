@@ -3291,22 +3291,12 @@ void Shader_DrawLightmapPageSurface( SurfaceHandle_t surfID, float red, float gr
 
 			x = lightmapPageWidth * texCoord[0];
 			y = lightmapPageHeight * texCoord[1];
-#ifdef _XBOX
-			// xboxissue - border safe
-			x += 32;
-			y += 32;
-#endif			
 			meshBuilder.Position3f( x, y, 0.0f );
 			meshBuilder.AdvanceVertex();
 
 			texCoord = &lightCoords[(i+1)%MSurf_VertCount( surfID )][bumpID][0];
 			x = lightmapPageWidth * texCoord[0];
 			y = lightmapPageHeight * texCoord[1];
-#ifdef _XBOX
-			// xboxissue - border safe
-			x += 32;
-			y += 32;
-#endif			
 			meshBuilder.Position3f( x, y, 0.0f );
 			meshBuilder.AdvanceVertex();
 		}

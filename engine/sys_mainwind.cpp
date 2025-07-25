@@ -309,18 +309,6 @@ void CGame::AppActivate( bool fActive )
 #endif // SWDS
 	SetActiveApp( fActive );
 
-#ifdef _XBOX
-	if ( host_initialized )
-	{
-		ClearIOStates();
-		if ( fActive )
-		{
-			UpdateMaterialSystemConfig();
-		}
-	}
-	SetActiveApp( fActive );
-#endif
-
 	// Allow queueing of activation events
 	SetCanPostActivateEvents( true );
 }

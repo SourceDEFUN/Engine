@@ -532,7 +532,6 @@ public:
 	virtual bool				IsSaveInProgress();
 	
 	virtual uint				OnStorageDeviceAttached( void );
-	virtual void				OnStorageDeviceDetached( void );
 
 	virtual void				ResetDemoInterpolation( void );
 
@@ -1541,15 +1540,6 @@ extern IXboxSystem *g_pXboxSystem;
 uint CEngineClient::OnStorageDeviceAttached( void )
 {
 	return g_pXboxSystem->OpenContainers();
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-void CEngineClient::OnStorageDeviceDetached( void )
-{
-	XBX_SetStorageDeviceId( XBX_INVALID_STORAGE_ID );
-	g_pXboxSystem->CloseContainers();
 }
 
 void CEngineClient::ResetDemoInterpolation( void )

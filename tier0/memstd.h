@@ -52,8 +52,8 @@
 // 	gated on other performance issues, and the SBH doesn't give us any win, so I've disabled it for now.
 // Once those perf issues are worked out, it might make sense to do perf tests with SBH, libc, and tcmalloc.
 //
-//$ #if defined( _WIN32 ) || defined( _PS3 ) || defined( LINUX )
-#if defined( _WIN32 ) || defined( _PS3 )
+//$ #if defined( _WIN32 ) || defined( LINUX )
+#if defined( _WIN32 )
 #define MEM_SBH_ENABLED 1
 #endif
 

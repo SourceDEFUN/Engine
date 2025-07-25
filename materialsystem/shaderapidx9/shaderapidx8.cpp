@@ -5738,7 +5738,7 @@ FORCEINLINE void CShaderAPIDx8::SetVertexShaderConstantInternal( int var, float 
 	Assert( numVecs > 0 );
 	Assert( pVec );
 
-	if ( IsPC() || IsPS3() )
+	if ( IsPC() )
 	{
 		Assert( var + numVecs <= g_pHardwareConfig->NumVertexShaderConstants() );
 
@@ -5823,7 +5823,7 @@ FORCEINLINE void CShaderAPIDx8::SetPixelShaderConstantInternal( int nStartConst,
 {
 	Assert( nStartConst + nNumConsts <= g_pHardwareConfig->NumPixelShaderConstants() );
 
-	if ( IsPC() || IsPS3() )
+	if ( IsPC() )
 	{
 		if ( !bForce )
 		{
@@ -6469,19 +6469,6 @@ ShaderAPITextureHandle_t CShaderAPIDx8::CreateDepthTexture(
 		}
 		Assert( 0 );
 	}
-
-#ifdef _XBOX
-	D3DSURFACE_DESC desc;
-	hr = pTexture->GetDepthStencilSurface()->GetDesc( &desc );
-	Assert( !FAILED( hr ) );
-
-	pTexture->m_nTimesBoundThisFrame = 0;
-	pTexture->m_StaticSizeBytes  = desc.Size;
-	pTexture->m_DynamicSizeBytes = 0;
-	pTexture->m_DebugName        = pDebugName;
-	pTexture->m_TextureGroupName = TEXTURE_GROUP_RENDER_TARGET;
-	pTexture->SetImageFormat( IMAGE_FORMAT_UNKNOWN );
-#endif
 
 	return i;
 }

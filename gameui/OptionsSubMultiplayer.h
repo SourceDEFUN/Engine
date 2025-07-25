@@ -104,9 +104,7 @@ private:
 	int	m_nLogoG;
 	int	m_nLogoB;
 
-#ifndef _XBOX
 	vgui::DHANDLE<CMultiplayerAdvancedDialog> m_hMultiplayerAdvancedDialog;
-#endif
 	vgui::FileOpenDialog *m_hImportSprayDialog;
 };
 

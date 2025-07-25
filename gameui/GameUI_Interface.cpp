@@ -183,7 +183,7 @@ void CGameUI::Initialize( CreateInterfaceFn factory )
 	enginesurfacefuncs = (vgui::ISurface *)factory(VGUI_SURFACE_INTERFACE_VERSION, NULL);
 	gameuifuncs = (IGameUIFuncs *)factory( VENGINE_GAMEUIFUNCS_VERSION, NULL );
 	matchmaking = (IMatchmaking *)factory( VENGINE_MATCHMAKING_VERSION, NULL );
-	xboxsystem = (IXboxSystem *)factory( XBOXSYSTEM_INTERFACE_VERSION, NULL );
+	xboxsystem = (IXboxSystem *)factory( "XboxSystemInterface001", NULL );
 	g_pEngineClientReplay = (IEngineClientReplay *)factory( ENGINE_REPLAY_CLIENT_INTERFACE_VERSION, NULL );
 
 	if ( ModInfo().SupportsVR() && CommandLine()->CheckParm( "-vr" ) )

@@ -227,7 +227,6 @@ static inline void SV_PackEntity(
 			}
 		}
 
-#ifndef _XBOX	
 #if defined( REPLAY_ENABLED )
 		if ( (hltv && hltv->IsActive()) || (replay && replay->IsActive()) )
 #else
@@ -240,7 +239,6 @@ static inline void SV_PackEntity(
 			pChangeFrame = pChangeFrame->Copy(); // allocs and copies ChangeFrameList
 		}
 		else
-#endif
 		{
 			// Ok, now snag the changeframe from the previous frame and update the 'last frame changed'
 			// for the properties in the delta.
@@ -275,7 +273,6 @@ static inline void SV_PackEntity(
 // in HLTV mode we ALWAYS have to store position and PVS info, even if entity didnt change
 void SV_FillHLTVData( CFrameSnapshot *pSnapshot, edict_t *edict, int iValidEdict )
 {
-#if !defined( _XBOX )
 	if ( pSnapshot->m_pHLTVEntityData && edict )
 	{
 		CHLTVEntityData *pHLTVData = &pSnapshot->m_pHLTVEntityData[iValidEdict];
@@ -298,13 +295,11 @@ void SV_FillHLTVData( CFrameSnapshot *pSnapshot, edict_t *edict, int iValidEdict
 		pHLTVData->origin[1] = pvsInfo->m_vCenter[1];
 		pHLTVData->origin[2] = pvsInfo->m_vCenter[2];
 	}
-#endif
 }
 
 // in Replay mode we ALWAYS have to store position and PVS info, even if entity didnt change
 void SV_FillReplayData( CFrameSnapshot *pSnapshot, edict_t *edict, int iValidEdict )
 {
-#if !defined( _XBOX )
 	if ( pSnapshot->m_pReplayEntityData && edict )
 	{
 		CReplayEntityData *pReplayData = &pSnapshot->m_pReplayEntityData[iValidEdict];
@@ -327,7 +322,6 @@ void SV_FillReplayData( CFrameSnapshot *pSnapshot, edict_t *edict, int iValidEdi
 		pReplayData->origin[1] = pvsInfo->m_vCenter[1];
 		pReplayData->origin[2] = pvsInfo->m_vCenter[2];
 	}
-#endif
 }
 
 // Returns the SendTable that should be used with the specified edict.

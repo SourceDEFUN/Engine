@@ -1191,7 +1191,7 @@ bool CMaterial::ShouldSkipVar( KeyValues *pVar, bool *pWasConditional )
 		}
 		else if ( ! stricmp( pCond, "gameconsole" ) )
 		{
-			bShouldSkip = !IsGameConsole();
+			bShouldSkip = true;
 		}
 		else
 		{

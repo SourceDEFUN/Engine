@@ -986,11 +986,9 @@ void UTIL_StringToColor32( color32 *color, const char *pString )
 	color->a = tmp[3];
 }
 
-#ifndef _XBOX
 void UTIL_DecodeICE( unsigned char * buffer, int size, const unsigned char *key)
 {
-	if ( !key )
-		return;
+	if ( !key ) return;
 
 	IceKey ice( 0 ); // level 0 = 64bit key
 	ice.set( key ); // set key
@@ -1014,7 +1012,6 @@ void UTIL_DecodeICE( unsigned char * buffer, int size, const unsigned char *key)
 	// copy encrypted data back to original buffer
 	Q_memcpy( buffer, temp, size-bytesLeft );
 }
-#endif
 
 // work-around since client header doesn't like inlined gpGlobals->curtime
 float IntervalTimer::Now( void ) const

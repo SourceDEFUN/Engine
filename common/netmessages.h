@@ -795,7 +795,7 @@ class MM_ClientInfo : public CNetMessage
 public:
 	DECLARE_MM_MESSAGE( ClientInfo );
 
-	XNADDR	m_xnaddr;	// xbox net address
+	int	m_xnaddr;	// xbox net address
 	uint64	m_id;		// machine ID
 	uint64	m_xuids[MAX_PLAYERS_PER_CLIENT];
 	byte	m_cVoiceState[MAX_PLAYERS_PER_CLIENT];
@@ -820,9 +820,9 @@ public:
 	uint64	m_id;
 	byte	m_cPlayers;
 	byte	m_cRemoteTalkers[MAX_PLAYERS_PER_CLIENT];
-	XUID	m_xuid[MAX_PLAYERS_PER_CLIENT];
+	uint64	m_xuid[MAX_PLAYERS_PER_CLIENT];
 	byte	m_cMuted[MAX_PLAYERS_PER_CLIENT];
-	CUtlVector< XUID >	m_Muted[MAX_PLAYERS_PER_CLIENT];
+	CUtlVector< uint64 >	m_Muted[MAX_PLAYERS_PER_CLIENT];
 };
 
 class MM_Checkpoint : public CNetMessage
@@ -897,7 +897,7 @@ public:
 	byte	m_MsgType;
 	uint64	m_Id;
 	XNKID	m_sessionId; 
-	XNADDR	m_xnaddr;  
+	int	m_xnaddr;  
 	XNKEY	m_key;
 };
 

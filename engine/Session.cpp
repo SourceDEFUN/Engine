@@ -89,11 +89,11 @@ void CSession::ResetSession()
 //-----------------------------------------------------------------------------
 void CSession::SetContext( const uint nContextId, const uint nContextValue, const bool bAsync )
 {
-	g_pXboxSystem->UserSetContext( XBX_GetPrimaryUserId(), nContextId, nContextValue, bAsync );
+	g_pXboxSystem->UserSetContext( 0, nContextId, nContextValue, bAsync );
 }
 void CSession::SetProperty( const uint nPropertyId, const uint cbValue, const void *pvValue, const bool bAsync )
 {
-	g_pXboxSystem->UserSetProperty( XBX_GetPrimaryUserId(), nPropertyId, cbValue, pvValue, bAsync );
+	g_pXboxSystem->UserSetProperty( 0, nPropertyId, cbValue, pvValue, bAsync );
 }
 
 //-----------------------------------------------------------------------------
@@ -175,7 +175,7 @@ void CSession::JoinLocal( const CClientInfo *pClient )
 //-----------------------------------------------------------------------------
 void CSession::JoinRemote( const CClientInfo *pClient )
 {
-	XUID  xuids[MAX_PLAYERS_PER_CLIENT] = {0};
+	uint64  xuids[MAX_PLAYERS_PER_CLIENT] = {0};
 	bool  bPrivate[MAX_PLAYERS_PER_CLIENT] = {0};
 
 	for( int i = 0; i < pClient->m_cPlayers; ++i )
@@ -227,7 +227,7 @@ void CSession::RemoveLocal( const CClientInfo *pClient )
 //-----------------------------------------------------------------------------
 void CSession::RemoveRemote( const CClientInfo *pClient )
 {
-	XUID  xuids[MAX_PLAYERS_PER_CLIENT] = {0};
+	uint64  xuids[MAX_PLAYERS_PER_CLIENT] = {0};
 
 	for( int i = 0; i < pClient->m_cPlayers; ++i )
 	{
@@ -260,21 +260,14 @@ bool CSession::CreateSession()
 	}
 
 	uint flags = m_nSessionFlags;
-	if( m_bIsHost )
-	{
-		flags |= XSESSION_CREATE_HOST;
-	}
-
-	if ( flags & XSESSION_CREATE_USES_ARBITRATION )
-	{
-		m_bIsArbitrated = true;
-	}
+	if ( m_bIsHost ) flags |= 0;
+	if ( flags & 0 ) m_bIsArbitrated = true;
 
 	m_hCreateHandle = g_pXboxSystem->CreateAsyncHandle();
 
 	// Create the session
  	uint ret = g_pXboxSystem->CreateSession( flags,
-											 XBX_GetPrimaryUserId(),
+											 0,
 											 m_nPlayerSlots[SLOTS_TOTALPUBLIC],
 											 m_nPlayerSlots[SLOTS_TOTALPRIVATE],
 											 &m_SessionNonce,

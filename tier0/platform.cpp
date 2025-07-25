@@ -164,9 +164,6 @@ void Plat_ExitProcess( int nCode )
 		int *x = NULL; *x = 1; // cause a hard crash, GC is not allowed to exit voluntarily from gc.dll
 	}
 	TerminateProcess( GetCurrentProcess(), nCode );
-#elif defined(_PS3)
-	// We do not use this path to exit on PS3 (naturally), rather we want a clear crash:
-	int *x = NULL; *x = 1;
 #else	
 	_exit( nCode );
 #endif

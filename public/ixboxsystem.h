@@ -56,14 +56,14 @@ public:
 	virtual uint			SessionStart( XboxHandle_t hSession, uint nFlags, bool bAsync, AsyncHandle_t *pAsyncHandle = NULL ) = 0;
 	virtual uint			SessionEnd( XboxHandle_t hSession, bool bAsync, AsyncHandle_t *pAsyncHandle = NULL ) = 0;
 	virtual int				SessionJoinLocal( XboxHandle_t hSession, uint nUserCount, const uint *pUserIndexes, const bool *pPrivateSlots, bool bAsync, AsyncHandle_t *pAsyncHandle = NULL ) = 0;
-	virtual int				SessionJoinRemote( XboxHandle_t hSession, uint nUserCount, const XUID *pXuids, const bool *pPrivateSlots, bool bAsync, AsyncHandle_t *pAsyncHandle = NULL ) = 0;
+	virtual int				SessionJoinRemote( XboxHandle_t hSession, uint nUserCount, const uint64 *pXuids, const bool *pPrivateSlots, bool bAsync, AsyncHandle_t *pAsyncHandle = NULL ) = 0;
 	virtual int				SessionLeaveLocal( XboxHandle_t hSession, uint nUserCount, const uint *pUserIndexes, bool bAsync, AsyncHandle_t *pAsyncHandle = NULL ) = 0;
-	virtual int				SessionLeaveRemote( XboxHandle_t hSession, uint nUserCount, const XUID *pXuids, bool bAsync, AsyncHandle_t *pAsyncHandle = NULL ) = 0;
+	virtual int				SessionLeaveRemote( XboxHandle_t hSession, uint nUserCount, const uint64 *pXuids, bool bAsync, AsyncHandle_t *pAsyncHandle = NULL ) = 0;
 	virtual int				SessionMigrate( XboxHandle_t hSession, uint nUserIndex, void *pSessionInfo, bool bAsync, AsyncHandle_t *pAsyncHandle = NULL ) = 0;
 	virtual int				SessionArbitrationRegister( XboxHandle_t hSession, uint nFlags, uint64 nonce, uint *pBytes, void *pBuffer, bool bAsync, AsyncHandle_t *pAsyncHandle = NULL ) = 0;
 
 	// Stats
-	virtual int				WriteStats( XboxHandle_t hSession, XUID xuid, uint nViews, void* pViews, bool bAsync, AsyncHandle_t *pAsyncHandle = NULL ) = 0;
+	virtual int				WriteStats( XboxHandle_t hSession, uint64 xuid, uint nViews, void* pViews, bool bAsync, AsyncHandle_t *pAsyncHandle = NULL ) = 0;
 
 	// Achievements
 	virtual int				EnumerateAchievements( uint nUserIdx, uint64 xuid, uint nStartingIdx, uint nCount, void *pBuffer, uint nBufferBytes, bool bAsync = true, AsyncHandle_t *pAsyncHandle = NULL ) = 0;
@@ -74,7 +74,4 @@ public:
 	virtual uint			OpenContainers( void ) = 0;
 	virtual void			CloseContainers( void ) = 0;
 };
-
-#define XBOXSYSTEM_INTERFACE_VERSION	"XboxSystemInterface001"
-
 #endif // IXBOXSYSTEM_H

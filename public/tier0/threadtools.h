@@ -14,7 +14,7 @@
 #include "tier0/platform.h"
 #include "tier0/dbg.h"
 
-#if defined( POSIX ) && !defined( _PS3 )
+#if defined( POSIX )
 #include <pthread.h>
 #include <errno.h>
 #define WAIT_OBJECT_0 0
@@ -23,16 +23,9 @@
 #define THREAD_PRIORITY_HIGHEST 2
 #endif
 
-#if !defined( _PS3 ) && defined(COMPILER_MSVC)
+#if defined(COMPILER_MSVC)
 // For _ReadWriteBarrier()
 #include <intrin.h>
-#endif
-
-#if defined( _PS3 )
-#include <sys/ppu_thread.h>
-#include <sys/synchronization.h>
-#include <cell/atomic.h>
-#include <sys/timer.h>
 #endif
 
 #ifdef OSX
@@ -42,11 +35,6 @@
 #define PTHREAD_MUTEX_ERRORCHECK_NP    PTHREAD_MUTEX_ERRORCHECK
 #define PTHREAD_MUTEX_ADAPTIVE_NP      3
 #endif
-
-#ifdef _PS3
-#define PS3_SYS_PPU_THREAD_COMMON_STACK_SIZE ( 256 * 1024 )
-#endif
-
 
 #if defined( _WIN32 )
 #pragma once
@@ -81,13 +69,7 @@ typedef void *HANDLE;
 // Start thread running  - error if already running
 enum ThreadPriorityEnum_t
 {
-#if defined( PLATFORM_PS3 )
-	TP_PRIORITY_NORMAL  = 1001,
-	TP_PRIORITY_HIGH = 100,
-	TP_PRIORITY_LOW = 2001,
-	TP_PRIORITY_DEFAULT = 1001
-#error "Need PRIORITY_LOWEST/HIGHEST"
-#elif defined( LINUX )
+#if defined( LINUX )
     // We can use nice on Linux threads to change scheduling.
     // pthreads on Linux only allows priority setting on
     // real-time threads.
@@ -99,14 +81,14 @@ enum ThreadPriorityEnum_t
 	TP_PRIORITY_LOW = 10,
 	TP_PRIORITY_HIGHEST = -20,
 	TP_PRIORITY_LOWEST = 19,
-#else  // PLATFORM_PS3
+#else
 	TP_PRIORITY_DEFAULT = 0,	//	THREAD_PRIORITY_NORMAL
 	TP_PRIORITY_NORMAL = 0,	//	THREAD_PRIORITY_NORMAL
 	TP_PRIORITY_HIGH = 1,	//	THREAD_PRIORITY_ABOVE_NORMAL
 	TP_PRIORITY_LOW = -1,	//	THREAD_PRIORITY_BELOW_NORMAL
 	TP_PRIORITY_HIGHEST = 2,	//	THREAD_PRIORITY_HIGHEST
 	TP_PRIORITY_LOWEST = -2,	//	THREAD_PRIORITY_LOWEST 
-#endif // PLATFORM_PS3
+#endif
 };
 
 #if defined( LINUX )
@@ -129,43 +111,9 @@ enum ThreadPriorityEnum_t
 
 extern bool gbCheckNotMultithreaded;
 
-#ifdef _PS3
+#define CHECK_NOT_MULTITHREADED()
 
-#define USE_INTRINSIC_INTERLOCKED
-
-#define CHECK_NOT_MULTITHREADED()														\
-{																						\
-	static int init = 0;																\
-	static sys_ppu_thread_t threadIDPrev;												\
-																						\
-	if (!init)																			\
-	{																					\
-		sys_ppu_thread_get_id(&threadIDPrev);											\
-		init = 1;																		\
-	}																					\
-	else if (gbCheckNotMultithreaded)													\
-	{																					\
-		sys_ppu_thread_t threadID;														\
-		sys_ppu_thread_get_id(&threadID);												\
-		if (threadID != threadIDPrev)													\
-		{																				\
-			printf("CHECK_NOT_MULTITHREADED: prev thread = %x, cur thread = %x\n",		\
-				(uint)threadIDPrev, (uint)threadID);												\
-			*(int*)0 = 0;																\
-		}																				\
-	}																					\
-}
-
-#else // _PS3
-	#define CHECK_NOT_MULTITHREADED()
-#endif // _PS3
-
-#if defined( _PS3 )
-#define MAX_THREADS_SUPPORTED 16
-#else
 #define MAX_THREADS_SUPPORTED 32 // Secton: huh?
-#endif
-
 
 
 //-----------------------------------------------------------------------------
@@ -188,13 +136,8 @@ FORWARD_DECLARE_HANDLE( ThreadHandle_t );
 #endif // !COMPILER_SNC
 typedef uintp (*ThreadFunc_t)( void *pParam );
 
-#if defined( _PS3 )
-PLATFORM_OVERLOAD ThreadHandle_t CreateSimpleThread( ThreadFunc_t, void *pParam, ThreadId_t *pID, unsigned stackSize = 0x10000 /*64*/ );
-PLATFORM_INTERFACE ThreadHandle_t CreateSimpleThread( ThreadFunc_t, void *pParam, unsigned stackSize = 0x10000 /*64*/ );
-#else //_PS3
 PLATFORM_OVERLOAD ThreadHandle_t CreateSimpleThread( ThreadFunc_t, void *pParam, ThreadId_t *pID, unsigned stackSize = 0 );
 PLATFORM_INTERFACE ThreadHandle_t CreateSimpleThread( ThreadFunc_t, void *pParam, unsigned stackSize = 0 );
-#endif //_PS3
 PLATFORM_INTERFACE bool ReleaseThreadHandle( ThreadHandle_t );
 
 
@@ -220,9 +163,7 @@ DLL_IMPORT unsigned long STDCALL GetCurrentThreadId();
 
 inline void ThreadPause()
 {
-#if defined( COMPILER_PS3 )
-	__db16cyc();
-#elif defined( COMPILER_GCC ) && (defined( __i386__ ) || defined( __x86_64__ ))
+#if defined( COMPILER_GCC ) && (defined( __i386__ ) || defined( __x86_64__ ))
 	__asm __volatile( "pause" );
 #elif defined( POSIX )
         sched_yield();
@@ -230,11 +171,6 @@ inline void ThreadPause()
 	_mm_pause();
 #elif defined( COMPILER_MSVC32 )
 	__asm pause;
-#elif defined( COMPILER_MSVCX360 )
-	YieldProcessor(); 
-	__asm { or r0,r0,r0 } 
-	YieldProcessor(); 
-	__asm { or r1,r1,r1 } 
 #else
 #error "implement me"
 #endif
@@ -263,8 +199,6 @@ inline void ThreadSleep(unsigned nMilliseconds = 0)
         }
 #endif
 	Sleep( nMilliseconds );
-#elif PS3
-	sys_timer_usleep( nMilliseconds * 1000 );
 #elif defined(POSIX)
         usleep( nMilliseconds * 1000 );
 #endif
@@ -287,15 +221,11 @@ PLATFORM_INTERFACE void ThreadSetAffinity( ThreadHandle_t hThread, int nAffinity
 
 #ifdef _WIN32
 #define NOINLINE
-#elif defined( _PS3 )
-#define NOINLINE __attribute__ ((noinline))
 #elif defined(POSIX)
 #define NOINLINE __attribute__ ((noinline))
 #endif
 
-#if defined( _PS3 )
-#define ThreadMemoryBarrier() __lwsync()
-#elif defined(COMPILER_MSVC)
+#if defined(COMPILER_MSVC)
 // Prevent compiler reordering across this barrier. This is
 // sufficient for most purposes on x86/x64.
 #define ThreadMemoryBarrier() _ReadWriteBarrier()
@@ -377,19 +307,8 @@ inline int32 ThreadInterlockedExchange( int32 volatile *p, int32 value )							{
 inline int32 ThreadInterlockedExchangeAdd( int32 volatile *p, int32 value )							{ Assert( (size_t)p % 4 == 0 ); return _InterlockedExchangeAdd( (volatile long*)p, value ); }
 inline int32 ThreadInterlockedCompareExchange( int32 volatile *p, int32 value, int32 comperand )	{ Assert( (size_t)p % 4 == 0 ); return _InterlockedCompareExchange( (volatile long*)p, value, comperand ); }
 inline bool ThreadInterlockedAssignIf( int32 volatile *p, int32 value, int32 comperand )			{ Assert( (size_t)p % 4 == 0 ); return ( _InterlockedCompareExchange( (volatile long*)p, value, comperand ) == comperand ); }
-#elif defined( _PS3 )
-PLATFORM_INTERFACE inline int32 ThreadInterlockedIncrement( int32 volatile * ea )											{ return cellAtomicIncr32( (uint32_t*)ea ) + 1; }
-PLATFORM_INTERFACE inline int32 ThreadInterlockedDecrement( int32 volatile * ea )											{ return cellAtomicDecr32( (uint32_t*)ea ) - 1; }
-PLATFORM_INTERFACE inline int32 ThreadInterlockedExchange( int32 volatile * ea, int32 value )								{ return cellAtomicStore32( ( uint32_t* )ea, value); }
-PLATFORM_INTERFACE inline int32 ThreadInterlockedExchangeAdd( int32 volatile * ea, int32 value )							{ return cellAtomicAdd32( ( uint32_t* )ea, value ); }
-PLATFORM_INTERFACE inline int32 ThreadInterlockedCompareExchange( int32 volatile * ea, int32 value, int32 comperand )		{ return cellAtomicCompareAndSwap32( (uint32_t*)ea, comperand, value ) ; }
-PLATFORM_INTERFACE inline bool ThreadInterlockedAssignIf( int32 volatile * ea, int32 value, int32 comperand )				{ return ( cellAtomicCompareAndSwap32( (uint32_t*)ea, comperand, value ) == ( uint32_t ) comperand );  }
-
-PLATFORM_INTERFACE inline int64 ThreadInterlockedCompareExchange64( int64 volatile *pDest, int64 value, int64 comperand )	{	return cellAtomicCompareAndSwap64( ( uint64_t* ) pDest, comperand, value ); }
-PLATFORM_INTERFACE inline bool ThreadInterlockedAssignIf64( volatile int64 *pDest, int64 value, int64 comperand )			{ return ( cellAtomicCompareAndSwap64( ( uint64_t* ) pDest, comperand, value ) == ( uint64_t ) comperand ); }
-
 #else
-// non 32-bit windows and 360 implementation
+// non 32-bit windows
 PLATFORM_INTERFACE int32 ThreadInterlockedIncrement( int32 volatile * ) NOINLINE;
 PLATFORM_INTERFACE int32 ThreadInterlockedDecrement( int32 volatile * ) NOINLINE;
 PLATFORM_INTERFACE int32 ThreadInterlockedExchange( int32 volatile *, int32 value ) NOINLINE;
@@ -417,11 +336,8 @@ inline void const *ThreadInterlockedExchangePointerToConst( void const * volatil
 inline void const *ThreadInterlockedCompareExchangePointerToConst( void const * volatile *p, void const *value, void const *comperand )	{ return ThreadInterlockedCompareExchangePointer( const_cast < void * volatile * > ( p ), const_cast < void * > ( value ), const_cast < void * > ( comperand ) ); }
 inline bool ThreadInterlockedAssignPointerToConstIf( void const * volatile *p, void const *value, void const *comperand )			{ return ThreadInterlockedAssignPointerIf( const_cast < void * volatile * > ( p ), const_cast < void * > ( value ), const_cast < void * > ( comperand ) ); }
 
-
-#ifndef _PS3
 PLATFORM_INTERFACE int64 ThreadInterlockedCompareExchange64( int64 volatile *, int64 value, int64 comperand ) NOINLINE;
 PLATFORM_INTERFACE bool ThreadInterlockedAssignIf64( volatile int64 *pDest, int64 value, int64 comperand ) NOINLINE;
-#endif
 
 PLATFORM_INTERFACE int64 ThreadInterlockedExchange64( int64 volatile *, int64 value ) NOINLINE;
 
@@ -500,28 +416,17 @@ PLATFORM_INTERFACE void ThreadNotifySyncReleasing(void *p);
 
 #ifndef NO_THREAD_LOCAL
 
-#if defined(WIN32) || defined(OSX) ||  defined( _PS3 ) || ( defined (_LINUX) ) || defined(PLATFORM_BSD)
+#if defined(WIN32) || defined(OSX) || ( defined (_LINUX) ) || defined(PLATFORM_BSD)
 #ifndef __AFXTLS_H__ // not compatible with some Windows headers
 
-#if defined(_PS3)
-#define CTHREADLOCALINT CThreadLocalInt<int>
-#define CTHREADLOCALINTEGER( typ ) CThreadLocalInt<typ>
-#define CTHREADLOCALPTR( typ ) CThreadLocalPtr<typ>
-#define CTHREADLOCAL( typ ) CThreadLocal<typ>
-#define GETLOCAL( x ) ( x.Get() )
-#else
 #define CTHREADLOCALINT GenericThreadLocals::CThreadLocalInt<int>
 #define CTHREADLOCALINTEGER( typ ) GenericThreadLocals::CThreadLocalInt<typ>
 #define CTHREADLOCALPTR( typ ) GenericThreadLocals::CThreadLocalPtr<typ>
 #define CTHREADLOCAL( typ ) GenericThreadLocals::CThreadLocal<typ>
 #define GETLOCAL( x ) ( x.Get() )
 
-#endif
-
-#if !defined(_PS3)
 namespace GenericThreadLocals
 {
-#endif
 	// a (not so efficient) implementation of thread locals for compilers without full support (i.e. visual c).
 	// don't use this explicity - instead, use the CTHREADxxx macros above.
 
@@ -661,10 +566,8 @@ private:
 		bool operator==( const CThreadLocalPtr<T> &p ) const;
 		bool operator!=( const CThreadLocalPtr<T> &p ) const;
 	};
-#if !defined(_PS3)
 }
 using namespace GenericThreadLocals;
-#endif
 
 
 #ifdef _OSX
@@ -672,9 +575,7 @@ PLATFORM_INTERFACE GenericThreadLocals::CThreadLocalInt<int> g_nThreadID;
 #else // _OSX
 #ifndef TIER0_DLL_EXPORT
 
-#ifndef _PS3
 DLL_GLOBAL_IMPORT CTHREADLOCALINT g_nThreadID;
-#endif // !_PS3
 
 #endif // TIER0_DLL_EXPORT
 #endif // _OSX
@@ -954,8 +855,6 @@ private:
 	#define TT_SIZEOF_CRITICALSECTION 24
 #endif // _WIN64
 	byte m_CriticalSection[TT_SIZEOF_CRITICALSECTION];
-#elif defined( _PS3 )
-	sys_mutex_t m_Mutex;
 #elif defined(POSIX)
 	pthread_mutex_t m_Mutex;
 	pthread_mutexattr_t m_Attr;
@@ -1096,49 +995,7 @@ private:
 };
 
 #else
-#ifdef _PS3
-
-class CThreadFastMutex
-{
-public:
-	CThreadFastMutex();
-	~CThreadFastMutex();
-
-	//------------------------------------------------------
-	// Mutex acquisition/release. Const intentionally defeated.
-	//------------------------------------------------------
-	void Lock();
-	void Lock() const		{ (const_cast<CThreadFastMutex *>(this))->Lock(); }
-	void Unlock();
-	void Unlock() const		{ (const_cast<CThreadFastMutex *>(this))->Unlock(); }
-
-	bool TryLock();
-	bool TryLock() const	{ return (const_cast<CThreadFastMutex *>(this))->TryLock(); }
-
-	//------------------------------------------------------
-	// Use this to make deadlocks easier to track by asserting
-	// when it is expected that the current thread owns the mutex
-	//------------------------------------------------------
-	bool AssertOwnedByCurrentThread();
-
-	//------------------------------------------------------
-	// Enable tracing to track deadlock problems
-	//------------------------------------------------------
-	void SetTrace( bool );
-
-private:
-	// Disallow copying
-	CThreadFastMutex( const CThreadFastMutex & );
-	//CThreadFastMutex &operator=( const CThreadFastMutex & );
-	sys_lwmutex_t m_Mutex;
-        sys_mutex_t m_SlowMutex;
-};
-
-#else
-
 typedef CThreadMutex CThreadFastMutex;
-
-#endif
 
 class ALIGN128 CAlignedThreadFastMutex : public CThreadFastMutex
 {
@@ -1349,10 +1206,6 @@ protected:
 #ifdef _WIN32
 	HANDLE m_hSyncObject;
 	bool m_bCreatedHandle;
-#elif defined( _PS3 )
-	static sys_lwmutex_t	m_staticMutex;
-	static uint32_t			m_bstaticMutexInitialized;
-	static uint32_t			m_bstaticMutexInitializing;
 #elif defined(POSIX)
 	pthread_mutex_t	m_Mutex;
 	pthread_cond_t	m_Condition;
@@ -1398,15 +1251,6 @@ public:
 private:
 	CThreadSemaphore(const CThreadSemaphore &);
 	CThreadSemaphore &operator=(const CThreadSemaphore &);
-#ifdef _PS3
-	bool AddWaitingThread();
-	void RemoveWaitingThread();
-	sys_semaphore_t			m_Semaphore;
-	sys_semaphore_value_t	m_sema_max_val;
-	uint32_t				m_numWaitingThread;
-	uint32_t				m_bInitalized;
-	uint32_t						m_semaCount;
-#endif
 };
 
 #if defined( _WIN32 )
@@ -1446,39 +1290,6 @@ enum NamedEventResult_t
 	TT_EventNotSignaled,
 	TT_EventSignaled
 };
-#if defined( _PS3 )
-//---------------------------------------------------------------------------
-// CThreadEventWaitObject - the purpose of this class is to help implement
-// WaitForMultipleObejcts on PS3. 
-//
-// Each event maintains a linked list of CThreadEventWaitObjects. When a 
-// thread wants to wait on an event it passes the event a semaphore that 
-// ptr to see the index of the event that triggered it
-//
-// The thread-specific mutex is to ensure that setting the index and setting the
-// semaphore are atomic
-//---------------------------------------------------------------------------
-
-class CThreadEventWaitObject
-{
-public:
-	CThreadEventWaitObject *m_pPrev, *m_pNext;
-	sys_semaphore_t			*m_pSemaphore;
-	int						m_index;
-	int						*m_pFlag;
-
-	CThreadEventWaitObject() {}
-
-	void Init(sys_semaphore_t *pSem, int index, int *pFlag)
-	{
-		m_pSemaphore = pSem;
-		m_index = index;
-		m_pFlag = pFlag;
-	}
-
-	void Set();
-};
-#endif //_PS3
 
 class PLATFORM_CLASS CThreadEvent : public CThreadSyncObject
 {
@@ -1512,79 +1323,9 @@ public:
 	// To implement these, I need to check that casts are safe
 	static uint32 WaitForMultiple( int nObjects, CThreadEvent *ppObjects, bool bWaitAll, uint32 dwTimeout = TT_INFINITE );
 
-#ifdef _PS3
-	void RegisterWaitingThread(sys_semaphore_t *pSemaphore, int index, int *flag);
-	void UnregisterWaitingThread(sys_semaphore_t *pSemaphore);
-#endif
-
-protected:
-#ifdef _PS3
-	// These virtual functions need to be inline in order for the class to be exported from tier0.prx
-	virtual bool AddWaitingThread()
-	{
-		//This checks if the event is already signaled and if not creates a semaphore which will be signaled 
-		//when the event is finally signaled.
-		bool result;
-
-		sys_lwmutex_lock(&m_staticMutex, 0);
-
-		if (m_bSet)
-			result=false;
-		else
-		{
-			result=true;
-
-			m_numWaitingThread++;
-
-			if ( m_numWaitingThread == 1 )
-			{		
-				sys_semaphore_attribute_t semAttr;
-				sys_semaphore_attribute_initialize( semAttr );
-				int err = sys_semaphore_create( &m_Semaphore, &semAttr, 0, 256 );
-				Assert( err == CELL_OK );
-				m_bInitalized = true;
-			}
-		}
-
-		sys_lwmutex_unlock(&m_staticMutex);
-		return result;
-	}
-
-	virtual void RemoveWaitingThread()
-	{
-		sys_lwmutex_lock(&m_staticMutex, 0);
-
-		m_numWaitingThread--;
-
-		if ( m_numWaitingThread == 0)
-		{		
-			int err = sys_semaphore_destroy( m_Semaphore );
-			Assert( err == CELL_OK );
-			m_bInitalized = false;
-		}
-
-		sys_lwmutex_unlock(&m_staticMutex);
-	}
-#endif
 private:
 	CThreadEvent( const CThreadEvent & );
 	CThreadEvent &operator=( const CThreadEvent & );
-#if defined( _PS3 )
-	uint32_t				m_bSet;
-	bool					m_bManualReset;
-
-	sys_semaphore_t			m_Semaphore;
-	uint32_t				m_numWaitingThread;
-	uint32_t				m_bInitalized;
-
-	CThreadEventWaitObject	m_waitObjects[CTHREADEVENT_MAX_WAITING_THREADS+2];	
-	CThreadEventWaitObject	*m_pWaitObjectsPool;
-	CThreadEventWaitObject	*m_pWaitObjectsList;
-	
-	CThreadEventWaitObject* LLUnlinkNode(CThreadEventWaitObject *node);
-	CThreadEventWaitObject* LLLinkNode(CThreadEventWaitObject* list, CThreadEventWaitObject *node);
-
-#endif
 };
 
 // Hard-wired manual event for use in array declarations
@@ -1765,16 +1506,6 @@ private:
 // A thread wrapper similar to a Java thread.
 //
 //-----------------------------------------------------------------------------
-#ifdef _PS3
-// Everything must be inline for this to work across PRX boundaries
-
-class CThread;
-PLATFORM_INTERFACE CThread *GetCurThreadPS3();
-PLATFORM_INTERFACE void SetCurThreadPS3( CThread * );
-PLATFORM_INTERFACE void AllocateThreadID( void );
-PLATFORM_INTERFACE void FreeThreadID( void );
-#endif
-
 class PLATFORM_CLASS CThread
 {
 public:
@@ -1917,17 +1648,6 @@ private:
 #ifdef _WIN32
 	HANDLE 	m_hThread;
 	ThreadId_t m_threadId;
-#elif defined( _PS3 )
-	sys_ppu_thread_t	m_threadId;
-	volatile sys_ppu_thread_t	m_threadZombieId;
-
-	// Mutex and condition variable used by the Suspend / Resume logic
-	sys_mutex_t			m_mutexSuspend;
-	sys_cond_t			m_condSuspend;
-
-	//EAPS3 Event to indicate that a thread has terminated. This helps with the replacing of WaitForMultipleObjects
-	//      on the PS3, since it waits for a thread to finish.
-	CThreadEvent		m_threadEnd;
 #elif defined(POSIX)
 	pthread_t m_threadId;
 	volatile pthread_t	m_threadZombieId;
@@ -1941,12 +1661,6 @@ private:
 	unsigned m_flags;
 	CThreadManualEvent m_NotSuspendedEvent;
 };
-
-// The CThread implementation needs to be inlined for performance on the PS3 - It makes a difference of more than 1ms/frame
-// Since the dependency checker isn't smart enough to take an #ifdef _PS3 into account, all platforms will inline it.
-#ifdef _PS3
-#include "threadtools.inl"
-#endif
 
 //-----------------------------------------------------------------------------
 //
@@ -2147,11 +1861,6 @@ extern "C"
 
 inline void CThreadMutex::Lock()
 {
-#if defined(_PS3)
-	#ifndef NO_THREAD_SYNC
-		sys_mutex_lock( m_Mutex, 0 );
-	#endif
-#else
 	#if defined( THREAD_MUTEX_TRACING_ENABLED )
 		uint thisThreadID = ThreadGetCurrentId();
 		if ( m_bTrace && m_currentOwnerID && ( m_currentOwnerID != thisThreadID ) )
@@ -2170,20 +1879,12 @@ inline void CThreadMutex::Lock()
 		}
 		m_lockCount++;
 	#endif
-#endif
 }
 
 //---------------------------------------------------------
 
 inline void CThreadMutex::Unlock()
 {
-#if defined( _PS3 )
-
-	#ifndef NO_THREAD_SYNC
-		sys_mutex_unlock( m_Mutex );
-	#endif
-
-#else
 	#ifdef THREAD_MUTEX_TRACING_ENABLED
 		AssertMsg( m_lockCount >= 1, "Invalid unlock of thread lock" );
 		m_lockCount--;
@@ -2195,7 +1896,6 @@ inline void CThreadMutex::Unlock()
 		}
 	#endif
 	UnlockSilent();
-#endif
 }
 
 //---------------------------------------------------------
@@ -2230,8 +1930,6 @@ inline bool CThreadMutex::AssertOwnedByCurrentThread()
 		return true;
 	AssertMsg3( 0, "Expected thread %u as owner of lock 0x%p, but %u owns", ThreadGetCurrentId(), (CRITICAL_SECTION *)&m_CriticalSection, m_currentOwnerID );
 	return false;
-#elif defined( _PS3 )
-		return true;
 #endif
 #else
 	return true;
@@ -2255,8 +1953,6 @@ inline void CThreadMutex::SetTrace( bool bTrace )
 #ifdef THREAD_MUTEX_TRACING_ENABLED
 	m_bTrace = bTrace;
 #endif
-#elif defined _PS3
-	//EAPS3
 #endif
 
 }
@@ -2565,21 +2261,11 @@ FORCEINLINE bool CThreadSpinRWLock::TryLockForRead()
 	LockInfo_t oldValue;
 	LockInfo_t newValue;
 
-	if( IsPS3() )
-	{
-		// this is the code equivalent to original code (see below) that doesn't cause LHS on Xbox360
-		// WARNING: This code assumes BIG Endian CPU
-		oldValue.m_i64 = uint32( m_lockInfo.m_nReaders );
-		newValue.m_i64 = oldValue.m_i64 + 1; // NOTE: when we have -1 (or 0xFFFFFFFF) readers, this will result in non-equivalent code
-	}
-	else
-	{
-		// this is the original code that worked here for a while
-		oldValue.m_nReaders = m_lockInfo.m_nReaders;
-		oldValue.m_writerId = 0;
-		newValue.m_nReaders = oldValue.m_nReaders + 1;
-		newValue.m_writerId = 0;
-	}
+	// this is the original code that worked here for a while
+	oldValue.m_nReaders = m_lockInfo.m_nReaders;
+	oldValue.m_writerId = 0;
+	newValue.m_nReaders = oldValue.m_nReaders + 1;
+	newValue.m_writerId = 0;
 
 	if ( AssignIf( newValue, oldValue ) )
 	{
@@ -2618,9 +2304,4 @@ template<class T> FORCEINLINE T ReadVolatileMemory( T const *pPtr )
 #pragma warning(pop)
 #endif
 
-#if defined( _PS3 )
-BOOL SetEvent( CThreadEvent *pEvent );
-BOOL ResetEvent( CThreadEvent *pEvent );
-DWORD WaitForMultipleObjects(DWORD nCount, CThreadEvent **lppHandles, BOOL bWaitAll, DWORD dwMilliseconds );
-#endif // _PS3
 #endif // THREADTOOLS_H

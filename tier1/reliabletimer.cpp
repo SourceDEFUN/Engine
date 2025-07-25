@@ -48,11 +48,6 @@ CReliableTimer::CReliableTimer()
 			sm_nPerformanceFrequency = g_ClockSpeed;
 		}
 	}
-#elif defined(_PS3)
-	// On PowerPC, the time base register increment frequency is implementation dependent, and doesn't have to be constant.
-	// On PS3, measured it to be just shy of 80Mhz on the PPU and doesn't seem to change
-	if ( sm_nPerformanceFrequency == 0 )
-		sm_nPerformanceFrequency = sys_time_get_timebase_frequency(); 
 #else
 	// calculate performance frequency the first time we use a timer
 	if ( 0 == sm_nPerformanceFrequency )
@@ -81,11 +76,6 @@ int64 CReliableTimer::GetPerformanceCountNow()
 		CycleCount.Sample();
 		return CycleCount.GetLongCycles();
 	}
-#elif defined( _PS3 )
-	// use handy macro to grab tb
-	uint64 ulNow;
-	SYS_TIMEBASE_GET( ulNow );
-	return ulNow;
 #elif (defined( __arm__ ) || defined( __aarch64__ )) && defined (POSIX)
 	struct timespec ts;
 	clock_gettime(CLOCK_REALTIME, &ts);

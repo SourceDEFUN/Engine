@@ -398,13 +398,11 @@ inline void AddToPartialChangeEntsList( int iEnt, bool bPartial )
 	if ( !dt_ShowPartialChangeEnts.GetInt() )
 		return;
 
-#if !defined( _XBOX )
 	if ( !bPartial )
 		iEnt = -iEnt;
 	
 	if ( g_PartialChangeEnts.Find( iEnt ) == -1 )
 		g_PartialChangeEnts.AddToTail( iEnt );
-#endif
 }
 
 
@@ -413,7 +411,6 @@ void PrintPartialChangeEntsList()
 	if ( !dt_ShowPartialChangeEnts.GetInt() )
 		return;
 
-#if !defined( _XBOX )
 	int iCurRow = 15;
 	Con_NPrintf( iCurRow++, "----- dt_ShowPartialChangeEnts -----" );
 	Con_NPrintf( iCurRow++, "" );
@@ -467,7 +464,6 @@ void PrintPartialChangeEntsList()
 	
 	g_PartialChangeEnts.Purge();
 	g_nTotalPropChanges = g_nTotalEntChanges = 0;
-#endif
 }
 
 

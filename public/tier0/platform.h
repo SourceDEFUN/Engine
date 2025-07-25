@@ -93,11 +93,10 @@
 	#define IsOSX() false
 	#define IsPosix() false
 	#define IsBSD() false
-	#define PLATFORM_WINDOWS 1 // Windows PC or Xbox 360
+	#define PLATFORM_WINDOWS 1
 	#define IsWindows() true
 	#define IsPC() true
 	#define IsConsole() false
-	#define IsPS3() false
 	#define IS_WINDOWS_PC
 	#define PLATFORM_WINDOWS_PC 1 // Windows PC
 	#ifdef _WIN64
@@ -119,7 +118,6 @@
 	#define IsPC() true
 	#define IsWindows() false
 	#define IsConsole() false
-	#define IsPS3() false
 	#if defined( LINUX )
 		#define IsLinux() true
 	#else
@@ -214,16 +212,7 @@ typedef signed char int8;
 //-----------------------------------------------------------------------------
 // Set up platform type defines.
 //-----------------------------------------------------------------------------
-#if defined( _PS3 )
-	#if !defined( _GAMECONSOLE )
-		#define _GAMECONSOLE
-	#endif
-	#define IsPC()			false
-	#define IsGameConsole()	true
-#else
-	#define IsPC()			true
-	#define IsGameConsole()	false
-#endif
+#define IsPC()			true
 
 #ifdef PLATFORM_64BITS
 	#define IsPlatform64Bits()	true

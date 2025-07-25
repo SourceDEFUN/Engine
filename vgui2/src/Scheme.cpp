@@ -676,14 +676,9 @@ void CScheme::LoadFonts()
 
 	// get our language
 	if ( IsPC() )
-	{
 		bValid = vgui::g_pSystem->GetRegistryString( "HKEY_CURRENT_USER\\Software\\Valve\\Source\\Language", language, sizeof( language ) - 1 );
-	}
 	else
-	{
-		Q_strncpy( language, XBX_GetLanguageString(), sizeof( language ) );
 		bValid = true;
-	}
 
 	if ( !bValid )
 	{
@@ -1496,14 +1491,9 @@ int CScheme::GetMinimumFontHeightForCurrentLanguage()
 	char language[64];
 	bool bValid;
 	if ( IsPC() )
-	{
 		bValid = vgui::g_pSystem->GetRegistryString( "HKEY_CURRENT_USER\\Software\\Valve\\Source\\Language", language, sizeof(language)-1 );
-	}
 	else
-	{
-		Q_strncpy( language, XBX_GetLanguageString(), sizeof( language ) );
 		bValid = true;
-	}
 
 	if ( bValid )
 	{

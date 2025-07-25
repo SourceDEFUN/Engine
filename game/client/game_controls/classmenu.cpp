@@ -27,9 +27,7 @@
 
 #include "cdll_util.h"
 #include "IGameUIFuncs.h" // for key bindings
-#ifndef _XBOX
 extern IGameUIFuncs *gameuifuncs; // for key binding details
-#endif
 #include <game/client/iviewport.h>
 
 #include <stdlib.h> // MAX_PATH define

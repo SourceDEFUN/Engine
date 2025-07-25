@@ -96,7 +96,6 @@ void CContentControlDialog::ResetPassword()
 {
 	// Set initial value
 #ifdef WIN32
-#ifndef _XBOX
 	HKEY key;
 	if ( ERROR_SUCCESS == VCRHook_RegOpenKeyEx(HKEY_CURRENT_USER, "Software\\Valve\\Half-Life\\Settings", 0, KEY_READ, &key))
 	{
@@ -107,7 +106,6 @@ void CContentControlDialog::ResetPassword()
 		VCRHook_RegCloseKey( key );
 	}
     else
-#endif
     {
         m_szGorePW[ 0 ] = 0;
     }
@@ -209,7 +207,6 @@ void CContentControlDialog::WriteToken( const char *str )
 {
 	// Set initial value
 #ifdef WIN32
-#ifndef _XBOX
 	HKEY key;
 	if ( ERROR_SUCCESS == VCRHook_RegOpenKeyEx(HKEY_CURRENT_USER, "Software\\Valve\\Half-Life\\Settings", 0, KEY_WRITE, &key))
 	{
@@ -220,7 +217,6 @@ void CContentControlDialog::WriteToken( const char *str )
 
 		VCRHook_RegCloseKey( key );
 	}
-#endif
 #else
 	vgui::system()->SetRegistryString( "Software\\Valve\\Half-Life\\Settings\\User Token 2", m_szGorePW );
 #endif

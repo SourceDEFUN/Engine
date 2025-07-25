@@ -493,7 +493,6 @@ public:
 DECLARE_ACHIEVEMENT( CAchievementPortalHitTurretWithTurret, ACHIEVEMENT_PORTAL_HIT_TURRET_WITH_TURRET, "PORTAL_HIT_TURRET_WITH_TURRET", 5 );
 
 
-#ifndef _XBOX
 class CAchievementPortalFindAllDinosaurs : public CBaseAchievement
 {
 	DECLARE_CLASS( CAchievementPortalFindAllDinosaurs, CBaseAchievement );
@@ -538,7 +537,6 @@ class CAchievementPortalFindAllDinosaurs : public CBaseAchievement
 	}
 };
 DECLARE_ACHIEVEMENT( CAchievementPortalFindAllDinosaurs, ACHIEVEMENT_PORTAL_TRANSMISSION_RECEIVED, "PORTAL_TRANSMISSION_RECEIVED", 0 );
-#endif // _XBOX
 
 // achievements which are won by a map event firing once
 DECLARE_MAP_EVENT_ACHIEVEMENT( ACHIEVEMENT_PORTAL_GET_PORTALGUNS, "PORTAL_GET_PORTALGUNS", 5 );

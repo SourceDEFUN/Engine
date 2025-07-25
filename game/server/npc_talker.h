@@ -15,13 +15,11 @@
 #include <time.h>
 #endif
 
-#ifndef _XBOX
 #undef min
 #undef max
 #pragma warning(push)
 #include <set>
 #pragma warning(pop)
-#endif
 
 #ifdef _WIN32
 #pragma once
@@ -240,15 +238,7 @@ protected:
 	//---------------------------------
 
 	DECLARE_DATADESC();
-#ifndef _XBOX
 	DEFINE_CUSTOM_AI;
-#else
-public:
-	DEFINE_CUSTOM_AI;
-private:
-#endif
 };
-
 #include "tier0/memdbgoff.h"
-
 #endif		//TALKNPC_H

@@ -409,7 +409,6 @@ void CGameClient::SetupPackInfo( CFrameSnapshot *pSnapshot )
 
 	// if this client is the HLTV or Replay client, add the nocheck PVS bit array
 	// normal clients don't need that extra array
-#ifndef _XBOX
 #if defined( REPLAY_ENABLED )
 	if ( IsHLTV() || IsReplay() )
 #else
@@ -421,7 +420,6 @@ void CGameClient::SetupPackInfo( CFrameSnapshot *pSnapshot )
 		m_PackInfo.m_pTransmitAlways = m_pCurrentFrame->transmit_always;
 	}
 	else
-#endif
 	{
 		m_PackInfo.m_pTransmitAlways = NULL;
 	}
@@ -597,7 +595,6 @@ void CGameClient::Inactivate( void )
 	{
 		m_Server->RemoveClientFromGame( this );
 	}
-#ifndef _XBOX
 	if ( IsHLTV() )
 	{	
 		hltv->Changelevel();
@@ -608,7 +605,6 @@ void CGameClient::Inactivate( void )
 	{
 		replay->Changelevel();
 	}
-#endif
 #endif
 	CBaseClient::Inactivate();
 
@@ -644,7 +640,6 @@ bool CGameClient::UpdateAcknowledgedFramecount(int tick)
 
 void CGameClient::Clear()
 {
-#ifndef _XBOX
 	if ( m_bIsHLTV && hltv )
 	{
 		hltv->Shutdown();
@@ -655,7 +650,6 @@ void CGameClient::Clear()
 	{
 		replay->Shutdown();
 	}
-#endif
 #endif
 
 	CBaseClient::Clear();
@@ -746,10 +740,6 @@ bool CGameClient::SetSignonState(int state, int spawncount)
 		m_NetChannel->SetTimeout( sv_timeout.GetFloat() ); // use smaller timeout limit
 		m_NetChannel->SetFileTransmissionMode( true );
 
-#ifdef _XBOX
-		// to save memory on the XBOX reduce reliable buffer size from 96 to 8 kB
-		m_NetChannel->SetMaxBufferSize( true, 8*1024 );
-#endif
 	}
 
 	return CBaseClient::SetSignonState( state, spawncount );
@@ -1017,12 +1007,10 @@ void CGameClient::SpawnPlayer( void )
 
 CClientFrame *CGameClient::GetDeltaFrame( int nTick )
 {
-#ifndef _XBOX
 	Assert ( !IsHLTV() ); // has no ClientFrames
 #if defined( REPLAY_ENABLED )
 	Assert ( !IsReplay() );  // has no ClientFrames
 #endif
-#endif	
 
 	if ( m_bIsInReplayMode )
 	{
@@ -1096,7 +1084,6 @@ bool CGameClient::IsEngineClientCommand( const CCommand &args ) const
 
 bool CGameClient::SendNetMsg(INetMessage &msg, bool bForceReliable)
 {
-#ifndef _XBOX
 	if ( m_bIsHLTV )
 	{
 		// pass this message to HLTV
@@ -1108,7 +1095,6 @@ bool CGameClient::SendNetMsg(INetMessage &msg, bool bForceReliable)
 		// pass this message to replay
 		return replay->SendNetMsg( msg, bForceReliable );
 	}
-#endif
 #endif
 	return CBaseClient::SendNetMsg( msg, bForceReliable);
 }
@@ -1253,7 +1239,6 @@ void CGameClient::SendSnapshot( CClientFrame * pFrame )
 
 bool CGameClient::ShouldSendMessages( void )
 {
-#ifndef _XBOX
 	if ( m_bIsHLTV )
 	{
 		// calc snapshot interval
@@ -1274,7 +1259,6 @@ bool CGameClient::ShouldSendMessages( void )
 		// I am the Replay client, record every nSnapshotInterval tick
 		return ( sv.m_nTickCount >= (replay->m_nLastTick + nSnapshotInterval) );
 	}
-#endif
 #endif
 	// If sv_stressbots is true, then treat a bot more like a regular client and do deltas and such for it.
 	if( IsFakeClient() )
@@ -1347,9 +1331,7 @@ void CGameClient::PacketEnd()
 
 void CGameClient::ConnectionClosing(const char *reason)
 {
-#ifndef _XBOX
 	SV_RedirectEnd ();
-#endif
 	// Check for printf format tokens in this reason string. Crash exploit.
 	Disconnect ( (reason && !strchr( reason, '%' ) ) ? reason : "Connection closing" );	
 }
@@ -1360,9 +1342,7 @@ void CGameClient::ConnectionCrashed(const char *reason)
 	{
 		DebuggerBreakIfDebugging_StagingOnly();
 
-#ifndef _XBOX
 		SV_RedirectEnd ();
-#endif
 		// Check for printf format tokens in this reason string. Crash exploit.
 		Disconnect ( (reason && !strchr( reason, '%' ) ) ? reason : "Connection lost" );	
 	}

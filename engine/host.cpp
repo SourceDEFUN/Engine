@@ -4344,7 +4344,7 @@ void Host_Shutdown(void)
 	scr_disabled_for_loading = true;
 #endif
 
-#if defined VOICE_OVER_IP && !defined SWDS && !defined( NO_VOICE ) //!defined(_XBOX)
+#if defined VOICE_OVER_IP && !defined SWDS && !defined( NO_VOICE )
 	Voice_Deinit();
 #endif // VOICE_OVER_IP
 

@@ -874,14 +874,12 @@ void CBaseServer::WriteDeltaEntities( CBaseClient *client, CClientFrame *to, CCl
 	u.m_nFullProps = 0;
 	u.m_pServer = this;
 	u.m_nClientEntity = client->m_nEntityIndex;
-#ifndef _XBOX
 	if ( IsHLTV() || IsReplay() )
 	{
 		// cull props only on master proxy
 		u.m_bCullProps = sv.IsActive();
 	}
 	else
-#endif
 	{
 		u.m_bCullProps = true;	// always cull props for players
 	}

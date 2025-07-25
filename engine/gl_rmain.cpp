@@ -1138,14 +1138,8 @@ void DrawLightmapPage( int lightmapPageID )
 	CMeshBuilder meshBuilder;
 	meshBuilder.Begin( pMesh, MATERIAL_QUADS, 1 );
 
-#ifndef _XBOX
 	int x = 0;
 	int y = 0;
-#else
-	// xboxissue - border safe
-	int x = 32;
-	int	y = 32;
-#endif
 	float s = 1.0f;
 	float t = 1.0f;
 

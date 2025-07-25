@@ -149,12 +149,6 @@ void GetColorForSurface( trace_t *trace, Vector *color )
 #define	FLECK_DAMPEN		0.3f
 #define	FLECK_ANGULAR_SPRAY	0.6f
 
-#ifndef _XBOX
-
-//
-// PC ONLY!
-//
-
 static void CreateFleckParticles( const Vector& origin, const Vector &color, trace_t *trace, char materialType, int iScale )
 {
 	Vector	spawnOffset	= trace->endpos + ( trace->plane.normal * 1.0f );
@@ -223,8 +217,6 @@ static void CreateFleckParticles( const Vector& origin, const Vector &color, tra
 		pFleckParticle->m_uchColor[2] = MIN( 1.0f, color[2]*colorRamp )*255.0f;
 	}
 }
-
-#endif // _XBOX
 
 //-----------------------------------------------------------------------------
 // Purpose: Debris flecks caused by impacts
@@ -637,15 +629,9 @@ void FX_AntlionImpact( const Vector &pos, trace_t *trace )
 // Input  : &pos - 
 //			&dir - 
 //-----------------------------------------------------------------------------
-#if defined( _XBOX )
-#define NUM_BUG_BLOOD	16
-#define NUM_BUG_BLOOD2	8
-#define NUM_BUG_SPLATS	8
-#else
 #define NUM_BUG_BLOOD	32
 #define NUM_BUG_BLOOD2	16
 #define NUM_BUG_SPLATS	16
-#endif
 void FX_BugBlood( Vector &pos, Vector &dir, Vector &vWorldMins, Vector &vWorldMaxs )
 {
 	CSmartPtr<CSimpleEmitter> pSimple = CSimpleEmitter::Create( "FX_BugBlood" );
@@ -989,10 +975,6 @@ void FX_DustImpact( const Vector &origin, trace_t *tr, float flScale )
 		}
 	}			
 }
-
-#ifdef _XBOX
-extern PMaterialHandle g_Material_Spark;
-#endif // _XBOX
 
 //-----------------------------------------------------------------------------
 // Purpose: 

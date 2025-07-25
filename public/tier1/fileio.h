@@ -13,9 +13,7 @@
 #else
 #include <sys/types.h>
 #include <sys/stat.h>
-#if !defined( _PS3 )
 #include <signal.h>
-#endif // _PS3
 #endif
 
 #include "tier0/platform.h"
@@ -52,7 +50,6 @@ private:
 
 };
 
-#if !defined(_PS3)
 //-----------------------------------------------------------------------------
 // Purpose: Encapsulates watching a directory for file changes
 //-----------------------------------------------------------------------------
@@ -96,6 +93,4 @@ private:
 	void PostDirWatch();
 #endif
 };
-#endif // _PS3
-
 #endif // FILEIO_H

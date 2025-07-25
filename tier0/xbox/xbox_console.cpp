@@ -11,21 +11,3 @@
 IXboxConsole *g_pXboxConsole;
 
 typedef IXboxConsole * (WINAPI *CONSOLEINTERFACEFUNC)( void );
-
-void XboxConsoleInit()
-{
-	g_pXboxConsole = NULL;
-
-	HMODULE hDLL = ::LoadLibrary( "vxbdm_360.dll" );
-	if ( !hDLL )
-	{
-		return;
-	}
-
-	CONSOLEINTERFACEFUNC fpnGetConsoleInterface = (CONSOLEINTERFACEFUNC) ::GetProcAddress( hDLL, "GetConsoleInterface" );
-
-	if ( fpnGetConsoleInterface )
-	{
-		g_pXboxConsole = fpnGetConsoleInterface();
-	}
-}

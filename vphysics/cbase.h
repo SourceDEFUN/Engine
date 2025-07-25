@@ -7,9 +7,6 @@
 //=============================================================================//
 // system
 #include <stdio.h>
-#ifdef _XBOX
-#include <ctype.h>
-#endif
 
 // Valve
 #include "tier0/dbg.h"

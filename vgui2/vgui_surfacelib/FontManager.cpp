@@ -566,12 +566,6 @@ FallbackFont_t g_FallbackFonts[] =
 	{ "DejaVu Sans", NULL },
 	{ NULL, "DejaVu Sans" },		// every other font falls back to this
 };
-#elif defined(_PS3)
-// list of how fonts fallback
-FallbackFont_t g_FallbackFonts[] =
-{
-	{ NULL, "Tahoma" },		// every other font falls back to this
-};
 #else
 #error
 #endif
@@ -619,8 +613,6 @@ const char *CFontManager::GetForeignFallbackFontName()
 	return "Helvetica";
 #elif defined(LINUX) || defined(PLATFORM_BSD)
 	return "WenQuanYi Zen Hei";
-#elif defined(_PS3)
-	return "Tahoma";
 #else
 #error
 #endif

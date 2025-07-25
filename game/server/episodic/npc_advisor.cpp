@@ -366,11 +366,6 @@ void CNPC_Advisor::Spawn()
 {
 	BaseClass::Spawn();
 
-#ifdef _XBOX
-	// Always fade the corpse
-	AddSpawnFlags( SF_NPC_FADE_CORPSE );
-#endif // _XBOX
-
 	Precache();
 
 	SetModel( STRING( GetModelName() ) );

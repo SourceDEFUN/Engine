@@ -360,11 +360,9 @@ void ClientModeShared::Init()
 	ListenForGameEvent( "game_newmap" );
 #endif
 
-#ifndef _XBOX
 	HLTVCamera()->Init();
 #if defined( REPLAY_ENABLED )
 	ReplayCamera()->Init();
-#endif
 #endif
 
 	m_CursorNone = vgui::dc_none;

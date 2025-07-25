@@ -390,16 +390,6 @@ struct CatchAndWriteContext_t
 //			pv -			Void pointer to pass that function
 //			eAction -		Specifies what to do if it catches an exception
 //-----------------------------------------------------------------------------
-#if defined(_PS3)
-
-int CatchAndWriteMiniDump_Impl( CatchAndWriteContext_t &ctx )
-{
-	// we dont handle minidumps on ps3
-	return ctx.Invoke();
-}
-
-#else
-
 static const char *GetExceptionCodeName( unsigned long code )
 {
 	switch ( code )
@@ -468,8 +458,6 @@ int CatchAndWriteMiniDump_Impl( CatchAndWriteContext_t &ctx )
 	return ctx.Invoke();
 #endif
 }
-
-#endif // _PS3
 
 //-----------------------------------------------------------------------------
 // Purpose: Catches and writes out any exception throw by the specified function
