@@ -9,7 +9,12 @@ A love letter to Source Engine and Valve Software.
 * SDL3 upgrade
 * Vulkan instead of OpenGL/DirectX
 * Replacement of proprietary technology with open-source alternatives
+* Better graphics
+* Improve VRAD and make it use SYCL instead of just CPU
+### Perhaps...
 * Hammer's full Linux support (don't expect it, though...)
+* Map's Input/Output system replaced with Python scripting
+* Add support for Mesh-based maps
 
 ## Code Cleanup days
 In these days, i try to remove as much lines of code that wouldn't be used
