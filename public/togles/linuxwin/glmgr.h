@@ -91,7 +91,7 @@ extern TelemetryGPUStats_t g_TelemetryGPUStats;
 #endif
 
 struct GLMRect;
-typedef void *PseudoGLContextPtr;
+typedef void *SDL_GLContext;
 
 // parrot the D3D present parameters, more or less... "adapter" translates into "active display index" per the m_activeDisplayCount below.
 class GLMDisplayParams

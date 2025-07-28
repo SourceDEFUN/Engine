@@ -3,10 +3,10 @@
 // Purpose: 
 //
 //===========================================================================//
+#include <SDL3/SDL_video.h>
 #if defined( USE_SDL )
 #undef PROTECTED_THINGS_ENABLE
-#include "SDL.h"
-#include "SDL_syswm.h"
+#include <SDL3/SDL.h>
 
 #if defined( OSX )
 #define DONT_DEFINE_BOOL
@@ -209,7 +209,8 @@ private:
 	CSysModule		*m_hUnicodeModule;
 
 	bool			m_bCanPostActivateEvents;
-	int				m_iDesktopWidth, m_iDesktopHeight, m_iDesktopRefreshRate;
+	int				m_iDesktopWidth, m_iDesktopHeight;
+	float			m_iDesktopRefreshRate;
 	void			UpdateDesktopInformation();
 #ifdef WIN32
 	void			UpdateDesktopInformation( WPARAM wParam, LPARAM lParam );
@@ -1298,7 +1299,7 @@ CGame::CGame()
 	m_bCanPostActivateEvents = true;
 	m_iDesktopWidth = 0;
 	m_iDesktopHeight = 0;
-	m_iDesktopRefreshRate = 0;
+	m_iDesktopRefreshRate = 0.f;
 }
 
 //-----------------------------------------------------------------------------
@@ -1407,14 +1408,6 @@ void *CGame::GetMainWindowPlatformSpecificHandle( void )
 #ifdef WIN32
 	return (void*)m_hWindow;
 #else
-	SDL_SysWMinfo pInfo;
-	SDL_VERSION( &pInfo.version );
-	if ( !SDL_GetWindowWMInfo( (SDL_Window*)m_pSDLWindow, &pInfo ) )
-	{
-		Error( "Fatal Error: Unable to get window info from SDL." );
-		return NULL;
-	}
-
 #ifdef OSX
 	id nsWindow = (id)pInfo.info.cocoa.window;
 	SEL selector = sel_registerName("windowRef");
@@ -1442,23 +1435,37 @@ void CGame::GetDesktopInfo( int &width, int &height, int &refreshrate )
 {
 #if defined( USE_SDL )
 
-	width = 640;
-	height = 480;
+	width = 1280;
+	height = 720;
 	refreshrate = 0;
 
 	// Go through all the displays and return the size of the largest.
-	for( int i = 0; i < SDL_GetNumVideoDisplays(); i++ )
+	int displayCounter; bool SDL3failed = false; // Secton: oh my god, this is fucking unbelievable...
+	SDL_GetDisplays(&displayCounter);
+	for( int i = 0; i < displayCounter; i++ )
 	{
-		SDL_Rect rect;
+		const SDL_DisplayMode* rect = SDL_GetDesktopDisplayMode( i );
 
-		if ( !SDL_GetDisplayBounds( i, &rect ) )
-		{
-			if ( ( rect.w > width ) || ( ( rect.w == width ) && ( rect.h > height ) ) )
-			{
-				width = rect.w;
-				height = rect.h;
-			}
+		if ( rect ) {
+			width = rect->w;
+			height = rect->h;
+		} else {
+			SDL3failed = true;
+			break;
 		}
+		printf("\n\nDetected screen resolution as %ix%i\n\n", rect->w, rect->h);
+		// printf("\n\nis %ix%i\n\n", rect.w, rect.h);
+	}
+	if (SDL3failed) {
+		const SDL_DisplayMode* rect = SDL_GetDesktopDisplayMode( SDL_GetPrimaryDisplay() );
+		if (rect) {
+			printf("\nSDL3\nFinal screen resolution: %ix%i\n\n", rect->w, rect->h);
+			width = rect->w; height = rect->h;
+		} else {
+			printf("\nWe have failed miserably at detecting screen resolution...\n");
+		}
+	} else {
+		printf("\nAll's good! %ix%i\n", width, height);
 	}
 #else
 	// order of initialization means that this might get called early.  In that case go ahead and grab the current
@@ -1484,14 +1491,21 @@ void CGame::UpdateDesktopInformation( )
 #if defined( USE_SDL )
 	// Get the size of the display we will be displayed fullscreen on.
 	static ConVarRef sdl_displayindex( "sdl_displayindex" );
-	int displayIndex = sdl_displayindex.IsValid() ? sdl_displayindex.GetInt() : 0;
+	int displayIndex = sdl_displayindex.GetInt();
 
-	SDL_DisplayMode mode;
-	SDL_GetDesktopDisplayMode( displayIndex, &mode );
+	const SDL_DisplayMode* mode = SDL_GetDesktopDisplayMode( displayIndex );
 
-	m_iDesktopWidth = mode.w;
-	m_iDesktopHeight = mode.h;
-	m_iDesktopRefreshRate = mode.refresh_rate;
+	if ( !mode )
+	{
+		Assert( 0 );
+		mode = (SDL_DisplayMode*)SDL_GetDesktopDisplayMode( SDL_GetPrimaryDisplay() );
+	}
+	if ( !mode ) Error("SDL3 fail: Couldn't Update Desktop Information!");
+	else displayIndex = SDL_GetPrimaryDisplay();
+
+	m_iDesktopWidth = mode->w;
+	m_iDesktopHeight = mode->h;
+	m_iDesktopRefreshRate = mode->refresh_rate;
 #else
 	HDC dc = ::GetDC( m_hWindow );
 	m_iDesktopWidth = ::GetDeviceCaps(dc, HORZRES);

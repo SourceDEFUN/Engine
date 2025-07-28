@@ -40,8 +40,8 @@
 #endif
 
 #ifdef USE_SDL
-#include "SDL_clipboard.h"
-#include "SDL_error.h"
+#include <SDL3/SDL_clipboard.h>
+#include <SDL3/SDL_error.h>
 #endif
 
 #define PROTECTED_THINGS_DISABLE

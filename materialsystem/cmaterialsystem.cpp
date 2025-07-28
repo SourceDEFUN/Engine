@@ -1609,7 +1609,7 @@ void CMaterialSystem::GenerateConfigFromConfigKeyValues( MaterialSystem_Config_t
 
 	uint width = 0;
 	uint height = 0;
-	uint refreshHz = 0; // Not used
+	float refreshHz = 0.f; // Not used
 
 #ifdef USE_SDL
 	// query backbuffer size (window size whether FS or windowed)
@@ -1626,7 +1626,7 @@ void CMaterialSystem::GenerateConfigFromConfigKeyValues( MaterialSystem_Config_t
 
 	// Get the recommended resolution from dxsupport.cfg, this assumes a 4:3 aspect ratio
 	int nRecommendedWidth, nRecommendedHeight;
-	ReadInt( pKeyValues, "DefaultRes", 640, -1, &nRecommendedWidth );
+	ReadInt( pKeyValues, "DefaultRes", 1280, -1, &nRecommendedWidth );
 	nRecommendedHeight = ( nRecommendedWidth * 3 ) / 4;
 	int nRecommendedPixels = nRecommendedHeight * nRecommendedWidth;
 

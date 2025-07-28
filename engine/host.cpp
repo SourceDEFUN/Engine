@@ -125,7 +125,7 @@
 #include <locale.h>
 
 #ifdef USE_SDL
-#include "SDL.h"
+#include <SDL3/SDL.h>
 #endif
 #endif
 

@@ -6,8 +6,7 @@
 
 #if defined( USE_SDL )
 #undef PROTECTED_THINGS_ENABLE
-#include "SDL.h"
-#include "SDL_syswm.h"
+#include <SDL3/SDL.h>
 #endif
 
 #if defined( _WIN32 )
@@ -238,8 +237,8 @@ CVideoMode_Common::CVideoMode_Common( void )
     m_nNumModes    = 0;
     m_bInitialized = false;
 
-    DefaultVideoMode().width  = 640;
-    DefaultVideoMode().height = 480;
+    DefaultVideoMode().width  = 1280;
+    DefaultVideoMode().height = 720;
     DefaultVideoMode().bpp    = 32;
     DefaultVideoMode().refreshRate = 0;
 
@@ -252,8 +251,8 @@ CVideoMode_Common::CVideoMode_Common( void )
     m_pBackgroundTexture   = NULL;
     m_pLoadingTexture      = NULL;
     m_bWindowed            = false;
-    m_nModeWidth           = IsPC() ? 1024 : 640;
-    m_nModeHeight          = IsPC() ? 768 : 480;
+    m_nModeWidth           = IsPC() ? 1280 : 800;
+    m_nModeHeight          = IsPC() ? 720 : 600;
 	m_bVROverride = false;
 }
 
@@ -423,7 +422,8 @@ int CVideoMode_Common::FindVideoMode( int nDesiredWidth, int nDesiredHeight, boo
 		m_nRenderWidth = nDesiredWidth;
 		m_nRenderHeight = nDesiredHeight;
 
-		uint nWidth, nHeight, nRefreshHz;
+		uint nWidth, nHeight;
+        float nRefreshHz;
 
 		g_pLauncherMgr->GetNativeDisplayInfo( -1, nWidth, nHeight, nRefreshHz );
 
@@ -546,7 +546,9 @@ void CVideoMode_Common::ResetCurrentModeForNewResolution( int nWidth, int nHeigh
 			m_nVROverrideX = vrBounds.nX;
 			m_nVROverrideY = vrBounds.nY;
 #elif defined( USE_SDL )
-			for ( int i = 0; i < SDL_GetNumVideoDisplays(); i++ )
+            int displayCounter;
+            SDL_GetDisplays(&displayCounter);
+			for ( int i = 0; i < displayCounter; i++ )
 			{
 				SDL_Rect sdlRect;
 				SDL_GetDisplayBounds( i, &sdlRect );
@@ -632,7 +634,7 @@ bool CVideoMode_Common::CreateGameWindow( int nWidth, int nHeight, bool bWindowe
         if ( !SetMode( GetModeWidth(), GetModeHeight(), IsWindowedMode() ) )
             return false;
 
-#if defined( USE_SDL ) && 0
+#if defined( USE_SDL ) // && 0
 		static ConVarRef mat_viewportscale( "mat_viewportscale" );
 
 		if ( !bWindowed )
@@ -1025,9 +1027,8 @@ void CVideoMode_Common::InvalidateWindow()
 #if defined( USE_SDL )
 		SDL_Event fake;
 		memset(&fake, '\0', sizeof (SDL_Event));
-		fake.type = SDL_WINDOWEVENT;
+		fake.type = SDL_EVENT_WINDOW_EXPOSED;
 		fake.window.windowID = SDL_GetWindowID( (SDL_Window *) g_pLauncherMgr->GetWindowRef() );
-		fake.window.event = SDL_WINDOWEVENT_EXPOSED;
 		SDL_PushEvent(&fake);
 #else
 		InvalidateRect( (HWND)game->GetMainWindow(), NULL, FALSE );
@@ -1425,9 +1426,9 @@ void CVideoMode_Common::AdjustWindow( int nWidth, int nHeight, int nBPP, bool bW
 	{
 		SDL_Window* win = (SDL_Window*)g_pLauncherMgr->GetWindowRef();
 		if ( m_bVROverride || CommandLine()->FindParm( "-noborder" ) )
-			SDL_SetWindowBordered( win, SDL_FALSE );
+			SDL_SetWindowBordered( win, false );
 		else
-			SDL_SetWindowBordered( win, SDL_TRUE );
+			SDL_SetWindowBordered( win, true );
 			
 	}
 #endif
@@ -1520,13 +1521,20 @@ void CVideoMode_Common::CenterEngineWindow( void *hWndCenter, int width, int hei
 #if defined(USE_SDL)
 	// Get the displayindex, and center our window on that display.
 	static ConVarRef sdl_displayindex( "sdl_displayindex" );
-	int displayindex = sdl_displayindex.IsValid() ? sdl_displayindex.GetInt() : 0;
+	int displayindex = sdl_displayindex.GetInt();
 
-	SDL_DisplayMode mode;
-	SDL_GetCurrentDisplayMode( displayindex, &mode );
+	SDL_DisplayMode* mode = (SDL_DisplayMode*)SDL_GetCurrentDisplayMode( displayindex );
 
-	const int wide = mode.w;
-	const int tall = mode.h;
+    if ( !mode )
+	{
+		Assert( 0 );
+		mode = (SDL_DisplayMode*)SDL_GetCurrentDisplayMode( SDL_GetPrimaryDisplay() );
+	}
+	if ( !mode ) Error("SDL3 fail: Couldn't Center a Window! (CVideoMode_Common::CenterEngineWindow)");
+	else displayindex = SDL_GetPrimaryDisplay();
+
+	const int wide = mode->w;
+	const int tall = mode->h;
 
 	CenterX = (wide - width) / 2;
 	CenterY = (tall - height) / 2;

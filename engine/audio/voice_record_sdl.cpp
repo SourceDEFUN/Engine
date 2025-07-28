@@ -15,7 +15,7 @@
 #include "tier0/threadtools.h"
 
 #include <assert.h>
-#include <SDL_audio.h>
+#include <SDL3/SDL_audio.h>
 
 #define RECORDING_BUFFER_SECONDS 3
 #define SAMPLE_COUNT 2048
@@ -80,21 +80,22 @@ protected:
 	virtual				~VoiceRecord_SDL();
 public:
 	VoiceRecord_SDL();
-	virtual void		Release();
-	virtual bool		RecordStart();
-	virtual void		RecordStop();
+	virtual void	Release();
+	// virtual void	PollCapture();
+	bool			RecordStart();
+	void			RecordStop();
 
 	// Initialize. The format of the data we expect from the provider is
 	// 8-bit signed mono at the specified sample rate.
-	virtual bool		Init(int sampleRate);
+	bool		Init(int sampleRate);
 	virtual void		Idle() {}; // Stub
 	void RenderBuffer( char *pszBuf, int size );
 
 	// Get the most recent N samples.
-	virtual int			GetRecordedData(short *pOut, int nSamplesWanted );
+	int			GetRecordedData(short *pOut, int nSamplesWanted );
 
 	SDL_AudioSpec m_ReceivedRecordingSpec;
-	int m_BytesPerSample; // Да кому нужна эта ваша инкапсуляция?
+	int m_BytesPerSample; // Who needs your incapsulation?
 	int m_nSampleRate;
 private:
 	bool				InitalizeInterfaces();	// Initialize the openal capture buffers and other interfaces
@@ -103,7 +104,8 @@ private:
 private:
 
 	SDL_AudioDeviceID m_Device;
-	AudioBuf m_AudioBuffer;
+    SDL_AudioStream*  m_Stream{};
+    AudioBuf          m_AudioBuffer;
 };
 
 void audioRecordingCallback( void *userdata, uint8 *stream, int len )
@@ -135,77 +137,102 @@ void VoiceRecord_SDL::Release()
 	delete this;
 }
 
-bool VoiceRecord_SDL::RecordStart()
-{
-	if ( !m_Device )
-		InitalizeInterfaces();
+// Secton: we have audioRecordingCallback for that 🤦
+// void VoiceRecord_SDL::PollCapture()
+// {
+//     if (!m_Stream) return;
 
-	if ( !m_Device )
-		return false;
+//     const int chunkSize = 4096;
+//     Uint8 temp[chunkSize];
 
-	SDL_PauseAudioDevice( m_Device, SDL_FALSE );
+//     int bytesRead;
+//     while ((bytesRead = SDL_GetAudioStreamData(m_Stream, temp, chunkSize)) > 0)
+//         RenderBuffer((char*)temp, bytesRead);
+// }
 
-	return true;
+bool VoiceRecord_SDL::RecordStart() {
+    if (!m_Stream) return false;
+    return SDL_ResumeAudioDevice(m_Device);
 }
 
+void VoiceRecord_SDL::RecordStop() {
+    if (m_Device)
+        SDL_PauseAudioDevice(m_Device);
 
-void VoiceRecord_SDL::RecordStop()
-{
-	// Stop capturing.
-	if ( m_Device )
-		SDL_PauseAudioDevice( m_Device, SDL_TRUE );
-
-	// Release the capture buffer interface and any other resources that are no
-	// longer needed
-	ReleaseInterfaces();
+    if (m_Stream) {
+        SDL_DestroyAudioStream(m_Stream);
+        m_Stream = nullptr;
+        m_Device = 0;
+    }
 }
 
 bool VoiceRecord_SDL::InitalizeInterfaces()
 {
-	//Default audio spec
-	SDL_AudioSpec desiredRecordingSpec;
-	SDL_zero(desiredRecordingSpec);
-	desiredRecordingSpec.freq = m_nSampleRate;
-	desiredRecordingSpec.format = AUDIO_S16;
-	desiredRecordingSpec.channels = 1;
-	desiredRecordingSpec.samples = SAMPLE_COUNT;
-	desiredRecordingSpec.callback = audioRecordingCallback;
-	desiredRecordingSpec.userdata = (void*)this;
+    SDL_AudioSpec desired{};
+    desired.freq = m_nSampleRate;
+    desired.format = SDL_AUDIO_S16;
+    desired.channels = 1;
+    // desired.samples = SAMPLE_COUNT;
 
-	//Open recording device
-	m_Device = SDL_OpenAudioDevice( NULL, SDL_TRUE, &desiredRecordingSpec, &m_ReceivedRecordingSpec, 0 );
+    // SDL3: open a capture stream instead of setting callback
+    m_Stream = SDL_OpenAudioDeviceStream(
+        m_Device, // NULL + iscapture → replaced
+        &desired,
+        nullptr, // No direct callback; we'll pull data
+        nullptr  // No userdata
+    );
 
-	if( m_Device != 0 )
-	{
-		//Calculate per sample bytes
-		m_BytesPerSample = m_ReceivedRecordingSpec.channels * ( SDL_AUDIO_BITSIZE( m_ReceivedRecordingSpec.format ) / 8 );
+    if (!m_Stream) return false;
 
-		//Calculate bytes per second
-		int bytesPerSecond = m_ReceivedRecordingSpec.freq * m_BytesPerSample;
+    // Get actual format
+    m_ReceivedRecordingSpec = desired;  // SDL3 won't automatically fill this struct.
+    // If you need actual device format, use SDL_GetAudioStreamFormat().
 
-		//Allocate and initialize byte buffer
-		m_AudioBuffer.size = RECORDING_BUFFER_SECONDS * bytesPerSecond;
+    // Device ID (needed for pause/resume)
+    m_Device = SDL_GetAudioStreamDevice(m_Stream);
 
-		if( !m_AudioBuffer.data )
-			m_AudioBuffer.data = (char *)malloc( m_AudioBuffer.size );
+    m_BytesPerSample =
+        m_ReceivedRecordingSpec.channels *
+        (SDL_AUDIO_BITSIZE(m_ReceivedRecordingSpec.format) / 8);
 
-		m_AudioBuffer.readPtr = m_AudioBuffer.data;
-		m_AudioBuffer.writePtr = m_AudioBuffer.data + SAMPLE_COUNT*m_BytesPerSample*2;
+    int bytesPerSecond = m_ReceivedRecordingSpec.freq * m_BytesPerSample;
 
-		memset( m_AudioBuffer.data, 0, m_AudioBuffer.size );
+    m_AudioBuffer.size = RECORDING_BUFFER_SECONDS * bytesPerSecond;
+    if (!m_AudioBuffer.data)
+        m_AudioBuffer.data = (char*)malloc(m_AudioBuffer.size);
 
-		return true;
-	}
-	else
-		return false;
+    m_AudioBuffer.readPtr = m_AudioBuffer.data;
+    m_AudioBuffer.writePtr = m_AudioBuffer.data +
+                             SAMPLE_COUNT * m_BytesPerSample * 2;
+
+    memset(m_AudioBuffer.data, 0, m_AudioBuffer.size);
+
+    return true;
 }
 
-bool VoiceRecord_SDL::Init(int sampleRate)
-{
-	m_nSampleRate = sampleRate;
-	ReleaseInterfaces();
+bool VoiceRecord_SDL::Init(int sampleRate) {
+    m_nSampleRate = sampleRate;
 
-	return true;
+    SDL_AudioSpec desired{};
+    desired.freq = sampleRate;
+    desired.format = SDL_AUDIO_S16;
+    desired.channels = 1;
+    // desired.samples = SAMPLE_COUNT;
+
+    // SDL3: Open capture stream
+    m_Stream = SDL_OpenAudioDeviceStream(
+        m_Device, &desired, nullptr, nullptr
+    );
+
+    if (!m_Stream) {
+        Msg("Failed to open audio capture: %s", SDL_GetError());
+        return false;
+    }
+
+    m_Device = SDL_GetAudioStreamDevice(m_Stream);
+    m_BytesPerSample = desired.channels * (SDL_AUDIO_BITSIZE(desired.format) / 8);
+
+    return true;
 }
 
 

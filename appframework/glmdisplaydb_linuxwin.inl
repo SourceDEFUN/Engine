@@ -541,7 +541,8 @@ void    GLMDisplayInfo::PopulateModes( void )
         Assert( !m_modes );
         m_modes = new CUtlVector< GLMDisplayMode* >;
 
-        int nummodes = SDL_GetNumVideoDisplays();
+        int nummodes;
+        SDL_GetDisplays(&nummodes);
 
         for ( int i = 0; i < nummodes; i++ )
         {
@@ -560,8 +561,7 @@ void    GLMDisplayInfo::PopulateModes( void )
                 uint h;
         } s_Resolutions[] =
         {
-                { 640, 480 },   // 4x3
-                { 800, 600 },
+                { 800, 600 },   // 4x3
                 { 1024, 768 },
                 { 1152, 864 },
                 { 1280, 960 },
@@ -571,11 +571,14 @@ void    GLMDisplayInfo::PopulateModes( void )
 
                 { 1280, 720 },  // 16x9
                 { 1366, 768 },
+                { 1536, 864 },
                 { 1600, 900 },
                 { 1920, 1080 },
+                { 2048, 1152 },
+                { 2560, 1440 },
+                { 3840, 2160 },
 
-                { 720, 480 },   // 16x10
-                { 1280, 800 },
+                { 1280, 800 },   // 16x10
                 { 1680, 1050 },
                 { 1920, 1200 },
                 { 2560, 1600 },

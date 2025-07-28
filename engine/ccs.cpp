@@ -86,7 +86,7 @@ class frame_buf_window
 	}
 
 public:
-	frame_buf_window(const char* pTitle = "frame_buf_window", int width = 640, int height = 480, int scaleX = 1, int scaleY = 1);
+	frame_buf_window(const char* pTitle = "frame_buf_window", int width = 1280, int height = 720, int scaleX = 1, int scaleY = 1);
 
 	virtual ~frame_buf_window();
 

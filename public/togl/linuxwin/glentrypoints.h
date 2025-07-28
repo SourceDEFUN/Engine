@@ -38,7 +38,7 @@
 #include "interface.h"
 #include "togl/rendermechanism.h"
 
-void *VoidFnPtrLookup_GlMgr(const char *fn, bool &okay, const bool bRequired, void *fallback=NULL);
+SDL_FunctionPointer VoidFnPtrLookup_GlMgr(const char *fn, bool &okay, const bool bRequired, SDL_FunctionPointer fallback=NULL);
 
 #if GL_USE_EXECUTE_HELPER_FOR_ALL_API_CALLS
 class CGLExecuteHelperBase
@@ -136,7 +136,7 @@ public:
 			return false;
 		else if (this->m_pFn == NULL)
 		{
-			this->m_pFn = (FunctionType) VoidFnPtrLookup_GlMgr(fn, okay, false, (void *) fallback);
+			this->m_pFn = (FunctionType) VoidFnPtrLookup_GlMgr(fn, okay, false, (SDL_FunctionPointer) fallback);
 			this->SetFuncName( fn );
 		}
 		okay = m_pFn != NULL;
@@ -252,7 +252,7 @@ public:
 	{
 		if (this->m_pFn == NULL)
 		{
-			this->m_pFn = (FunctionType) VoidFnPtrLookup_GlMgr(fn, okay, bRequired, (void *) fallback);
+			this->m_pFn = (FunctionType) VoidFnPtrLookup_GlMgr(fn, okay, bRequired, (SDL_FunctionPointer) fallback);
 			this->SetFuncName( fn );
 		}
 		return okay;
@@ -333,17 +333,18 @@ public:
 
 // This will be set to the current OpenGL context's entry points.
 extern COpenGLEntryPoints *gGL;
-typedef void * (*GL_GetProcAddressCallbackFunc_t)(const char *, bool &, const bool, void *);
+// Secton 2SDL3: i have no fucking clue what i'm doing ;(
+// typedef SDL_FunctionPointer GL_GetProcAddressCallbackFunc_t;
 
 #ifdef TOGL_DLL_EXPORT
 	DLL_EXPORT COpenGLEntryPoints *ToGLConnectLibraries( CreateInterfaceFn factory );
 	DLL_EXPORT void ToGLDisconnectLibraries();
-	DLL_EXPORT COpenGLEntryPoints *GetOpenGLEntryPoints(GL_GetProcAddressCallbackFunc_t callback);
+	DLL_EXPORT COpenGLEntryPoints *GetOpenGLEntryPoints(SDL_FunctionPointer callback);
 	DLL_EXPORT void ClearOpenGLEntryPoints();
 #else
 	DLL_IMPORT COpenGLEntryPoints *ToGLConnectLibraries( CreateInterfaceFn factory );
 	DLL_IMPORT void ToGLDisconnectLibraries();
-	DLL_IMPORT COpenGLEntryPoints *GetOpenGLEntryPoints(GL_GetProcAddressCallbackFunc_t callback);
+	DLL_IMPORT COpenGLEntryPoints *GetOpenGLEntryPoints(SDL_FunctionPointer callback);
 	DLL_IMPORT void ClearOpenGLEntryPoints();
 #endif
 

@@ -11,7 +11,7 @@
 #endif
 
 #if defined( USE_SDL )
-
+#include <SDL3/SDL_video.h>
 #include "tier0/threadtools.h"
 #include "appframework/IAppSystem.h"
 
@@ -70,7 +70,7 @@ public:
 	
 	virtual void GetMouseDelta( int &x, int &y, bool bIgnoreNextMouseDelta = false ) = 0;
 
-	virtual void GetNativeDisplayInfo( int nDisplay, uint &nWidth, uint &nHeight, uint &nRefreshHz ) = 0; // Retrieve the size of the monitor (desktop)
+	virtual void GetNativeDisplayInfo( int nDisplay, uint &nWidth, uint &nHeight, float &nRefreshHz ) = 0; // Retrieve the size of the monitor (desktop)
 	virtual void RenderedSize( uint &width, uint &height, bool set ) = 0;	// either set or retrieve rendered size value (from dxabstract)
 	virtual void DisplayedSize( uint &width, uint &height ) = 0;			// query backbuffer size (window size whether FS or windowed)
 	

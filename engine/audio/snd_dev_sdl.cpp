@@ -19,7 +19,7 @@
 #define _STDINT_H_ 1
 #endif
 
-#include "SDL.h"
+#include <SDL3/SDL.h>
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -195,72 +195,43 @@ inline bool CAudioDeviceSDLAudio::ValidWaveOut( void ) const
 //-----------------------------------------------------------------------------
 // Opens the windows wave out device
 //-----------------------------------------------------------------------------
-void CAudioDeviceSDLAudio::OpenWaveOut( void )
+void CAudioDeviceSDLAudio::OpenWaveOut(void)
 {
 	debugsdl("SDLAUDIO: OpenWaveOut...\n");
+    #define SDLAUDIO_FAIL(fnstr) \
+        do { \
+            const char* err = SDL_GetError(); \
+            printf("SDLAUDIO: " fnstr " failed: %s\n", err ? err : "???"); \
+            CloseWaveOut(); \
+            return; \
+        } while (false)
 
-#ifndef WIN32
-	char appname[ 256 ];
-	KeyValues *modinfo = new KeyValues( "ModInfo" );
+    if (!SDL_WasInit(SDL_INIT_AUDIO))
+    {
+        if (!SDL_InitSubSystem(SDL_INIT_AUDIO))   // SDL3 returns bool now
+            SDLAUDIO_FAIL("SDL_InitSubSystem(SDL_INIT_AUDIO)");
+    }
 
-	if ( modinfo->LoadFromFile( g_pFileSystem, "gameinfo.txt" ) )
-		Q_strncpy( appname, modinfo->GetString( "game" ), sizeof( appname ) );
-	else
-		Q_strncpy( appname, "Source1 Game", sizeof( appname ) );
+    debugsdl("SDLAUDIO: Using SDL audio target '%s'\n", SDL_GetCurrentAudioDriver());
 
-	modinfo->deleteThis();
-	modinfo = NULL;
+    SDL_AudioSpec desired{};
+    desired.freq = SOUND_DMA_SPEED;
+    desired.format = SDL_AUDIO_S16;
+    desired.channels = 2;
+    // desired.samples = 2048;
 
-	// Set these environment variables, in case we're using PulseAudio.
-	setenv("PULSE_PROP_application.name", appname, 1);
-	setenv("PULSE_PROP_media.role", "game", 1);
-#endif
+    // SDL3: open a playback stream instead of callback device
+    SDL_AudioStream *m_stream = SDL_OpenAudioDeviceStream(m_devId, &desired, nullptr, nullptr);
+    if (!m_stream) SDLAUDIO_FAIL("SDL_OpenAudioDeviceStream()");
 
-	// !!! FIXME: specify channel map, etc
-	// !!! FIXME: set properties (role, icon, etc).
+    m_devId = SDL_GetAudioStreamDevice(m_stream);
 
-	//#define SDLAUDIO_FAIL(fnstr) do { DevWarning(fnstr " failed"); CloseWaveOut(); return; } while (false)
-	//#define SDLAUDIO_FAIL(fnstr) do { printf("SDLAUDIO: " fnstr " failed: %s\n", SDL_GetError ? SDL_GetError() : "???"); CloseWaveOut(); return; } while (false)
-	#define SDLAUDIO_FAIL(fnstr) do { const char *err = SDL_GetError(); printf("SDLAUDIO: " fnstr " failed: %s\n", err ? err : "???"); CloseWaveOut(); return; } while (false)
+    AllocateOutputBuffers();
 
-	if (!SDL_WasInit(SDL_INIT_AUDIO))
-	{
-		if (SDL_InitSubSystem(SDL_INIT_AUDIO))
-			SDLAUDIO_FAIL("SDL_InitSubSystem(SDL_INIT_AUDIO)");
-	}
+    // Start audio
+    SDL_ResumeAudioDevice(m_devId);
 
-	debugsdl("SDLAUDIO: Using SDL audio target '%s'\n", SDL_GetCurrentAudioDriver());
-
-	// Open an audio device...
-	//  !!! FIXME: let user specify a device?
-	// !!! FIXME: we can handle quad, 5.1, 7.1, etc here.
-	SDL_AudioSpec desired, obtained;
-	memset(&desired, '\0', sizeof (desired));
-	desired.freq = SOUND_DMA_SPEED;
-	desired.format = AUDIO_S16SYS;
-	desired.channels = 2;
-	desired.samples = 2048;
-	desired.callback = &CAudioDeviceSDLAudio::AudioCallbackEntry;
-	desired.userdata = this;
-	m_devId = SDL_OpenAudioDevice(NULL, 0, &desired, &obtained, SDL_AUDIO_ALLOW_ANY_CHANGE);
-
-	if (!m_devId)
-		SDLAUDIO_FAIL("SDL_OpenAudioDevice()");
-
-	#undef SDLAUDIO_FAIL
-
-	// We're now ready to feed audio data to SDL!
-	AllocateOutputBuffers();
-	SDL_PauseAudioDevice(m_devId, 0);
-
-#if defined( BINK_VIDEO ) && defined( LINUX )
-	// Tells Bink to use SDL for its audio decoding
-	if ( g_pVideo != NULL) 
-	{
-		g_pVideo->SoundDeviceCommand( VideoSoundDeviceOperation::SET_SDL_PARAMS, NULL, (void *)&obtained );
-	
-	}
-#endif
+    #undef SDLAUDIO_FAIL
 }
 
 //-----------------------------------------------------------------------------
@@ -415,28 +386,25 @@ int CAudioDeviceSDLAudio::GetOutputPosition( void )
 //-----------------------------------------------------------------------------
 // Pausing
 //-----------------------------------------------------------------------------
-void CAudioDeviceSDLAudio::Pause( void )
+void CAudioDeviceSDLAudio::Pause(void)
 {
-	m_pauseCount++;
-	if (m_pauseCount == 1)
-	{
+    m_pauseCount++;
+    if (m_pauseCount == 1) {
 		debugsdl("SDLAUDIO: PAUSE\n");
-		SDL_PauseAudioDevice(m_devId, 1);
+        SDL_PauseAudioDevice(m_devId);
 	}
 }
 
-
-void CAudioDeviceSDLAudio::UnPause( void )
+void CAudioDeviceSDLAudio::UnPause(void)
 {
-	if ( m_pauseCount > 0 )
-	{
-		m_pauseCount--;
-		if (m_pauseCount == 0)
-		{
+    if (m_pauseCount > 0)
+    {
+        m_pauseCount--;
+        if (m_pauseCount == 0) {
 			debugsdl("SDLAUDIO: UNPAUSE\n");
-			SDL_PauseAudioDevice(m_devId, 0);
+            SDL_ResumeAudioDevice(m_devId);
 		}
-	}
+    }
 }
 
 bool CAudioDeviceSDLAudio::IsActive( void )

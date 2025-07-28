@@ -302,7 +302,7 @@ void CSourceVirtualReality::CreateRenderTargets( IMaterialSystem *pMaterialSyste
 
 	g_StereoGuiTexture.Init( materials->CreateNamedRenderTargetTextureEx2(
 		"_rt_gui",
-		640, 480, RT_SIZE_OFFSCREEN,
+		1280, 720, RT_SIZE_OFFSCREEN,
 		materials->GetBackBufferFormat(),
 		MATERIAL_RT_DEPTH_SHARED,
 		TEXTUREFLAGS_CLAMPS | TEXTUREFLAGS_CLAMPT,

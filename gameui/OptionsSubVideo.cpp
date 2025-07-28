@@ -28,9 +28,10 @@
 #include "ModInfo.h"
 #include "vgui_controls/Tooltip.h"
 #include "sourcevr/isourcevirtualreality.h"
+#include <SDL3/SDL_video.h>
 
 #if defined( USE_SDL )
-#include "SDL.h"
+#include <SDL3/SDL.h>
 #endif
 
 #include "inetchannelinfo.h"
@@ -1071,7 +1072,8 @@ COptionsSubVideo::COptionsSubVideo(vgui::Panel *parent) : PropertyPage(parent, N
 	// which is an operation we don't support as it currently stands. The user can 
 	// pass -adapter N to use a different device.
 #if defined( USE_SDL ) && defined( DX_TO_GL_ABSTRACTION )
-	int numVideoDisplays = SDL_GetNumVideoDisplays();
+	int numVideoDisplays;
+	SDL_GetDisplays(&numVideoDisplays);
 
 	m_pWindowed = new vgui::ComboBox( this, "DisplayModeCombo", 5 + numVideoDisplays, false );
 
@@ -1177,7 +1179,9 @@ void COptionsSubVideo::PrepareResolutionList()
 	gameuifuncs->GetDesktopResolution( desktopWidth, desktopHeight );
 
 #if defined( USE_SDL )
-	bool bFullScreenWithMultipleDisplays = ( !bWindowed && ( SDL_GetNumVideoDisplays() > 1 ) );
+	int displayCounter;
+	SDL_GetDisplays(&displayCounter);
+	bool bFullScreenWithMultipleDisplays = ( !bWindowed && ( displayCounter > 1 ) );
 	if ( bFullScreenWithMultipleDisplays )
 	{
 		SDL_Rect rect;

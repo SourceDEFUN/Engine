@@ -166,8 +166,8 @@ struct MaterialSystem_Config_t
 		SetFlag( MATSYS_VIDCFG_FLAGS_DISABLE_PHONG, false );
 		SetFlag( MATSYS_VIDCFG_FLAGS_VR_MODE, false );
 
-		m_VideoMode.m_Width = 640;
-		m_VideoMode.m_Height = 480;
+		m_VideoMode.m_Width = 1280;
+		m_VideoMode.m_Height = 720;
 		m_VideoMode.m_RefreshRate = 60;
 		dxSupportLevel = 0;
 		bCompressedTextures = true;
