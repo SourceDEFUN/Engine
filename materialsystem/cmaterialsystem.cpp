@@ -25,6 +25,12 @@
 #include "vstdlib/IKeyValuesSystem.h"
 #include "ctexturecompositor.h"
 
+#ifdef USE_SDL
+#include <SDL3/SDL.h>
+#include <SDL3/SDL_video.h>
+#include <SDL3/SDL_opengl.h>
+#endif
+
 // NOTE: This must be the last file included!!!
 #include "tier0/memdbgon.h"
 
@@ -1155,22 +1161,22 @@ int	 CMaterialSystem::GetModeCount( int adapter ) const
 //-----------------------------------------------------------------------------
 static void ConvertModeStruct( ShaderDeviceInfo_t *pMode, const MaterialSystem_Config_t &config ) 
 {
-	pMode->m_DisplayMode.m_nWidth = config.m_VideoMode.m_Width;					
+	pMode->m_DisplayMode.m_nWidth = config.m_VideoMode.m_Width;
 	pMode->m_DisplayMode.m_nHeight = config.m_VideoMode.m_Height;
-	pMode->m_DisplayMode.m_Format = config.m_VideoMode.m_Format;			
-	pMode->m_DisplayMode.m_nRefreshRateNumerator = config.m_VideoMode.m_RefreshRate;	
-	pMode->m_DisplayMode.m_nRefreshRateDenominator = config.m_VideoMode.m_RefreshRate ? 1 : 0;	
-	pMode->m_nBackBufferCount = 1;			
+	pMode->m_DisplayMode.m_Format = config.m_VideoMode.m_Format;
+	pMode->m_DisplayMode.m_nRefreshRateNumerator = config.m_VideoMode.m_RefreshRate;
+	pMode->m_DisplayMode.m_nRefreshRateDenominator = config.m_VideoMode.m_RefreshRate ? 1 : 0;
+	pMode->m_nBackBufferCount = 1;
 	pMode->m_nAASamples = config.m_nAASamples;
 	pMode->m_nAAQuality = config.m_nAAQuality;
 	pMode->m_nDXLevel = MAX( ABSOLUTE_MINIMUM_DXLEVEL, config.dxSupportLevel );
-	pMode->m_nWindowedSizeLimitWidth = (int)config.m_WindowedSizeLimitWidth;	
+	pMode->m_nWindowedSizeLimitWidth = (int)config.m_WindowedSizeLimitWidth;
 	pMode->m_nWindowedSizeLimitHeight = (int)config.m_WindowedSizeLimitHeight;
 
 	pMode->m_bWindowed = config.Windowed();
-	pMode->m_bResizing = config.Resizing();			
+	pMode->m_bResizing = config.Resizing();
 	pMode->m_bUseStencil = config.Stencil();
-	pMode->m_bLimitWindowedSize = config.LimitWindowedSize();	
+	pMode->m_bLimitWindowedSize = config.LimitWindowedSize();
 	pMode->m_bWaitForVSync = config.WaitForVSync();	
 	pMode->m_bScaleToOutputResolution = config.ScaleToOutputResolution();
 	pMode->m_bUsingMultipleWindows = config.UsingMultipleWindows();
@@ -1191,7 +1197,18 @@ static void ConvertModeStruct( MaterialVideoMode_t *pMode, const ShaderDisplayMo
 void CMaterialSystem::GetModeInfo( int nAdapter, int nMode, MaterialVideoMode_t& info ) const
 {
 	ShaderDisplayMode_t shaderInfo;
+	#ifndef USE_SDL
 	g_pShaderDeviceMgr->GetModeInfo( &shaderInfo, nAdapter, nMode );
+	#else
+	static ConVarRef sdl_displayindex( "sdl_displayindex" );
+	const SDL_DisplayMode* mode = SDL_GetCurrentDisplayMode(sdl_displayindex.GetInt());
+    if (mode) {
+        info.m_Width = mode->w;
+        info.m_Height = mode->h;
+        info.m_RefreshRate = (int)mode->refresh_rate;
+        // Set other fields as needed
+    }
+	#endif
 	ConvertModeStruct( &info, shaderInfo );
 }
 
@@ -1202,7 +1219,9 @@ void CMaterialSystem::GetModeInfo( int nAdapter, int nMode, MaterialVideoMode_t&
 void CMaterialSystem::GetDisplayMode( MaterialVideoMode_t& info ) const
 {
 	ShaderDisplayMode_t shaderInfo;
-	g_pShaderDeviceMgr->GetCurrentModeInfo( &shaderInfo, m_nAdapter );
+	g_pShaderDeviceMgr->GetCurrentModeInfo( &shaderInfo, m_nAdapter ); // 2SDL3
+	shaderInfo.m_nWidth = g_config.m_VideoMode.m_Width; shaderInfo.m_nHeight = g_config.m_VideoMode.m_Height;
+	shaderInfo.m_Format = g_config.m_VideoMode.m_Format;
 	ConvertModeStruct( &info, shaderInfo );
 }
 

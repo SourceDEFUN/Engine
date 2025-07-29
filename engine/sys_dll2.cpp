@@ -4,6 +4,7 @@
 //
 // $NoKeywords: $
 //===========================================================================//
+#include <cstdio>
 #define DISABLE_PROTECTED_THINGS
 
 #if defined( USE_SDL )
@@ -1714,6 +1715,7 @@ bool CEngineAPI::ModInit( const char *pModName, const char *pGameDir )
 
 	// Create the game window now that we have a search path
 	// FIXME: Deal with initial window width + height better
+
 	if ( !videomode || !videomode->CreateGameWindow( g_pMaterialSystemConfig->m_VideoMode.m_Width, g_pMaterialSystemConfig->m_VideoMode.m_Height, bWindowed ) )
 	{
 		return false;

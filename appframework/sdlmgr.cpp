@@ -517,7 +517,7 @@ InitReturnVal_t CSDLMgr::Init()
 	if (m_Window != NULL)
 		return INIT_OK;  // already initialized.
 
-	if (!SDL_WasInit(SDL_INIT_VIDEO))
+	if (SDL_WasInit(SDL_INIT_VIDEO))
 	{
 		if (!SDL_Init(SDL_INIT_VIDEO))
 			Error( "SDL_Init(SDL_INIT_VIDEO) failed: %s", SDL_GetError() );

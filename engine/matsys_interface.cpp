@@ -410,7 +410,7 @@ static void ReadMaterialSystemConfigFromRegistry( MaterialSystem_Config_t &confi
 
 		// Make sure the width / height isn't too large for this display.
 		SDL_Rect rect;
-		if ( !SDL_GetDisplayBounds( displayIndex, &rect ) )
+		if ( SDL_GetDisplayBounds( displayIndex, &rect ) )
 		{
 			if ( ( config.m_VideoMode.m_Width > rect.w ) || ( config.m_VideoMode.m_Height > rect.h ) )
 			{
@@ -608,7 +608,7 @@ static void OverrideMaterialSystemConfigFromCommandLine( MaterialSystem_Config_t
 
 			// Make sure the width / height isn't too large for this display.
 			SDL_Rect rect;
-			if ( !SDL_GetDisplayBounds( displayIndex, &rect ) )
+			if ( SDL_GetDisplayBounds( displayIndex, &rect ) )
 			{
 				if ( ( config.m_VideoMode.m_Width > rect.w ) || ( config.m_VideoMode.m_Height > rect.h ) )
 				{
@@ -890,8 +890,10 @@ CON_COMMAND( mat_configcurrent, "show the current video control panel config for
 #if !defined(SWDS)
 CON_COMMAND( mat_setvideomode, "sets the width, height, windowed state of the material system" )
 {
-	if ( args.ArgC() != 4 )
+	if ( args.ArgC() != 4 ) {
+		Msg("Make sure to write width, height and `window ? 1 : 0` into args!");
 		return;
+	}
 
 	int nWidth = Q_atoi( args[1] );
 	int nHeight = Q_atoi( args[2] );

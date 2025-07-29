@@ -251,8 +251,8 @@ CVideoMode_Common::CVideoMode_Common( void )
     m_pBackgroundTexture   = NULL;
     m_pLoadingTexture      = NULL;
     m_bWindowed            = false;
-    m_nModeWidth           = IsPC() ? 1280 : 800;
-    m_nModeHeight          = IsPC() ? 720 : 600;
+    m_nModeWidth           = IsPC() ? 1024 : 640;
+    m_nModeHeight          = IsPC() ? 768 : 480;
 	m_bVROverride = false;
 }
 
@@ -354,6 +354,10 @@ vmode_t *CVideoMode_Common::GetMode( int num )
 //-----------------------------------------------------------------------------
 int CVideoMode_Common::GetModeCount( void )
 {
+    #ifdef USE_SDL
+    // Secton: i hate this....
+    return 18;
+    #endif
     return m_nNumModes;
 }
 
@@ -514,12 +518,12 @@ void CVideoMode_Common::ResetCurrentModeForNewResolution( int nWidth, int nHeigh
 
 	// default to non-VR values
 	m_bWindowed = bWindowed;
-	m_nModeWidth = pMode->width;
-	m_nModeHeight = pMode->height;
-	m_nUIWidth = pMode->width;
-	m_nUIHeight = pMode->height;
-	m_nStereoWidth = pMode->width;
-	m_nStereoHeight = pMode->height;
+	m_nModeWidth = nWidth;
+	m_nModeHeight = nHeight;
+	m_nUIWidth = nWidth;
+	m_nUIHeight = nHeight;
+	m_nStereoWidth = nWidth;
+	m_nStereoHeight = nHeight;
 
 	// assume we won't be overriding the position
 	m_bVROverride = false;
@@ -539,8 +543,8 @@ void CVideoMode_Common::ResetCurrentModeForNewResolution( int nWidth, int nHeigh
 
 
 			// This is the smallest size the the UI in source games can handle.
-			m_nUIWidth =	640;
-			m_nUIHeight =	480;
+			m_nUIWidth =	800;
+			m_nUIHeight =	600;
 
 #if defined( WIN32 ) && !defined( USE_SDL )
 			m_nVROverrideX = vrBounds.nX;
@@ -634,7 +638,7 @@ bool CVideoMode_Common::CreateGameWindow( int nWidth, int nHeight, bool bWindowe
         if ( !SetMode( GetModeWidth(), GetModeHeight(), IsWindowedMode() ) )
             return false;
 
-#if defined( USE_SDL ) // && 0
+#if defined( USE_SDL ) && 0
 		static ConVarRef mat_viewportscale( "mat_viewportscale" );
 
 		if ( !bWindowed )
@@ -832,7 +836,7 @@ void CVideoMode_Common::DrawStartupVideo()
 {
 	CETWScope timer( "CVideoMode_Common::DrawStartupGraphic" );
 
-    // render an avi, if we have one
+    // render startup video, if we have one
 	if ( !m_bPlayedStartupVideo && !InEditMode() && !ShouldForceVRActive() )
     {
         game->PlayStartupVideos();
@@ -2252,14 +2256,6 @@ bool CVideoMode_MaterialSystem::Init( )
     // we only support 32-bit rendering.
     int bitsperpixel = 32;
 
-    bool bAllowSmallModes = false;
-#ifndef ANDROID
-    if ( CommandLine()->FindParm( "-small" ) )
-#endif
-    {
-        bAllowSmallModes = true;
-    }
-
     int nAdapter = materials->GetCurrentAdapter();
     int nModeCount = materials->GetModeCount( nAdapter );
 
@@ -2271,11 +2267,9 @@ bool CVideoMode_MaterialSystem::Init( )
         MaterialVideoMode_t info;
         materials->GetModeInfo( nAdapter, i, info );
 
-        if ( info.m_Width < 640 || info.m_Height < 480 )
-        {
-            if ( !bAllowSmallModes )
-                continue;
-        }
+        if ( info.m_Width < 800 || info.m_Height < 600 )
+            // Error("Your display resolution is too small!");
+            continue;
 
         // make sure we don't already have this mode listed
         bool bAlreadyInList = false;
@@ -2352,16 +2346,15 @@ bool CVideoMode_MaterialSystem::SetMode( int nWidth, int nHeight, bool bWindowed
 
     // update current video state
     MaterialSystem_Config_t config = *g_pMaterialSystemConfig;
-    config.m_VideoMode.m_Width = pMode->width;
-    config.m_VideoMode.m_Height = pMode->height;
+    config.m_VideoMode.m_Width = nWidth; // pMode->width;
+    config.m_VideoMode.m_Height = nHeight; // pMode->height;
+    pMode->width = nWidth; pMode->height = nHeight;
 
 	// make sure VR mode is up to date
 	config.SetFlag( MATSYS_VIDCFG_FLAGS_VR_MODE, UseVR() || ShouldForceVRActive() );
 
 	if ( ShouldForceVRActive() )
-	{
 		config.m_nVRModeAdapter = materials->GetCurrentAdapter();
-	}
 
 #ifdef SWDS
     config.m_VideoMode.m_RefreshRate = 60;

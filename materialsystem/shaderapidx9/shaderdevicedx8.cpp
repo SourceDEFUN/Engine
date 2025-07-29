@@ -1270,6 +1270,22 @@ void CShaderDeviceMgrDx8::GetModeInfo( ShaderDisplayMode_t* pInfo, int nAdapter,
 
 	pInfo->m_nWidth       = d3dInfo.Width;
 	pInfo->m_nHeight      = d3dInfo.Height;
+	// Secton FIXME: This forces engine to use overrides instead of defaults.
+	//               Actually it should use config instead of defaults but after
+	//               porting engine from SDL2 to SDL3 it stopped to care for some reason.
+	//               Also debugger mysteriously skips EnumAdapterModes - wth?
+	if ( CommandLine()->FindParm( "-width" ) || CommandLine()->FindParm( "-w" ) )
+		{
+		pInfo->m_nWidth = CommandLine()->ParmValue( "-width", 1280);
+		pInfo->m_nWidth = CommandLine()->ParmValue( "-w", 1280);
+		if( !( CommandLine()->FindParm( "-height" ) || CommandLine()->FindParm( "-h" ) ) )
+			pInfo->m_nHeight = ( pInfo->m_nWidth * 3 ) / 4;
+	}
+	if ( CommandLine()->FindParm( "-height" ) || CommandLine()->FindParm( "-h" ) )
+	{
+		pInfo->m_nHeight = CommandLine()->ParmValue( "-height", 720);
+		pInfo->m_nHeight = CommandLine()->ParmValue( "-h", 720);
+	}
 	pInfo->m_Format      = ImageLoader::D3DFormatToImageFormat( d3dInfo.Format );
 	pInfo->m_nRefreshRateNumerator = d3dInfo.RefreshRate;
 	pInfo->m_nRefreshRateDenominator = 1;
@@ -1290,6 +1306,22 @@ void CShaderDeviceMgrDx8::GetCurrentModeInfo( ShaderDisplayMode_t* pInfo, int nA
 	D3DDISPLAYMODE mode = { 0 };
 	hr = D3D()->GetAdapterDisplayMode( nAdapter, &mode );
 	Assert( !FAILED(hr) );
+
+	// Secton FIXME: This forces engine to use overrides instead of defaults.
+	//               Actually it should use config instead of defaults but after
+	//               porting engine from SDL2 to SDL3 it stopped to care for some reason.
+	if ( CommandLine()->FindParm( "-width" ) || CommandLine()->FindParm( "-w" ) )
+	{
+		mode.Width = CommandLine()->ParmValue( "-width", 1280);
+		mode.Width = CommandLine()->ParmValue( "-w", 1280);
+		if( !( CommandLine()->FindParm( "-height" ) || CommandLine()->FindParm( "-h" ) ) )
+			mode.Height = ( mode.Width * 3 ) / 4;
+	}
+	if ( CommandLine()->FindParm( "-height" ) || CommandLine()->FindParm( "-h" ) )
+	{
+		mode.Height = CommandLine()->ParmValue( "-height", 720);
+		mode.Height = CommandLine()->ParmValue( "-h", 720);
+	}
 
 	pInfo->m_nWidth = mode.Width;
 	pInfo->m_nHeight = mode.Height;

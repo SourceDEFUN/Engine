@@ -548,7 +548,7 @@ void    GLMDisplayInfo::PopulateModes( void )
         {
                 SDL_Rect rect = { 0, 0, 0, 0 };
 
-                if ( !SDL_GetDisplayBounds( i, &rect ) && rect.w && rect.h )
+                if ( SDL_GetDisplayBounds( i, &rect ) && rect.w && rect.h )
                 {
                         m_modes->AddToTail( new GLMDisplayMode( rect.w, rect.h, 0 ) );
                 }
@@ -565,9 +565,11 @@ void    GLMDisplayInfo::PopulateModes( void )
                 { 1024, 768 },
                 { 1152, 864 },
                 { 1280, 960 },
+		{ 1400, 1050 },
                 { 1600, 1200 },
                 { 1920, 1440 },
                 { 2048, 1536 },
+                { 3200, 2400 },
 
                 { 1280, 720 },  // 16x9
                 { 1366, 768 },
@@ -582,6 +584,7 @@ void    GLMDisplayInfo::PopulateModes( void )
                 { 1680, 1050 },
                 { 1920, 1200 },
                 { 2560, 1600 },
+                { 3840, 2400 }
         };
 
         for ( int i = 0; i < ARRAYSIZE( s_Resolutions ); i++ )
