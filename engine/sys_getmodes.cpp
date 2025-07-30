@@ -354,10 +354,6 @@ vmode_t *CVideoMode_Common::GetMode( int num )
 //-----------------------------------------------------------------------------
 int CVideoMode_Common::GetModeCount( void )
 {
-    #ifdef USE_SDL
-    // Secton: i hate this....
-    return 18;
-    #endif
     return m_nNumModes;
 }
 
