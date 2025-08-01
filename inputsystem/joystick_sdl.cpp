@@ -10,8 +10,10 @@
 #include "tier0/icommandline.h"
 
 #include <SDL3/SDL.h>
+#include <SDL3/SDL_error.h>
 #include <SDL3/SDL_gamepad.h>
 #include <SDL3/SDL_haptic.h>
+#include <SDL3/SDL_joystick.h>
 
 // NOTE: This has to be the last file included!
 #include "tier0/memdbgon.h"
@@ -45,17 +47,17 @@ void SearchForDevice()
 		return;
 	}
 
-	int joysticksCount; SDL_GetJoysticks(&joysticksCount);
+	int joysticksCount; SDL_GetGamepads(&joysticksCount);
 	for ( int device_index = 0; device_index < joysticksCount; ++device_index )
 	{
-		SDL_Joystick *joystick = SDL_OpenJoystick(device_index);
+		SDL_Gamepad *joystick = SDL_OpenGamepad(device_index);
 		if ( joystick == NULL )
 		{
 			continue;
 		}
 
-		int joystickId = SDL_GetJoystickID(joystick);
-		SDL_CloseJoystick(joystick);
+		int joystickId = SDL_GetGamepadID(joystick);
+		SDL_CloseGamepad(joystick);
 
 		if ( joystickId == newJoystickId )
 		{
@@ -196,21 +198,23 @@ void CInputSystem::InitializeJoysticks( void )
 
 	SDL_AddEventWatch(JoystickSDLWatcher, this);
 
+	// Thanks to: https://glusoft.com/sdl3-tutorials/use-gamepads-joysticks-sdl3/
 	int totalSticks;
-	SDL_GetJoysticks(&totalSticks);
+	SDL_JoystickID *ids = SDL_GetGamepads(&totalSticks);
 	for ( int i = 0; i < totalSticks; i++ )
 	{
-		if ( SDL_IsGamepad(i) )
+		if ( SDL_IsGamepad(ids[i]) )
 		{
-			JoystickHotplugAdded(i);
-		} 
+			JoystickHotplugAdded(ids[i]);
+		}
 		else
 		{
-			SDL_GUID joyGUID = SDL_GetJoystickGUIDForID(i);
+			SDL_GUID joyGUID = SDL_GetGamepadGUIDForID(ids[i]);
 			char szGUID[sizeof(joyGUID.data)*2 + 1];
 			SDL_GUIDToString(joyGUID, szGUID, sizeof(szGUID));
 
-			Msg("Found joystick '%s' (%s), but no recognized controller configuration for it.\n", SDL_GetJoystickNameForID(i), szGUID);
+			Msg("Found joystick '%s' (%s), but no recognized controller configuration for it.\n", SDL_GetGamepadGUIDForID(ids[i]), szGUID);
+			Msg("SDL3 error: %s\n", SDL_GetError());
 		}
 	}
 
@@ -256,7 +260,8 @@ static void SetJoyXControllerFound( bool found )
 void CInputSystem::JoystickHotplugAdded( int joystickIndex )
 {
 	// SDL_IsGameController doesn't bounds check its inputs.
-	int joysticksCount; SDL_GetJoysticks(&joysticksCount);
+	int joysticksCount;
+	SDL_JoystickID* jID = SDL_GetGamepads(&joysticksCount);
 	if ( joystickIndex < 0 || joystickIndex >= joysticksCount )
 		return;
 
@@ -266,15 +271,15 @@ void CInputSystem::JoystickHotplugAdded( int joystickIndex )
 		return;
 	}
 
-	SDL_Joystick *joystick = SDL_OpenJoystick(joystickIndex);
+	SDL_Gamepad *joystick = SDL_OpenGamepad(joystickIndex);
 	if ( joystick == NULL )
 	{
 		Warning("Could not open joystick %i: %s", joystickIndex, SDL_GetError());
 		return;
 	}
 
-	int joystickId = SDL_GetJoystickID(joystick);
-	SDL_CloseJoystick(joystick);
+	int joystickId = SDL_GetGamepadID(joystick);
+	SDL_CloseGamepad(joystick);
 
 	int activeJoystick = joy_active.GetInt();
 	JoystickInfo_t& info = m_pJoystickInfo[ 0 ];

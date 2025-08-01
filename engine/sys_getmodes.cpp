@@ -112,8 +112,6 @@ public:
     virtual int         GetModeHeight( void ) const;
 	virtual int			GetModeStereoWidth() const;
 	virtual int			GetModeStereoHeight() const;
-	virtual int			GetModeUIWidth() const  OVERRIDE;
-	virtual int			GetModeUIHeight() const OVERRIDE;
     virtual const vrect_t &GetClientViewRect( ) const;
     virtual void        SetClientViewRect( const vrect_t &viewRect );
     virtual void        MarkClientViewRectDirty();
@@ -193,8 +191,6 @@ protected:
     int                 m_nModeHeight;
     int                 m_nStereoWidth;
     int                 m_nStereoHeight;
-    int                 m_nUIWidth;
-    int                 m_nUIHeight;
 	int					m_nVROverrideX;
 	int					m_nVROverrideY;
 #if defined( USE_SDL )
@@ -316,21 +312,6 @@ int CVideoMode_Common::GetModeStereoWidth( void ) const
 int CVideoMode_Common::GetModeStereoHeight( void ) const
 {
 	return m_nStereoHeight;
-}
-
-
-//-----------------------------------------------------------------------------
-// Returns the video mode full screen UI width + height.
-//-----------------------------------------------------------------------------
-
-int CVideoMode_Common::GetModeUIWidth( void ) const
-{
-	return m_nUIWidth;
-}
-
-int CVideoMode_Common::GetModeUIHeight( void ) const
-{
-    return m_nUIHeight;
 }
 
 
@@ -508,16 +489,10 @@ int CVideoMode_Common::FindVideoMode( int nDesiredWidth, int nDesiredHeight, boo
 //-----------------------------------------------------------------------------
 void CVideoMode_Common::ResetCurrentModeForNewResolution( int nWidth, int nHeight, bool bWindowed )
 {
-    // Fill in vid structure for the mode
-    int nGameMode = FindVideoMode( nWidth, nHeight, bWindowed );
-    vmode_t *pMode = GetMode( nGameMode );
-
 	// default to non-VR values
 	m_bWindowed = bWindowed;
 	m_nModeWidth = nWidth;
 	m_nModeHeight = nHeight;
-	m_nUIWidth = nWidth;
-	m_nUIHeight = nHeight;
 	m_nStereoWidth = nWidth;
 	m_nStereoHeight = nHeight;
 
@@ -536,11 +511,6 @@ void CVideoMode_Common::ResetCurrentModeForNewResolution( int nWidth, int nHeigh
 			RequestedWindowVideoMode().height = m_nModeHeight = vrBounds.nHeight;
 			m_bVROverride = true;
 			m_bWindowed = vr_force_windowed.GetBool();
-
-
-			// This is the smallest size the the UI in source games can handle.
-			m_nUIWidth =	800;
-			m_nUIHeight =	600;
 
 #if defined( WIN32 ) && !defined( USE_SDL )
 			m_nVROverrideX = vrBounds.nX;
@@ -2389,8 +2359,8 @@ void CVideoMode_MaterialSystem::AdjustForModeChange( void )
         return;
 
     // get previous size
-	int nOldUIWidth = GetModeUIWidth();
-	int nOldUIHeight = GetModeUIHeight();
+	int nOldUIWidth = GetModeWidth();
+	int nOldUIHeight = GetModeHeight();
 
     // Get the new mode info from the config record
     int nNewWidth = g_pMaterialSystemConfig->m_VideoMode.m_Width;

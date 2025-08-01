@@ -1517,3 +1517,10 @@ void CInputSystem::StartTextInput()
 		SDL_StartTextInput( (SDL_Window*)m_pLauncherMgr->GetWindowRef() );
 #endif
 }
+void CInputSystem::StopTextInput()
+{
+#ifdef USE_SDL
+	if (m_pLauncherMgr)
+		SDL_StopTextInput( (SDL_Window*)m_pLauncherMgr->GetWindowRef() );
+#endif
+}

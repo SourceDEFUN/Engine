@@ -38,7 +38,7 @@ extern void S_SpatializeChannel( /*int nSlot,*/ int volume[6], int master_vol, c
 #define	WAV_MASK				(WAV_BUFFERS - 1)
 #define	WAV_BUFFER_SIZE			0x0400
 
-#if 1
+#if 0
 #define debugsdl printf
 #else
 static inline void debugsdl(const char *fmt, ...) {}

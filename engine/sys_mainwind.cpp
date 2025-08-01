@@ -1459,13 +1459,8 @@ void CGame::GetDesktopInfo( int &width, int &height, int &refreshrate )
 	if (SDL3failed) {
 		const SDL_DisplayMode* rect = SDL_GetDesktopDisplayMode( SDL_GetPrimaryDisplay() );
 		if (rect) {
-			printf("\nSDL3\nFinal screen resolution: %ix%i\n\n", rect->w, rect->h);
 			width = rect->w; height = rect->h;
-		} else {
-			printf("\nWe have failed miserably at detecting screen resolution...\n");
-		}
-	} else {
-		printf("\nAll's good! %ix%i\n", width, height);
+		} else printf("\nWe have failed miserably at detecting screen resolution...\n");
 	}
 #else
 	// order of initialization means that this might get called early.  In that case go ahead and grab the current

@@ -630,7 +630,7 @@ void CEngineVGui::Init()
 	//		staticDebugSystemPanel ( Engine debug stuff ) zpos == 125 )
 
 	staticPanel = new CStaticPanel( NULL, "staticPanel" );	
-	staticPanel->SetBounds( 0, 0, videomode->GetModeUIWidth(), videomode->GetModeUIHeight() );
+	staticPanel->SetBounds( 0, 0, videomode->GetModeWidth(), videomode->GetModeHeight() );
 	staticPanel->SetPaintBorderEnabled(false);
 	staticPanel->SetPaintBackgroundEnabled(false);
 	staticPanel->SetPaintEnabled(false);
@@ -643,7 +643,7 @@ void CEngineVGui::Init()
 	COM_TimestampedLog( "Building Panels (staticClientDLLPanel)" );
 
 	staticClientDLLPanel = new CEnginePanel( staticPanel, "staticClientDLLPanel" );
-	staticClientDLLPanel->SetBounds( 0, 0, videomode->GetModeUIWidth(), videomode->GetModeUIHeight() );
+	staticClientDLLPanel->SetBounds( 0, 0, videomode->GetModeWidth(), videomode->GetModeHeight() );
 	staticClientDLLPanel->SetPaintBorderEnabled(false);
 	staticClientDLLPanel->SetPaintBackgroundEnabled(false);
 	staticClientDLLPanel->SetKeyBoardInputEnabled( false );	// popups in the client DLL can enable this.
@@ -657,7 +657,7 @@ void CEngineVGui::Init()
 	COM_TimestampedLog( "Building Panels (staticClientDLLToolsPanel)" );
 
 	staticClientDLLToolsPanel = new CEnginePanel( staticPanel, "staticClientDLLToolsPanel" );
-	staticClientDLLToolsPanel->SetBounds( 0, 0, videomode->GetModeUIWidth(), videomode->GetModeUIHeight() );
+	staticClientDLLToolsPanel->SetBounds( 0, 0, videomode->GetModeWidth(), videomode->GetModeHeight() );
 	staticClientDLLToolsPanel->SetPaintBorderEnabled(false);
 	staticClientDLLToolsPanel->SetPaintBackgroundEnabled(false);
 	staticClientDLLToolsPanel->SetKeyBoardInputEnabled( false );	// popups in the client DLL can enable this.
@@ -667,7 +667,7 @@ void CEngineVGui::Init()
 	staticClientDLLToolsPanel->SetZPos( 28 );
 
 	staticEngineToolsPanel = new CEnginePanel( staticPanel, "Engine Tools" );
-	staticEngineToolsPanel->SetBounds( 0, 0, videomode->GetModeUIWidth(), videomode->GetModeUIHeight() );
+	staticEngineToolsPanel->SetBounds( 0, 0, videomode->GetModeWidth(), videomode->GetModeHeight() );
 	staticEngineToolsPanel->SetPaintBorderEnabled(false);
 	staticEngineToolsPanel->SetPaintBackgroundEnabled(false);
 	staticEngineToolsPanel->SetPaintEnabled(false);
@@ -682,7 +682,7 @@ void CEngineVGui::Init()
 	if(NeedProportional())
 		staticGameUIPanel->SetProportional(true);
 
-	staticGameUIPanel->SetBounds( 0, 0, videomode->GetModeUIWidth(), videomode->GetModeUIHeight() );
+	staticGameUIPanel->SetBounds( 0, 0, videomode->GetModeWidth(), videomode->GetModeHeight() );
 	staticGameUIPanel->SetPaintBorderEnabled(false);
 	staticGameUIPanel->SetPaintBackgroundEnabled(false);
 	staticGameUIPanel->SetPaintEnabled(false);
@@ -691,7 +691,7 @@ void CEngineVGui::Init()
 	staticGameUIPanel->SetZPos( 100 );
 
 	staticGameDLLPanel = new CEnginePanel( staticPanel, "staticGameDLLPanel" );
-	staticGameDLLPanel->SetBounds( 0, 0, videomode->GetModeUIWidth(), videomode->GetModeUIHeight() );
+	staticGameDLLPanel->SetBounds( 0, 0, videomode->GetModeWidth(), videomode->GetModeHeight() );
 	staticGameDLLPanel->SetPaintBorderEnabled(false);
 	staticGameDLLPanel->SetPaintBackgroundEnabled(false);
 	staticGameDLLPanel->SetKeyBoardInputEnabled( false );	// popups in the game DLL can enable this.
@@ -744,7 +744,7 @@ void CEngineVGui::Init()
 
 	// Make sure this is on top of everything
 	staticFocusOverlayPanel = new CFocusOverlayPanel( staticPanel, "FocusOverlayPanel" );
-	staticFocusOverlayPanel->SetBounds( 0, 0, videomode->GetModeUIWidth(), videomode->GetModeUIHeight() );
+	staticFocusOverlayPanel->SetBounds( 0, 0, videomode->GetModeWidth(), videomode->GetModeHeight() );
 	staticFocusOverlayPanel->SetZPos( 150 );
 	staticFocusOverlayPanel->MoveToFront();
 
@@ -1996,8 +1996,8 @@ bool CFocusOverlayPanel::DrawFocusPanelList( void )
 		int x, y, x1, y1;
 		vgui::ipanel()->GetClipRect( vpanel, x, y, x1, y1 );
 
-		if ( (x1 - x) == videomode->GetModeUIWidth() && 
-			 (y1 - y) == videomode->GetModeUIHeight() )
+		if ( (x1 - x) == videomode->GetModeWidth() && 
+			 (y1 - y) == videomode->GetModeHeight() )
 		{
 			x += fullscreeninset;
 			y += fullscreeninset;

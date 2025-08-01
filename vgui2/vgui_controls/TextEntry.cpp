@@ -6,6 +6,7 @@
 //=============================================================================//
 
 
+#include "tier2/tier2.h"
 #include <assert.h>
 #include <ctype.h>
 #include <stdio.h>
@@ -1486,8 +1487,8 @@ void TextEntry::OnMousePressed(MouseCode code)
 			return;
 		}
 
-		if( IsEnabled() )
-			g_pInputSystem->StartTextInput();
+		if( IsEnabled() ) g_pInputSystem->StartTextInput();
+		else              g_pInputSystem->StopTextInput();
 
 		// move the cursor to where the mouse was pressed
 		int x, y;
