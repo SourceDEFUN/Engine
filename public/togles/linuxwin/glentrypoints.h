@@ -343,8 +343,6 @@ public:
 
 // This will be set to the current OpenGL context's entry points.
 extern COpenGLEntryPoints *gGL;
-// Secton 2SDL3: i have no fucking clue what i'm doing ;(
-// typedef SDL_FunctionPointer (*GL_GetProcAddressCallbackFunc_t)(const char *, bool &, const bool, void *);
 
 #ifdef TOGL_DLL_EXPORT
 	DLL_EXPORT COpenGLEntryPoints *ToGLConnectLibraries( CreateInterfaceFn factory );

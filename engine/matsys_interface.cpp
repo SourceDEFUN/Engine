@@ -40,7 +40,7 @@
 #include "client.h"
 #include "sourcevr/isourcevirtualreality.h"
 
-#if defined( USE_SDL )
+#ifdef USE_SDL
 #include <SDL3/SDL.h>
 #endif
 

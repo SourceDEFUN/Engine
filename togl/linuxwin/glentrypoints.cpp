@@ -145,7 +145,7 @@ SDL_FunctionPointer VoidFnPtrLookup_GlMgr(const char *fn, bool &okay, const bool
 #else
 	retval = (*gGL_GetProcAddressCallback)(fn, okay, bRequired, fallback);
 #endif
-	printf("CDynamicFunctionOpenGL: SDL_GL_GetProcAddress(\"%s\") returned %p\n", fn, retval);
+	// printf("CDynamicFunctionOpenGL: SDL_GL_GetProcAddress(\"%s\") returned %p\n", fn, retval);
 	if ((retval == NULL) && (fallback != NULL))
 	{
 		printf("CDynamicFunctionOpenGL: Using fallback %p for \"%s\"\n", fallback, fn);

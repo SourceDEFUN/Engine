@@ -21,6 +21,10 @@
 #include "shaderapidx8_global.h"
 #include "imeshdx8.h"
 #include "materialsystem/materialsystem_config.h"
+#ifdef USE_SDL
+// #include "../engine/gl_matsysiface.h"
+// extern const MaterialSystem_Config_t *g_pMaterialSystemConfig;
+#endif
 #include "vertexshaderdx8.h"
 #include "recording.h"
 #include "winutils.h"
@@ -1305,6 +1309,11 @@ void CShaderDeviceMgrDx8::GetCurrentModeInfo( ShaderDisplayMode_t* pInfo, int nA
 	HRESULT hr;
 	D3DDISPLAYMODE mode = { 0 };
 	hr = D3D()->GetAdapterDisplayMode( nAdapter, &mode );
+#ifdef USE_SDL
+	const MaterialSystem_Config_t *mats = &materials->GetCurrentConfigForVideoCard();
+	mode.Width = mats->m_VideoMode.m_Width;
+	mode.Height = mats->m_VideoMode.m_Height;
+#endif
 	Assert( !FAILED(hr) );
 
 	// Secton FIXME: This forces engine to use overrides instead of defaults.
