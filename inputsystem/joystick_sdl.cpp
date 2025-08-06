@@ -14,6 +14,7 @@
 #include <SDL3/SDL_gamepad.h>
 #include <SDL3/SDL_haptic.h>
 #include <SDL3/SDL_joystick.h>
+#include <cstdio>
 
 // NOTE: This has to be the last file included!
 #include "tier0/memdbgon.h"
@@ -26,6 +27,7 @@ ConVar joy_axisbutton_threshold( "joy_axisbutton_threshold", "0.3", FCVAR_ARCHIV
 ConVar joy_axis_deadzone( "joy_axis_deadzone", "0.2", FCVAR_ARCHIVE, "Dead zone near the zero point to not report movement." );
 
 static void joy_active_changed_f( IConVar *var, const char *pOldValue, float flOldValue );
+// Secton FIXME: Set automatically to 1 if gamepads are ready, otherwise no gamepad input for you!
 ConVar joy_active( "joy_active", "-1", FCVAR_NONE, "Which of the connected joysticks / gamepads to use (-1 means first found)", &joy_active_changed_f);
 
 static void joy_gamecontroller_config_changed_f( IConVar *var, const char *pOldValue, float flOldValue );
@@ -98,7 +100,7 @@ void joy_gamecontroller_config_changed_f( IConVar *var, const char *pOldValue, f
 }
 
 //-----------------------------------------------------------------------------
-// Handle the events coming from the GameController SDL subsystem.
+// Handle the events coming from the Gamepad SDL subsystem.
 //-----------------------------------------------------------------------------
 bool JoystickSDLWatcher( void *userInfo, SDL_Event *event )
 {
@@ -199,29 +201,26 @@ void CInputSystem::InitializeJoysticks( void )
 	SDL_AddEventWatch(JoystickSDLWatcher, this);
 
 	// Thanks to: https://glusoft.com/sdl3-tutorials/use-gamepads-joysticks-sdl3/
-	int totalSticks;
-	SDL_JoystickID *ids = SDL_GetGamepads(&totalSticks);
-	for ( int i = 0; i < totalSticks; i++ )
-	{
-		if ( SDL_IsGamepad(ids[i]) )
+	if (SDL_HasGamepad()) {
+		int totalSticks;
+		SDL_JoystickID *ids = SDL_GetGamepads(&totalSticks);
+		for ( int i = 0; i < totalSticks; i++ )
 		{
-			JoystickHotplugAdded(ids[i]);
-		}
-		else
-		{
-			SDL_GUID joyGUID = SDL_GetGamepadGUIDForID(ids[i]);
-			char szGUID[sizeof(joyGUID.data)*2 + 1];
-			SDL_GUIDToString(joyGUID, szGUID, sizeof(szGUID));
+			if ( SDL_IsGamepad(ids[i]) )
+			{
+				JoystickHotplugAdded(ids[i]);
+			}
+			else
+			{
+				SDL_GUID joyGUID = SDL_GetGamepadGUIDForID(ids[i]);
+				char szGUID[sizeof(joyGUID.data)*2 + 1];
+				SDL_GUIDToString(joyGUID, szGUID, sizeof(szGUID));
 
-			Msg("Found joystick '%s' (%s), but no recognized controller configuration for it.\n", SDL_GetGamepadGUIDForID(ids[i]), szGUID);
-			Msg("SDL3 error: %s\n", SDL_GetError());
+				Msg("Found joystick '%s' (%s), but no recognized controller configuration for it.\n", SDL_GetGamepadGUIDForID(ids[i]), szGUID);
+				Msg("SDL3 error: %s\n", SDL_GetError());
+			}
 		}
-	}
-
-	if ( totalSticks < 1 )
-	{
-		Msg("Did not detect any valid joysticks.\n");
-	}
+	} else Msg("Did not detect any valid joysticks.\n");
 }
 
 void CInputSystem::ShutdownJoysticks()
@@ -259,20 +258,14 @@ static void SetJoyXControllerFound( bool found )
 
 void CInputSystem::JoystickHotplugAdded( int joystickIndex )
 {
-	// SDL_IsGameController doesn't bounds check its inputs.
-	int joysticksCount;
-	SDL_JoystickID* jID = SDL_GetGamepads(&joysticksCount);
-	if ( joystickIndex < 0 || joystickIndex >= joysticksCount )
-		return;
-
 	if ( !SDL_IsGamepad(joystickIndex) )
 	{
-		Warning("Joystick is not recognized by the game controller system. You can configure the controller in Steam Big Picture mode.\n");
+		Warning("Joystick is not recognized by the game controller system.\n");
 		return;
 	}
 
 	SDL_Gamepad *joystick = SDL_OpenGamepad(joystickIndex);
-	if ( joystick == NULL )
+	if ( !joystick )
 	{
 		Warning("Could not open joystick %i: %s", joystickIndex, SDL_GetError());
 		return;
