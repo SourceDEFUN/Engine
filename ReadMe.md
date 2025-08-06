@@ -3,12 +3,13 @@ A love letter to Source Engine and Valve Software.
 ## What's changed
 * waifu renamed to waf
 * Hammer's INFDEV Linux support
+* SDL3 upgrade
 
 ## What to expect
 * Utilities port to Linux
-* SDL3 upgrade
 * Vulkan instead of OpenGL/DirectX
 * Replacement of proprietary technology with open-source alternatives
+    * New GUI replacing VGUI2
 * Better graphics
 * Improve VRAD and make it use SYCL instead of just CPU
 ### Perhaps...
