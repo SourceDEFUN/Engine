@@ -1860,10 +1860,7 @@ void CSDLMgr::PumpWindowsMessageLoop()
 
 				if ( bPressed )
 				{
-					if ( m_bGotMouseButtonDown &&
-						 ( (int)( event.button.timestamp - m_MouseButtonDownTimeStamp ) <= sdl_double_click_time.GetInt() ) &&
-						 ( abs( event.button.x - m_MouseButtonDownX ) <= sdl_double_click_size.GetInt() ) &&
-						 ( abs( event.button.y - m_MouseButtonDownY ) <= sdl_double_click_size.GetInt() ) )
+					if ( event.button.clicks >= 2 )
 					{
 						bDoublePress = true;
 						m_bGotMouseButtonDown = false;
