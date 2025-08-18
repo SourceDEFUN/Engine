@@ -2558,6 +2558,7 @@ void CMatSystemSurface::OnScreenSizeChanged( int nOldWidth, int nOldHeight )
 
 	// update the root panel size
 	ipanel()->SetSize(m_pEmbeddedPanel, iNewWidth, iNewHeight);
+	SetFullscreenViewport(m_nFullscreenViewportX, m_nFullscreenViewportY, iNewWidth, iNewHeight);
 
 	// notify every panel
 	VPANEL panel = GetEmbeddedPanel();
