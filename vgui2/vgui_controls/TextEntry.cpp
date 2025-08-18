@@ -1488,7 +1488,7 @@ void TextEntry::OnMousePressed(MouseCode code)
 		}
 
 		if( IsEnabled() ) g_pInputSystem->StartTextInput();
-		else              g_pInputSystem->StopTextInput();
+		// else              g_pInputSystem->StopTextInput();
 
 		// move the cursor to where the mouse was pressed
 		int x, y;
@@ -3895,7 +3895,7 @@ void TextEntry::OnSetFocus()
 		// clear any selection
 		SelectNone();
 	}
-	
+	g_pInputSystem->StartTextInput();
 	BaseClass::OnSetFocus();
 }
 
