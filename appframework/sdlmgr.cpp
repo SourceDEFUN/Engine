@@ -1789,7 +1789,7 @@ void CSDLMgr::PumpWindowsMessageLoop()
 				m_nMouseXDelta += event.motion.xrel;
 				m_nMouseYDelta += event.motion.yrel;
 
-				if ( !m_bRawInput && !m_bCursorVisible &&
+				if ( !m_bRawInput && !m_bCursorVisible && !m_bExpectSyntheticMouseMotion &&
 					(event.motion.x < m_nMouseTargetX - m_nWarpDelta ||
 					 event.motion.x > m_nMouseTargetX + m_nWarpDelta ||
 					 event.motion.y < m_nMouseTargetY - m_nWarpDelta ||
@@ -1797,6 +1797,7 @@ void CSDLMgr::PumpWindowsMessageLoop()
 				{
 					// We have strayed outside of our desired area, so
 					// warp the cursor back to the middle of the window.
+					DevMsg("Mouse Warped! Additional info: %i %i\n", m_nMouseXDelta, m_nMouseYDelta);
 					SDL_WarpMouseInWindow( m_Window, m_nMouseTargetX, m_nMouseTargetY );
 					m_bExpectSyntheticMouseMotion = true;
 				}
