@@ -71,13 +71,6 @@ public:
 	virtual int				GetModeStereoWidth() const = 0;
 	virtual int				GetModeStereoHeight() const = 0;
 
-	// Returns the size of full screen UI. This might be wider than a single
-	// eye on displays like the Oculus Rift where a single eye is very narrow.
-	// if the game isn't running in side by side stereo, this is the same
-	// as GetModeWidth and GetModeHeight
-	virtual int				GetModeUIWidth() const = 0;
-	virtual int				GetModeUIHeight() const = 0;
-
 	// Returns the subrect to draw the client view into.
 	// Coordinates are measured relative to the drawable region of the window
 	virtual const vrect_t &	GetClientViewRect( ) const = 0;
@@ -101,8 +94,8 @@ public:
 //-----------------------------------------------------------------------------
 // Utilities for virtual screen coordinates
 //-----------------------------------------------------------------------------
-#define XRES(x)	( x  * ( ( float )videomode->GetModeStereoWidth() / 640.0 ) )
-#define YRES(y)	( y  * ( ( float )videomode->GetModeStereoHeight() / 480.0 ) )
+#define XRES(x)	( x  * ( ( float )videomode->GetModeStereoWidth() / 1280.0 ) )
+#define YRES(y)	( y  * ( ( float )videomode->GetModeStereoHeight() / 720.0 ) )
 
 
 //-----------------------------------------------------------------------------

@@ -55,11 +55,11 @@ def build(bld):
 		'../public/tier1',
 		'../common',
 		'../'
-	] + bld.env.INCLUDES_SDL2
+	] + bld.env.INCLUDES_SDL3
 
 	defines = []
 
-	libs = ['tier0','tier1','tier2','vstdlib','mathlib','bitmap','shaderlib','vtf']
+	libs = ['tier0','tier1','tier2','vstdlib','mathlib','bitmap','shaderlib','vtf','SDL3']
 
 	install_path = bld.env.LIBDIR
 

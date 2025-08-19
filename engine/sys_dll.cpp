@@ -23,7 +23,7 @@
 #endif
 
 #if defined( USE_SDL )
-#include "SDL.h"
+#include <SDL3/SDL.h>
 #endif
 
 #include "quakedef.h"

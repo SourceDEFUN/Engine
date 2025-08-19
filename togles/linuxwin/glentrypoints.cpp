@@ -126,11 +126,11 @@ bool g_bPrintOpenGLCalls = false;
 #endif
 
 COpenGLEntryPoints *gGL = NULL;
-GL_GetProcAddressCallbackFunc_t gGL_GetProcAddressCallback = NULL;
+SDL_FunctionPointer gGL_GetProcAddressCallback = NULL;
 
-void *VoidFnPtrLookup_GlMgr(const char *fn, bool &okay, const bool bRequired, void *fallback)
+SDL_FunctionPointer VoidFnPtrLookup_GlMgr(const char *fn, bool &okay, const bool bRequired, SDL_FunctionPointer fallback)
 {
-	void *retval = NULL;
+	SDL_FunctionPointer retval = NULL;
 	if ((!okay) && (!bRequired))  // always look up if required (so we get a complete list of crucial missing symbols).
 		return NULL;
 
@@ -153,7 +153,7 @@ void *VoidFnPtrLookup_GlMgr(const char *fn, bool &okay, const bool bRequired, vo
 	return retval;
 }
 
-COpenGLEntryPoints *GetOpenGLEntryPoints(GL_GetProcAddressCallbackFunc_t callback)
+COpenGLEntryPoints *GetOpenGLEntryPoints(SDL_FunctionPointer callback)
 {
 	if (gGL == NULL)
 	{

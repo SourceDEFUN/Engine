@@ -246,17 +246,17 @@ void GLMDebugPrintf( const char *pMsg, ... )
 //===============================================================================
 // functions that are dependant on g_pLauncherMgr
 
-inline bool MakeContextCurrent( PseudoGLContextPtr hContext ) 
+inline bool MakeContextCurrent( SDL_GLContext hContext ) 
 {
 	return g_pLauncherMgr->MakeContextCurrent( hContext );
 }
 
-inline PseudoGLContextPtr GetMainContext()
+inline SDL_GLContext GetMainContext()
 {
 	return g_pLauncherMgr->GetMainContext();
 }
 
-inline PseudoGLContextPtr GetGLContextForWindow( void* windowref )
+inline SDL_GLContext GetGLContextForWindow( void* windowref )
 {
 	return g_pLauncherMgr->GetGLContextForWindow( windowref );
 }
@@ -478,7 +478,7 @@ void GLMgr::SetCurrentContext( GLMContext *context )
 GLMContext *GLMgr::GetCurrentContext( void )
 {
 #if defined( USE_SDL )
-	PseudoGLContextPtr context = GetMainContext();
+	SDL_GLContext context = GetMainContext();
 	return (GLMContext*) context;
 #else
 	Assert( 0 );

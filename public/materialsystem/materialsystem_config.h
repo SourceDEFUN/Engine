@@ -12,6 +12,7 @@
 #endif
 
 #include "materialsystem/imaterialsystem.h"
+#include "tier0/icommandline.h"
 
 #define MATERIALSYSTEM_CONFIG_VERSION "VMaterialSystemConfig002"
 
@@ -166,8 +167,20 @@ struct MaterialSystem_Config_t
 		SetFlag( MATSYS_VIDCFG_FLAGS_DISABLE_PHONG, false );
 		SetFlag( MATSYS_VIDCFG_FLAGS_VR_MODE, false );
 
-		m_VideoMode.m_Width = 640;
-		m_VideoMode.m_Height = 480;
+		m_VideoMode.m_Width = 1280;
+		m_VideoMode.m_Height = 720;
+		if ( CommandLine()->FindParm( "-width" ) || CommandLine()->FindParm( "-w" ) )
+		{
+			m_VideoMode.m_Width = CommandLine()->ParmValue( "-width", 1280);
+			m_VideoMode.m_Width = CommandLine()->ParmValue( "-w", 1280);
+			if( !( CommandLine()->FindParm( "-height" ) || CommandLine()->FindParm( "-h" ) ) )
+				m_VideoMode.m_Height = ( m_VideoMode.m_Width * 3 ) / 4;
+		}
+		if ( CommandLine()->FindParm( "-height" ) || CommandLine()->FindParm( "-h" ) )
+		{
+			m_VideoMode.m_Height = CommandLine()->ParmValue( "-height", 720);
+			m_VideoMode.m_Height = CommandLine()->ParmValue( "-h", 720);
+		}
 		m_VideoMode.m_RefreshRate = 60;
 		dxSupportLevel = 0;
 		bCompressedTextures = true;

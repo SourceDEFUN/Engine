@@ -60,8 +60,8 @@
 #include "steam/steam_api.h"
 
 #if defined( USE_SDL )
-#include <SDL.h>
-#include <SDL_version.h>
+#include <SDL3/SDL.h>
+#include <SDL3/SDL_version.h>
 
 #if !defined( _WIN32 )
 #define MB_OK 			0x00000001
@@ -1181,9 +1181,7 @@ DLL_EXPORT int LauncherMain( int argc, char **argv )
 #endif // LINUX
 
 #ifdef USE_SDL
-	SDL_version ver;
-	SDL_GetVersion( &ver );
-	Msg("SDL version %d.%d.%d revision %s\n", (int)ver.major, (int)ver.minor, (int)ver.patch, SDL_GetRevision());
+	Msg("SDL version %d.%d.%d revision %s\n", SDL_MAJOR_VERSION, SDL_MINOR_VERSION, SDL_MICRO_VERSION, SDL_GetRevision());
 #endif
 
 #if (defined LINUX || defined PLATFORM_BSD) && defined USE_SDL && defined TOGLES && !defined ANDROID

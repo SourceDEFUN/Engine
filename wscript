@@ -324,7 +324,7 @@ def options(opt):
 
 	opt.load('compiler_optimizations subproject')
 
-	opt.load('xcompile compiler_cxx compiler_c sdl2 clang_compilation_database strip_on_install_v2 waf_unit_test subproject')
+	opt.load('xcompile compiler_cxx compiler_c sdl3 clang_compilation_database strip_on_install_v2 waf_unit_test subproject')
 	if sys.platform == 'win32':
 		opt.load('msvc msdev msvs')
 	opt.load('reconfigure')
@@ -386,7 +386,7 @@ def check_deps(conf):
 	if conf.env.DEST_OS != 'android':
 		if conf.env.DEST_OS != 'win32':
 			if conf.options.SDL:
-				conf.check_cfg(package='sdl2', uselib_store='SDL2', args=['--cflags', '--libs'])
+				conf.check_cfg(package='sdl3', uselib_store='SDL3', args=['--cflags', '--libs'])
 			if conf.options.DEDICATED:
 				conf.check_cfg(package='libedit', uselib_store='EDIT', args=['--cflags', '--libs'])
 			else:
@@ -404,7 +404,7 @@ def check_deps(conf):
 			if conf.options.OPUS:
 				conf.check_cfg(package='opus', uselib_store='OPUS', args=['--cflags', '--libs'])
 	else:
-		conf.check(lib='SDL2', uselib_store='SDL2')
+		conf.check(lib='SDL3', uselib_store='SDL3')
 		conf.check(lib='freetype2', uselib_store='FT2')
 		conf.check(lib='jpeg', uselib_store='JPEG', define_name='HAVE_JPEG')
 		conf.check(lib='png', uselib_store='PNG', define_name='HAVE_PNG')
@@ -421,7 +421,7 @@ def check_deps(conf):
 		conf.check(lib='libz', uselib_store='ZLIB', define_name='USE_ZLIB')
 		# conf.check(lib='nvtc', uselib_store='NVTC')
 		# conf.check(lib='ati_compress_mt_vc10', uselib_store='ATI_COMPRESS_MT_VC10')
-		conf.check(lib='SDL2', uselib_store='SDL2')
+		conf.check(lib='SDL3', uselib_store='SDL3')
 		conf.check(lib='libjpeg', uselib_store='JPEG', define_name='HAVE_JPEG')
 		conf.check(lib='libpng', uselib_store='PNG', define_name='HAVE_PNG')
 		conf.check(lib='d3dx9', uselib_store='D3DX9')
@@ -628,7 +628,7 @@ def build(bld):
 	os.environ["CCACHE_DIR"] = os.path.abspath('.ccache/'+bld.env.COMPILER_CC+'/'+bld.env.DEST_OS+'/'+bld.env.DEST_CPU)
 
 	if bld.env.DEST_OS in ['win32', 'android']:
-		sdl_name = 'SDL2.dll' if bld.env.DEST_OS == 'win32' else 'libSDL2.so'
+		sdl_name = 'SDL3.dll' if bld.env.DEST_OS == 'win32' else 'libSDL3.so'
 		sdl_path = os.path.join('lib', bld.env.DEST_OS, bld.env.DEST_CPU, sdl_name)
 		bld.install_files(bld.env.LIBDIR, [sdl_path])
 

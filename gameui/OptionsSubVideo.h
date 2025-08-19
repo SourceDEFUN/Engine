@@ -45,7 +45,6 @@ private:
 	MESSAGE_FUNC_PTR_CHARPTR( OnTextChanged, "TextChanged", panel, text );
 	MESSAGE_FUNC( OpenAdvanced, "OpenAdvanced" );
 	MESSAGE_FUNC( LaunchBenchmark, "LaunchBenchmark" );
-	MESSAGE_FUNC( OpenGammaDialog, "OpenGammaDialog" );
 
    
 	void		PrepareResolutionList();
@@ -67,7 +66,6 @@ private:
 	vgui::CheckButton	*m_pHDContent;
 
 	vgui::DHANDLE<class COptionsSubVideoAdvancedDlg> m_hOptionsSubVideoAdvancedDlg;
-	vgui::DHANDLE<class CGammaDialog> m_hGammaDialog;
 
 	bool m_bRequireRestart;
    MESSAGE_FUNC( OpenThirdPartyVideoCreditsDialog, "OpenThirdPartyVideoCreditsDialog" );

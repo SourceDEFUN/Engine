@@ -1098,7 +1098,7 @@ $Project "engine"
 
 		//$Lib	"$LIBCOMMON/binkw32"					[$WIN32&&!$QUICKTIME_WIN32]
 		$File   "$LIBCOMMON\quicktime\QTMLClient"       [$WIN32&&$QUICKTIME_WIN32]
-		$ImpLib	"SDL2" [$SDL]
+		$ImpLib	"SDL3" [$SDL]
 		$File	"$SRCDIR\DX9SDK\lib\dsound.lib" [$WIN32]
 		$File	"$SRCDIR\DX9SDK\lib\dxguid.lib" [$WIN32]
 	}	

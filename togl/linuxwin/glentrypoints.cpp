@@ -28,6 +28,12 @@
 // Immediately include gl.h, etc. here to avoid compilation warnings.
 
 #include "togl/rendermechanism.h"
+#include <cstdio>
+
+#ifdef USE_SDL
+#include <SDL3/SDL_video.h>
+extern SDL_DECLSPEC SDL_FunctionPointer SDLCALL SDL_GL_GetProcAddress(const char *proc);
+#endif
 
 #include "appframework/AppFramework.h"
 #include "appframework/IAppSystemGroup.h"
@@ -126,20 +132,23 @@ bool g_bPrintOpenGLCalls = false;
 #endif
 
 COpenGLEntryPoints *gGL = NULL;
-GL_GetProcAddressCallbackFunc_t gGL_GetProcAddressCallback = NULL;
+SDL_FunctionPointer gGL_GetProcAddressCallback = NULL;
 
-void *VoidFnPtrLookup_GlMgr(const char *fn, bool &okay, const bool bRequired, void *fallback)
+SDL_FunctionPointer VoidFnPtrLookup_GlMgr(const char *fn, bool &okay, const bool bRequired, SDL_FunctionPointer fallback)
 {
-	void *retval = NULL;
+	SDL_FunctionPointer retval = NULL;
 	if ((!okay) && (!bRequired))  // always look up if required (so we get a complete list of crucial missing symbols).
 		return NULL;
 
-	// SDL does the right thing, so we never need to use tier0 in this case.
+#ifdef USE_SDL
+	retval = SDL_GL_GetProcAddress(fn);
+#else
 	retval = (*gGL_GetProcAddressCallback)(fn, okay, bRequired, fallback);
-	//printf("CDynamicFunctionOpenGL: SDL_GL_GetProcAddress(\"%s\") returned %p\n", fn, retval);
+#endif
+	// printf("CDynamicFunctionOpenGL: SDL_GL_GetProcAddress(\"%s\") returned %p\n", fn, retval);
 	if ((retval == NULL) && (fallback != NULL))
 	{
-		//printf("CDynamicFunctionOpenGL: Using fallback %p for \"%s\"\n", fallback, fn);
+		printf("CDynamicFunctionOpenGL: Using fallback %p for \"%s\"\n", fallback, fn);
 		retval = fallback;
 	}
 
@@ -153,7 +162,7 @@ void *VoidFnPtrLookup_GlMgr(const char *fn, bool &okay, const bool bRequired, vo
 	return retval;
 }
 
-COpenGLEntryPoints *GetOpenGLEntryPoints(GL_GetProcAddressCallbackFunc_t callback)
+COpenGLEntryPoints *GetOpenGLEntryPoints(SDL_FunctionPointer callback)
 {
 	if (gGL == NULL)
 	{
@@ -304,7 +313,7 @@ static bool CheckOpenGLExtension_internal(const char *ext, const int coremajor, 
 			if (glXQueryExtensionsString && glXGetCurrentDisplay) 
 			{
 				extensions = glXQueryExtensionsString(glXGetCurrentDisplay(), 0);
-				ptr = strstr(extensions, ext);
+				if (!extensions) ptr = strstr(extensions, ext);
 			}
 		}
 #endif

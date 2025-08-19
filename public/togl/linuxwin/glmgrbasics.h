@@ -30,10 +30,11 @@
 #ifndef GLMBASICS_H
 #define	GLMBASICS_H
 
+#include <SDL3/SDL_video.h>
 #pragma once
 
 #ifdef USE_SDL
-#include "SDL_opengl.h"
+#include <SDL3/SDL_opengl.h>
 #endif
 
 #ifdef OSX
@@ -61,7 +62,8 @@
 #include "dxabstract_types.h"
 
 struct GLMRect;
-typedef void *PseudoGLContextPtr;
+// Secton: i'm losing my fuckinfg sanity over porting this piece of shit to SDL3
+typedef SDL_GLContext PseudoGLContextPtr;
 
 // types
 
