@@ -16,6 +16,7 @@
 
 #include <KeyValues.h>
 #include <vgui/IScheme.h>
+#include "vgui_controls/QueryBox.h"
 #include "tier1/convar.h"
 #include <stdio.h>
 #include <vgui_controls/TextEntry.h>

@@ -123,6 +123,7 @@ int GetScreenAspectMode( int width, int height )
 //-----------------------------------------------------------------------------
 static void GetResolutionName( uint w, uint h, char *sz, int sizeofsz, int desktopWidth, int desktopHeight )
 {
+	// Secton :this might be an issue
 	Q_snprintf( sz, sizeofsz, "%i x %i", w, h );
 }
 
@@ -903,17 +904,15 @@ COptionsSubVideo::COptionsSubVideo(vgui::Panel *parent) : PropertyPage(parent, N
 	m_pBenchmark = new Button( this, "BenchmarkButton", "#GameUI_LaunchBenchmark" );
 	m_pBenchmark->SetCommand(new KeyValues("LaunchBenchmark"));
 	m_pThirdPartyCredits = new URLButton(this, "ThirdPartyVideoCredits", "#GameUI_ThirdPartyTechCredits");
-//	m_pThirdPartyCredits->SetCommand(new KeyValues("OpenThirdPartyVideoCreditsDialog"));
+	m_pThirdPartyCredits->SetCommand(new KeyValues("OpenThirdPartyVideoCreditsDialog"));
 	m_pThirdPartyCredits->SetVisible(false);
 	m_pHDContent = new CheckButton( this, "HDContentButton", "#GameUI_HDContent" );
 
 	char pszAspectName[3][64];
-	const wchar_t *unicodeText = g_pVGuiLocalize->Find("#GameUI_AspectNormal");
-	g_pVGuiLocalize->ConvertUnicodeToANSI(unicodeText, pszAspectName[0], 32);
-	unicodeText = g_pVGuiLocalize->Find("#GameUI_AspectWide16x9");
-	g_pVGuiLocalize->ConvertUnicodeToANSI(unicodeText, pszAspectName[1], 32);
-	unicodeText = g_pVGuiLocalize->Find("#GameUI_AspectWide16x10");
-	g_pVGuiLocalize->ConvertUnicodeToANSI(unicodeText, pszAspectName[2], 32);
+	const wchar_t *unicodeText;
+	g_pVGuiLocalize->ConvertUnicodeToANSI(L"4:3", pszAspectName[0], 32);
+	g_pVGuiLocalize->ConvertUnicodeToANSI(L"16:9", pszAspectName[1], 32);
+	g_pVGuiLocalize->ConvertUnicodeToANSI(L"16:10", pszAspectName[2], 32);
 
 #ifndef ANDROID
 	int iNormalItemID = m_pAspectRatio->AddItem( pszAspectName[0], NULL );
@@ -1073,8 +1072,8 @@ void COptionsSubVideo::PrepareResolutionList() // Secton: this code was too dogs
 	// get the currently selected resolution
 	char sz[256];
 	m_pMode->GetText(sz, 256);
-	int currentWidth = 0, currentHeight = 0;
-	sscanf( sz, "%i x %i", &currentWidth, &currentHeight );
+	int currentWidth = 0, currentHeight = 0; char currentStandard[8] = {0};
+	sscanf( sz, "%i x %i (%7s)", &currentWidth, &currentHeight, currentStandard );
 
 	// Clean up before filling the info again.
 	m_pMode->DeleteAllItems();
@@ -1096,7 +1095,6 @@ void COptionsSubVideo::PrepareResolutionList() // Secton: this code was too dogs
 		currentHeight = desktopHeight;
 	}
 
-	// Secton TODO: Bring back Android resolutions!
 	// iterate all the video modes adding them to the dropdown
 	int selectedItemID = -1;
 	for (int i = 0; i < sizeof(s_Resolutions) / sizeof(s_Resolutions[0]); i++) {
@@ -1339,8 +1337,8 @@ void COptionsSubVideo::OnApplyChanges()
 		m_pMode->GetItemText( m_nSelectedMode, sz, 256 );
 	}
 
-	int width = 0, height = 0;
-	sscanf( sz, "%i x %i", &width, &height );
+	int width = 0, height = 0; char standard[8] = {0};
+	sscanf( sz, "%i x %i (%7s)", &width, &height, standard );
 
 	// windowed
 	bool bConfigChanged = false;
@@ -1442,8 +1440,8 @@ void COptionsSubVideo::OnTextChanged(Panel *pPanel, const char *pszText)
 
 		m_nSelectedMode = m_pMode->GetActiveItem();
 
-		int w = 0, h = 0;
-		sscanf(pszText, "%i x %i", &w, &h);
+		int w = 0, h = 0; char standard[8] = {0};
+		sscanf(pszText, "%i x %i (%7s)", &w, &h, standard);
 		if ( config.m_VideoMode.m_Width != w || config.m_VideoMode.m_Height != h )
 		{
 			OnDataChanged();

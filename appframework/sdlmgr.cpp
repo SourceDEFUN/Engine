@@ -537,14 +537,14 @@ InitReturnVal_t CSDLMgr::Init()
 #endif
 	}
 
-	fprintf(stderr, "SDL video target is '%s'\n", SDL_GetCurrentVideoDriver());
-	Msg("SDL video target is '%s'\n", SDL_GetCurrentVideoDriver());
+	// Secton 2SDL3: Seems to be only (null) on Wayland. The docs don't say that
+	//               SDL_GetCurrentVideoDriver will tell you about Wayland, only X11.
+	// fprintf(stderr, "SDL video target is '%s'\n", SDL_GetCurrentVideoDriver());
+	// Msg("SDL video target is '%s'\n", SDL_GetCurrentVideoDriver());
 
 	m_bForbidMouseGrab = true;
 	if ( !CommandLine()->FindParm("-nomousegrab") && CommandLine()->FindParm("-mousegrab") )
-	{
 		m_bForbidMouseGrab = false;
-	}
 
 	m_WindowShownAndRaised = false;
 
@@ -1797,7 +1797,6 @@ void CSDLMgr::PumpWindowsMessageLoop()
 				{
 					// We have strayed outside of our desired area, so
 					// warp the cursor back to the middle of the window.
-					DevMsg("Mouse Warped! Additional info: %i %i\n", m_nMouseXDelta, m_nMouseYDelta);
 					SDL_WarpMouseInWindow( m_Window, m_nMouseTargetX, m_nMouseTargetY );
 					m_bExpectSyntheticMouseMotion = true;
 				}
