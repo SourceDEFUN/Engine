@@ -14,7 +14,7 @@
 
 #if defined( USE_SDL )
 #undef M_PI
-#include "SDL.h"
+#include <SDL3/SDL.h>
 static void initKeymap(void);
 #endif
 
@@ -586,7 +586,7 @@ void CInputSystem::PollInputState_Windows()
 
 #if defined( USE_SDL )
 
-static BYTE        scantokey[SDL_NUM_SCANCODES];
+static BYTE        scantokey[SDL_SCANCODE_COUNT];
 
 static void initKeymap(void)
 {
@@ -697,7 +697,7 @@ void CInputSystem::PollInputState_Platform()
 
 						if( ( scanCode != BUTTON_CODE_NONE ) )
 						{
-							// For SDL, hitting spacebar causes a SDL_KEYDOWN event, then SDL_TEXTINPUT with
+							// For SDL, hitting spacebar causes a SDL_EVENT_KEY_DOWN event, then SDL_EVENT_TEXT_INPUT with
 							//	event.text.text[0] = ' ', and then we get here and wind up sending two events
 							//	to PostButtonPressedEvent. The first is virtualCode = ' ', the 2nd has virtualCode = 0.
 							// This will confuse Button::OnKeyCodePressed(), which is checking for space keydown
@@ -1513,6 +1513,14 @@ ISteamController* CInputSystem::SteamControllerInterface()
 void CInputSystem::StartTextInput()
 {
 #ifdef USE_SDL
-	SDL_StartTextInput();
+	if (m_pLauncherMgr)
+		SDL_StartTextInput( (SDL_Window*)m_pLauncherMgr->GetWindowRef() );
+#endif
+}
+void CInputSystem::StopTextInput()
+{
+#ifdef USE_SDL
+	if (m_pLauncherMgr)
+		SDL_StopTextInput( (SDL_Window*)m_pLauncherMgr->GetWindowRef() );
 #endif
 }

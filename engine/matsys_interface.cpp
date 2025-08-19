@@ -40,11 +40,10 @@
 #include "client.h"
 #include "sourcevr/isourcevirtualreality.h"
 
-#if defined( USE_SDL )
-#include "SDL.h"
+#ifdef USE_SDL
+#include <SDL3/SDL.h>
 #endif
 
-//X360TEMP
 #include "materialsystem/itexture.h"
 
 extern IFileSystem *g_pFileSystem;
@@ -411,7 +410,7 @@ static void ReadMaterialSystemConfigFromRegistry( MaterialSystem_Config_t &confi
 
 		// Make sure the width / height isn't too large for this display.
 		SDL_Rect rect;
-		if ( !SDL_GetDisplayBounds( displayIndex, &rect ) )
+		if ( SDL_GetDisplayBounds( displayIndex, &rect ) )
 		{
 			if ( ( config.m_VideoMode.m_Width > rect.w ) || ( config.m_VideoMode.m_Height > rect.h ) )
 			{
@@ -609,7 +608,7 @@ static void OverrideMaterialSystemConfigFromCommandLine( MaterialSystem_Config_t
 
 			// Make sure the width / height isn't too large for this display.
 			SDL_Rect rect;
-			if ( !SDL_GetDisplayBounds( displayIndex, &rect ) )
+			if ( SDL_GetDisplayBounds( displayIndex, &rect ) )
 			{
 				if ( ( config.m_VideoMode.m_Width > rect.w ) || ( config.m_VideoMode.m_Height > rect.h ) )
 				{
@@ -645,8 +644,8 @@ static void OverrideMaterialSystemConfigFromCommandLine( MaterialSystem_Config_t
 	if ( CommandLine()->FindParm( "-safe" ) )
 	{
 		config.SetFlag( MATSYS_VIDCFG_FLAGS_WINDOWED, true );
-		config.m_VideoMode.m_Width = 640;
-		config.m_VideoMode.m_Height = 480;
+		config.m_VideoMode.m_Width = 1280;
+		config.m_VideoMode.m_Height = 720;
 		config.m_VideoMode.m_RefreshRate = 0;
 		config.m_nAASamples = 0;
 		config.m_nAAQuality = 0;
@@ -891,8 +890,10 @@ CON_COMMAND( mat_configcurrent, "show the current video control panel config for
 #if !defined(SWDS)
 CON_COMMAND( mat_setvideomode, "sets the width, height, windowed state of the material system" )
 {
-	if ( args.ArgC() != 4 )
+	if ( args.ArgC() != 4 ) {
+		Msg("Make sure to write width, height and `window ? 1 : 0` into args!");
 		return;
+	}
 
 	int nWidth = Q_atoi( args[1] );
 	int nHeight = Q_atoi( args[2] );

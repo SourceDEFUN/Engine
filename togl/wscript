@@ -40,11 +40,11 @@ def build(bld):
 		'../public',
 		'../public/tier0',
 		'../public/tier1'
-	] + bld.env.INCLUDES_SDL2
+	] + bld.env.INCLUDES_SDL3
 
 	defines = []
 
-	libs = ['tier0','tier1','tier2','vstdlib','mathlib']
+	libs = ['tier0','tier1','tier2','vstdlib','mathlib','SDL3']
 
 	if bld.env.DEST_OS == "darwin":
 		libs += ["OPENGL", "CARBON"]

@@ -6,8 +6,7 @@
 
 #if defined( USE_SDL )
 #undef PROTECTED_THINGS_ENABLE
-#include "SDL.h"
-#include "SDL_syswm.h"
+#include <SDL3/SDL.h>
 #endif
 
 #if defined( _WIN32 )
@@ -113,8 +112,6 @@ public:
     virtual int         GetModeHeight( void ) const;
 	virtual int			GetModeStereoWidth() const;
 	virtual int			GetModeStereoHeight() const;
-	virtual int			GetModeUIWidth() const  OVERRIDE;
-	virtual int			GetModeUIHeight() const OVERRIDE;
     virtual const vrect_t &GetClientViewRect( ) const;
     virtual void        SetClientViewRect( const vrect_t &viewRect );
     virtual void        MarkClientViewRectDirty();
@@ -194,8 +191,6 @@ protected:
     int                 m_nModeHeight;
     int                 m_nStereoWidth;
     int                 m_nStereoHeight;
-    int                 m_nUIWidth;
-    int                 m_nUIHeight;
 	int					m_nVROverrideX;
 	int					m_nVROverrideY;
 #if defined( USE_SDL )
@@ -238,8 +233,8 @@ CVideoMode_Common::CVideoMode_Common( void )
     m_nNumModes    = 0;
     m_bInitialized = false;
 
-    DefaultVideoMode().width  = 640;
-    DefaultVideoMode().height = 480;
+    DefaultVideoMode().width  = 1280;
+    DefaultVideoMode().height = 720;
     DefaultVideoMode().bpp    = 32;
     DefaultVideoMode().refreshRate = 0;
 
@@ -317,21 +312,6 @@ int CVideoMode_Common::GetModeStereoWidth( void ) const
 int CVideoMode_Common::GetModeStereoHeight( void ) const
 {
 	return m_nStereoHeight;
-}
-
-
-//-----------------------------------------------------------------------------
-// Returns the video mode full screen UI width + height.
-//-----------------------------------------------------------------------------
-
-int CVideoMode_Common::GetModeUIWidth( void ) const
-{
-	return m_nUIWidth;
-}
-
-int CVideoMode_Common::GetModeUIHeight( void ) const
-{
-    return m_nUIHeight;
 }
 
 
@@ -423,7 +403,8 @@ int CVideoMode_Common::FindVideoMode( int nDesiredWidth, int nDesiredHeight, boo
 		m_nRenderWidth = nDesiredWidth;
 		m_nRenderHeight = nDesiredHeight;
 
-		uint nWidth, nHeight, nRefreshHz;
+		uint nWidth, nHeight;
+        float nRefreshHz;
 
 		g_pLauncherMgr->GetNativeDisplayInfo( -1, nWidth, nHeight, nRefreshHz );
 
@@ -508,18 +489,12 @@ int CVideoMode_Common::FindVideoMode( int nDesiredWidth, int nDesiredHeight, boo
 //-----------------------------------------------------------------------------
 void CVideoMode_Common::ResetCurrentModeForNewResolution( int nWidth, int nHeight, bool bWindowed )
 {
-    // Fill in vid structure for the mode
-    int nGameMode = FindVideoMode( nWidth, nHeight, bWindowed );
-    vmode_t *pMode = GetMode( nGameMode );
-
 	// default to non-VR values
 	m_bWindowed = bWindowed;
-	m_nModeWidth = pMode->width;
-	m_nModeHeight = pMode->height;
-	m_nUIWidth = pMode->width;
-	m_nUIHeight = pMode->height;
-	m_nStereoWidth = pMode->width;
-	m_nStereoHeight = pMode->height;
+	m_nModeWidth = nWidth;
+	m_nModeHeight = nHeight;
+	m_nStereoWidth = nWidth;
+	m_nStereoHeight = nHeight;
 
 	// assume we won't be overriding the position
 	m_bVROverride = false;
@@ -537,16 +512,13 @@ void CVideoMode_Common::ResetCurrentModeForNewResolution( int nWidth, int nHeigh
 			m_bVROverride = true;
 			m_bWindowed = vr_force_windowed.GetBool();
 
-
-			// This is the smallest size the the UI in source games can handle.
-			m_nUIWidth =	640;
-			m_nUIHeight =	480;
-
 #if defined( WIN32 ) && !defined( USE_SDL )
 			m_nVROverrideX = vrBounds.nX;
 			m_nVROverrideY = vrBounds.nY;
 #elif defined( USE_SDL )
-			for ( int i = 0; i < SDL_GetNumVideoDisplays(); i++ )
+            int displayCounter;
+            SDL_GetDisplays(&displayCounter);
+			for ( int i = 0; i < displayCounter; i++ )
 			{
 				SDL_Rect sdlRect;
 				SDL_GetDisplayBounds( i, &sdlRect );
@@ -830,7 +802,7 @@ void CVideoMode_Common::DrawStartupVideo()
 {
 	CETWScope timer( "CVideoMode_Common::DrawStartupGraphic" );
 
-    // render an avi, if we have one
+    // render startup video, if we have one
 	if ( !m_bPlayedStartupVideo && !InEditMode() && !ShouldForceVRActive() )
     {
         game->PlayStartupVideos();
@@ -1025,9 +997,8 @@ void CVideoMode_Common::InvalidateWindow()
 #if defined( USE_SDL )
 		SDL_Event fake;
 		memset(&fake, '\0', sizeof (SDL_Event));
-		fake.type = SDL_WINDOWEVENT;
+		fake.type = SDL_EVENT_WINDOW_EXPOSED;
 		fake.window.windowID = SDL_GetWindowID( (SDL_Window *) g_pLauncherMgr->GetWindowRef() );
-		fake.window.event = SDL_WINDOWEVENT_EXPOSED;
 		SDL_PushEvent(&fake);
 #else
 		InvalidateRect( (HWND)game->GetMainWindow(), NULL, FALSE );
@@ -1425,9 +1396,9 @@ void CVideoMode_Common::AdjustWindow( int nWidth, int nHeight, int nBPP, bool bW
 	{
 		SDL_Window* win = (SDL_Window*)g_pLauncherMgr->GetWindowRef();
 		if ( m_bVROverride || CommandLine()->FindParm( "-noborder" ) )
-			SDL_SetWindowBordered( win, SDL_FALSE );
+			SDL_SetWindowBordered( win, false );
 		else
-			SDL_SetWindowBordered( win, SDL_TRUE );
+			SDL_SetWindowBordered( win, true );
 			
 	}
 #endif
@@ -1520,13 +1491,20 @@ void CVideoMode_Common::CenterEngineWindow( void *hWndCenter, int width, int hei
 #if defined(USE_SDL)
 	// Get the displayindex, and center our window on that display.
 	static ConVarRef sdl_displayindex( "sdl_displayindex" );
-	int displayindex = sdl_displayindex.IsValid() ? sdl_displayindex.GetInt() : 0;
+	int displayindex = sdl_displayindex.GetInt();
 
-	SDL_DisplayMode mode;
-	SDL_GetCurrentDisplayMode( displayindex, &mode );
+	SDL_DisplayMode* mode = (SDL_DisplayMode*)SDL_GetCurrentDisplayMode( displayindex );
 
-	const int wide = mode.w;
-	const int tall = mode.h;
+    if ( !mode )
+	{
+		Assert( 0 );
+		mode = (SDL_DisplayMode*)SDL_GetCurrentDisplayMode( SDL_GetPrimaryDisplay() );
+	}
+	if ( !mode ) Error("SDL3 fail: Couldn't Center a Window! (CVideoMode_Common::CenterEngineWindow)");
+	else displayindex = SDL_GetPrimaryDisplay();
+
+	const int wide = mode->w;
+	const int tall = mode->h;
 
 	CenterX = (wide - width) / 2;
 	CenterY = (tall - height) / 2;
@@ -2244,14 +2222,6 @@ bool CVideoMode_MaterialSystem::Init( )
     // we only support 32-bit rendering.
     int bitsperpixel = 32;
 
-    bool bAllowSmallModes = false;
-#ifndef ANDROID
-    if ( CommandLine()->FindParm( "-small" ) )
-#endif
-    {
-        bAllowSmallModes = true;
-    }
-
     int nAdapter = materials->GetCurrentAdapter();
     int nModeCount = materials->GetModeCount( nAdapter );
 
@@ -2263,11 +2233,9 @@ bool CVideoMode_MaterialSystem::Init( )
         MaterialVideoMode_t info;
         materials->GetModeInfo( nAdapter, i, info );
 
-        if ( info.m_Width < 640 || info.m_Height < 480 )
-        {
-            if ( !bAllowSmallModes )
-                continue;
-        }
+        if ( info.m_Width < 800 || info.m_Height < 600 )
+            // Error("Your display resolution is too small!");
+            continue;
 
         // make sure we don't already have this mode listed
         bool bAlreadyInList = false;
@@ -2344,16 +2312,15 @@ bool CVideoMode_MaterialSystem::SetMode( int nWidth, int nHeight, bool bWindowed
 
     // update current video state
     MaterialSystem_Config_t config = *g_pMaterialSystemConfig;
-    config.m_VideoMode.m_Width = pMode->width;
-    config.m_VideoMode.m_Height = pMode->height;
+    config.m_VideoMode.m_Width = nWidth; // pMode->width;
+    config.m_VideoMode.m_Height = nHeight; // pMode->height;
+    pMode->width = nWidth; pMode->height = nHeight;
 
 	// make sure VR mode is up to date
 	config.SetFlag( MATSYS_VIDCFG_FLAGS_VR_MODE, UseVR() || ShouldForceVRActive() );
 
 	if ( ShouldForceVRActive() )
-	{
 		config.m_nVRModeAdapter = materials->GetCurrentAdapter();
-	}
 
 #ifdef SWDS
     config.m_VideoMode.m_RefreshRate = 60;
@@ -2392,8 +2359,8 @@ void CVideoMode_MaterialSystem::AdjustForModeChange( void )
         return;
 
     // get previous size
-	int nOldUIWidth = GetModeUIWidth();
-	int nOldUIHeight = GetModeUIHeight();
+	int nOldUIWidth = GetModeWidth();
+	int nOldUIHeight = GetModeHeight();
 
     // Get the new mode info from the config record
     int nNewWidth = g_pMaterialSystemConfig->m_VideoMode.m_Width;

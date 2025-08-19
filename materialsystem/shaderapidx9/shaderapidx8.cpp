@@ -8698,7 +8698,7 @@ void CShaderAPIDx8::SpewBoardState()
 		}
 
 		static char buf[1024];
-		static RECT r = { 0, 0, 640, 480 };
+		static RECT r = { 0, 0, 1280, 720 };
 
 		if (m_DynamicState.m_VertexBlend == 0)
 			return;

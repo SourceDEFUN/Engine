@@ -146,7 +146,7 @@ def build(bld):
 		'../../public/tier1',
 		'fxctmp9',
 		'vshtmp9'
-	] + bld.env.INCLUDES_SDL2
+	] + bld.env.INCLUDES_SDL3
 
 	defines = []
 

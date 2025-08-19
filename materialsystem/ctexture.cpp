@@ -1244,7 +1244,8 @@ void CTexture::ApplyRenderTargetSizeMode( int &width, int &height, ImageFormat f
 			}
 		}
 		break;
-
+		
+		// Secton FIXME: i have no clue what >>= operator so i replaced it with -= operator :P
 		case RT_SIZE_PICMIP:
 		{
 			int fbWidth, fbHeight;
@@ -1259,11 +1260,11 @@ void CTexture::ApplyRenderTargetSizeMode( int &width, int &height, ImageFormat f
 
 			while( width > fbWidth )
 			{
-				width >>= 1;
+				width -= 1;
 			}
 			while( height > fbHeight )
 			{
-				height >>= 1;
+				height -= 1;
 			}
 		}
 		break;
@@ -1277,11 +1278,11 @@ void CTexture::ApplyRenderTargetSizeMode( int &width, int &height, ImageFormat f
 			MaterialSystem()->GetRenderTargetFrameBufferDimensions( fbWidth, fbHeight );
 			while( width > fbWidth )
 			{
-				width >>= 1;
+				width -= 1;
 			}
 			while( height > fbHeight )
 			{
-				height >>= 1;
+				height -= 1;
 			}
 		}
 		break;
@@ -1302,8 +1303,8 @@ void CTexture::ApplyRenderTargetSizeMode( int &width, int &height, ImageFormat f
 			// Shrink the buffer if it's bigger than back buffer.  Otherwise, don't mess with it.
 			while( (width > fbWidth) || (height > fbHeight) )
 			{
-				width >>= 1;
-				height >>= 1;
+				width -= 1;
+				height -= 1;
 			}
 		}
 		break;

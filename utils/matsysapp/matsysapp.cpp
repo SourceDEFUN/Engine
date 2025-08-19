@@ -395,9 +395,9 @@ int MaterialSystemApp::WinMain(void *hInstance, void *hPrevInstance, char *szCmd
         GetParameters();
 	}
 	
-    // Default to 640 pixels wide
-    m_width  = FindNumParameter("-width", 640);
-    m_height = FindNumParameter("-height", 480);
+    // Default to 1280 pixels wide
+    m_width  = FindNumParameter("-width", 1280);
+    m_height = FindNumParameter("-height", 720);
     m_bpp    = FindNumParameter("-bpp", 32);
     m_fov    = FindNumParameter("-fov", 90);
 	

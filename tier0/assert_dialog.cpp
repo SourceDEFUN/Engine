@@ -24,7 +24,7 @@
 
 // We lazily load the SDL shared object, and only reference functions if it's
 // available, so this can be included on the dedicated server too.
-#include "SDL.h"
+#include <SDL3/SDL.h>
 
 typedef int ( SDLCALL FUNC_SDL_ShowMessageBox )( const SDL_MessageBoxData *messageboxdata, int *buttonid );
 #endif
@@ -483,9 +483,9 @@ DBG_INTERFACE bool DoNewAssertDialog( const tchar *pFilename, int line, const tc
 	if( !pfnSDLShowMessageBox )
 	{
 #ifdef OSX
-		void *ret = dlopen( "libSDL2-2.0.0.dylib", RTLD_LAZY );
+		void *ret = dlopen( "libSDL3-2.0.0.dylib", RTLD_LAZY );
 #else
-		void *ret = dlopen( "libSDL2-2.0.so.0", RTLD_LAZY );
+		void *ret = dlopen( "libSDL3-2.0.so.0", RTLD_LAZY );
 #endif
 		if ( ret )
 			{ pfnSDLShowMessageBox = ( FUNC_SDL_ShowMessageBox * )dlsym( ret, "SDL_ShowMessageBox" ); }

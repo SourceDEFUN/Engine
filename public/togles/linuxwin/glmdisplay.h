@@ -33,7 +33,7 @@
 #pragma once
 
 #ifdef USE_SDL
-#include "SDL_opengl.h"
+#include <SDL3/SDL_opengl.h>
 #endif
 
 #ifdef OSX

@@ -28,9 +28,10 @@
 #include "ModInfo.h"
 #include "vgui_controls/Tooltip.h"
 #include "sourcevr/isourcevirtualreality.h"
+#include <SDL3/SDL_video.h>
 
 #if defined( USE_SDL )
-#include "SDL.h"
+#include <SDL3/SDL.h>
 #endif
 
 #include "inetchannelinfo.h"
@@ -120,125 +121,11 @@ int GetScreenAspectMode( int width, int height )
 //-----------------------------------------------------------------------------
 // Purpose: returns the string name of the specified resolution mode
 //-----------------------------------------------------------------------------
-static void GetResolutionName( vmode_t *mode, char *sz, int sizeofsz, int desktopWidth, int desktopHeight )
+static void GetResolutionName( uint w, uint h, char *sz, int sizeofsz, int desktopWidth, int desktopHeight )
 {
-	Q_snprintf( sz, sizeofsz, "%i x %i%s", mode->width, mode->height,
-				( mode->width == desktopWidth ) && ( mode->height == desktopHeight ) ? " (native)": "" );
+	// Secton :this might be an issue
+	Q_snprintf( sz, sizeofsz, "%i x %i", w, h );
 }
-
-//-----------------------------------------------------------------------------
-// Purpose: Gamma-adjust dialog
-//-----------------------------------------------------------------------------
-class CGammaDialog : public vgui::Frame
-{
-	DECLARE_CLASS_SIMPLE( CGammaDialog, vgui::Frame );
-public:
-	CGammaDialog( vgui::VPANEL hParent ) : BaseClass( NULL, "OptionsSubVideoGammaDlg" )
-	{
-		// parent is ignored, since we want look like we're steal focus from the parent (we'll become modal below)
-		SetTitle("#GameUI_AdjustGamma_Title", true);
-		SetSize( 400, 260 );
-		SetDeleteSelfOnClose( true );
-
-		m_pGammaSlider = new CCvarSlider( this, "Gamma", "#GameUI_Gamma", 1.6f, 2.6f, "mat_monitorgamma" );
-		m_pGammaLabel = new Label( this, "Gamma label", "#GameUI_Gamma" );
-		m_pGammaEntry = new TextEntry( this, "GammaEntry" );
-
-		Button *ok = new Button( this, "OKButton", "#vgui_ok" );
-		ok->SetCommand( new KeyValues("OK") );
-
-		LoadControlSettings( "resource/OptionsSubVideoGammaDlg.res" );
-		MoveToCenterOfScreen();
-		SetSizeable( false );
-
-		m_pGammaSlider->SetTickCaptions( "#GameUI_Light", "#GameUI_Dark" );
-	}
-
-	MESSAGE_FUNC_PTR( OnGammaChanged, "SliderMoved", panel )
-	{
-		if (panel == m_pGammaSlider)
-		{
-			m_pGammaSlider->ApplyChanges();
-		}
-	}
-
-	virtual void Activate()
-	{
-		BaseClass::Activate();
-		m_flOriginalGamma = m_pGammaSlider->GetValue();
-		UpdateGammaLabel();
-	}
-
-	MESSAGE_FUNC( OnOK, "OK" )
-	{
-		// make the gamma stick
-		m_flOriginalGamma = m_pGammaSlider->GetValue();
-		Close();
-	}
-
-	virtual void OnClose()
-	{
-		// reset to the original gamma
-		m_pGammaSlider->SetValue( m_flOriginalGamma );
-		m_pGammaSlider->ApplyChanges();
-		BaseClass::OnClose();
-	}
-
-	void OnKeyCodeTyped(KeyCode code)
-	{
-		// force ourselves to be closed if the escape key it pressed
-		if (code == KEY_ESCAPE)
-		{
-			Close();
-		}
-		else
-		{
-			BaseClass::OnKeyCodeTyped(code);
-		}
-	}
-
-	MESSAGE_FUNC_PTR( OnControlModified, "ControlModified", panel )
-	{
-		// the HasBeenModified() check is so that if the value is outside of the range of the
-		// slider, it won't use the slider to determine the display value but leave the
-		// real value that we determined in the constructor
-		if (panel == m_pGammaSlider && m_pGammaSlider->HasBeenModified())
-		{
-			UpdateGammaLabel();
-		}
-	}
-
-	MESSAGE_FUNC_PTR( OnTextChanged, "TextChanged", panel )
-	{
-		if (panel == m_pGammaEntry)
-		{
-			char buf[64];
-			m_pGammaEntry->GetText(buf, 64);
-
-			float fValue = (float) atof(buf);
-			if (fValue >= 1.0)
-			{
-				m_pGammaSlider->SetSliderValue(fValue);
-				PostActionSignal(new KeyValues("ApplyButtonEnable"));
-			}
-		}
-	}
-
-	void UpdateGammaLabel()
-	{
-		char buf[64];
-		Q_snprintf(buf, sizeof( buf ), " %.1f", m_pGammaSlider->GetSliderValue());
-		m_pGammaEntry->SetText(buf);
-	}
-
-
-private:
-	CCvarSlider			*m_pGammaSlider;
-	vgui::Label			*m_pGammaLabel;
-	vgui::TextEntry		*m_pGammaEntry;
-	float				m_flOriginalGamma;
-};
-
 
 //-----------------------------------------------------------------------------
 // Purpose: advanced keyboard settings dialog
@@ -491,7 +378,7 @@ public:
 	int FindMSAAMode( int nAASamples, int nAAQuality )
 	{
 		// Run through the AA Modes supported by the device
-        for ( int nAAMode = 0; nAAMode < m_nNumAAModes; nAAMode++ )
+		for ( int nAAMode = 0; nAAMode < m_nNumAAModes; nAAMode++ )
 		{
 			// If we found the mode that matches what we're looking for, return the index
 			if ( ( m_nAAModes[nAAMode].m_nNumSamples == nAASamples) && ( m_nAAModes[nAAMode].m_nQualityLevel == nAAQuality) )
@@ -1009,7 +896,6 @@ COptionsSubVideo::COptionsSubVideo(vgui::Panel *parent) : PropertyPage(parent, N
 	m_bDisplayedVRModeMessage = false;
 
 	m_pGammaButton = new Button( this, "GammaButton", "#GameUI_AdjustGamma" );
-	m_pGammaButton->SetCommand(new KeyValues("OpenGammaDialog"));
 	m_pMode = new ComboBox(this, "Resolution", 8, false);
 	m_pAspectRatio = new ComboBox( this, "AspectRatio", 6, false );
 	m_pVRMode = new ComboBox( this, "VRMode", 2, false );
@@ -1018,17 +904,15 @@ COptionsSubVideo::COptionsSubVideo(vgui::Panel *parent) : PropertyPage(parent, N
 	m_pBenchmark = new Button( this, "BenchmarkButton", "#GameUI_LaunchBenchmark" );
 	m_pBenchmark->SetCommand(new KeyValues("LaunchBenchmark"));
 	m_pThirdPartyCredits = new URLButton(this, "ThirdPartyVideoCredits", "#GameUI_ThirdPartyTechCredits");
-//	m_pThirdPartyCredits->SetCommand(new KeyValues("OpenThirdPartyVideoCreditsDialog"));
+	m_pThirdPartyCredits->SetCommand(new KeyValues("OpenThirdPartyVideoCreditsDialog"));
 	m_pThirdPartyCredits->SetVisible(false);
 	m_pHDContent = new CheckButton( this, "HDContentButton", "#GameUI_HDContent" );
 
 	char pszAspectName[3][64];
-	const wchar_t *unicodeText = g_pVGuiLocalize->Find("#GameUI_AspectNormal");
-	g_pVGuiLocalize->ConvertUnicodeToANSI(unicodeText, pszAspectName[0], 32);
-	unicodeText = g_pVGuiLocalize->Find("#GameUI_AspectWide16x9");
-	g_pVGuiLocalize->ConvertUnicodeToANSI(unicodeText, pszAspectName[1], 32);
-	unicodeText = g_pVGuiLocalize->Find("#GameUI_AspectWide16x10");
-	g_pVGuiLocalize->ConvertUnicodeToANSI(unicodeText, pszAspectName[2], 32);
+	const wchar_t *unicodeText;
+	g_pVGuiLocalize->ConvertUnicodeToANSI(L"4:3", pszAspectName[0], 32);
+	g_pVGuiLocalize->ConvertUnicodeToANSI(L"16:9", pszAspectName[1], 32);
+	g_pVGuiLocalize->ConvertUnicodeToANSI(L"16:10", pszAspectName[2], 32);
 
 #ifndef ANDROID
 	int iNormalItemID = m_pAspectRatio->AddItem( pszAspectName[0], NULL );
@@ -1052,7 +936,7 @@ COptionsSubVideo::COptionsSubVideo(vgui::Panel *parent) : PropertyPage(parent, N
 		break;
 	}
 #else
-	int iNormalItemID = m_pAspectRatio->AddItem( "lemonparty.org", NULL );
+	int iNormalItemID = m_pAspectRatio->AddItem( "undefined", NULL );
 	m_pAspectRatio->ActivateItem( iNormalItemID );
 
 	m_pGammaButton->SetEnabled(false);
@@ -1071,7 +955,8 @@ COptionsSubVideo::COptionsSubVideo(vgui::Panel *parent) : PropertyPage(parent, N
 	// which is an operation we don't support as it currently stands. The user can 
 	// pass -adapter N to use a different device.
 #if defined( USE_SDL ) && defined( DX_TO_GL_ABSTRACTION )
-	int numVideoDisplays = SDL_GetNumVideoDisplays();
+	int numVideoDisplays;
+	SDL_GetDisplays(&numVideoDisplays);
 
 	m_pWindowed = new vgui::ComboBox( this, "DisplayModeCombo", 5 + numVideoDisplays, false );
 
@@ -1150,49 +1035,54 @@ COptionsSubVideo::COptionsSubVideo(vgui::Panel *parent) : PropertyPage(parent, N
 //-----------------------------------------------------------------------------
 // Purpose: Generates resolution list
 //-----------------------------------------------------------------------------
-void COptionsSubVideo::PrepareResolutionList()
-{
+#pragma clang diagnostic ignored "-Wwritable-strings"
+void COptionsSubVideo::PrepareResolutionList() // Secton: this code was too dogshit so i rewrote it -
+{                                              //         i wasted more than 3 days trying to debug this
+	static const struct                        //         shit and i'm not willing to keep doing myself
+	{                                          //         a disservice anymore!
+		uint w; uint h; char* standard;
+	} s_Resolutions[] = // Secton: if you're adding more, don't forget to update the same one in glmdisplaydb_linuxwin.inl!
+	{ // Standards source: https://upload.wikimedia.org/wikipedia/commons/0/0c/Vector_Video_Standards8.svg
+		{ 800, 600, "SVGA" },   // 4x3
+		{ 1024, 768, "XGA" },
+		{ 1152, 864, "XGA+" },
+		{ 1280, 960, "QuadVGA" },
+		{ 1400, 1050, "SXGA+" },
+		{ 1600, 1200, "UXGA" },
+		{ 1920, 1440, "" },
+		{ 2048, 1536, "QXGA" },
+		{ 3200, 2400, "QUXGA" },
+
+		{ 1280, 720, "HD" },  // 16x9
+		{ 1366, 768, "FWXGA" },
+		{ 1536, 864, "" },
+		{ 1600, 900, "WSXGA" },
+		{ 1920, 1080, "Full HD" },
+		{ 2048, 1152, "" },
+		{ 2560, 1440, "(W)QHD" },
+		{ 3840, 2160, "4K UHD" },
+
+		{ 1280, 800, "WXGA" },   // 16x10
+		{ 1440, 900, "WXGA+" },   // 16x10
+		{ 1680, 1050, "WSXGA+" },
+		{ 1920, 1200, "WUXGA" },
+		{ 2560, 1600, "WQXGA" },
+		{ 3840, 2400, "WQUXGA" }
+	};
 	// get the currently selected resolution
 	char sz[256];
 	m_pMode->GetText(sz, 256);
-	int currentWidth = 0, currentHeight = 0;
-	sscanf( sz, "%i x %i", &currentWidth, &currentHeight );
+	int currentWidth = 0, currentHeight = 0; char currentStandard[8] = {0};
+	sscanf( sz, "%i x %i (%7s)", &currentWidth, &currentHeight, currentStandard );
 
 	// Clean up before filling the info again.
 	m_pMode->DeleteAllItems();
-#ifndef ANDROID
-	m_pAspectRatio->SetItemEnabled(1, false);
-	m_pAspectRatio->SetItemEnabled(2, false);
-#endif
-	// get full video mode list
-	vmode_t *plist = NULL;
-	int count = 0;
-	gameuifuncs->GetVideoModes( &plist, &count );
-
-	const MaterialSystem_Config_t &config = materials->GetCurrentConfigForVideoCard();
 
 	// Windowed is the last item in the combobox.
 	bool bWindowed = ( m_pWindowed->GetActiveItem() >= ( m_pWindowed->GetItemCount() - 1 ) );
 	int desktopWidth, desktopHeight;
 	gameuifuncs->GetDesktopResolution( desktopWidth, desktopHeight );
-
-#if defined( USE_SDL )
-	bool bFullScreenWithMultipleDisplays = ( !bWindowed && ( SDL_GetNumVideoDisplays() > 1 ) );
-	if ( bFullScreenWithMultipleDisplays )
-	{
-		SDL_Rect rect;
-#if defined( DX_TO_GL_ABSTRACTION )
-		int displayIndex = m_pWindowed->GetActiveItem();
-#else
-		int displayIndex = materials->GetCurrentAdapter();
-#endif
-
-		if ( !SDL_GetDisplayBounds( displayIndex, &rect ) )
-		{
-			desktopWidth = rect.w;
-			desktopHeight = rect.h;
-		}
-	}
+	const MaterialSystem_Config_t &config = materials->GetCurrentConfigForVideoCard();
 
 	// If we are switching to fullscreen, and this isn't the mode we're currently in, then
 	//	fake things out so the native fullscreen resolution is selected. Stuck this in
@@ -1204,78 +1094,34 @@ void COptionsSubVideo::PrepareResolutionList()
 		currentWidth = desktopWidth;
 		currentHeight = desktopHeight;
 	}
-#endif
 
 	// iterate all the video modes adding them to the dropdown
-	bool bFoundWidescreen = false;
 	int selectedItemID = -1;
-	for (int i = 0; i < count; i++, plist++)
-	{
-#if !defined( USE_SDL )
-		// don't show modes bigger than the desktop for windowed mode
-		if ( bWindowed )
-#endif
-		{
-			if ( plist->width > desktopWidth || plist->height > desktopHeight )
-			{
-				// Filter out sizes larger than our desktop.
-				continue;
-			}
-		}
-
-		GetResolutionName( plist, sz, sizeof( sz ), desktopWidth, desktopHeight );
-
+	for (int i = 0; i < sizeof(s_Resolutions) / sizeof(s_Resolutions[0]); i++) {
+		if ( s_Resolutions[i].w > desktopWidth || s_Resolutions[i].h > desktopHeight )
+			continue; // Filter out sizes larger than our desktop.
+		int iAspectMode = GetScreenAspectMode( s_Resolutions[i].w, s_Resolutions[i].h );
+		m_pAspectRatio->SetItemEnabled( iAspectMode, true );
 		int itemID = -1;
-
-		int iAspectMode = GetScreenAspectMode( plist->width, plist->height );
-#ifndef ANDROID
-		if ( iAspectMode > 0 )
-		{
-			m_pAspectRatio->SetItemEnabled( iAspectMode, true );
-			bFoundWidescreen = true;
-		}
-
+		GetResolutionName( s_Resolutions[i].w, s_Resolutions[i].h, sz, sizeof( sz ), desktopWidth, desktopHeight );
 		// filter the list for those matching the current aspect
 		if ( iAspectMode == m_pAspectRatio->GetActiveItem() )
-		{
 			itemID = m_pMode->AddItem( sz, NULL);
-		}
-#else
-		float aspect = (float)plist->width / plist->height;
-		float native_aspect = (float)desktopWidth / desktopHeight;
 
-		if( fabs(native_aspect - aspect) < 0.01f )
-			itemID = m_pMode->AddItem( sz, NULL);
-#endif
-
-		// try and find the bestplistplistplist match for the resolution to be selected
-		if ( plist->width == currentWidth && plist->height == currentHeight )
-		{
+		// try and find the best match for the resolution to be selected
+		if ( s_Resolutions[i].w == currentWidth && s_Resolutions[i].h == currentHeight )
 			selectedItemID = itemID;
-		}
-		else if ( selectedItemID == -1 && plist->width == config.m_VideoMode.m_Width && plist->height == config.m_VideoMode.m_Height )
-		{
+		else if ( selectedItemID == -1 && s_Resolutions[i].w == config.m_VideoMode.m_Width && s_Resolutions[i].h == config.m_VideoMode.m_Height )
 			selectedItemID = itemID;
-		}
-	}
+		m_nSelectedMode = selectedItemID;
 
-	// disable ratio selection if we can't display widescreen.
-#ifndef ANDROID
-	m_pAspectRatio->SetEnabled( bFoundWidescreen );
-#endif
-
-	m_nSelectedMode = selectedItemID;
-
-	if ( selectedItemID != -1 )
-	{
-		m_pMode->ActivateItem( selectedItemID );
-	}
-	else
-	{
-		int Width = config.m_VideoMode.m_Width;
-		int Height = config.m_VideoMode.m_Height;
-
-#if defined( USE_SDL )
+		if ( selectedItemID != -1 )
+			m_pMode->ActivateItem( selectedItemID );
+		else
+		{
+			int Width = config.m_VideoMode.m_Width;
+			int Height = config.m_VideoMode.m_Height;
+#ifdef USE_SDL
 		// If we are switching to a new display, or the size is greater than the desktop, then
 		//	display the desktop width and height.
 		if ( bNewFullscreenDisplay || ( Width > desktopWidth ) || ( Height > desktopHeight ) )
@@ -1284,9 +1130,10 @@ void COptionsSubVideo::PrepareResolutionList()
 			Height = desktopHeight;
 		}
 #endif
-
-		Q_snprintf( sz, ARRAYSIZE( sz ), "%d x %d", Width, Height );
+		Q_snprintf( sz, ARRAYSIZE( sz ), "%d x %d %s", Width, Height,
+		           sizeof(s_Resolutions[i].standard) != 0 ? s_Resolutions[i].standard : "" );
 		m_pMode->SetText( sz );
+		}
 	}
 }
 
@@ -1296,9 +1143,7 @@ void COptionsSubVideo::PrepareResolutionList()
 COptionsSubVideo::~COptionsSubVideo()
 {
 	if (m_hOptionsSubVideoAdvancedDlg.Get())
-	{
 		m_hOptionsSubVideoAdvancedDlg->MarkForDeletion();
-	}
 }
 
 
@@ -1362,7 +1207,7 @@ void COptionsSubVideo::OnResetData()
 
 	const MaterialSystem_Config_t &config = materials->GetCurrentConfigForVideoCard();
 
-    // reset UI elements
+	// reset UI elements
 #if defined( USE_SDL ) && defined( DX_TO_GL_ABSTRACTION )
 	int ItemIndex;
 
@@ -1383,21 +1228,16 @@ void COptionsSubVideo::OnResetData()
 		}
 	}
 
-    m_pWindowed->ActivateItem( ItemIndex );
+	m_pWindowed->ActivateItem( ItemIndex );
 #else
-    m_pWindowed->ActivateItem( config.Windowed() ? 1 : 0 );
+	m_pWindowed->ActivateItem( config.Windowed() ? 1 : 0 );
 #endif
 
-	// reset gamma control
-#ifdef ANDROID
 	m_pGammaButton->SetEnabled( false );
-#else
-	m_pGammaButton->SetEnabled( !config.Windowed() );
-#endif
 
 	m_pHDContent->SetSelected( BUseHDContent() );
 
-    SetCurrentResolutionComboItem();
+	SetCurrentResolutionComboItem();
 
 	bool bVREnabled = config.m_nVRModeAdapter != -1;
 	m_pVRMode->ActivateItem( bVREnabled ? 1 : 0 );
@@ -1416,18 +1256,18 @@ void COptionsSubVideo::SetCurrentResolutionComboItem()
 
 	const MaterialSystem_Config_t &config = materials->GetCurrentConfigForVideoCard();
 
-    int resolution = -1;
-    for ( int i = 0; i < count; i++, plist++ )
+	int resolution = -1;
+	for ( int i = 0; i < count; i++, plist++ )
 	{
 		if ( plist->width == config.m_VideoMode.m_Width && 
 			 plist->height == config.m_VideoMode.m_Height )
 		{
-            resolution = i;
+			resolution = i;
 			break;
 		}
 	}
 
-    if (resolution != -1)
+	if (resolution != -1)
 	{
 		char sz[256];
 		int desktopWidth, desktopHeight;
@@ -1442,15 +1282,15 @@ void COptionsSubVideo::SetCurrentResolutionComboItem()
 		int displayIndex = materials->GetCurrentAdapter();
 #endif
 
-		if ( !SDL_GetDisplayBounds( displayIndex, &rect ) )
+		if ( SDL_GetDisplayBounds( displayIndex, &rect ) )
 		{
 			desktopWidth = rect.w;
 			desktopHeight = rect.h;
 		}
 #endif
 
-		GetResolutionName( plist, sz, sizeof(sz), desktopWidth, desktopHeight );
-        m_pMode->SetText(sz);
+		GetResolutionName( plist->width, plist->height, sz, sizeof(sz), desktopWidth, desktopHeight );
+		m_pMode->SetText(sz);
 	}
 }
 
@@ -1497,8 +1337,8 @@ void COptionsSubVideo::OnApplyChanges()
 		m_pMode->GetItemText( m_nSelectedMode, sz, 256 );
 	}
 
-	int width = 0, height = 0;
-	sscanf( sz, "%i x %i", &width, &height );
+	int width = 0, height = 0; char standard[8] = {0};
+	sscanf( sz, "%i x %i (%7s)", &width, &height, standard );
 
 	// windowed
 	bool bConfigChanged = false;
@@ -1519,12 +1359,8 @@ void COptionsSubVideo::OnApplyChanges()
 
 
 	// make sure there is a change
-	if ( config.m_VideoMode.m_Width != width
-		|| config.m_VideoMode.m_Height != height
-		|| config.Windowed() != windowed )
-	{
+	if ( config.m_VideoMode.m_Width != width || config.m_VideoMode.m_Height != height || config.Windowed() != windowed )
 		bConfigChanged = true;
-	}
 
 #if defined( USE_SDL )
 	if ( !windowed )
@@ -1546,7 +1382,7 @@ void COptionsSubVideo::OnApplyChanges()
 			}
 		}
 
-		if ( !SDL_GetDisplayBounds( displayIndexTarget, &rect ) )
+		if ( SDL_GetDisplayBounds( displayIndexTarget, &rect ) )
 		{
 			// If we are going non-native fullscreen, tweak the resolution to have the same aspect ratio as the display.
 			if ( ( width != rect.w ) || ( height != rect.h ) )
@@ -1590,16 +1426,7 @@ void COptionsSubVideo::OnApplyChanges()
 void COptionsSubVideo::PerformLayout()
 {
 	BaseClass::PerformLayout();
-
-	if ( m_pGammaButton )
-	{
-#ifdef ANDROID
-		m_pGammaButton->SetEnabled( false );
-#else
-		const MaterialSystem_Config_t &config = materials->GetCurrentConfigForVideoCard();
-		m_pGammaButton->SetEnabled( !config.Windowed() );
-#endif
-	}
+	if ( m_pGammaButton ) m_pGammaButton->SetEnabled( false );
 }
 
 //-----------------------------------------------------------------------------
@@ -1608,18 +1435,18 @@ void COptionsSubVideo::PerformLayout()
 void COptionsSubVideo::OnTextChanged(Panel *pPanel, const char *pszText)
 {
 	if (pPanel == m_pMode)
-    {
+	{
 		const MaterialSystem_Config_t &config = materials->GetCurrentConfigForVideoCard();
 
 		m_nSelectedMode = m_pMode->GetActiveItem();
 
-		int w = 0, h = 0;
-		sscanf(pszText, "%i x %i", &w, &h);
-        if ( config.m_VideoMode.m_Width != w || config.m_VideoMode.m_Height != h )
-        {
-            OnDataChanged();
-        }
-    }
+		int w = 0, h = 0; char standard[8] = {0};
+		sscanf(pszText, "%i x %i (%7s)", &w, &h, standard);
+		if ( config.m_VideoMode.m_Width != w || config.m_VideoMode.m_Height != h )
+		{
+			OnDataChanged();
+		}
+	}
 #ifndef ANDROID
 	else if (pPanel == m_pAspectRatio)
 	{
@@ -1712,19 +1539,6 @@ void COptionsSubVideo::OpenAdvanced()
 	}
 
 	m_hOptionsSubVideoAdvancedDlg->Activate();
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: Opens gamma-adjusting dialog
-//-----------------------------------------------------------------------------
-void COptionsSubVideo::OpenGammaDialog()
-{
-	if ( !m_hGammaDialog.Get() )
-	{
-		m_hGammaDialog = new CGammaDialog( GetVParent() );
-	}
-
-	m_hGammaDialog->Activate();
 }
 
 //-----------------------------------------------------------------------------

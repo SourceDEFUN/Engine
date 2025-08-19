@@ -950,24 +950,14 @@ void CDetailModel::ComputeAngles( void )
 {
 	switch( m_Orientation )
 	{
-	case 0:
-		break;
-
+	case 0: break;
 	case 1:
-		{
-			Vector vecDir;
-			VectorSubtract( CurrentViewOrigin(), m_Origin, vecDir );
-			VectorAngles( vecDir, m_Angles );
-		}
+		m_Angles = CurrentViewAngles();
 		break;
-
 	case 2:
-		{
-			Vector vecDir;
-			VectorSubtract( CurrentViewOrigin(), m_Origin, vecDir );
-			vecDir.z = 0.0f;
-			VectorAngles( vecDir, m_Angles );
-		}
+		m_Angles = CurrentViewAngles();
+		m_Angles.x = 0.f; m_Angles.z = 0.f;
+		// Secton TODO: Implement Crysis-like foliage behavior! Use X axis for that.
 		break;
 	}
 }

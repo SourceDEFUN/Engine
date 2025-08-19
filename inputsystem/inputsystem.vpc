@@ -50,7 +50,7 @@ $Project "inputsystem"
 	{
 		$Lib	tier1
 		$Lib	tier2
-		$ImpLib SDL2
+		$ImpLib SDL3
 		$Implib	"steam_api"						[($WIN32||$WIN64||$POSIX||$PS3)&&!$NO_STEAM]
 	}
 }

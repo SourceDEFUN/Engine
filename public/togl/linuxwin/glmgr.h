@@ -85,7 +85,8 @@ extern TelemetryGPUStats_t g_TelemetryGPUStats;
 #endif
 
 struct GLMRect;
-typedef void *PseudoGLContextPtr;
+// Secton: i'm losing my fuckinfg sanity over porting this piece of shit to SDL3
+typedef SDL_GLContext PseudoGLContextPtr;
 
 // parrot the D3D present parameters, more or less... "adapter" translates into "active display index" per the m_activeDisplayCount below.
 class GLMDisplayParams
@@ -1678,7 +1679,7 @@ class GLMContext
 #if defined( USE_SDL )
 		int								m_pixelFormatAttribs[100];	// more than enough
 		PseudoNSGLContextPtr			m_nsctx;
-		void *							m_ctx;
+		SDL_GLContext					m_ctx;
 #endif
 		bool							m_bUseBoneUniformBuffers; // if true, we use two uniform buffers for vertex shader constants vs. one
 

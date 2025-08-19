@@ -54,11 +54,11 @@ def build(bld):
 		'../../public/tier0',
 		'../../public/tier1',
 		'../../common'
-	] + bld.env.INCLUDES_SDL2
+	] + bld.env.INCLUDES_SDL3
 
 	defines = []
 
-	libs = ['tier0','tier1','tier2','tier3','vstdlib','SDL2']
+	libs = ['tier0','tier1','tier2','tier3','vstdlib','SDL3']
 
 	if bld.env.DEST_OS == 'win32':
 		libs += ['USER32', 'IMM32', 'GDI32', 'SHELL32', 'OLE32', 'SHLWAPI', 'vgui_surfacelib', 'WINMM']

@@ -28,24 +28,16 @@
         {
             "label": "Build",
             "type": "shell",
-            "command": "./waf install",
-            "problemMatcher": {
-                "base": "$gcc",
-                "fileLocation": ["relative", "${workspaceFolder}/build/"]
-            },
+            "command": "./waf install --prefix=../Build/",
             "group": {
                 "kind": "build",
                 "isDefault": true
             },
             "windows": {
-                "command": "./waf.bat install",
-                "problemMatcher": {
-                    "base": "$msCompile",
-                    "fileLocation": ["relative", "${workspaceFolder}/build/"]
-                }
+                "command": "./waf.bat install --prefix=../Build/"
             },
             "osx": {
-                "command": "python3 waf install"
+                "command": "python3 waf install --prefix=../Build/"
             }
         }
     ]
