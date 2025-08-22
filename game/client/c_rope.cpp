@@ -146,6 +146,7 @@ static Vector	g_BarbedSubdivs[MAX_ROPE_SUBDIVS] = {	Vector(1.5,		1.5*1.5,		1.5*1
 static float g_flLockAmount = 0.1;
 static float g_flLockFalloff = 0.3;
 
+extern IVModelInfoClient *modelinfo;
 
 
 

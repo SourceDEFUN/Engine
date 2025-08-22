@@ -15,6 +15,7 @@
 #include "engine/ivmodelinfo.h"
 #include "fx_line.h"
 #include "materialsystem/imaterialvar.h"
+extern IVModelInfoClient *modelinfo;
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

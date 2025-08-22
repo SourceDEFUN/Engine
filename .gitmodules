@@ -1,9 +1,9 @@
-[submodule "thirdparty"]
-	path = thirdparty
-	url = https://github.com/nillerusr/source-thirdparty
 [submodule "ivp"]
 	path = ivp
-	url = https://github.com/nillerusr/source-physics
+	url = https://github.com/valberrie/icepick-physics.git
 [submodule "lib"]
 	path = lib
 	url = https://github.com/nillerusr/source-engine-libs.git
+[submodule "Thirdparty/minimp3"]
+	path = Thirdparty/minimp3
+	url = https://github.com/lieff/minimp3.git

@@ -490,6 +490,8 @@ bool CClientScoreBoardDialog::GetPlayerScoreInfo(int playerIndex, KeyValues *kv)
 //-----------------------------------------------------------------------------
 void CClientScoreBoardDialog::UpdatePlayerAvatar( int playerIndex, KeyValues *kv )
 {
+	// valb - TODO
+#ifndef NO_STEAM
 	// Update their avatar
 	if ( kv && ShowAvatars() && steamapicontext->SteamFriends() && steamapicontext->SteamUtils() )
 	{
@@ -524,6 +526,7 @@ void CClientScoreBoardDialog::UpdatePlayerAvatar( int playerIndex, KeyValues *kv
 			}
 		}
 	}
+#endif
 }
 
 //-----------------------------------------------------------------------------

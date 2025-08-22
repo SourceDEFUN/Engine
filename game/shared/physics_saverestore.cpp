@@ -23,6 +23,12 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
+#ifdef CLIENT_DLL
+	extern IVModelInfoClient *modelinfo;
+#else
+	extern IVModelInfo *modelinfo;
+#endif
+
 //-----------------------------------------------------------------------------
 
 static short PHYS_SAVE_RESTORE_VERSION = 5;

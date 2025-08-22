@@ -29,6 +29,7 @@
 #include "cam_thirdperson.h"
 #include "inputsystem/iinputsystem.h"
 #include "touch.h"
+#include "cdll_client_int.h"
 
 // up / down
 #define	PITCH	0

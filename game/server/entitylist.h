@@ -15,6 +15,10 @@
 
 #include "baseentity.h"
 
+#include "tier1/utlvector.h" // Secton FIXME: Seriously?!?
+
+#include "iservernetworkable.h"
+
 class IEntityListener;
 
 abstract_class CBaseEntityClassList

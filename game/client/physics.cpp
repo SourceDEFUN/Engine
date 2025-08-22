@@ -28,6 +28,8 @@
 
 // file system interface
 extern IFileSystem *filesystem;
+extern IVModelInfoClient *modelinfo;
+extern IStaticPropMgrClient *staticpropmgr;
 
 ConVar	cl_phys_timescale( "cl_phys_timescale", "1.0", FCVAR_CHEAT, "Sets the scale of time for client-side physics (ragdolls)" );
 

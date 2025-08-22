@@ -22,6 +22,7 @@
 #undef CWorld
 #endif
 
+extern IVModelInfoClient *modelinfo;
 C_GameRules *g_pGameRules = NULL;
 static C_World *g_pClientWorld;
 

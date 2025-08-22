@@ -19,6 +19,7 @@
 #include "engine/IEngineSound.h"
 #include "engine/IEngineTrace.h"
 #include "engine/ivmodelinfo.h"
+extern IVModelInfoClient *modelinfo;
 
 #include "fx_line.h"
 #include "interface.h"

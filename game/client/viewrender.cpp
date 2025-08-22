@@ -87,6 +87,9 @@ static void testfreezeframe_f( void )
 }
 static ConCommand test_freezeframe( "test_freezeframe", testfreezeframe_f, "Test the freeze frame code.", FCVAR_CHEAT );
 
+extern IVModelInfoClient *modelinfo;
+extern IStaticPropMgrClient *staticpropmgr;
+
 //-----------------------------------------------------------------------------
 
 static ConVar r_visocclusion( "r_visocclusion", "0", FCVAR_CHEAT );

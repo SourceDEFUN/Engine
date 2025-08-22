@@ -13,7 +13,7 @@
 #pragma once
 #endif
 
-
+#include "variant_t.h"
 #include "baseentity.h"
 
 
@@ -51,7 +51,7 @@ public:
 	DECLARE_SIMPLE_DATADESC();
 };
 
-
+class ISave; class IRestore;
 //-----------------------------------------------------------------------------
 // Purpose: Stores a list of connections to other entities, for data/commands to be
 //			communicated along.

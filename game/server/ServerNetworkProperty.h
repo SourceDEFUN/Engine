@@ -14,6 +14,9 @@
 #include "iservernetworkable.h"
 #include "server_class.h"
 #include "edict.h"
+#include "util.h"
+extern inline int ENTINDEX( edict_t *pEdict);
+#include "../shared/predictioncopy.h"
 #include "timedeventmgr.h"
 
 //

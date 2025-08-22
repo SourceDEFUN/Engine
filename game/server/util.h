@@ -25,6 +25,7 @@
 #include "shake.h"
 
 #include "vstdlib/random.h"
+#include "mathlib/vmatrix.h"
 #include <string.h>
 
 #include "utlvector.h"
@@ -153,7 +154,7 @@ public:
 //
 // Conversion among the three types of "entity", including identity-conversions.
 //
-inline int	  ENTINDEX( edict_t *pEdict)			
+inline int	  ENTINDEX( edict_t *pEdict)
 { 
 	int nResult = pEdict ? pEdict->m_EdictIndex : 0;
 	Assert( nResult == engine->IndexOfEdict(pEdict) );
@@ -169,7 +170,7 @@ inline edict_t* INDEXENT( int iEdictNum )
 
 // Testing the three types of "entity" for nullity
 inline bool FNullEnt(const edict_t* pent)
-{ 
+{
 	return pent == NULL || ENTINDEX((edict_t*)pent) == 0; 
 }
 

@@ -657,13 +657,13 @@ inline C_BasePlayer *ToBasePlayer( C_BaseEntity *pEntity )
 
 inline C_BaseEntity *C_BasePlayer::GetUseEntity() 
 { 
-	return m_hUseEntity;
+	return (C_BaseEntity*)m_hUseEntity.Get();
 }
 
 
 inline IClientVehicle *C_BasePlayer::GetVehicle() 
 { 
-	C_BaseEntity *pVehicleEnt = m_hVehicle.Get();
+	C_BaseEntity *pVehicleEnt = (C_BaseEntity*)m_hVehicle.Get();
 	return pVehicleEnt ? pVehicleEnt->GetClientVehicle() : NULL;
 }
 

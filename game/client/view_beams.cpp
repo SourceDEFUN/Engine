@@ -26,6 +26,8 @@
 	#include "prop_portal_shared.h"
 #endif
 
+extern IVModelInfoClient *modelinfo;
+
 ConVar r_DrawBeams( "r_DrawBeams", "1", FCVAR_CHEAT, "0=Off, 1=Normal, 2=Wireframe" );
 
 // memdbgon must be the last include file in a .cpp file!!!

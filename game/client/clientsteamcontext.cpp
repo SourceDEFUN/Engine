@@ -1,4 +1,5 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
+#ifndef NO_STEAM
 #include "cbase.h"
 #include "clientsteamcontext.h"
 
@@ -129,3 +130,4 @@ void CClientSteamContext::InvokeCallbacks( const SteamLoggedOnChange_t &loggedOn
 		m_LoggedOnCallbacks[i]( loggedOnStatus );
 	}
 }
+#endif

@@ -11,6 +11,11 @@
 #include "model_types.h"
 #include "IEffects.h"
 #include "util_shared.h"
+#ifdef CLIENT_DLL
+	extern IVModelInfoClient *modelinfo;
+#else
+	extern IVModelInfo *modelinfo;
+#endif
 
 #if !defined( CLIENT_DLL )
 #include "ndebugoverlay.h"

@@ -134,8 +134,11 @@ SDL_FunctionPointer VoidFnPtrLookup_GlMgr(const char *fn, bool &okay, const bool
 	if ((!okay) && (!bRequired))  // always look up if required (so we get a complete list of crucial missing symbols).
 		return NULL;
 
-	// SDL does the right thing, so we never need to use tier0 in this case.
+#ifdef USE_SDL
+	retval = SDL_GL_GetProcAddress(fn);
+#else
 	retval = (*gGL_GetProcAddressCallback)(fn, okay, bRequired, fallback);
+#endif
 	//printf("CDynamicFunctionOpenGL: SDL_GL_GetProcAddress(\"%s\") returned %p\n", fn, retval);
 	if ((retval == NULL) && (fallback != NULL))
 	{

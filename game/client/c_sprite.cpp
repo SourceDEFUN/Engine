@@ -24,6 +24,7 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
+extern IVModelInfoClient *modelinfo;
 ConVar	r_drawsprites( "r_drawsprites", "1", FCVAR_CHEAT );
 
 //-----------------------------------------------------------------------------

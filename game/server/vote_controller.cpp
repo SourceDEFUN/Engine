@@ -780,6 +780,8 @@ void CVoteController::TrackVoteCaller( CBasePlayer *pPlayer )
 	if ( !pPlayer )
 		return;
 
+	// valb - TODO: refactor to not require steam
+#ifndef NO_STEAM
 	CSteamID steamID;
 	pPlayer->GetSteamID( &steamID );
 
@@ -792,6 +794,7 @@ void CVoteController::TrackVoteCaller( CBasePlayer *pPlayer )
 	}
 
 	m_VoteCallers.Insert( steamID.ConvertToUint64(), gpGlobals->curtime + sv_vote_creation_timer.GetInt() );
+#endif
 };
 
 //-----------------------------------------------------------------------------
@@ -802,6 +805,8 @@ bool CVoteController::CanEntityCallVote( CBasePlayer *pPlayer, int &nCooldown )
 	if ( !pPlayer )
 		return false;
 	
+	// valb - TODO: refactor to not require steam
+#ifndef NO_STEAM
 	CSteamID steamID;
 	pPlayer->GetSteamID( &steamID );
 
@@ -819,6 +824,7 @@ bool CVoteController::CanEntityCallVote( CBasePlayer *pPlayer, int &nCooldown )
 	}
 
 	return true;
+#endif
 };
 
 //-----------------------------------------------------------------------------

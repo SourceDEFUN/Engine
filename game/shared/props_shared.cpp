@@ -36,6 +36,12 @@ extern CBaseEntity *BreakModelCreateSingle( CBaseEntity *pOwner, breakmodel_t *p
 static int nPropBreakablesPerFrameCount = 0;
 static int nFrameNumber = 0;
 
+#ifdef CLIENT_DLL
+	extern IVModelInfoClient *modelinfo;
+#else
+	extern IVModelInfo *modelinfo;
+#endif
+
 //=============================================================================================================
 // UTILITY FUNCS
 //=============================================================================================================

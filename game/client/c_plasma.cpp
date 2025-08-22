@@ -17,6 +17,8 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
+extern IVModelInfoClient *modelinfo;
+
 #define	NUM_CHILD_FLAMES	6
 #define	CHILD_SPREAD		40
 

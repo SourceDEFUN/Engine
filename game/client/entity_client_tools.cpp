@@ -21,6 +21,8 @@
 
 class CClientTools;
 
+extern IVModelInfoClient *modelinfo;
+
 void DrawSpriteModel( IClientEntity *baseentity, CEngineSprite *psprite,
 						const Vector &origin, float fscale, float frame, 
 						int rendermode, int r, int g, int b, int a,

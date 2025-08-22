@@ -27,6 +27,8 @@ ConVar	cl_phys_props_enable( "cl_phys_props_enable", "1", 0, "Disable clientside
 ConVar	cl_phys_props_respawndist( "cl_phys_props_respawndist", "1500", 0, "Minimum distance from the player that a clientside prop must be before it's allowed to respawn." );
 ConVar	cl_phys_props_respawnrate( "cl_phys_props_respawnrate", "60", 0, "Time, in seconds, between clientside prop respawns." );
 
+extern IVModelInfoClient *modelinfo;
+
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////

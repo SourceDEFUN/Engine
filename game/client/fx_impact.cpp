@@ -15,6 +15,8 @@
 #endif
 #include "engine/IStaticPropMgr.h"
 #include "c_impact_effects.h"
+extern IVModelInfoClient *modelinfo;
+extern IStaticPropMgrClient *staticpropmgr;
 
 
 // memdbgon must be the last include file in a .cpp file!!!

@@ -19,6 +19,11 @@
 #include "debugoverlay_shared.h"
 #include "coordsize.h"
 #include "vphysics/performance.h"
+#ifdef CLIENT_DLL
+	extern IVModelInfoClient *modelinfo;
+#else
+	extern IVModelInfo *modelinfo;
+#endif
 
 #ifdef CLIENT_DLL
 	#include "c_te_effect_dispatch.h"

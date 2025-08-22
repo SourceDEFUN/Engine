@@ -470,11 +470,14 @@ public:
 	bool m_bConsoleTextMode;
 
 public:
+#ifndef NO_STEAM
 	// Steam API context for use by input system for access to steam controllers.
 	CSteamAPIContext& SteamAPIContext() { return m_SteamAPIContext; }
-
+#endif
 private:
+#ifndef NO_STEAM
 	CSteamAPIContext m_SteamAPIContext;
+#endif
 	bool m_bSkipControllerInitialization;
 };
 

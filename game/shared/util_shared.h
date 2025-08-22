@@ -6,6 +6,7 @@
 
 #ifndef UTIL_SHARED_H
 #define UTIL_SHARED_H
+#include "KeyValues.h"
 #ifdef _WIN32
 #pragma once
 #endif
@@ -17,6 +18,7 @@
 #include "engine/IEngineTrace.h"
 #include "engine/IStaticPropMgr.h"
 #include "shared_classnames.h"
+#include "shareddefs.h"
 
 #ifdef CLIENT_DLL
 #include "cdll_client_int.h"
@@ -582,6 +584,7 @@ private:
 	float Now( void ) const;		// work-around since client header doesn't like inlined gpGlobals->curtime
 };
 
+class KeyValues;
 char* ReadAndAllocStringValue( KeyValues *pSub, const char *pName, const char *pFilename = NULL );
 
 int UTIL_StringFieldToInt( const char *szValue, const char **pValueStrings, int iNumStrings );

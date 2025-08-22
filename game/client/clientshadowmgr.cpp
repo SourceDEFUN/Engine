@@ -99,6 +99,9 @@ ConVar r_threaded_client_shadow_manager( "r_threaded_client_shadow_manager", "0"
 #pragma warning( disable: 4701 )
 #endif
 
+extern IVModelInfoClient *modelinfo;
+extern IStaticPropMgrClient *staticpropmgr;
+
 // forward declarations
 void ToolFramework_RecordMaterialParams( IMaterial *pMaterial );
 

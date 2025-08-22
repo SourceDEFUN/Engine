@@ -104,6 +104,7 @@ void C_BaseCombatWeapon::OnRestore()
 
 int C_BaseCombatWeapon::GetWorldModelIndex( void )
 {
+	extern IVModelInfoClient *modelinfo;
 	if ( GameRules() )
 	{
 		const char *pBaseName = modelinfo->GetModelName( modelinfo->GetModel( m_iWorldModelIndex ) );

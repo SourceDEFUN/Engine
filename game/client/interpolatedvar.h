@@ -6,6 +6,7 @@
 
 #ifndef INTERPOLATEDVAR_H
 #define INTERPOLATEDVAR_H
+#warning "Interpolated Var has been used! Closing doors..."
 #ifdef _WIN32
 #pragma once
 #endif
@@ -15,8 +16,10 @@
 #include "lerp_functions.h"
 #include "animationlayer.h"
 #include "convar.h"
+#include "cdll_client_int.h"
+extern CGlobalVarsBase *gpGlobals;
 
-
+// Secton: memdbgon must be the last include file blah blah blah...
 #include "tier0/memdbgon.h"
 
 #define COMPARE_HISTORY(a,b) \

@@ -3582,6 +3582,7 @@ CON_COMMAND( mat_shadercount, "display count of all shaders and reset that count
 #if defined( DX_TO_GL_ABSTRACTION )
 void	CShaderManager::DoStartupShaderPreloading()
 {
+	// return; // valb - HACK: for some reason on my machine, we crash in LoadShaderCache with a null pixel shader, so we'll just skip this step
 #ifdef ANDROID // Too slow
 	return;
 #endif

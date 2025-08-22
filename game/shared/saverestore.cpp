@@ -47,6 +47,12 @@ void AddRestoredEntity( C_BaseEntity *pEntity );
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
+#ifdef CLIENT_DLL
+	extern IVModelInfoClient *modelinfo;
+#else
+	extern IVModelInfo *modelinfo;
+#endif
+
 #define MAX_ENTITYARRAY 1024
 #define ZERO_TIME ((FLT_MAX*-0.5))
 // A bit arbitrary, but unlikely to collide with any saved games...

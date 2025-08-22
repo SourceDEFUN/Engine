@@ -36,6 +36,9 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
+// valb - wasn't exported from tier0 i guess
+extern CTHREADLOCALINT g_nThreadID;
+
 class CVoxelTree;
 class CIntersectSweptBox;
 

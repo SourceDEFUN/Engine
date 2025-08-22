@@ -9,6 +9,8 @@
 
 #include "simtimer.h"
 #include "ai_component.h"
+#include "util.h"
+extern CBasePlayer *UTIL_GetLocalPlayer( void );
 
 #if defined( _WIN32 )
 #pragma once

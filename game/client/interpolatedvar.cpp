@@ -4,7 +4,6 @@
 //
 //=============================================================================//
 
-#include "cbase.h"
 #include "interpolatedvar.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

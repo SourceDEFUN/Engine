@@ -20,9 +20,15 @@
 #include "ServerNetworkProperty.h"
 #include "shareddefs.h"
 #include "engine/ivmodelinfo.h"
+#include "takedamageinfo.h"
+#include "touchlink.h"
+#include "groundlink.h"
+#include "util.h"
+extern inline edict_t* INDEXENT( int iEdictNum );
 
 class CDamageModifier;
 class CDmgAccumulator;
+class IRecipientFilter;
 
 struct CSoundParameters;
 

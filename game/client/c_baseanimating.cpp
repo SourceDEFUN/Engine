@@ -18,6 +18,7 @@
 #include "c_te_legacytempents.h"
 #include "activitylist.h"
 #include "animation.h"
+extern IVModelInfoClient *modelinfo;
 
 #include "clienteffectprecachesystem.h"
 #include "IEffects.h"

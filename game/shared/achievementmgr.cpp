@@ -1070,6 +1070,8 @@ bool CalcHasNumClanPlayers( int iClanTeammates )
 
 	if ( IsPC() )
 	{
+		// valb - TODO: fix for non-steam
+#ifndef NO_STEAM
 		// Do a cheap rejection: check teammate count first to see if we even need to bother checking w/Steam
 		// Subtract 1 for the local player.
 		if ( CalcPlayerCount()-1 < iClanTeammates )
@@ -1106,6 +1108,7 @@ bool CalcHasNumClanPlayers( int iClanTeammates )
 			}
 		}
 		return false;
+#endif
 	}
 	else 
 	{

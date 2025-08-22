@@ -25,6 +25,11 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
+#ifdef CLIENT_DLL
+	extern IVModelInfoClient *modelinfo;
+#else
+	extern IVModelInfo *modelinfo;
+#endif
 
 //-----------------------------------------------------------------------------
 // Interface to allow the particle system to call back into the game code

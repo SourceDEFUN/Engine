@@ -108,8 +108,10 @@ extern CreateInterfaceFn g_AppSystemFactory;
 IHammer *g_pHammer = NULL;
 IPhysics *g_pPhysics = NULL;
 ISourceVirtualReality *g_pSourceVR = NULL;
-#if defined( USE_SDL )
-ILauncherMgr *g_pLauncherMgr = NULL;
+#ifdef USE_SDL
+// valb - HACK: defined in appframework/sdl_mgr???
+// ILauncherMgr *g_pLauncherMgr = NULL;
+extern ILauncherMgr *g_pLauncherMgr;
 #endif
 
 #ifndef SWDS

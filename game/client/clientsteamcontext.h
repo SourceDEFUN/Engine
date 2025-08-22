@@ -14,6 +14,7 @@ struct SteamLoggedOnChange_t
 	bool bLoggedOn;
 };
 
+#ifndef NO_STEAM
 class CClientSteamContext : public CSteamAPIContext
 {
 public:
@@ -50,6 +51,9 @@ private:
 
 	CUtlVector< CUtlDelegate< void ( const SteamLoggedOnChange_t & ) > > m_LoggedOnCallbacks;
 };
+#else
+class CClientSteamContext;
+#endif
 
 CClientSteamContext &ClientSteamContext();			// singleton accessor
 

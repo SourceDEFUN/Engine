@@ -34,6 +34,7 @@ static ConVar r_PortalTestEnts( "r_PortalTestEnts", "1", FCVAR_CHEAT, "Clip enti
 static ConVar r_portalsopenall( "r_portalsopenall", "0", FCVAR_CHEAT, "Open all portals" );
 static ConVar cl_threaded_client_leaf_system("cl_threaded_client_leaf_system", "0"  );
 
+extern IVModelInfoClient *modelinfo;
 
 DEFINE_FIXEDSIZE_ALLOCATOR( CClientRenderablesList, 1, CUtlMemoryPool::GROW_SLOW );
 

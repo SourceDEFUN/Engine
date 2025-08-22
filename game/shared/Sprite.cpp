@@ -25,6 +25,12 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
+#ifdef CLIENT_DLL
+	extern IVModelInfoClient *modelinfo;
+#else
+	extern IVModelInfo *modelinfo;
+#endif
+
 const float MAX_SPRITE_SCALE = 64.0f;
 const float MAX_GLOW_PROXY_SIZE = 64.0f;
 

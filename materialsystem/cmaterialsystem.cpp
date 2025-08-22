@@ -646,10 +646,12 @@ bool CMaterialSystem::Connect( CreateInterfaceFn factory )
 	}
 
 	// Get at the interfaces exported by the shader DLL
-	g_pShaderDeviceMgr = (IShaderDeviceMgr*)m_ShaderAPIFactory( SHADER_DEVICE_MGR_INTERFACE_VERSION, 0 );
+	// g_pShaderDeviceMgr = (IShaderDeviceMgr*)m_ShaderAPIFactory( SHADER_DEVICE_MGR_INTERFACE_VERSION, 0 );
+	g_pShaderDeviceMgr = (IShaderDeviceMgr*)factory( SHADER_DEVICE_MGR_INTERFACE_VERSION, 0 );
 	if ( !g_pShaderDeviceMgr )
 		return false;
-	g_pHWConfig = (IHardwareConfigInternal*)m_ShaderAPIFactory( MATERIALSYSTEM_HARDWARECONFIG_INTERFACE_VERSION, 0 );
+	// g_pHWConfig = (IHardwareConfigInternal*)m_ShaderAPIFactory( MATERIALSYSTEM_HARDWARECONFIG_INTERFACE_VERSION, 0 );
+	g_pHWConfig = (IHardwareConfigInternal*)factory( MATERIALSYSTEM_HARDWARECONFIG_INTERFACE_VERSION, 0 );
 	if ( !g_pHWConfig )
 		return false;
 	

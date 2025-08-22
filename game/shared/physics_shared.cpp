@@ -38,6 +38,12 @@ IPhysicsSurfaceProps *physprops = NULL;
 // UNDONE: Split into separate hashes?
 IPhysicsObjectPairHash *g_EntityCollisionHash = NULL;
 
+#ifdef CLIENT_DLL
+	extern IVModelInfoClient *modelinfo;
+#else
+	extern IVModelInfo *modelinfo;
+#endif
+
 const char *SURFACEPROP_MANIFEST_FILE = "scripts/surfaceproperties_manifest.txt";
 
 const objectparams_t g_PhysDefaultObjectParams =

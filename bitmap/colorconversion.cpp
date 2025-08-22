@@ -26,7 +26,7 @@ typedef int32 *DWORD_PTR;
 #include "bitmap/float_bm.h"
 
 #define STB_DXT_IMPLEMENTATION
-#include "stb_dxt.h"
+#include <stb/stb_dxt.h>
 
 // Should be last include
 #include "tier0/memdbgon.h"

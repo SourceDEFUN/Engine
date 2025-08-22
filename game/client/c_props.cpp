@@ -18,6 +18,8 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
+extern IVModelInfoClient *modelinfo;
+
 IMPLEMENT_NETWORKCLASS_ALIASED( DynamicProp, DT_DynamicProp )
 
 BEGIN_NETWORK_TABLE( CDynamicProp, DT_DynamicProp )

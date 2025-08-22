@@ -34,6 +34,7 @@
 
 bool UseHWMorphModels();
 
+extern IVModelInfoClient *modelinfo;
 
 using namespace vgui;
 

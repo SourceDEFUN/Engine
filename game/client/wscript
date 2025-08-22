@@ -42,7 +42,7 @@ def build(bld):
 		'../../public/tier0',
 		'../../public/tier1',
 		'../../vgui2/include',
-		'../../vgui2/controls',
+		'../../vgui2/vgui_controls',
 		'../shared'
 	]
 

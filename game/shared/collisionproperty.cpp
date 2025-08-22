@@ -31,6 +31,9 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
+// valb - HACK: wasn't exported by tier0
+extern CTHREADLOCALINT g_nThreadID;
+
 //-----------------------------------------------------------------------------
 // KD tree query callbacks
 //-----------------------------------------------------------------------------

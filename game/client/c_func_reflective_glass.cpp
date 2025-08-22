@@ -6,6 +6,7 @@
 //===========================================================================//
 #include "cbase.h"
 #include "view_shared.h"
+extern IVModelInfoClient *modelinfo;
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

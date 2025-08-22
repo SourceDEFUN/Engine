@@ -574,8 +574,10 @@ bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory,
 	if ( cvar == NULL )
 		return false;
 
+#ifndef NO_STEAM
 	s_SteamAPIContext.Init();
 	s_SteamGameServerAPIContext.Init();
+#endif
 
 	// init each (seperated for ease of debugging)
 	if ( (engine = (IVEngineServer*)appSystemFactory(INTERFACEVERSION_VENGINESERVER, NULL)) == NULL )
@@ -774,8 +776,10 @@ void CServerGameDLL::DLLShutdown( void )
 	// reset (shutdown) the gamestatsupload connection
 	gamestatsuploader->InitConnection();
 
+#ifndef NO_STEAM
 	s_SteamAPIContext.Clear(); // Steam API context shutdown
 	s_SteamGameServerAPIContext.Clear();
+#endif
 
 	gameeventmanager = NULL;
 	

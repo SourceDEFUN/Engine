@@ -2785,6 +2785,10 @@ void C_BasePlayer::UpdateFogBlend( void )
 //-----------------------------------------------------------------------------
 bool C_BasePlayer::GetSteamID( CSteamID *pID )
 {
+#ifdef NO_STEAM
+	// valb - HACK: no steam
+	return false;
+#else
 	// try to make this a little more efficient
 
 	player_info_t pi;
@@ -2807,6 +2811,7 @@ bool C_BasePlayer::GetSteamID( CSteamID *pID )
 		}
 	}
 	return false;
+#endif
 }
 
 #if defined USES_ECON_ITEMS

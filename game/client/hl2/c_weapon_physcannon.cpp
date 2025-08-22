@@ -12,6 +12,8 @@
 #include "view.h"
 #include "particles_attractor.h"
 
+extern IVModelInfoClient *modelinfo;
+
 class C_WeaponPhysCannon: public C_BaseHLCombatWeapon
 {
 	DECLARE_CLASS( C_WeaponPhysCannon, C_BaseHLCombatWeapon );

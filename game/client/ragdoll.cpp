@@ -23,6 +23,8 @@
 extern ConVar r_FadeProps;
 #endif
 
+extern IVModelInfoClient *modelinfo;
+
 CRagdoll::CRagdoll()
 {
 	m_ragdoll.listCount = 0;

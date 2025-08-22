@@ -17,9 +17,16 @@
 #endif
 
 #include "bitvec.h"
+#include "edict.h"
 
 class CHintMessageQueue;
 class CHintMessageTimers;
+
+#ifdef CLIENT_DLL
+extern CGlobalVarsBase *gpGlobals;
+#else
+extern CGlobalVars *gpGlobals;
+#endif
 
 typedef bool (*HintTimerCallback)( CBasePlayer *pOnPlayer );
 

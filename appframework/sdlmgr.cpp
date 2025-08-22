@@ -57,7 +57,7 @@ ConVar sdl_double_click_size( "sdl_double_click_size", "2" );
 ConVar sdl_double_click_time( "sdl_double_click_time", "400" );
 
 #if defined( DX_TO_GL_ABSTRACTION )
-COpenGLEntryPoints *gGL = NULL;
+extern COpenGLEntryPoints *gGL;
 #endif
 
 const int kBogusSwapInterval = INT_MAX;
@@ -413,6 +413,7 @@ private:
 	double m_flPrevGLSwapWindowTime;
 };
 
+// valb - HACK: but this is defined in engine/sys_dll2.cpp?
 ILauncherMgr *g_pLauncherMgr = NULL;
 
 void* CreateSDLMgr()
