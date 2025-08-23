@@ -17,7 +17,9 @@
 #endif
 
 #include "blockingudpsocket.h"
+#ifndef NO_VCR
 #include "tier0/vcrmode.h"
+#endif
 
 class CBlockingUDPSocket::CImpl	
 {
@@ -104,7 +106,11 @@ unsigned int CBlockingUDPSocket::ReceiveSocketMessage( struct sockaddr_in *packe
 	struct sockaddr fromaddress;
 	int		fromlen = sizeof( fromaddress );
 
+#ifndef NO_VCR
 	int packet_length = VCRHook_recvfrom
+#else
+	int packet_length = recvfrom
+#endif
 		(
 		m_Socket, 
 		(char *)buf, 

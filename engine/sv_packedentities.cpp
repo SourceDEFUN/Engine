@@ -30,7 +30,9 @@
 #include "con_nprint.h"
 #include "smooth_average.h"
 #include "vengineserver_impl.h"
+#ifndef NO_VCR
 #include "tier0/vcrmode.h"
+#endif
 #include "vstdlib/jobthread.h"
 #include "enginethreads.h"
 

@@ -35,7 +35,9 @@ typedef unsigned char uuid_t[16];
 #include "mathlib/IceKey.H"
 #include "bitbuf.h"
 #include "tier0/icommandline.h"
+#ifndef NO_VCR
 #include "tier0/vcrmode.h"
+#endif
 #include "blockingudpsocket.h"
 #include "cserserverprotocol_engine.h"
 #include "utlbuffer.h"

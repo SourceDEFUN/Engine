@@ -65,7 +65,9 @@
 #include "filesystem.h"
 #include "filesystem_engine.h"
 #include "tier0/etwprof.h"
+#ifndef NO_VCR
 #include "tier0/vcrmode.h"
+#endif
 #include "traceinit.h"
 #include "host_saverestore.h"
 #include "l_studio.h"
@@ -2578,7 +2580,11 @@ void _Host_RunFrame (float time)
 
 		// When playing back a VCR file, don't do host_sleep. That way, if it was recorded with
 		// host_sleep on, it'll play back way Faster.
+#ifndef NO_VCR
 		if ( host_Sleep.GetInt() && VCRGetMode() != VCR_Playback )
+#else
+		if (host_Sleep.GetInt())
+#endif
 		{
 			Sys_Sleep( host_Sleep.GetInt() );
 		}

@@ -5,9 +5,9 @@ add_library(client SHARED)
 target_include_directories(client PUBLIC game_controls ../../vgui2/include ../../vgui2/vgui_controls ../shared .)
 
 # DISABLE_STEAM doesn't work, NO_STEAM is actually checked
-target_compile_definitions(client PUBLIC DISABLE_STEAM=1 NO_STEAM CLIENT_DLL NO_STRING_T VECTOR strncpy=use_Q_strncpy_instead _snprintf=use_Q_snprintf_instead)
+target_compile_definitions(client PUBLIC DISABLE_STEAM=1 NO_STEAM CLIENT_DLL NO_STRING_T VECTOR _snprintf=use_Q_snprintf_instead) # strncpy=use_Q_strncpy_instead
 
-add_dependencies(client tier0 tier1 tier2 tier3 particles dmxloader vgui_controls matsys_controls mathlib vstdlib choreoobjects steam_api bitmap vtf)
+add_dependencies     (client        tier0 tier1 tier2 tier3 particles dmxloader vgui_controls matsys_controls mathlib vstdlib choreoobjects steam_api bitmap vtf)
 target_link_libraries(client PUBLIC tier0 tier1 tier2 tier3 particles dmxloader vgui_controls matsys_controls mathlib vstdlib choreoobjects steam_api bitmap vtf)
 target_sources(client PUBLIC in_touch.cpp ../../public/tier0/memoverride.cpp)
 
@@ -74,11 +74,13 @@ target_sources(client PUBLIC
 		c_baseentity.cpp
 		c_baseflex.cpp
 		c_baseplayer.cpp
+		c_basetempentity.cpp
 		c_baseviewmodel.cpp
 		c_breakableprop.cpp
 		c_colorcorrection.cpp
 		c_colorcorrectionvolume.cpp
 		c_dynamiclight.cpp
+		c_effects.cpp
 		c_entitydissolve.cpp
 		c_entityparticletrail.cpp
 		c_env_fog_controller.cpp
@@ -100,6 +102,7 @@ target_sources(client PUBLIC
 		c_func_tracktrain.cpp
 		c_gib.cpp
 		c_hairball.cpp
+		c_impact_effects.cpp
 		c_info_overlay_accessor.cpp
 		c_lightglow.cpp
 		C_MaterialModifyControl.cpp
@@ -112,8 +115,10 @@ target_sources(client PUBLIC
 		c_playerresource.cpp
 		c_point_camera.cpp
 		c_point_commentary_node.cpp
+		c_prop_vehicle.cpp
 		c_props.cpp
 		c_ragdoll_manager.cpp
+		c_recipientfilter.cpp
 		c_rope.cpp
 		c_rumble.cpp
 		c_sceneentity.cpp
@@ -124,9 +129,52 @@ target_sources(client PUBLIC
 		c_sprite.cpp
 		c_sprite_perfmonitor.cpp
 		c_sun.cpp
+		c_te.cpp
+		c_te_armorricochet.cpp
+		c_te_basebeam.cpp
+		c_te_beamentpoint.cpp
+		c_te_beaments.cpp
+		c_te_beamfollow.cpp
+		c_te_beamlaser.cpp
+		c_te_beampoints.cpp
+		c_te_beamring.cpp
+		c_te_beamringpoint.cpp
+		c_te_beamspline.cpp
+		c_te_bloodsprite.cpp
+		c_te_bloodstream.cpp
+		c_te_breakmodel.cpp
+		c_te_bspdecal.cpp
+		c_te_bubbles.cpp
+		c_te_bubbletrail.cpp
+		c_te_clientprojectile.cpp
+		c_te_decal.cpp
+		c_te_dynamiclight.cpp
+		c_te_effect_dispatch.cpp
+		c_te_energysplash.cpp
+		c_te_explosion.cpp
+		c_te_fizz.cpp
+		c_te_footprint.cpp
+		c_te_glassshatter.cpp
+		c_te_glowsprite.cpp
+		c_te_impact.cpp
+		c_te_killplayerattachments.cpp
+		c_te_largefunnel.cpp
+		c_te_legacytempents.cpp
+		c_te_muzzleflash.cpp
+		c_te_particlesystem.cpp
+		c_te_physicsprop.cpp
+		c_te_playerdecal.cpp
+		c_te_projecteddecal.cpp
+		c_te_showline.cpp
+		c_te_smoke.cpp
+		c_te_sparks.cpp
+		c_te_sprite.cpp
+		c_te_spritespray.cpp
+		c_te_worlddecal.cpp
 		c_team.cpp
 		c_tesla.cpp
 		c_test_proxytoggle.cpp
+		c_tracer.cpp
 		c_user_message_register.cpp
 		c_vehicle_choreo_generic.cpp
 		c_vehicle_jeep.cpp
@@ -173,14 +221,19 @@ target_sources(client PUBLIC
 		flashlighteffect.cpp
 		../shared/func_ladder.cpp
 		functionproxy.cpp
+		fx.cpp
 		fx_blood.cpp
 		fx_cube.cpp
+		fx_discreetline.cpp
+		fx_envelope.cpp
 		fx_explosion.cpp
 		fx_fleck.cpp
 		fx_impact.cpp
 		fx_interpvalue.cpp
+		fx_line.cpp
 		fx_quad.cpp
 		fx_shelleject.cpp
+		fx_sparks.cpp
 		fx_staticline.cpp
 		fx_tracer.cpp
 		fx_trail.cpp
@@ -191,18 +244,25 @@ target_sources(client PUBLIC
 		../shared/GameStats.cpp
 		../shared/gamestringpool.cpp
 		gametrace_client.cpp
+		geiger.cpp
 		../shared/gamevars_shared.cpp
 		glow_outline_effect.cpp
 		glow_overlay.cpp
+		history_resource.cpp
 		../shared/hintmessage.cpp
 		../shared/hintsystem.cpp
 		hltvcamera.cpp
 		hud.cpp
 		hud_animationinfo.cpp
+		hud_base_account.cpp
+		hud_baseachievement_tracker.cpp
 		hud_basechat.cpp
+		# hud_basedeathnotice.cpp # TF2
 		hud_basetimer.cpp
 		hud_bitmapnumericdisplay.cpp
+		hud_chat.cpp
 		hud_closecaption.cpp
+		# hud_controlpointicons.cpp # TF@
 		hud_crosshair.cpp
 		hud_element_helper.cpp
 		hl2/hud_filmdemo.cpp
@@ -211,12 +271,19 @@ target_sources(client PUBLIC
 		hud_msg.cpp
 		hud_numericdisplay.cpp
 		hud_pdump.cpp
+		# hud_posture.cpp # Probably a HL PS2 thing.
 		hud_redraw.cpp
+		hud_squadstatus.cpp
 		hud_vehicle.cpp
+		hud_vguiscreencursor.cpp
+		hud_voicestatus.cpp
+		# hud_vote.cpp
+		hud_weapon.cpp
 		../shared/igamesystem.cpp
 		in_camera.cpp
 		in_joystick.cpp
 		in_main.cpp
+		in_touch.cpp
 		initializer.cpp
 		interpolatedvar.cpp
 		IsNPCProxy.cpp
@@ -227,6 +294,7 @@ target_sources(client PUBLIC
 		matrixproxy.cpp
 		menu.cpp
 		message.cpp
+		MonitorMaterialProxy.cpp
 		movehelper_client.cpp
 		../shared/movevars_shared.cpp
 		../shared/multiplay_gamerules.cpp
@@ -234,6 +302,7 @@ target_sources(client PUBLIC
 		panelmetaclassmgr.cpp
 		particle_collision.cpp
 		particle_litsmokeemitter.cpp
+		particle_prototype.cpp
 		../shared/particle_parse.cpp
 		../shared/particle_property.cpp
 		particle_proxies.cpp
@@ -244,6 +313,7 @@ target_sources(client PUBLIC
 		particles_localspace.cpp
 		particles_new.cpp
 		particles_simple.cpp
+		particlesphererenderer.cpp
 		../shared/particlesystemquery.cpp
 		perfvisualbenchmark.cpp
 		physics.cpp
@@ -268,6 +338,7 @@ target_sources(client PUBLIC
 		ragdoll.cpp
 		../shared/ragdoll_shared.cpp
 		recvproxy.cpp
+		rendertexture.cpp
 		basepresence.cpp
 		../shared/rope_helpers.cpp
 		../shared/saverestore.cpp
@@ -275,6 +346,7 @@ target_sources(client PUBLIC
 		ScreenSpaceEffects.cpp
 		../shared/sequence_Transitioner.cpp
 		simple_keys.cpp
+		smoke_fog_overlay.cpp
 		../shared/simtimer.cpp
 		../shared/singleplay_gamerules.cpp
 		../shared/SoundEmitterSystem.cpp
@@ -286,14 +358,19 @@ target_sources(client PUBLIC
 		../shared/SpriteTrail.cpp
 		../shared/studio_shared.cpp
 		studio_stats.cpp
+		# TeamBitmapImage.cpp # probably TF2 or DOD:S stuff i dunno
 		../shared/takedamageinfo.cpp
 		../shared/teamplay_gamerules.cpp
 		../shared/teamplayroundbased_gamerules.cpp
 		../shared/test_ehandle.cpp
 		text_message.cpp
 		texturescrollmaterialproxy.cpp
+		# thermalmaterialproxy.cpp # probably useless
 		timematerialproxy.cpp
 		toggletextureproxy.cpp
+		toolframework_client.cpp
+		touch.cpp
+		# train.cpp # what the hell is this?!?
 		../shared/usercmd.cpp
 		../shared/usermessages.cpp
 		../shared/util_shared.cpp
@@ -307,14 +384,20 @@ target_sources(client PUBLIC
 		vgui_centerstringpanel.cpp
 		vgui_consolepanel.cpp
 		vgui_debugoverlaypanel.cpp
+		# vgui_entityimagepanel.cpp
+		# vgui_entitypanel.cpp
 		vgui_fpspanel.cpp
 		vgui_game_viewport.cpp
 		vgui_grid.cpp
+		# vgui_imagehealthpanel.cpp # May be broken
 		vgui_int.cpp
 		vgui_loadingdiscpanel.cpp
 		vgui_messagechars.cpp
 		vgui_netgraphpanel.cpp
 		vgui_slideshow_display_screen.cpp
+		# vgui_textmessagepanel.cpp
+		vgui_video_player.cpp
+		vgui_video.cpp
 		view.cpp
 		view_beams.cpp
 		view_effects.cpp
@@ -324,6 +407,7 @@ target_sources(client PUBLIC
 		viewdebug.cpp
 		viewpostprocess.cpp
 		viewrender.cpp
+		voice_menu.cpp
 		../shared/voice_banmgr.cpp
 		../shared/voice_status.cpp
 		warp_overlay.cpp
@@ -332,12 +416,9 @@ target_sources(client PUBLIC
 		weapon_selection.cpp
 		weapons_resource.cpp
 		WorldDimsProxy.cpp
-		vgui_video.cpp
-		vgui_video_player.cpp
 		../shared/mp_shareddefs.cpp
-		../client/c_vote_controller.cpp
+		c_vote_controller.cpp
 		../../public/haptics/haptic_msgs.cpp
-		../client/touch.cpp
 
         # pch shit
         ../../public/bone_setup.cpp
@@ -379,6 +460,8 @@ target_sources(client PUBLIC
         game_controls/basemodelpanel.h
         game_controls/basemodel_panel.cpp
         game_controls/basemodel_panel.h
+		../../tier2/camerautils.cpp # baaad idea.
+		../../tier2/renderutils.cpp # this is getting bad, but without this we'll get missing symbols error 😭
         game_controls/ClientScoreBoardDialog.cpp
         game_controls/commandmenu.cpp
         game_controls/intromenu.cpp

@@ -3,7 +3,7 @@ project(appframework)
 add_library(appframework STATIC AppSystemGroup.cpp ../public/filesystem_init.cpp)
 
 if(BUILD_SDL)
-    find_package(SDL3 REQUIRED)
+    find_package(SDL3 REQUIRED CONFIG REQUIRED COMPONENTS SDL3)
     target_include_directories(appframework PUBLIC SDL3::SDL3)
     target_sources(appframework PUBLIC sdlmgr.cpp)
 endif()

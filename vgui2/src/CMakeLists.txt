@@ -22,7 +22,7 @@ add_library(vgui2 SHARED
 )
 
 target_compile_definitions(vgui2 PUBLIC DONT_PROTECT_FILEIO_FUNCTIONS=1)
-find_package(SDL3 REQUIRED)
+find_package(SDL3 REQUIRED CONFIG REQUIRED COMPONENTS SDL3)
 target_include_directories(vgui2 PUBLIC SDL3::SDL3 ./ ../../public ../ ../../public/tier0 ../../public/tier1)
 
 add_dependencies(vgui2 tier0 tier1 tier2 tier3 vstdlib)

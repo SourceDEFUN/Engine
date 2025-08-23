@@ -34,7 +34,7 @@ elseif(WIN32 AND (NOT BUILD_GL))
 endif()
 
 target_compile_definitions(shaderapidx9 PUBLIC SHADER_DLL_EXPORT PROTECTED_THINGS_ENABLE)
-find_package(SDL3 REQUIRED)
+find_package(SDL3 REQUIRED CONFIG REQUIRED COMPONENTS SDL3)
 target_include_directories(shaderapidx9 PUBLIC ./ ../../public ../../public/tier0 ../../public/tier1 ../../common ../ SDL3::SDL3)
 
 install(TARGETS shaderapidx9 DESTINATION bin)

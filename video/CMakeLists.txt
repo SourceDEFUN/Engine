@@ -7,7 +7,7 @@ add_library(video_services SHARED
 
 add_dependencies(video_services tier0 tier1 tier2 tier3 vstdlib)
 target_link_libraries(video_services PUBLIC tier0 tier1 tier2 tier3 vstdlib)
-find_package(SDL3 REQUIRED)
+find_package(SDL3 REQUIRED CONFIG REQUIRED COMPONENTS SDL3)
 target_include_directories(video_services PUBLIC SDL3::SDL3)
 
 if(APPLE)

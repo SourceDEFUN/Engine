@@ -19,7 +19,9 @@
 #include "ents_shared.h"
 #include "hltvserver.h"
 #include "replayserver.h"
+#ifndef NO_VCR
 #include "tier0/vcrmode.h"
+#endif
 #include "framesnapshot.h"
 
 

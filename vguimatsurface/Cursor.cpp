@@ -16,7 +16,9 @@
 #endif
 
 #include "tier0/dbg.h"
+#ifndef NO_VCR
 #include "tier0/vcrmode.h"
+#endif
 #include "tier0/icommandline.h"
 #include "tier1/utldict.h"
 #include "Cursor.h"

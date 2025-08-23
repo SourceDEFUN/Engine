@@ -9,7 +9,9 @@
 #include <windows.h>
 #endif
 #include "tier0/platform.h"
+#ifndef NO_VCR
 #include "tier0/vcrmode.h"
+#endif
 #include "iregistry.h"
 #include "tier0/dbg.h"
 #include "tier1/strtools.h"

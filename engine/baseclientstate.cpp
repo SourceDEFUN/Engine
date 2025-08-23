@@ -28,7 +28,9 @@
 #endif
 #include "sv_steamauth.h"
 #include "tier0/icommandline.h"
+#ifndef NO_VCR
 #include "tier0/vcrmode.h"
+#endif
 #include "snd_audio_source.h"
 #include "cl_steamauth.h"
 #include "server.h"

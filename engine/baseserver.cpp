@@ -50,7 +50,9 @@
 #include <client_class.h>
 #include "tier0/icommandline.h"
 #include "sv_steamauth.h"
+#ifndef NO_VCR
 #include "tier0/vcrmode.h"
+#endif
 #include "sv_ipratelimit.h"
 #include "cl_steamauth.h"
 #include "sv_filter.h"

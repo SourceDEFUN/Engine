@@ -6,10 +6,10 @@ target_include_directories(server PUBLIC ../shared ../../utils/common ../shared/
                                         .)
 
 # DISABLE_STEAM doesn't work, NO_STEAM is actually checked
-target_compile_definitions(server PUBLIC DISABLE_STEAM=1 NO_STEAM GAME_DLL VECTOR strncpy=use_Q_strncpy_instead _snprintf=use_Q_snprintf_instead)
+target_compile_definitions(server PUBLIC DISABLE_STEAM=1 NO_STEAM GAME_DLL VECTOR _snprintf=use_Q_snprintf_instead) # strncpy=use_Q_strncpy_instead
 
-add_dependencies(server choreoobjects dmxloader mathlib particles tier2 tier3 steam_api)
-target_link_libraries(server PUBLIC choreoobjects dmxloader mathlib particles tier2 tier3 steam_api)
+add_dependencies     (server        choreoobjects dmxloader mathlib particles tier0 tier1 tier2 tier3 vstdlib steam_api)
+target_link_libraries(server PUBLIC choreoobjects dmxloader mathlib particles tier0 tier1 tier2 tier3 vstdlib steam_api)
 
 if(WIN32)
     target_compile_definitions(server PUBLIC fopen=dont_use_fopen)
@@ -376,6 +376,65 @@ target_sources(server PUBLIC
         ../../public/stringregistry.cpp
         ../../public/studio.cpp
         GameStats_BasicStatsFunctions.cpp
+
+        # aand to make dlopen happy
+        # ../../tier0/threadtools.cpp
+        basetempentity.cpp
+        te.cpp
+        te_armorricochet.cpp
+        te_basebeam.cpp
+        te_beamentpoint.cpp
+        te_beaments.cpp
+        te_beamfollow.cpp
+        te_beamlaser.cpp
+        te_beampoints.cpp
+        te_beamring.cpp
+        te_beamringpoint.cpp
+        te_beamspline.cpp
+        te_bloodsprite.cpp
+        te_bloodstream.cpp
+        te_breakmodel.cpp
+        te_bspdecal.cpp
+        te_bubbles.cpp
+        te_bubbletrail.cpp
+        te_clientprojectile.cpp
+        te_decal.cpp
+        te_dynamiclight.cpp
+        te_effect_dispatch.cpp
+        te_energysplash.cpp
+        te_explosion.cpp
+        te_fizz.cpp
+        te_footprintdecal.cpp
+        te_glassshatter.cpp
+        te_glowsprite.cpp
+        te_impact.cpp
+        te_killplayerattachments.cpp
+        te_largefunnel.cpp
+        te_muzzleflash.cpp
+        te_particlesystem.cpp
+        te_physicsprop.cpp
+        te_playerdecal.cpp
+        te_projecteddecal.cpp
+        te_showline.cpp
+        te_smoke.cpp
+        te_sparks.cpp
+        te_sprite.cpp
+        te_spritespray.cpp
+        te_worlddecal.cpp
+        # ../../tier1/datamanager.cpp
+        ../shared/usermessages.cpp
+        # ../../tier1/tier1.cpp # oh dear god no
+        # ../../tier1/utlsymbol.cpp
+        # ../../tier1/mempool.cpp
+        smoke_trail.cpp
+        # ../../tier0/vcrmode.cpp # TODO: Might want to fix it.
+        steamjet.cpp
+        toolframework_server.cpp
+        ../../dmxloader/dmxloader.cpp # bad idea, but the UnserializeDMX symbol is missing even though we link dmxloader?!@?
+        ../shared/SpriteTrail.cpp
+        ../../mathlib/randsse.cpp
+        plasma.cpp
+        event_tempentity_tester.cpp
 )
 
 # we don't need to bother with vpc projects, just use subdirs, and include the base project

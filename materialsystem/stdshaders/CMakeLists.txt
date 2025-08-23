@@ -113,7 +113,7 @@ add_library(stdshader_dx9 SHARED
 )
 
 target_compile_definitions(stdshader_dx9 PUBLIC STDSHADER_DX9_DLL_EXPORT FAST_MATERIALVAR_ACCESS)
-find_package(SDL3 REQUIRED)
+find_package(SDL3 REQUIRED CONFIG REQUIRED COMPONENTS SDL3)
 target_include_directories(stdshader_dx9 PUBLIC ./ ../../public ../../public/tier0 ../../public/tier1 fxctmp9 vshtmp9 SDL3::SDL3)
 
 add_dependencies(stdshader_dx9 tier0 shaderlib tier1 mathlib)

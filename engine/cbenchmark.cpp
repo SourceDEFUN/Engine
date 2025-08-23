@@ -11,7 +11,9 @@
 #include <winsock2.h> // INADDR_ANY defn
 #endif
 #include "cbenchmark.h"
+#ifndef NO_VCR
 #include "tier0/vcrmode.h"
+#endif
 #include "filesystem_engine.h"
 #include "sys.h"
 #include "KeyValues.h"

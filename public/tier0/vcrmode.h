@@ -11,6 +11,9 @@
 //===========================================================================//
 #ifndef VCRMODE_H
 #define VCRMODE_H
+#ifdef NO_VCR
+#error "Uh oh, VCR mode has been used!"
+#endif
 
 #ifdef _WIN32
 #include <process.h>

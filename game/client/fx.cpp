@@ -56,6 +56,7 @@ ConVar muzzleflash_light( "muzzleflash_light", "1", FCVAR_ARCHIVE );
 
 extern void FX_TracerSound( const Vector &start, const Vector &end, int iTracerType );
 
+extern IVModelInfoClient *modelinfo;
 
 //===================================================================
 //===================================================================

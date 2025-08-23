@@ -22,7 +22,9 @@
 #include "host.h"
 #include "server.h"
 #include "networkstringtableclient.h"
+#ifndef NO_VCR
 #include "vcrmode.h"
+#endif
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -48,7 +50,10 @@ void CHLTVDemoRecorder::StartAutoRecording()
 {
 	char fileName[MAX_OSPATH];
 
-	tm today; VCRHook_LocalTime( &today );
+	tm today;
+#ifndef NO_VCR // Secton TODO: Time!
+	VCRHook_LocalTime( &today );
+#endif
 
 	Q_snprintf( fileName, sizeof(fileName), "auto-%04i%02i%02i-%02i%02i-%s.dem", 
 		1900 + today.tm_year, today.tm_mon+1, today.tm_mday, 

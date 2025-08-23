@@ -15,7 +15,9 @@
 #include "inetmsghandler.h"
 #include "host.h"
 #include "netmessages.h"
+#ifndef NO_VCR
 #include "tier0/vcrmode.h"
+#endif
 #include "tier0/etwprof.h"
 
 #include "net_ws_headers.h"
@@ -135,7 +137,9 @@ void CNetChan::CompressFragments()
 	// (for example if it uses only the first couple bits of the last byte in the message). If the
 	// last few bits are different, it can produce a different compressed size.
 	if ( !m_bUseCompression ) return;
+#ifndef NO_VCR
 	if ( VCRGetMode() != VCR_Disabled ) return;
+#endif
 
 	// write fragemnts for both streams
 	for ( int i=0; i<MAX_STREAMS; i++ )

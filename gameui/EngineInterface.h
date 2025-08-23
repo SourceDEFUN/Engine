@@ -29,6 +29,8 @@ extern class IEngineSound *enginesound;
 extern class IMatchmaking *matchmaking;
 extern class IXboxSystem  *xboxsystem;
 extern class IAchievementMgr *achievementmgr; 
+#ifndef NO_STEAM
 extern class CSteamAPIContext *steamapicontext;
+#endif
 
 #endif // ENGINEINTERFACE_H

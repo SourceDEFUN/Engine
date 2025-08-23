@@ -267,6 +267,7 @@ void COptionsSubVoice::OnCommand( const char *command)
             EndTestMicrophone();
         }
     }
+#ifndef NO_STEAM
 	else if (!stricmp(command, "SteamVoiceSettings"))
 	{
 		if ( steamapicontext && steamapicontext->SteamFriends() )
@@ -274,6 +275,7 @@ void COptionsSubVoice::OnCommand( const char *command)
 			steamapicontext->SteamFriends()->ActivateGameOverlay( "voicesettings" );
 		}
 	}
+#endif
     else
 	{
         BaseClass::OnCommand(command);

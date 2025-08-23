@@ -17,7 +17,7 @@ set(BUILD_DEDICATED OFF)
 set(BUILD_SDL ON)
 set(BUILD_OPUS OFF)
 set(BUILD_GL ON)
-set(DEBUG_ENGINE OFF)
+set(DEBUG_ENGINE ON)
 set(DISABLE_WARNS OFF)
 
 set(BUILD_GAME "hl2" CACHE STRING "What game to build: hl2, episodic, hl2mp, portal, hl1, hl1mp, cstrike, dod, tf")
@@ -95,6 +95,9 @@ else()
     add_compile_definitions(NDEBUG)
 endif()
 
+# Disable VCR mode. Planning to remove it, as there's no reason for it (i do know what it's for)
+# add_compile_definitions(NO_VCR) # Do not enable it yet, not every VCR use is covered in this define!
+
 # TODO: GIT_COMMIT_HASH
 
 # extra
@@ -125,6 +128,7 @@ include_directories(AFTER ./ public common public/tier0 public/tier1)
 #)
 
 # default install path for non-game targets
+set(CMAKE_INSTALL_PREFIX "${CMAKE_CURRENT_SOURCE_DIR}/../Build/")
 ## PROJECTS
 
 # common

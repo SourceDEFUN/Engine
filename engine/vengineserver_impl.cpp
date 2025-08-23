@@ -48,7 +48,9 @@
 #include "replay_internal.h"
 #include "replayserver.h"
 #include "replay/iserverengine.h"
+#ifndef NO_VCR
 #include "vcrmode.h"
+#endif
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -138,7 +140,9 @@ void SeedRandomNumberGenerator( bool random_invariant )
 	if (!random_invariant)
 	{
 		long iSeed;
+	#ifndef NO_VCR
 		g_pVCR->Hook_Time( &iSeed );
+	#endif
 		float flAppTime = Plat_FloatTime();
 		ThreadId_t threadId = ThreadGetCurrentId();
 

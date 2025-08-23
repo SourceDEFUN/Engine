@@ -18,6 +18,7 @@ public:
 	virtual bool Init( IMaterial *pMaterial, KeyValues *pKeyValues );
 	virtual void OnBind( void *pC_BaseEntity );
 	virtual void Release( void ) { delete this; }
+	virtual IMaterial * GetMaterial() {return nullptr;}
 private:
 	IMaterialVar *m_pMonitorTextureVar;
 };
@@ -35,7 +36,7 @@ CMonitorMaterialProxy::~CMonitorMaterialProxy()
 
 bool CMonitorMaterialProxy::Init( IMaterial *pMaterial, KeyValues *pKeyValues )
 {
-	char const* pMonitorTextureVarName = pKeyValues->getString( "$monitorTextureVar" );
+	char const* pMonitorTextureVarName = pKeyValues->GetString( "$monitorTextureVar" );
 	if( !pMonitorTextureVarName )
 		return false;
 

@@ -50,6 +50,9 @@ PMaterialHandle g_Mat_Combine_Muzzleflash[3] = { NULL, NULL, NULL };
 static ConVar fx_drawimpactdebris( "fx_drawimpactdebris", "1", FCVAR_DEVELOPMENTONLY, "Draw impact debris effects." );
 static ConVar fx_drawimpactdust( "fx_drawimpactdust", "1", FCVAR_DEVELOPMENTONLY, "Draw impact dust effects." );
 
+extern IStaticPropMgrClient *staticpropmgr;
+extern IVModelInfoClient *modelinfo;
+
 void FX_CacheMaterialHandles( void )
 {
 	g_Mat_Fleck_Wood[0] = ParticleMgr()->GetPMaterial( "effects/fleck_wood1" );

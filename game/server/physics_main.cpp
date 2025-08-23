@@ -31,7 +31,9 @@
 #include "hierarchy.h"
 #include "trains.h"
 #include "vphysicsupdateai.h"
+#ifndef NO_VCR
 #include "tier0/vcrmode.h"
+#endif
 #include "pushentity.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -892,8 +894,10 @@ void CBaseEntity::PhysicsDispatchThink( BASEPTR thinkFunc )
 	
 	// The thinkLimit stuff makes a LOT of calls to Sys_FloatTime, which winds up calling into
 	// VCR mode so much that the framerate becomes unusable.
+#ifndef NO_VCR
 	if ( VCRGetMode() != VCR_Disabled )
 		thinkLimit = 0;
+#endif
 
 	float startTime = 0.0;
 

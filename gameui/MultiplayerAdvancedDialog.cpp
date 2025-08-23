@@ -244,6 +244,7 @@ void CMultiplayerAdvancedDialog::CreateControls()
 
 	// Build out the clan dropdown
 	CScriptObject *pClanObj = m_pDescription->FindObject( "cl_clanid" );
+#ifndef NO_STEAM
 	ISteamFriends *pFriends = steamapicontext->SteamFriends();
 	if ( pFriends && pClanObj )
 	{
@@ -261,6 +262,7 @@ void CMultiplayerAdvancedDialog::CreateControls()
 			pClanObj->AddItem( new CScriptListItem( CFmtStr( "%s (%s)", pTag, pName ), id ) );
 		}
 	}
+#endif
 
 	mpcontrol_t	*pCtrl;
 

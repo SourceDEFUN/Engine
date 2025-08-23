@@ -54,7 +54,9 @@ mat_fullbright 1 doesn't work properly on alpha materials in testroom_standards
 #include "materialsystem/materialsystem_config.h"
 #include "worldsize.h"
 #include "TransitionTable.h"
+#ifndef NO_VCR
 #include "tier0/vcrmode.h"
+#endif
 
 #include "tier1/tier1.h"
 #include "tier1/utlbuffer.h"
@@ -3778,7 +3780,9 @@ void CShaderAPIDx8::ForceHardwareSync( void )
 		// the frame to finish (update sound, etc.)
 		
 		// Disable VCR mode here or else it'll screw up (and we don't really care if this part plays back in exactly the same amount of time).
+	#ifndef NO_VCR
 		VCRSetEnabled( false );
+	#endif
 
 		m_currentSyncQuery ++;
 		if ( m_currentSyncQuery >= ARRAYSIZE(m_pFrameSyncQueryObject) )
@@ -3789,7 +3793,9 @@ void CShaderAPIDx8::ForceHardwareSync( void )
 		int waitIndex = ((m_currentSyncQuery + NUM_FRAME_SYNC_QUERIES) - (NUM_FRAME_SYNC_FRAMES_LATENCY+1)) % NUM_FRAME_SYNC_QUERIES;
 		UpdateFrameSyncQuery( waitIndex, false );
 		UpdateFrameSyncQuery( m_currentSyncQuery, true );
+	#ifndef NO_VCR
 		VCRSetEnabled( true );
+	#endif
 	}
 }
 

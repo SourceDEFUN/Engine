@@ -28,10 +28,10 @@ add_library(materialsystem SHARED
 )
 
 target_compile_definitions(materialsystem PUBLIC DEFINE_MATERIALSYSTEM_INTERFACE MATERIALSYSTEM_EXPORTS)
-find_package(SDL3 REQUIRED)
+find_package(SDL3 REQUIRED CONFIG REQUIRED COMPONENTS SDL3)
 target_include_directories(appframework PUBLIC SDL3::SDL3) # why?
 
 add_dependencies(materialsystem tier0 tier1 tier2 vstdlib mathlib bitmap shaderlib vtf)
-target_link_libraries(materialsystem PUBLIC tier0 tier1 tier2 vstdlib mathlib bitmap shaderlib vtf)
+target_link_libraries(materialsystem PUBLIC tier0 tier1 tier2 vstdlib mathlib bitmap shaderlib vtf SDL3::SDL3)
 
 install(TARGETS materialsystem DESTINATION bin)

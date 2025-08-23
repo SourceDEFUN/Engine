@@ -69,7 +69,9 @@
 #include <vgui_controls/Menu.h>
 #include <vgui_controls/PHandle.h>
 #include "tier3/tier3.h"
+#ifndef NO_VCR
 #include "tier0/vcrmode.h"
+#endif
 #include "matsys_controls/matsyscontrols.h"
 #include "steam/steam_api.h"
 

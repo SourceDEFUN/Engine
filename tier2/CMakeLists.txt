@@ -20,5 +20,5 @@ add_library(tier2 STATIC
         vconfig.cpp
         keyvaluesmacros.cpp
 )
-find_package(SDL3 REQUIRED)
+find_package(SDL3 REQUIRED CONFIG REQUIRED COMPONENTS SDL3)
 target_include_directories(tier2 PRIVATE SDL3::SDL3 ../public/tier2)

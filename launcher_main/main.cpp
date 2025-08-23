@@ -222,12 +222,14 @@ int main( int argc, char *argv[] )
 
 	void *launcher = dlopen( "bin/liblauncher" DLL_EXT_STRING, RTLD_NOW );
 
-	if( !launcher )
+	if( !launcher ) {
+		fprintf( stderr, "Couldn't use %s\n", dlerror() );
 		launcher = dlopen( "bin/launcher" DLL_EXT_STRING, RTLD_NOW );
+	}
 
 	if ( !launcher )
 	{
-		fprintf( stderr, "%s\nFailed to load the launcher\n", dlerror() );
+		fprintf( stderr, "Couldn't use %s\nFailed to load the launcher.\n", dlerror() );
 		return 0;
 	}
 

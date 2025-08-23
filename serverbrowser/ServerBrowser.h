@@ -76,7 +76,8 @@ private:
 CServerBrowser &ServerBrowser();
 
 class CSteamAPIContext;
+#ifndef NO_STEAM
 extern CSteamAPIContext *steamapicontext;
-
+#endif
 
 #endif // SERVERBROWSER_H

@@ -40,6 +40,7 @@
 #include "tier0/memdbgon.h"
 
 extern ConVar muzzleflash_light;
+extern IVModelInfoClient *modelinfo;
 
 #define TENT_WIND_ACCEL 50
 

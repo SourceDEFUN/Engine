@@ -246,6 +246,7 @@ void CHudVoiceStatus::OnThink( void )
 #endif
 				activeSpeaker.pAvatar->SetDrawFriend(show_friend);
 				player_info_t pi;
+			#ifndef NO_STEAM
 				if ( engine->GetPlayerInfo( iPlayerIndex, &pi ) )
 				{
 					if ( steamapicontext != NULL && steamapicontext->SteamUtils() != NULL )
@@ -254,6 +255,7 @@ void CHudVoiceStatus::OnThink( void )
 						activeSpeaker.pAvatar->SetAvatarSteamID(steamIDForPlayer, k_EAvatarSize32x32);
 					}
 				}
+			#endif
 
 				activeSpeaker.pAvatar->SetAvatarSize( avatar_wide, avatar_tall);
 

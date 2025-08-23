@@ -19,6 +19,7 @@
 
 extern short		g_sModelIndexBloodDrop;	
 extern short		g_sModelIndexBloodSpray;
+extern IVModelInfoClient *modelinfo;
 
 //-----------------------------------------------------------------------------
 // Purpose: Blood sprite

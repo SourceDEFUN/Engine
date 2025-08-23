@@ -12,7 +12,9 @@
 #include "sv_log.h"
 #include "filesystem.h"
 #include "filesystem_engine.h"
+#ifndef NO_VCR
 #include "tier0/vcrmode.h"
+#endif
 #include "sv_main.h"
 #include "tier0/icommandline.h"
 #include <proto_oob.h>
@@ -481,7 +483,9 @@ void CLog::Print( const char * text )
 	}
 
 	tm today;
+#ifndef NO_VCR // Secton TODO: Time!
 	VCRHook_LocalTime( &today );
+#endif
 
 	if ( Q_strlen( text ) > 1024 )
 	{
@@ -850,7 +854,9 @@ void CLog::Open( void )
 
 	// Find a new log file slot.
 	tm today;
+#ifndef NO_VCR // Secton TODO: Time!
 	VCRHook_LocalTime( &today );
+#endif
 
 	// safety check for invalid paths
 	const char *pszLogsDir = sv_logsdir.GetString();

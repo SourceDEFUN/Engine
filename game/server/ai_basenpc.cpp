@@ -82,7 +82,9 @@
 #include "physics_prop_ragdoll.h"
 #include "vphysics/friction.h"
 #include "physics_npc_solver.h"
+#ifndef NO_VCR
 #include "tier0/vcrmode.h"
+#endif
 #include "death_pose.h"
 #include "datacache/imdlcache.h"
 #include "vstdlib/jobthread.h"
@@ -3677,7 +3679,11 @@ bool CAI_BaseNPC::PreNPCThink()
 
 	g_StartTimeCurThink = 0;
 
+#ifndef NO_VCR
 	if ( bUseThinkLimits && VCRGetMode() == VCR_Disabled )
+#else
+	if ( bUseThinkLimits )
+#endif
 	{
 		if ( m_iFrameBlocked == gpGlobals->framecount )
 		{
@@ -3728,7 +3734,11 @@ bool CAI_BaseNPC::PreNPCThink()
 
 void CAI_BaseNPC::PostNPCThink( void ) 
 { 
+#ifndef NO_VCR
 	if ( g_StartTimeCurThink != 0.0 && VCRGetMode() == VCR_Disabled )
+#else
+	if ( g_StartTimeCurThink != 0.0 )
+#endif
 	{
 		g_NpcTimeThisFrame += engine->Time() - g_StartTimeCurThink;
 	}

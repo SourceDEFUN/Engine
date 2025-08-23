@@ -20,6 +20,8 @@
 // UNDONE:  Get rid of this?
 #define FDECAL_PERMANENT			0x01
 
+extern IStaticPropMgrClient *staticpropmgr;
+
 //-----------------------------------------------------------------------------
 // Purpose: Projected Decal TE
 //-----------------------------------------------------------------------------

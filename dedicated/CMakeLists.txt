@@ -39,7 +39,7 @@ else()
 endif()
 
 target_compile_definitions(dedicated PUBLIC LAUNCHERONLY=1 SUPPORT_PACKED_STORE=1 DEDICATED=1)
-find_package(SDL3 REQUIRED)
+find_package(SDL3 REQUIRED CONFIG REQUIRED COMPONENTS SDL3)
 target_include_directories(appframework PUBLIC SDL3::SDL3)
 
 add_dependencies(dedicated tier0 tier1 tier2 tier3 vstdlib steam_api appframework mathlib)

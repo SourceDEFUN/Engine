@@ -17,7 +17,9 @@
 #include "VPanel.h"
 #include "utlvector.h"
 #include <KeyValues.h>
+#ifndef NO_VCR
 #include "tier0/vcrmode.h"
+#endif
 
 #include <vgui/VGUI.h>
 #include <vgui/ISystem.h>

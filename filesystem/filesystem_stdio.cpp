@@ -22,7 +22,9 @@
 #endif
 #endif
 #include "tier1/convar.h"
+#ifndef NO_VCR
 #include "tier0/vcrmode.h"
+#endif
 
 #include "tier1/fmtstr.h"
 #include "tier1/utlrbtree.h"

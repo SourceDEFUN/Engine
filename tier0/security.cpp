@@ -14,7 +14,9 @@
 #endif
 
 #include "tier0/platform.h"
+#ifndef NO_VCR
 #include "tier0/vcrmode.h"
+#endif
 #include "tier0/memalloc.h"
 
 #ifdef REQUIRE_HARDWARE_KEY

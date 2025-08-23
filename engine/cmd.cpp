@@ -13,9 +13,11 @@
 #include <windows.h>
 #endif
 
-#include "quakedef.h"						 
+#include "quakedef.h"
 #include "zone.h"
+#ifndef NO_VCR
 #include "tier0/vcrmode.h"
+#endif
 #include "demo.h"
 #include "filesystem.h"
 #include "filesystem_engine.h"
@@ -624,7 +626,9 @@ void Cmd_Exec_f( const CCommand &args )
 	}
 
 	char *original_f = f;
+#ifndef NO_VCR
 	VCRHook_Cmd_Exec(&f);
+#endif
 
 	// In case f was allocated and VCR mode spoofed f, free the old one we allocated earlier.
 	if ( original_f != buf && original_f != f )

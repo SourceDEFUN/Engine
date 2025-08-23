@@ -6,6 +6,7 @@
 //
 //=============================================================================//
 #include "cbase.h"
+#include "particle_prototype.h"
 
 PrototypeEffectLink *g_pPrototypeEffects = 0;
 

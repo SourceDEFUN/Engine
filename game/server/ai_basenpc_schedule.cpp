@@ -32,7 +32,9 @@
 #include "IEffects.h"
 #include "vstdlib/random.h"
 #include "ndebugoverlay.h"
+#ifndef NO_VCR
 #include "tier0/vcrmode.h"
+#endif
 #include "env_debughistory.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

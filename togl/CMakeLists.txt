@@ -15,7 +15,7 @@ add_library(togl SHARED
 )
 
 target_compile_definitions(togl PUBLIC TOGL_DLL_EXPORT=1)
-find_package(SDL3 REQUIRED)
+find_package(SDL3 REQUIRED CONFIG REQUIRED COMPONENTS SDL3)
 target_include_directories(togl PUBLIC ./ ../public ../public/tier0 ../public/tier1 SDL3::SDL3)
 
 add_dependencies(togl tier0 tier1 tier2 vstdlib mathlib)

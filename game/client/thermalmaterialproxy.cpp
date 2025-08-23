@@ -22,6 +22,7 @@ public:
 	virtual ~CThermalMaterialProxy();
 	virtual bool Init( IMaterial *pMaterial, KeyValues* pKeyValues );
 	virtual void OnBind( C_BaseEntity *pEntity );
+	virtual IMaterial * GetMaterial() {return nullptr;}
 
 private:
 	IMaterialVar *m_ThermalVar;

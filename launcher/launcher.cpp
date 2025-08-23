@@ -23,7 +23,9 @@
 #include <stdio.h>
 #include "tier0/icommandline.h"
 #include "engine_launcher_api.h"
+#ifndef NO_VCR
 #include "tier0/vcrmode.h"
+#endif
 #include "ifilesystem.h"
 #include "tier1/interface.h"
 #include "tier0/dbg.h"
@@ -191,6 +193,7 @@ SpewRetval_t LauncherDefaultSpewFunc( SpewType_t spewType, char const *pMsg )
 }
 
 
+#ifndef NO_VCR
 //-----------------------------------------------------------------------------
 // Implementation of VCRHelpers.
 //-----------------------------------------------------------------------------
@@ -211,6 +214,7 @@ public:
 };
 
 static CVCRHelpers g_VCRHelpers;
+#endif
 
 //-----------------------------------------------------------------------------
 // Purpose: Return the game directory
@@ -1191,8 +1195,39 @@ DLL_EXPORT int LauncherMain( int argc, char **argv )
 #ifdef WIN32
 	SetAppInstance( hInstance );
 #elif defined( POSIX )
+#ifndef NO_VCR
 	// Store off command line for argument searching
 	Plat_SetCommandLine( BuildCmdLine( argc, argv, false ) );
+#else
+	#define MAX_LINUX_CMDLINE 512
+	static char linuxCmdline[ MAX_LINUX_CMDLINE ];
+	int len;
+	int i;
+
+	for (len = 0, i = 0; i < argc; i++)
+	{
+		len += strlen(argv[i]);
+	}
+
+	if ( len > MAX_LINUX_CMDLINE )
+	{
+		printf( "command line too long, %i max\n", MAX_LINUX_CMDLINE );
+		exit(-1);
+		Plat_SetCommandLine("");
+	}
+
+	linuxCmdline[0] = '\0';
+	for ( i = 0; i < argc; i++ )
+	{
+		if ( i > 0 )
+		{
+			strcat( linuxCmdline, " " );
+		}
+		strcat( linuxCmdline, argv[ i ] );
+	}
+
+	Plat_SetCommandLine(linuxCmdline);
+#endif
 
 	if( CommandLine()->CheckParm( "-sleepatstartup" ) )
 	{
@@ -1259,19 +1294,27 @@ DLL_EXPORT int LauncherMain( int argc, char **argv )
 	// Start VCR mode?
 	if ( CommandLine()->CheckParm( "-vcrrecord", &filename ) )
 	{
+	#ifndef NO_VCR
 		if ( !VCRStart( filename, true, &g_VCRHelpers ) )
 		{
 			Error( "-vcrrecord: can't open '%s' for writing.\n", filename );
 			return -1;
 		}
+	#else
+		Error("VCR Mode was not compiled!");
+	#endif
 	}
 	else if ( CommandLine()->CheckParm( "-vcrplayback", &filename ) )
 	{
+	#ifndef NO_VCR
 		if ( !VCRStart( filename, false, &g_VCRHelpers ) )
 		{
 			Error( "-vcrplayback: can't open '%s' for reading.\n", filename );
 			return -1;
 		}
+	#else
+		Error("VCR Mode was not compiled!");
+	#endif
 	}
 
 	// See the function for why we do this.

@@ -19,6 +19,7 @@
 #include "client_virtualreality.h"
 #include "../hud_crosshair.h"
 #include "sourcevr/isourcevirtualreality.h"
+#include "datamap.h"
 // NVNT haptic utils
 #include "haptics/haptic_utils.h"
 

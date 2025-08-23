@@ -1894,7 +1894,9 @@ void CBasePanel::RunMenuCommand(const char *command)
     {
         if ( IsPC() )
         {
+		#ifndef NO_STEAM
             if ( !steamapicontext->SteamUser() || !steamapicontext->SteamUser()->BLoggedOn() )
+		#endif
             {
                 vgui::MessageBox *pMessageBox = new vgui::MessageBox("#GameUI_Achievements_SteamRequired_Title", "#GameUI_Achievements_SteamRequired_Message", this );
                 pMessageBox->DoModal();
@@ -2986,6 +2988,7 @@ void CBasePanel::OnOpenCSAchievementsDialog()
 		int screenHeight = 0;
 		engine->GetScreenSize( screenWide, screenHeight );
 
+	#ifndef NO_STEAM
 		// [smessick] For lower resolutions, open the Steam achievements instead of the CSS achievements screen.
 		if ( screenWide < GameClientExports()->GetAchievementsPanelMinWidth() )
 		{
@@ -2997,10 +3000,13 @@ void CBasePanel::OnOpenCSAchievementsDialog()
 		}
 		else
 		{
+	#endif
 			// Display the CSS achievements screen.
 			GameClientExports()->CreateAchievementsPanel( this );
 			GameClientExports()->DisplayAchievementPanel();
+	#ifndef NO_STEAM
 		}
+	#endif
     }
 }
 

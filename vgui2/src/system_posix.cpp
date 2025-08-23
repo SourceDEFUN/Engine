@@ -19,7 +19,9 @@
 #include <KeyValues.h>
 #include <vgui/IInputInternal.h>
 #include <vgui/ISurface.h>
+#ifndef NO_VCR
 #include "tier0/vcrmode.h"
+#endif
 #include "tier1/fmtstr.h"
 #include "filesystem.h"
 

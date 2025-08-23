@@ -18,7 +18,9 @@
 #include "server.h"
 #include "proto_oob.h"
 #include "host.h"
+#ifndef NO_VCR
 #include "tier0/vcrmode.h"
+#endif
 #include "sv_plugin.h"
 #include "sv_log.h"
 #include "filesystem_engine.h"

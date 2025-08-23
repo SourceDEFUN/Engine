@@ -19,7 +19,9 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #endif
+#ifndef NO_VCR
 #include "tier0/vcrmode.h"
+#endif
 #include "tier1/convar.h"
 #include "vstdlib/jobthread.h"
 #include "tier1/utlmap.h"
@@ -631,7 +633,7 @@ void CBaseFileSystem::InitAsync()
 		Msg( "Async I/O disabled from command line\n" );
 		return;
 	}
-#ifndef UNITTESTS
+#ifndef NO_VCR
 	if ( VCRGetMode() == VCR_Disabled )
 #endif
 	{

@@ -12,7 +12,9 @@
 #include "sv_main.h"
 #include "server.h"
 #include "MapReslistGenerator.h"
+#ifndef NO_VCR
 #include "tier0/vcrmode.h"
+#endif
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -101,7 +103,9 @@ static const char *GetTimestampString( void )
 {
 	static char string[128];
 	tm today;
+#ifndef NO_VCR // Secton TODO: Time!
 	VCRHook_LocalTime( &today );
+#endif
 	Q_snprintf( string, sizeof( string ), "%02i/%02i/%04i - %02i:%02i:%02i",
 		today.tm_mon+1, today.tm_mday, 1900 + today.tm_year,
 		today.tm_hour, today.tm_min, today.tm_sec );

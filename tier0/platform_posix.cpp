@@ -6,7 +6,9 @@
 //=============================================================================//
 
 #include "tier0/platform.h"
+#ifndef NO_VCR
 #include "tier0/vcrmode.h"
+#endif
 #include "tier0/memalloc.h"
 #include "tier0/dbg.h"
 #include <algorithm>
@@ -52,7 +54,9 @@
 // 
 // #define USE_RDTSC_FOR_FLOATTIME
 
+#ifndef NO_VCR
 extern VCRMode_t g_VCRMode;
+#endif
 
 static bool g_bBenchmarkMode = false;
 static double g_FakeBenchmarkTime = 0;

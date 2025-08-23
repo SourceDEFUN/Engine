@@ -43,7 +43,9 @@ extern IDataCache				*datacache;
 extern IMDLCache				*mdlcache;
 extern IServerEngineTools		*serverenginetools;
 extern IXboxSystem				*xboxsystem; // 360 only
+#ifndef NO_STEAM
 extern CSteamAPIContext			*steamapicontext; // available on game clients
+#endif
 extern CSteamGameServerAPIContext *steamgameserverapicontext; //available on game servers
 
 

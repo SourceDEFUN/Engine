@@ -1,6 +1,6 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 //
-// Purpose: 
+// Purpose: E.T. Phone Home (might remove it soon)
 //
 //=============================================================================//
 
@@ -23,7 +23,9 @@
 #include "cserserverprotocol_engine.h"
 #include "host_phonehome.h"
 #include "mathlib/IceKey.H"
+#ifndef NO_VCR
 #include "tier0/vcrmode.h"
+#endif
 #include "blockingudpsocket.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

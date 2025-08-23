@@ -103,7 +103,9 @@ extern IXboxSystem *xboxsystem;	// Xbox 360 only
 extern IMatchmaking *matchmaking;
 extern IVideoServices *g_pVideo;
 extern IUploadGameStats *gamestatsuploader;
+#ifndef NO_STEAM
 extern CSteamAPIContext *steamapicontext;
+#endif
 extern IReplaySystem *g_pReplay;
 extern IClientReplayContext *g_pClientReplayContext;
 extern IReplayManager *g_pReplayManager;
