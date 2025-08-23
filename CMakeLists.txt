@@ -15,9 +15,9 @@ endif()
 # TODO: add options for these
 set(BUILD_DEDICATED OFF)
 set(BUILD_SDL ON)
-set(BUILD_OPUS OFF)
+set(BUILD_OPUS ON)
 set(BUILD_GL ON)
-set(DEBUG_ENGINE ON)
+set(DEBUG_ENGINE OFF) # Enabling this is not recommended, as some things are missing.
 set(DISABLE_WARNS OFF)
 
 set(BUILD_GAME "hl2" CACHE STRING "What game to build: hl2, episodic, hl2mp, portal, hl1, hl1mp, cstrike, dod, tf")

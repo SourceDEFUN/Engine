@@ -8,7 +8,7 @@ add_library(vaudio_opus SHARED
 )
 
 add_dependencies(vaudio_opus tier0 tier1 vstdlib)
-target_link_libraries(vaudio_opus PUBLIC tier0 tier1 vstdlib, opus)
+target_link_libraries(vaudio_opus PUBLIC tier0 tier1 vstdlib opus)
 
 target_include_directories(vaudio_opus PUBLIC ./ ../../../public/tier1 ../../../public ../frame_encoder ../../ ../../../common ../../../public/engine/audio celt)
 target_compile_definitions(vaudio_opus PUBLIC OPUS_EXPORTS=1)
