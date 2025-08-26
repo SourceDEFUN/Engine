@@ -229,6 +229,7 @@ target_sources(server PUBLIC
         ../shared/particle_parse.cpp
         particle_system.cpp
         ../shared/particlesystemquery.cpp
+        particle_smokegrenade.cpp # huh, debug
         pathcorner.cpp
         pathtrack.cpp
         phys_controller.cpp

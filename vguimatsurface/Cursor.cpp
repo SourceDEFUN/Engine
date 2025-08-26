@@ -486,7 +486,9 @@ void CursorGetPos(void *hwnd, int &x, int &y)
 #if defined ( USE_SDL ) && !defined( PLATFORM_WINDOWS )
 	if ( s_bCursorVisible )
 	{
-		SDL_GetMouseState( (float*)&x, (float*)&y );
+		float fX, fY;
+		SDL_GetMouseState( &fX, &fY );
+		x = (int)fX; y = (int)fY;
 
 		int windowHeight = 0;
 		int windowWidth = 0;

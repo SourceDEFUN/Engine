@@ -1468,7 +1468,7 @@ void CSDLMgr::SetWindowFullScreen( bool bFullScreen, int nWidth, int nHeight )
 
 	if ( !mode )
 	{
-		Assert( 0 );
+		// Assert( 0 ); // Secton: This should not be an error.
 		mode = (SDL_DisplayMode*)SDL_GetDesktopDisplayMode( SDL_GetPrimaryDisplay() );
 	}
 	if ( !mode ) Error("SDL3 fail: Couldn't Set Window Full Screen!");
@@ -1727,10 +1727,10 @@ void CSDLMgr::handleKeyInput( const SDL_Event &event )
 
 #if GLMDEBUG
 	bool bIsShifted = ( ((theEvent.m_ModifierKeyMask & (1<<eCapsLockKey))!=0) || ((theEvent.m_ModifierKeyMask & (1<<eShiftKey))!=0) );
-	theEvent.m_UnicodeKeyUnmodified = event.key.keysym.sym;
+	theEvent.m_UnicodeKeyUnmodified = event.key.key;
 	if ( bIsShifted )
 	{
-		switch ( event.key.keysym.sym )
+		switch ( event.key.key )
 		{
 			case '[':
 				theEvent.m_UnicodeKeyUnmodified = '{';
@@ -2096,7 +2096,7 @@ void CSDLMgr::GetNativeDisplayInfo( int nDisplay, uint &nWidth, uint &nHeight, f
 
 	if ( !mode )
 	{
-		Assert( 0 );
+		// Assert( 0 ); // Secton: This shouldn't be an error, as it is normal.
 		mode = SDL_GetDesktopDisplayMode( SDL_GetPrimaryDisplay() );
 	}
 	if ( !mode ) Error("SDL3 fail: Couldn't get Native Display Info!");

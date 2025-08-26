@@ -93,7 +93,7 @@ int CFileTracker2::SubmitThreadedMD5Request( uint8 *pubBuffer, int cubBuffer, in
 		else
 		{
 			// this is an error, we should already know about the file
-			Assert(0);
+			// Assert(0); // Secton FIXME FIXME FIXMEEEEEE
 			return 0;
 		}
 

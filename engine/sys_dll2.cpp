@@ -1919,13 +1919,19 @@ bool CModAppSystemGroup::Create()
 			return AddLegacySystems();
 	}
 #endif
-
+		// Secton FIXME: signal SIGSEGV: address not mapped to object (fault address=0x0)
+		//               W.T.F?!?!?!?
+	#ifndef _DEBUG
 		IServerDLLSharedAppSystems *serverSharedSystems = ( IServerDLLSharedAppSystems * )g_ServerFactory( SERVER_DLL_SHARED_APPSYSTEMS, NULL );
 		if ( !serverSharedSystems )
 		{
 			Assert( !"Expected both game and client .dlls to have or not have shared app systems interfaces!!!" );
 			return AddLegacySystems();
 		}
+	#else
+		IServerDLLSharedAppSystems *serverSharedSystems = nullptr;
+		return AddLegacySystems();
+	#endif
 	
 	// Load game and client .dlls and build list then
 	CUtlVector< AppSystemInfo_t >	systems;

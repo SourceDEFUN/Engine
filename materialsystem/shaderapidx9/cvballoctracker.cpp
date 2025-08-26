@@ -110,7 +110,7 @@ private:
 	void					UpdateElements( CounterData & data, VertexFormat_t fmt, int numVerts, int vertexSize,
 											bool isDynamic, bool isCompressed );
 
-	int						ComputeAlignmentWastage( int bufferSize );
+	// int						ComputeAlignmentWastage( int bufferSize );
 	void					AddSaving( int & alreadySaved, int & yetToSave, const char *allocatorName, VertexElement_t element, Saving_t savingType );
 	void					SpewExpectedSavings( void );
 	void					UpdateData( const char * allocatorName, short allocatorKey, int bufferSize, VertexFormat_t fmt,
@@ -449,8 +449,7 @@ void CVBAllocTracker::UpdateElements( CounterData & data, VertexFormat_t fmt, in
 	}
 }
 
-int CVBAllocTracker::ComputeAlignmentWastage( int bufferSize )
-{}
+// int CVBAllocTracker::ComputeAlignmentWastage( int bufferSize ) {}
 
 void CVBAllocTracker::AddSaving( int & alreadySaved, int & yetToSave, const char *allocatorName, VertexElement_t element, Saving_t savingType )
 {
@@ -535,7 +534,7 @@ void CVBAllocTracker::UpdateData( const char * allocatorName, short allocatorKey
 		Assert( data.m_memCount  >= 0 );
 		data.m_vertCount += numVerts;
 		Assert( data.m_vertCount  >= 0 );
-		data.m_paddingCount += ( bufferSize < 0 ? -1 : +1 )*ComputeAlignmentWastage( abs( bufferSize ) );
+		// data.m_paddingCount += ( bufferSize < 0 ? -1 : +1 )*ComputeAlignmentWastage( abs( bufferSize ) );
 		UpdateElements( data, fmt, numVerts, vertexSize, isDynamic, isCompressed );
 	}
 }

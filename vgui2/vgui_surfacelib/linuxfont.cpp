@@ -790,7 +790,7 @@ bool CLinuxFont::IsValid()
 //-----------------------------------------------------------------------------
 int CLinuxFont::GetHeight()
 {
-	assert(IsValid());
+	// assert(IsValid()); // Secton TODO: Unless we cleaned up res files, this shall stay commented out indefinitely.
 	return m_iHeight;
 }
 
@@ -799,7 +799,7 @@ int CLinuxFont::GetHeight()
 //-----------------------------------------------------------------------------
 int CLinuxFont::GetHeightRequested()
 {
-	assert(IsValid());
+	// assert(IsValid()); // Secton TODO: Unless we cleaned up res files, this shall stay commented out indefinitely.
 	return m_iHeightRequested;
 }
 
@@ -808,7 +808,7 @@ int CLinuxFont::GetHeightRequested()
 //-----------------------------------------------------------------------------
 int CLinuxFont::GetAscent()
 {
-	assert(IsValid());
+	// assert(IsValid()); // Secton TODO: Unless we cleaned up res files, this shall stay commented out indefinitely.
 	return m_iAscent;
 }
 
@@ -817,7 +817,7 @@ int CLinuxFont::GetAscent()
 //-----------------------------------------------------------------------------
 int CLinuxFont::GetMaxCharWidth()
 {
-	assert(IsValid());
+	// assert(IsValid()); // Secton TODO: Unless we cleaned up res files, this shall stay commented out indefinitely.
 	return m_iMaxCharWidth;
 }
 

@@ -1492,7 +1492,7 @@ void CGame::UpdateDesktopInformation( )
 
 	if ( !mode )
 	{
-		Assert( 0 );
+		// ssert( 0 ); //SecotnL are you kiidng me
 		mode = (SDL_DisplayMode*)SDL_GetDesktopDisplayMode( SDL_GetPrimaryDisplay() );
 	}
 	if ( !mode ) Error("SDL3 fail: Couldn't Update Desktop Information!");

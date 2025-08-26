@@ -79,3 +79,6 @@ add_library(vgui_controls STATIC
         WizardSubPanel.cpp
         ../src/vgui_key_translation.cpp
 )
+if(WIN32)
+    target_link_libraries(SHELL32)
+endif()

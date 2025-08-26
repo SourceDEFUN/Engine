@@ -1879,7 +1879,7 @@ static ConVar mat_drawTitleSafe( "mat_drawTitleSafe", "0", 0, "Enable title safe
 
 CUtlVector< vgui::VPANEL > g_FocusPanelList;
 
-ConVar vgui_drawfocus( "vgui_drawfocus", "0", 0, "Report which panel is under the mouse." );
+ConVar vgui_drawfocus( "vgui_drawfocus", "1", 0, "Report which panel is under the mouse." );
 
 CFocusOverlayPanel::CFocusOverlayPanel( vgui::Panel *pParent, const char *pName ) : vgui::Panel( pParent, pName )
 {

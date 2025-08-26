@@ -5,11 +5,13 @@ add_library(vgui2 SHARED
         Border.cpp
         ScalableImageBorder.cpp
         ImageBorder.cpp
+        fileimage.cpp
         ../../public/filesystem_helpers.cpp
         ../../public/filesystem_init.cpp
         InputWin32.cpp
         LocalizedStringTable.cpp
         MemoryBitmap.cpp
+        MessageListener.cpp
         Scheme.cpp
         ../../public/UnicodeFileHelpers.cpp
         vgui.cpp

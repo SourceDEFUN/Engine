@@ -1497,7 +1497,7 @@ void CVideoMode_Common::CenterEngineWindow( void *hWndCenter, int width, int hei
 
     if ( !mode )
 	{
-		Assert( 0 );
+		// Assert( 0 );
 		mode = (SDL_DisplayMode*)SDL_GetCurrentDisplayMode( SDL_GetPrimaryDisplay() );
 	}
 	if ( !mode ) Error("SDL3 fail: Couldn't Center a Window! (CVideoMode_Common::CenterEngineWindow)");

@@ -88,23 +88,8 @@ struct ALIGN16 intx4
 	}
 } ALIGN16_POST;
 
-
-#if defined( _DEBUG )
-FORCEINLINE void TestVPUFlags()
-{
-	// Check that the VPU is in the appropriate (Java-compliant) mode (see 3.2.1 in altivec_pem.pdf on xds.xbox.com)
-	__vector4 a;
-	__asm
-	{
-		mfvscr	a;
-	}
-	unsigned int * flags		= (unsigned int *)&a;
-	unsigned int   controlWord	= flags[3];
-	Assert(controlWord == 0);
-}
-#else  // _DEBUG
+// Secton TODO: Remove this!
 FORCEINLINE void TestVPUFlags() {}
-#endif // _DEBUG
 
 
 // useful constants in SIMD packed float format:

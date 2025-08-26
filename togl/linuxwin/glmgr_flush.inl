@@ -49,8 +49,8 @@ FORCEINLINE void GLMContext::FlushDrawStates( uint nStartIndex, uint nEndIndex, 
 	Assert( ( m_drawingFBO == m_boundDrawFBO ) && ( m_drawingFBO == m_boundReadFBO ) ); // this check MUST succeed
 	Assert( m_pDevice->m_pVertDecl );
 
-#if GLMDEBUG
-	GLM_FUNC;
+#if GLMDEBUG // Secton FIXME: Got removed?!?
+	// GLM_FUNC;
 #endif
 
 	GL_BATCH_PERF( m_FlushStats.m_nTotalBatchFlushes++; )

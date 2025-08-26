@@ -185,6 +185,7 @@ target_include_directories(engine PUBLIC
 )
 
 find_package(CURL REQUIRED)
+find_package(SDL3 REQUIRED CONFIG REQUIRED COMPONENTS SDL3)
 target_link_libraries(engine PUBLIC
         tier0
         vgui_controls
@@ -201,7 +202,7 @@ target_link_libraries(engine PUBLIC
         steam_api
         matsys_controls
         bz2
-        SDL3
+        SDL3::SDL3
         jpeg
         z
         openal
