@@ -7,7 +7,7 @@
 //===========================================================================//
 #include "server_pch.h"
 #include "tier0/valve_minmax_off.h"
-#include <algorithm>
+#include <bits/stl_heap.h> // Secton: yoooo
 #include "tier0/valve_minmax_on.h"
 #include "vengineserver_impl.h"
 #include "vox.h"

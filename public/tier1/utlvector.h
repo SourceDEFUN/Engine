@@ -15,7 +15,7 @@
 #pragma once
 #endif
 
-#include <algorithm>
+// Secton: THERE IS NO ALGORIGHTM, STOP INCLUDING IT OUT OF NOWHERE!!!!
 
 #include <string.h>
 #include "tier0/platform.h"
