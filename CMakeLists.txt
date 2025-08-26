@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 4.0)
 project(source_engine)
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 ## CONFIG
@@ -110,7 +110,7 @@ endif()
 # any target
 # -fnonconst-initializers
 # TODO: msvc
-add_compile_options(-fpermissive -std=c++11)
+add_compile_options(-fpermissive)
 include_directories(AFTER ./ public common public/tier0 public/tier1)
 
 # tests

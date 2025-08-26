@@ -33,13 +33,13 @@ protected:
 	size_t m_nStride;
 	
 public:
-	FORCEINLINE CStridedPtr<T>( void *pData, size_t nByteStride )
+	FORCEINLINE CStridedPtr( void *pData, size_t nByteStride )
 	{
 		m_pData = reinterpret_cast<T *>( pData );
 		m_nStride = nByteStride / sizeof( T );
 	}
 
-	FORCEINLINE CStridedPtr<T>( void ) = default;
+	FORCEINLINE CStridedPtr( void ) = default;
 	T *operator->(void) const
 	{
 		return m_pData;
@@ -75,13 +75,13 @@ protected:
 	size_t m_nStride;
 
 public:
-	FORCEINLINE CStridedConstPtr<T>( void const *pData, size_t nByteStride )
+	FORCEINLINE CStridedConstPtr( void const *pData, size_t nByteStride )
 	{
 		m_pData = reinterpret_cast<T const *>( pData );
 		m_nStride = nByteStride / sizeof( T );
 	}
 
-	FORCEINLINE CStridedConstPtr<T>( void ) = default;
+	FORCEINLINE CStridedConstPtr( void ) = default;
 
 	const T *operator->(void) const
 	{

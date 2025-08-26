@@ -422,7 +422,7 @@ inline CDmElement* CDmElement::Copy( TraversalDepth_t depth ) const
 //-----------------------------------------------------------------------------
 inline bool CDmElement::IsA_Implementation( CUtlSymbol typeSymbol )
 {
-	return ( m_classType == typeSymbol ) || ( UTL_INVAL_SYMBOL == typeSymbol );
+	return ( m_classType == typeSymbol ) || ( !typeSymbol.IsValid() );
 }
 
 inline int CDmElement::GetInheritanceDepth_Implementation( CUtlSymbol typeSymbol, int nCurrentDepth )

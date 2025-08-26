@@ -756,8 +756,7 @@ int CShaderSystem::GetShaders( int nFirstShader, int nMaxCount, IShader **ppShad
 		{
 			// Don't add shaders twice
 			const char *pShaderName = info.m_ShaderDict.GetElementName( j );
-			if ( uniqueNames.Find( pShaderName ) != UTL_INVAL_SYMBOL )
-				continue;
+			if ( uniqueNames.Find( pShaderName ).IsValid() ) continue;
 
 			// Indicate we've seen this shader
 			uniqueNames.AddString( pShaderName );

@@ -12,7 +12,6 @@
 #include "tier0/memalloc.h"
 #include "tier0/dbg.h"
 #include <algorithm>
-#include <vector>
 
 #include <sys/time.h>
 #include <sys/resource.h>

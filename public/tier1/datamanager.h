@@ -1,4 +1,4 @@
-//========= Copyright © 1996-2005, Valve Corporation, All rights reserved. ============//
+//========= Copyright ï¿½ 1996-2005, Valve Corporation, All rights reserved. ============//
 //
 // Purpose: 
 //
@@ -137,10 +137,8 @@ class CDataManager : public CDataManagerBase
 	typedef CDataManagerBase BaseClass;
 public:
 
-	CDataManager<STORAGE_TYPE, CREATE_PARAMS, LOCK_TYPE, MUTEX_TYPE>( unsigned int size = (unsigned)-1 ) : BaseClass(size) {}
-	
-
-	~CDataManager<STORAGE_TYPE, CREATE_PARAMS, LOCK_TYPE, MUTEX_TYPE>()
+	CDataManager( unsigned int size = (unsigned)-1 ) : BaseClass(size) {}
+	~CDataManager()
 	{
 		// NOTE: This must be called in all implementations of CDataManager
 		if ( m_freeOnDestruct )

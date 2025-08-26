@@ -2496,9 +2496,9 @@ bool CNPC_Citizen::IsValidCommandTarget( CBaseEntity *pTarget )
 }
 
 //-----------------------------------------------------------------------------
-bool CNPC_Citizen::SpeakCommandResponse( AIConcept_t concept, const char *modifiers )
+bool CNPC_Citizen::SpeakCommandResponse( AIConcept_t Concept, const char *modifiers )
 {
-	return SpeakIfAllowed( concept, 
+	return SpeakIfAllowed( Concept, 
 						   CFmtStr( "numselected:%d,"
 									"useradio:%d%s",
 									( GetSquad() ) ? GetSquad()->NumMembers() : 1,

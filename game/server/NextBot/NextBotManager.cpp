@@ -614,9 +614,8 @@ void NextBotManager::OnSound( CBaseEntity *source, const Vector &pos, KeyValues 
 class NextBotResponseNotifyScan
 {
 public:
-	NextBotResponseNotifyScan( CBaseCombatCharacter *who, AIConcept_t concept, AI_Response *response ) : m_who( who ), m_concept( concept ), m_response( response )
-	{
-	}
+	NextBotResponseNotifyScan( CBaseCombatCharacter *who, AIConcept_t Concept, AI_Response *response ) : m_who( who ), m_concept( Concept ), m_response( response )
+	{}
 
 	bool operator() ( INextBot *bot )
 	{
@@ -637,9 +636,9 @@ public:
 /**
  * When an Actor speaks a concept
  */
-void NextBotManager::OnSpokeConcept( CBaseCombatCharacter *who, AIConcept_t concept, AI_Response *response )
+void NextBotManager::OnSpokeConcept( CBaseCombatCharacter *who, AIConcept_t Concept, AI_Response *response )
 {
-	NextBotResponseNotifyScan notify( who, concept, response );
+	NextBotResponseNotifyScan notify( who, Concept, response );
 	TheNextBots().ForEachBot( notify );
 
 	if ( IsDebugging( NEXTBOT_HEARING ) )

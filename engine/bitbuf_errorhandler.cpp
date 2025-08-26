@@ -24,7 +24,7 @@ void EngineBitBufErrorHandler( BitBufErrorType errorType, const char *pDebugName
 
 	// Only print an error a couple times.
 	CUtlSymbol sym = errorNames[ errorType ].Find( pDebugName );
-	if ( UTL_INVAL_SYMBOL == sym )
+	if ( !sym.IsValid() )
 	{
 		errorNames[ errorType ].AddString( pDebugName );
 		if ( errorType == BITBUFERROR_VALUE_OUT_OF_RANGE )

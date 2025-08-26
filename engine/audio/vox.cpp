@@ -1635,7 +1635,7 @@ void VOX_LoadSound( channel_t *pchan, const char *pszin )
 		{
 			if ( emitcaption )
 			{
-				if ( captionSymbol != UTL_INVAL_SYMBOL )
+				if ( captionSymbol.IsValid() )
 				{
 					g_pSoundServices->EmitCloseCaption( captionSymbol.String(), duration );
 
