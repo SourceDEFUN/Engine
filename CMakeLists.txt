@@ -54,6 +54,8 @@ if(ARCHITECTURE STREQUAL 64bit)
     add_compile_definitions(PLATFORM_64BITS=1)
 endif()
 
+add_compile_definitions(UseGUI_RmlUI) # TODO: make it changable in future!
+
 # platform whitelist
 if(LINUX)
     add_compile_definitions(_GLIBCXX_USE_CXX11_ABI=0 LINUX=1 _LINUX=1 POSIX=1 _POSIX=1 PLATFORM_POSIX=1 GNUC NO_HOOK_MALLOC _DLL_EXT=.so)

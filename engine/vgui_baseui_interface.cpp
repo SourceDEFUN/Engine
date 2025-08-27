@@ -9,6 +9,7 @@
 #include "client_pch.h"
 
 #include "tier0/platform.h"
+#include <memory>
 
 #ifdef IS_WINDOWS_PC
 #include "winlite.h"
@@ -64,6 +65,7 @@
 #include "cl_foguipanel.h"
 #include "cl_txviewpanel.h"
 
+#if UseGUI == VGUI2
 // vgui2 interface
 // note that GameUI project uses ..\public\vgui and ..\public\vgui_controls, not ..\utils\vgui\include
 #include <vgui/VGUI.h>
@@ -80,6 +82,10 @@
 #include <vgui_controls/MenuButton.h>
 #include <vgui_controls/Menu.h>
 #include <vgui_controls/PHandle.h>
+#elif UseGUI_RmlUI
+#include <RmlUi/Core.h>
+#include <RmlUi/Debugger.h>
+#endif
 
 #include "IVguiModule.h"
 #include "vgui_baseui_interface.h"
@@ -544,7 +550,7 @@ bool CEngineVGui::SetVGUIDirectories()
 //-----------------------------------------------------------------------------
 void CEngineVGui::Init()
 {
-	COM_TimestampedLog( "Loading gameui.dll" );
+	COM_TimestampedLog( "GUI: Loading GameUI library" );
 
 	// load the GameUI dll
 	const char *szDllName = "GameUI";
@@ -562,6 +568,11 @@ void CEngineVGui::Init()
 		Error( "Could not get IGameUI interface %s from %s\n", GAMEUI_INTERFACE_VERSION, szDllName );
 	}
 
+#if UseGUI_RmlUI
+	auto file_interface = std::make_unique<CustomFileInterface>();
+	Rml::SetFileInterface(file_interface.get());
+#endif
+
 	if ( IsPC() )
 	{
 		staticGameConsole = (IGameConsole *)m_GameUIFactory(GAMECONSOLE_INTERFACE_VERSION, NULL);
@@ -571,7 +582,10 @@ void CEngineVGui::Init()
 		}
 	}
 
+// if UseGUI_VGUI2
+	// Secton: Source Engine is not as modular as Valve told us.
 	vgui::VGui_InitMatSysInterfacesList( "BaseUI", &g_AppSystemFactory, 1 );
+// #endif
 
 	// Get our langauge string
 	char lang[ 64 ];
@@ -580,12 +594,13 @@ void CEngineVGui::Init()
 	if ( lang[0] )
 		vgui::system()->SetRegistryString( "HKEY_CURRENT_USER\\Software\\Valve\\Source\\Language", lang );
 
-	COM_TimestampedLog( "AttachToWindow" );
+	COM_TimestampedLog( "GUI: Attach to Window" );
 
 	// Need to be able to play sounds through vgui
 	g_pMatSystemSurface->InstallPlaySoundFunc( VGui_PlaySound );
 
-	COM_TimestampedLog( "Load Scheme File" );
+#if UseGUI_VGUI2
+	COM_TimestampedLog( "GUI: Load Scheme File" );
 
 	// load scheme
 	const char *pStr = "Resource/SourceScheme.res";
@@ -594,6 +609,7 @@ void CEngineVGui::Init()
 		Sys_Error( "Error loading file %s\n", pStr );
 		return;
 	}
+#endif
 
 	if ( IsSteamDeck() )
 	{
@@ -607,11 +623,15 @@ void CEngineVGui::Init()
 		}
 	}
 
-	COM_TimestampedLog( "vgui::ivgui()->Start()" );
+	COM_TimestampedLog( "GUI: Main initializing point" );
 
 	// Start the App running
+#ifdef UseGUI_VGUI2
 	vgui::ivgui()->Start();
 	vgui::ivgui()->SetSleep(false);
+#elifdef UseGUI_RmlUI
+	
+#endif
 
 	// setup base panel for the whole VGUI System
 	// The root panel for everything ( NULL parent makes it a child of the embedded panel )

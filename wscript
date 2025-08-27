@@ -577,6 +577,8 @@ def configure(conf):
 			conf.define('COMPILER_MSVC32', 1)
 		elif conf.env.DEST_CPU in ['x86_64', 'amd64']:
 			conf.define('COMPILER_MSVC64', 1)
+	
+	conf.define("UseGUI_VGUI2", 1)
 
 	if conf.env.COMPILER_CC != 'msvc':
 		conf.check_cc(cflags=cflags, linkflags=linkflags, msg='Checking for required C flags')

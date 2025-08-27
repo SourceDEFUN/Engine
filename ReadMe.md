@@ -6,6 +6,7 @@ Read more info about SourceDEFUN, why it was created, and features here: [Source
 ## Special thanks
 * [valberrie](https://github.com/valberrie) - CMake port
 * [Maksymilian Wilczyński](https://github.com/maksw2) - For [helping me](https://github.com/SourceDEFUN/OldVersion/commits?author=maksw2) back when i was learning how to code in C++ 😅
+* [LWSS](https://github.com/LWSS) - For RmlUI implementation, though it's on CS:GO engine branch.
 
 ## Announcement: Wanted!~
 Contributors who have an Apple device with macOS installed to maintain future macOS builds. Windows users should get maintenance from me, but it wouldn't be as frequent. I'm also planning to maintain \*BSD platforms.
