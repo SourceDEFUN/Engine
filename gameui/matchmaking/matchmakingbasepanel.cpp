@@ -570,10 +570,6 @@ bool CMatchmakingBasePanel::ValidateSigninAndStorage( bool bOnlineRequired, cons
 		return false;
 	}
 
-	// Handle the storage device selection
-	if ( !BasePanel()->HandleStorageDeviceRequest( pIssuingCommand ) )
-		return false;
-
 	// If we succeeded, clear the command out
 	BasePanel()->ClearPostPromptCommand( pIssuingCommand );
 

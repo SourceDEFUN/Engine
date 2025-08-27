@@ -19,7 +19,6 @@
 #include "shaderapidx8.h"
 #include "imeshdx8.h"
 #include "materialsystem/ivballoctracker.h"
-#include "gpubufferallocator.h"
 #include "tier1/utllinkedlist.h"
 #include "tier0/dbg.h"
 #include "tier1/memstack.h"

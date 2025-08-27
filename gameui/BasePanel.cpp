@@ -2339,14 +2339,7 @@ bool CBasePanel::ValidateStorageDevice( int *pStorageDeviceValidated )
 		}
 	}
 
-	if ( pStorageDeviceValidated )
-	{
-		if ( HandleStorageDeviceRequest( "" ) )
-			return true;
-
-		m_pStorageDeviceValidatedNotify = pStorageDeviceValidated;
-		return false;
-	}
+	if ( pStorageDeviceValidated ) return true;
 
 	return false;
 }
@@ -2360,62 +2353,6 @@ bool CBasePanel::HandleSignInRequest( const char *command )
 	return true;
 }
 
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Input  : *command - 
-//-----------------------------------------------------------------------------
-bool CBasePanel::HandleStorageDeviceRequest( const char *command )
-{
-	// If we don't have a valid sign-in, then we do nothing!
-	if ( m_bUserRefusedSignIn )
-		return true;
-
-	// If we have a valid storage device, there's nothing to prompt for
-	return true;
-	// Secton TODO: so, it returns true, because of stub it'll do so anyway,
-	//              so maybe remove the latter lines?
-
-	// If we have a post-prompt command, we're coming back into the call from that prompt
-	bool bQueuedCall = ( m_strPostPromptCommand.IsEmpty() == false );
-	
-	// Are we returning from a prompt?
-	if ( bQueuedCall && m_bStorageBladeShown )
-	{
-		// User has declined
-		if ( m_bUserRefusedStorageDevice )
-			return true;
-
-		// Prompt them
-		ShowMessageDialog( MD_PROMPT_STORAGE_DEVICE );
-		m_strPostPromptCommand = command;
-		
-		// Do not run the command
-		return false;
-	}
-	else
-	{
-		// If the user refused the sign-in and we respect that on this command, we're done
-		if ( m_bUserRefusedStorageDevice && CommandRespectsSignInDenied( command ) )
-			return true;
-
-		// If the message is required first, then do that instead
-		if ( CommandRequiresStorageDevice( command ) )
-		{
-			ShowMessageDialog( MD_PROMPT_STORAGE_DEVICE_REQUIRED );
-			m_strPostPromptCommand = command;
-			return false;
-		}
-
-		// This is a misnomer of the first order!
-		OnChangeStorageDevice();
-		m_strPostPromptCommand = command;
-		m_bStorageBladeShown = true;
-		m_bUserRefusedStorageDevice = false;
-		return false;
-	}
-
-	return true;
-}
 
 //-----------------------------------------------------------------------------
 // Purpose: Clear the command we've queued once it has succeeded in being called
@@ -2686,27 +2623,6 @@ void CBasePanel::OnOpenQuitConfirmationDialog()
 	}
 }
 
-//-----------------------------------------------------------------------------
-// Purpose: asks user how they feel about disconnecting
-//-----------------------------------------------------------------------------
-void CBasePanel::OnOpenDisconnectConfirmationDialog()
-{
-	// THis is for disconnecting from a multiplayer server
-	Assert( m_bUseMatchmaking );
-	Assert( false ); // Secton TODO: Deal with it!
-
-	if ( GameUI().IsConsoleUI() && GameUI().IsInLevel() )
-	{
-		if ( engine->GetLocalPlayer() == 1 )
-		{
-			ShowMessageDialog( MD_DISCONNECT_CONFIRMATION_HOST );
-		}
-		else
-		{
-			ShowMessageDialog( MD_DISCONNECT_CONFIRMATION );
-		}
-	}
-}
 
 //-----------------------------------------------------------------------------
 // Purpose: 

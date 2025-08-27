@@ -57,7 +57,6 @@
 #include "vgui/ISystem.h"
 #include "pure_server.h"
 #include "SoundEmitterSystem/isoundemittersystembase.h"
-#include "LoadScreenUpdate.h"
 #include "tier0/systeminformation.h"
 #include "steam/steam_api.h"
 #include "SourceAppInfo.h"
@@ -1060,7 +1059,6 @@ void CL_FullyConnected( void )
 
 	// allow normal screen updates
 	SCR_EndLoadingPlaque();
-	EndLoadingUpdates();
 
 	// FIXME: Please oh please move this out of this spot...
 	// It so does not belong here. Instead, we want some phase of the

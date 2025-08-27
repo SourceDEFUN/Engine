@@ -135,7 +135,7 @@ init() {
 	fi
 
 	if test ! -f "$HL_LOCATION$HL"; then
-		echo "Source Engine binary '$HL_LOCATION$HL' not found, exiting"
+		echo "SourceDEFUN binary '$HL_LOCATION$HL' not found, exiting"
 		quit 1
 	elif test ! -x "$HL_LOCATION$HL"; then
 		# Could try chmod but dont know what we will be

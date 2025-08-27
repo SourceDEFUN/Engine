@@ -36,7 +36,6 @@
 #include "server.h"
 #include "game/client/iclientrendertargets.h"
 #include "tier2/tier2.h"
-#include "LoadScreenUpdate.h"
 #include "client.h"
 #include "sourcevr/isourcevirtualreality.h"
 

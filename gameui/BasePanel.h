@@ -219,7 +219,6 @@ public:
 	void OnOpenDemoDialog();
 	void OnOpenCreateMultiplayerGameDialog();
 	void OnOpenQuitConfirmationDialog();
-	void OnOpenDisconnectConfirmationDialog();
 	void OnOpenChangeGameDialog();
 	void OnOpenPlayerListDialog();
 	void OnOpenBenchmarkDialog();
@@ -290,7 +289,6 @@ protected:
 public:
 	// FIXME: This should probably become a friend relationship between the classes
 	bool HandleSignInRequest( const char *command );
-	bool HandleStorageDeviceRequest( const char *command );
 	void ClearPostPromptCommand( const char *pCompletedCommand );
 
 private:

@@ -88,7 +88,7 @@ bool g_bRenderingCameraView = false;
 
 // These are the vectors for the "main" view - the one the player is looking down.
 // For stereo views, they are the vectors for the middle eye.
-static Vector g_vecRenderOrigin(0,0,0); // Secton TODO: Research it and make view bob!
+static Vector g_vecRenderOrigin(0,0,0);
 static QAngle g_vecRenderAngles(0,0,0);
 static Vector g_vecPrevRenderOrigin(0,0,0);	// Last frame's render origin
 static QAngle g_vecPrevRenderAngles(0,0,0); // Last frame's render angles

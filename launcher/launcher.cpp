@@ -1355,7 +1355,7 @@ DLL_EXPORT int LauncherMain( int argc, char **argv )
 				// Can't find the engine
 				if ( hwndEngine == NULL )
 				{
-					::MessageBox( NULL, "The modified entity keyvalues could not be sent to the Source Engine because the engine does not appear to be running.", "Source Engine Not Running", MB_OK | MB_ICONEXCLAMATION );
+					::MessageBox( NULL, "The modified entity keyvalues could not be sent to the SourceDEFUN because the engine does not appear to be running.", "SourceDEFUN Not Running", MB_OK | MB_ICONEXCLAMATION );
 				}
 				else
 				{			
@@ -1371,7 +1371,7 @@ DLL_EXPORT int LauncherMain( int argc, char **argv )
 
 					if ( !::SendMessage( hwndEngine, WM_COPYDATA, 0, (LPARAM)&copyData ) )
 					{
-						::MessageBox( NULL, "The Source Engine was found running, but did not accept the request to load a savegame. It may be an old version of the engine that does not support this functionality.", "Source Engine Declined Request", MB_OK | MB_ICONEXCLAMATION );
+						::MessageBox( NULL, "The SourceDEFUN was found running, but did not accept the request to load a savegame. It may be an old version of the engine that does not support this functionality.", "SourceDEFUN Declined Request", MB_OK | MB_ICONEXCLAMATION );
 					}
 					else
 					{

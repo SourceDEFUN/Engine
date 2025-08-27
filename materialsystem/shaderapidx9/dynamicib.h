@@ -18,7 +18,6 @@
 #include "shaderapi/ishaderutil.h"
 #include "materialsystem/ivballoctracker.h"
 #include "tier1/memstack.h"
-#include "gpubufferallocator.h"
 
 /////////////////////////////
 // D. Sim Dietrich Jr.

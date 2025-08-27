@@ -88,9 +88,6 @@ struct ALIGN16 intx4
 	}
 } ALIGN16_POST;
 
-// Secton TODO: Remove this!
-FORCEINLINE void TestVPUFlags() {}
-
 
 // useful constants in SIMD packed float format:
 // (note: some of these aren't stored on the 360, 

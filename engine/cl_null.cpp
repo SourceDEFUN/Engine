@@ -38,10 +38,6 @@ bool CL_IsPortalDemo()
 
 bool HandleRedirectAndDebugLog( const char *msg );
 
-//void BeginLoadingUpdates( MaterialNonInteractiveMode_t mode ) {}
-//void EndLoadingUpdates() {}
-void RefreshScreenIfNecessary() {}
-
 
 void Con_ColorPrintf( const Color& clr, const char *fmt, ... )
 {

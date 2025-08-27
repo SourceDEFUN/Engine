@@ -284,7 +284,6 @@ else()
 			buildcubemaps.cpp
 			debug_leafvis.cpp
 			debugoverlay.cpp
-			LoadScreenUpdate.cpp
 			enginetool.cpp
 			gl_drawlights.cpp
 			gl_lightmap.cpp

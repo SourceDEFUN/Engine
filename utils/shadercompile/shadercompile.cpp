@@ -136,8 +136,6 @@ double g_flStartTime;
 bool g_bVerbose = false;
 bool g_bSuppressWarnings = false;
 
-FORCEINLINE long AsTargetLong( long x ) { return x; } // Secton TODO: Remove this function!
-
 
 struct ShaderInfo_t
 {
@@ -701,14 +699,14 @@ static void FlushCombos( size_t *pnTotalFlushedSize, CUtlBuffer *pDynamicComboBu
 	if ( ! pCompressedShader )
 	{
 		// it grew
-		long lFlagSize = AsTargetLong( 0x80000000 | pDynamicComboBuffer->TellPut() );
+		long lFlagSize = 0x80000000 | pDynamicComboBuffer->TellPut();
 		pBuf->write( &lFlagSize, sizeof( lFlagSize ) );
 		pBuf->write( pDynamicComboBuffer->Base(), pDynamicComboBuffer->TellPut() );
 		*pnTotalFlushedSize += sizeof( lFlagSize ) + pDynamicComboBuffer->TellPut();
 	}
 	else
 	{
-		long lFlagSize = AsTargetLong( 0x40000000 | nCompressedSize );
+		long lFlagSize = 0x40000000 | nCompressedSize;
 		pBuf->write( &lFlagSize, sizeof( lFlagSize ) );
 		pBuf->write( pCompressedShader, nCompressedSize );
 		delete[] pCompressedShader;

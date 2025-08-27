@@ -123,7 +123,7 @@ int GetScreenAspectMode( int width, int height )
 //-----------------------------------------------------------------------------
 static void GetResolutionName( uint w, uint h, char *sz, int sizeofsz, int desktopWidth, int desktopHeight )
 {
-	// Secton :this might be an issue
+	// Secton: this might be an issue to put standards in
 	Q_snprintf( sz, sizeofsz, "%i x %i", w, h );
 }
 

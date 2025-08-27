@@ -33,7 +33,6 @@ bool SIMDTest()
 
 	// This app doesn't go through regular engine init, so init FPU/VPU math behaviour here:
 	SetupFPUControlWord();
-	TestVPUFlags();
 
 	// Initialize g_XYZ[] and g_CreationTime[]
 	SeedRandSIMD(1987301);

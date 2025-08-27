@@ -411,7 +411,7 @@ void CSDKLauncherDialog::Launch( int hActiveListItem, bool bForce )
 				// We can't run tools mode in engine versions earlier than OB 
 				if ( !V_strcmp( g_engineDir, "ep1" ) )
 				{
-					VGUIMessageBox( this, "Error", "Source Engine Tools is not compatible with the selected engine version." );
+					VGUIMessageBox( this, "Error", "SourceDEFUN Tools is not compatible with the selected engine version." );
 					return;
 				}
 
@@ -574,41 +574,10 @@ void CSDKLauncherDialog::PopulateCurrentEngineCombo( bool bSelectLast )
 
 	m_pCurrentEngineCombo->DeleteAllItems();
 
-	// Add ep1 engine
-	KeyValues *kv = new KeyValues( "values" );
-	kv = new KeyValues( "values" );
-	kv->SetString( "EngineVer", "ep1" );
-	m_pCurrentEngineCombo->AddItem( "Source Engine 2006", kv );
-	kv->deleteThis();
-	if ( !V_strcmp( g_engineDir, "ep1" ) )
-	{
-		nActiveEngine = 0;
-	}
-
-	// Add ep2 engine
-	kv = new KeyValues( "values" );
-	kv->SetString( "EngineVer", "source2007" );
-	m_pCurrentEngineCombo->AddItem( "Source Engine 2007", kv );
-	kv->deleteThis();
-	if ( !V_strcmp( g_engineDir, "source2007" ) )
-	{
-		nActiveEngine = 1;
-	}
-
-	// Add SP engine
-	kv = new KeyValues( "values" );
-	kv->SetString( "EngineVer", "source2009" );
-	m_pCurrentEngineCombo->AddItem( "Source Engine 2009", kv );
-	kv->deleteThis();
-	if ( !V_strcmp( g_engineDir, "source2009" ) )
-	{
-		nActiveEngine = 2;
-	}
-
-	// Add MP engine
+	KeyValues *kv = new KeyValues( "values" ); // Secton TODO: Research this.
 	kv = new KeyValues( "values" );
 	kv->SetString( "EngineVer", "orangebox" );
-	m_pCurrentEngineCombo->AddItem( "Source Engine MP", kv );
+	m_pCurrentEngineCombo->AddItem( "SourceDEFUN 2025", kv );
 	kv->deleteThis();
 	if ( !V_strcmp( g_engineDir, "orangebox" ) )
 	{

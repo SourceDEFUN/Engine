@@ -494,8 +494,6 @@ public:
 	// Sets the client renderable for an overlay's material proxy to bind to
 	virtual void			SetOverlayBindProxy( int iOverlayID, void *pBindProxy ) = 0;
 
-	virtual bool			CopyFrameBufferToMaterial( const char *pMaterialName ) = 0;
-
 	// Matchmaking
 	virtual void			ChangeTeam( const char *pTeamName ) = 0;
 

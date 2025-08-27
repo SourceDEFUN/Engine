@@ -81,8 +81,6 @@ CGamePanelInfo::CGamePanelInfo(vgui::Panel *parent, const char *name, const char
 	m_pGraphsPanel = new CGraphPanel(this,"GraphsPanel");
 	m_pServerInfoPanel = new CServerInfoPanel(this, "ServerInfo");
 	
-	m_pBudgetPanel = NULL; // Secton TODO: Remove it!
-
 	m_pServerInfoPanel->AddActionSignalTarget(this);
 
 	m_pDetailsSheet->AddPage(m_pServerInfoPanel,"#Game_Main_Settings");
@@ -91,9 +89,6 @@ CGamePanelInfo::CGamePanelInfo(vgui::Panel *parent, const char *name, const char
 	m_pDetailsSheet->AddPage(m_pPlayerListPanel,"#Game_Current_Players");
 	m_pDetailsSheet->AddPage(m_pBanListPanel,"#Game_Bans");
 	
-	if ( m_pBudgetPanel )
-		m_pDetailsSheet->AddPage(m_pBudgetPanel,"#Game_Budgets");
-
 // chat panel disabled until we get the parsing done
 //	m_pDetailsSheet->AddPage(m_pServerChatPanel,"#Game_Chat");
 	m_pDetailsSheet->AddPage(m_pServerLogPanel,"#Game_Console");

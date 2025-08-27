@@ -131,7 +131,6 @@ public:
 	FSAsyncStatus_t	AsyncAppendFile( const char *pDestFileName, const char *pSrcFileName, FSAsyncControl_t *pControl = NULL );
 
 	void			DirectoryCopy( const char *pPath, const char *pDestFileName, bool bIsXSave );
-	void			DirectorCopyToMemory( const char *pPath, const char *pDestFileName );
 	bool			DirectoryExtract( FileHandle_t pFile, int fileCount, bool bIsXSave );
 	int				DirectoryCount( const char *pPath );
 	void			DirectoryClear( const char *pPath, bool bIsXSave );
@@ -669,55 +668,6 @@ void CSaveRestoreFileSystem::AsyncFinishAllWrites( void )
 }
 
 //-----------------------------------------------------------------------------
-// Purpose: Package up all intermediate files to a save game as per usual, but keep them in memory instead of commiting them to disk
-//-----------------------------------------------------------------------------
-void CSaveRestoreFileSystem::DirectorCopyToMemory( const char *pPath, const char *pDestFileName )
-{
-	// Write the save file
-	FileHandle_t hSaveFile = Open( pDestFileName, "ab+", pPath );
-	if ( !hSaveFile )
-		return;
-
-	SaveFile_t &saveFile = GetFile( hSaveFile );
-
-	// At this point, we're going to be sneaky and spoof the uncompressed buffer back into the compressed one
-	// We need to do this because the file goes out to disk as a mixture of an uncompressed header and tags, and compressed
-	// intermediate files, so this emulates that in memory
-	saveFile.pCompressedBuffer->Purge();
-	saveFile.nCompressedSize = 0;
-	saveFile.pCompressedBuffer->Put( saveFile.pBuffer->Base(), saveFile.nSize );
-
-	unsigned int nNumFilesPacked = 0;
-	for ( int i = GetDirectory().FirstInorder(); GetDirectory().IsValidIndex( i ); i = GetDirectory().NextInorder( i ) )
-	{
-		SaveFile_t &file = GetFile( i );
-		const char *pName = GetString( file.name );
-		char szFileName[MAX_PATH];
-		if ( Q_stristr( pName, ".hl" ) )
-		{
-			int fileSize = CompressedSize( pName );
-			if ( fileSize )
-			{
-				Assert( Q_strlen( pName ) <= MAX_PATH );
-
-				memset( szFileName, 0, sizeof( szFileName ) );
-				Q_strncpy( szFileName, pName, sizeof( szFileName ) );
-				saveFile.pCompressedBuffer->Put( szFileName, sizeof( szFileName ) );
-				saveFile.pCompressedBuffer->Put( &fileSize, sizeof(fileSize) );
-				saveFile.pCompressedBuffer->Put( file.pCompressedBuffer->Base(), file.nCompressedSize );
-				
-				SaveMsg("SIM: Packed: %s [Size: %.02f KB]\n", GetString( file.name ), (float)file.nCompressedSize / 1024.0f );
-				nNumFilesPacked++;
-			}
-		}
-	}		
-
-	// Set the final, complete size of the file
-	saveFile.nCompressedSize = saveFile.pCompressedBuffer->TellMaxPut();
-	SaveMsg("SIM: (%s) Total Files Packed: %d [Size: %.02f KB]\n", GetString( saveFile.name ), nNumFilesPacked, (float) saveFile.nCompressedSize / 1024.0f );
-}
-
-//-----------------------------------------------------------------------------
 // Purpose: Copies the compressed contents of the CSaveDirectory into the save file on disk.
 //			Note: This expects standard saverestore behavior, and does NOT
 //			currently use pPath to filter the filename search.
@@ -728,13 +678,6 @@ void CSaveRestoreFileSystem::DirectoryCopy( const char *pPath, const char *pDest
 	{
 		// Function depends on known behavior
 		Assert( 0 );
-		return;
-	}
-
-	// If we don't have a valid storage device, save this to memory instead
-	if ( saverestore->StorageDeviceValid() == false )
-	{
-		DirectorCopyToMemory( pPath, pDestFileName );
 		return;
 	}
 

@@ -37,7 +37,6 @@
 #include "tier2/tier2.h"
 #include "enginethreads.h"
 #include "steam/steam_api.h"
-#include "LoadScreenUpdate.h"
 #include "datacache/idatacache.h"
 #include "master.h"
 
@@ -3802,7 +3801,6 @@ void Host_Init( bool bDedicated )
 #endif
 
 	Host_PostInit();
-	EndLoadingUpdates( );
 	CMatRenderContextPtr pRenderContext( g_pMaterialSystem );
 	pRenderContext->SetNonInteractiveTempFullscreenBuffer( NULL, MATERIAL_NON_INTERACTIVE_MODE_STARTUP );
 	pRenderContext->SetNonInteractivePacifierTexture( NULL, 0, 0, 0 );

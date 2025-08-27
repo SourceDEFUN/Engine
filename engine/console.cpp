@@ -1228,8 +1228,8 @@ void CConPanel::PaintBackground()
 		return;
 
 	int wide = GetWide();
-	char ver[ 100 ];
-	Q_snprintf(ver, sizeof( ver ), "Source Engine %i (build %d)", PROTOCOL_VERSION, build_number() );
+	char ver[ 100 ];                                            // Secton TODO: implement custom build number with CMake!
+	Q_snprintf(ver, sizeof( ver ), "SourceDEFUN %i (build %d)", PROTOCOL_VERSION, build_number() );
 	wchar_t unicode[ 200 ];
 	g_pVGuiLocalize->ConvertANSIToUnicode( ver, unicode, sizeof( unicode ) );
 

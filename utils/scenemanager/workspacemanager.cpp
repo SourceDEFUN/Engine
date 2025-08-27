@@ -34,7 +34,7 @@
 #include <vgui/ILocalize.h>
 #include "tier3/tier3.h"
 
-char g_appTitle[] = "Source Engine SceneManager";
+char g_appTitle[] = "SourceDEFUN Scene Manager";
 static char g_appTitleFmt[] = "%s - SceneManager Workspace (%s)";
 static char g_appTitleFmtModified[] = "%s * - SceneManager Workspace (%s)";
 

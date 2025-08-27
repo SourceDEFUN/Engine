@@ -52,7 +52,6 @@
 #include "eiface.h"
 #include "server.h"
 #include "ifilelist.h"
-#include "LoadScreenUpdate.h"
 #include "optimize.h"
 #include "networkstringtable.h"
 #include "tier1/callqueue.h"
@@ -3565,7 +3564,6 @@ model_t	*CModelLoader::LoadModel( model_t *mod, REFERENCETYPE *pReferencetype )
 				g_pMaterialSystem->UpdateExcludedTextures();
 			}
 
-			BeginLoadingUpdates( MATERIAL_NON_INTERACTIVE_MODE_LEVEL_LOAD );
 			g_pFileSystem->BeginMapAccess();
 			Map_LoadModel( mod );
 			g_pFileSystem->EndMapAccess();

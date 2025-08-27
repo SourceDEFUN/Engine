@@ -210,7 +210,7 @@ void CLCD::Init( void )
 	KeyValues *kv = new KeyValues( "G15" );
 	if ( kv->LoadFromFile( filesystem, G15_RESOURCE_FILE, "MOD" ) )
 	{
-		char const *title = kv->GetString( "game", "Source Engine" );
+		char const *title = kv->GetString( "game", "SourceDEFUN" );
 		m_nMaxChatHistory = clamp( 1, kv->GetInt( "chatlines", m_nMaxChatHistory ), 64 );
 		Assert( title );
 		m_Title = title;

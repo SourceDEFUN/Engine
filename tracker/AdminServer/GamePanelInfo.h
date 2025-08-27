@@ -92,7 +92,6 @@ private:
 	CServerConfigPanel *m_pServerConfigPanel;
 	CGraphPanel *m_pGraphsPanel;
 	CServerInfoPanel *m_pServerInfoPanel;
-	CBudgetPanelContainer *m_pBudgetPanel;
 
 	// state
 	bool m_bRemoteServer;

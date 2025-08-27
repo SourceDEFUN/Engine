@@ -313,7 +313,6 @@ public:
 	virtual void			FinishAsyncSave() { ::FinishAsyncSave(); }
 
 	void					AddDeferredCommand( char const *pchCommand );
-	virtual bool			StorageDeviceValid( void );
 
 	virtual bool			IsSaveInProgress();
 
@@ -715,10 +714,7 @@ int CSaveRestore::SaveGameSlot( const char *pSaveName, const char *pSaveComment,
 	{
 		bClearFile = false;
 		SaveMsg( "Queue AgeSaveList\n"); 
-		if ( StorageDeviceValid() )
-		{
-			g_AsyncSaveCallQueue.QueueCall( this, &CSaveRestore::AgeSaveList, CUtlEnvelope<const char *>(pSaveName), save_history_count.GetInt(), IsXSave() );
-		}
+		g_AsyncSaveCallQueue.QueueCall( this, &CSaveRestore::AgeSaveList, CUtlEnvelope<const char *>(pSaveName), save_history_count.GetInt(), IsXSave() );
 	}
 
 	S_ExtraUpdate();
@@ -827,7 +823,7 @@ int CSaveRestore::SaveGameSlot( const char *pSaveName, const char *pSaveComment,
 	// @TODO: this async finish all writes has to go away, very expensive and will make game hitchy. switch to a wait on the last async op
 	g_AsyncSaveCallQueue.QueueCall( g_pFileSystem, &IFileSystem::AsyncFinishAllWrites );
 	
-	if ( IsXSave() && StorageDeviceValid() )
+	if ( IsXSave() )
 	{
 		// Finish all pending I/O to the storage devices
 		g_AsyncSaveCallQueue.QueueCall( g_pXboxSystem, &IXboxSystem::FinishContainerWrites );
@@ -1032,20 +1028,9 @@ bool CSaveRestore::SaveFileExists( const char *pName )
 	bool bExists = false;
 
 	if ( IsXSave() )
-	{
-		if ( StorageDeviceValid() )
-		{
-			bExists = g_pFileSystem->FileExists( name );
-		}
-		else
-		{
-			bExists = g_pSaveRestoreFileSystem->FileExists( name );
-		}
-	}
-	else
-	{
 		bExists = g_pFileSystem->FileExists( name );
-	}
+	else
+		bExists = g_pFileSystem->FileExists( name );
 
 	return bExists;
 }
@@ -2785,11 +2770,7 @@ void CSaveRestore::AutoSaveDangerousIsSafe()
 	char szOldName[MAX_PATH];
 	char szNewName[MAX_PATH];
 
-	// Back up the old autosaves
-	if ( StorageDeviceValid() )
-	{
-		AgeSaveList( "autosave", save_history_count.GetInt(), IsXSave() );
-	}
+	AgeSaveList( "autosave", save_history_count.GetInt(), IsXSave() );
 
 	Q_snprintf( szOldName, sizeof( szOldName ), "//%s/%sautosavedangerous.tga", MOD_DIR, GetSaveDir() );
 	Q_snprintf( szNewName, sizeof( szNewName ), "//%s/%sautosave.tga", MOD_DIR, GetSaveDir() );
@@ -3033,10 +3014,6 @@ CON_COMMAND( _autosave, "Autosave" )
 
 CON_COMMAND( _autosavedangerous, "AutoSaveDangerous" )
 {
-	// Don't even bother if we've got an invalid save
-	if ( saverestore->StorageDeviceValid() == false )
-		return;
-
 	AutoSave_Silent( true );
 	bool bConsole = save_console.GetBool();
 	if ( bConsole )
@@ -3081,10 +3058,6 @@ CON_COMMAND( autosavedangerous, "AutoSaveDangerous" )
 {
 	// Can we save at this point?
 	if ( !saverestore->IsValidSave() || !sv_autosave.GetBool() )
-		return;
-
-	// Don't even bother if we've got an invalid save
-	if ( saverestore->StorageDeviceValid() == false )
 		return;
 
 	//Don't print out "SAVED" unless we're running on an Xbox (in which case it prints "CHECKPOINT").
@@ -3288,13 +3261,7 @@ void CSaveRestore::OnFrameRendered()
 	}
 }
 
-bool CSaveRestore::StorageDeviceValid( void )
-{ // Secton TODO: Lmao?!? DEAL WITH IT TOO!
-	return true;
-}
-
 bool CSaveRestore::IsSaveInProgress()
 {
 	return g_bSaveInProgress;
 }
-

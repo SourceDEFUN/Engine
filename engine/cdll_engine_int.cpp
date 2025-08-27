@@ -512,8 +512,6 @@ public:
 
 	virtual void				SetOverlayBindProxy( int iOverlayID, void *pBindProxy );
 
-	virtual bool				CopyFrameBufferToMaterial( const char *pMaterialName );
-
 	// Matchmaking
 	void						ChangeTeam( const char *pTeamName );
 	virtual void				ReadConfiguration( const bool readDefault = false );
@@ -1400,52 +1398,6 @@ void CEngineClient::SetOverlayBindProxy( int iOverlayID, void *pBindProxy )
 void CEngineClient::ChangeTeam( const char *pTeamName )
 {
 	g_pMatchmaking->ChangeTeam( pTeamName );
-}
-
-//-----------------------------------------------------------------------------
-// Returns true if copy occured
-//-----------------------------------------------------------------------------
-bool CEngineClient::CopyFrameBufferToMaterial( const char *pMaterialName )
-{ // Secton TODO: Deal with it!
-	// not for PC
-	Assert( 0 );
-	return false;
-
-	IMaterial *pMaterial = materials->FindMaterial( pMaterialName, TEXTURE_GROUP_OTHER );
-	if ( pMaterial->IsErrorMaterial() )
-	{
-		// unknown material
-		return false;
-	}
-
-	bool bFound;
-	IMaterialVar *pMaterialVar = pMaterial->FindVar( "$baseTexture", &bFound, false );
-	if ( !bFound || pMaterialVar->GetType() != MATERIAL_VAR_TYPE_TEXTURE )
-	{
-		// lack of expected $basetexture
-		return false;
-	}
-
-	ITexture *pTexture = pMaterialVar->GetTextureValue();
-	if ( !pTexture || !pTexture->IsRenderTarget() )
-	{
-		// base texture is not a render target
-		return false;
-	}
-
-	CMatRenderContextPtr pRenderContext( materials );
-
-	int width, height;
-	pRenderContext->GetRenderTargetDimensions( width, height );
-	if ( width != pTexture->GetActualWidth() || height != pTexture->GetActualHeight() )
-	{
-		// better be matched, not supporting a disparate blit in this context
-		// disparate blit may very well use same RT we are trying to copy into
-		return false;
-	}
-
-	pRenderContext->CopyRenderTargetToTexture( pTexture );
-	return true;
 }
 
 

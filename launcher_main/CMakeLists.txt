@@ -1,16 +1,16 @@
 cmake_minimum_required(VERSION 4.0)
 project(launcher_main)
-add_executable(hl2_launcher)
+add_executable(SourceDEFUN)
 
 if(NOT (ANDROID EQUAL 1))
-    target_sources(hl2_launcher PUBLIC main.cpp)
-    target_include_directories(hl2_launcher PUBLIC ../public)
+    target_sources(SourceDEFUN PUBLIC main.cpp)
+    target_include_directories(SourceDEFUN PUBLIC ../public)
 
     if(WIN32)
-        target_sources(hl2_launcher PUBLIC launcher_main.rc)
+        target_sources(SourceDEFUN PUBLIC launcher_main.rc)
     else ()
-        target_link_libraries(hl2_launcher PUBLIC dl)
+        target_link_libraries(SourceDEFUN PUBLIC dl)
     endif()
 endif()
 
-install(TARGETS hl2_launcher DESTINATION .)
+install(TARGETS SourceDEFUN DESTINATION .)

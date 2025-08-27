@@ -10,8 +10,6 @@
 #include "filesystem.h"
 #include "tier0/icommandline.h"
 
-// Secton TODO: Deal with it!
-
 // Server benchmark. Only works on specified maps.
 // Lasts for N ticks.
 // Enable sv_stressbots.

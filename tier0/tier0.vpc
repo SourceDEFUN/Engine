@@ -154,7 +154,6 @@ $Project "tier0"
 		$File	"platform_posix.cpp"		[$POSIX]
 		$File	"pmc360.cpp"		[$X360]
 		$File	"pme.cpp"			[$WINDOWS]
-		$File	"pme_posix.cpp"		[$POSIX]
 		$File	"PMELib.cpp"		[$WINDOWS||$POSIX]
 		{
 			$Configuration

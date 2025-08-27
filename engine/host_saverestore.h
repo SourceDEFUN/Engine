@@ -56,7 +56,6 @@ public:
 	virtual void					SetIsXSave( bool bState ) = 0;
 
 	virtual void					FinishAsyncSave() = 0;
-	virtual bool					StorageDeviceValid() = 0;
 	virtual void					SetMostRecentSaveGame( const char *lpszFilename ) = 0;
 
 	virtual bool					IsSaveInProgress() = 0;

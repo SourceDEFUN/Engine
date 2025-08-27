@@ -64,7 +64,6 @@ def build(bld):
 		source += [
 			'cpu_posix.cpp',
 			'platform_posix.cpp',
-			'pme_posix.cpp',
 			'vcrmode_posix.cpp'
 		]
 
