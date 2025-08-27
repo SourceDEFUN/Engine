@@ -35,7 +35,7 @@ def build(bld):
 		'../../public/tier1',
 		'../common',
 		'../../common',
-		'../../thirdparty'
+		'../../Thirdparty'
 	]
 
 	defines = []

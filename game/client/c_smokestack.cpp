@@ -19,6 +19,8 @@
 	#define SMOKESTACK_MAX_MATERIALS 1
 #endif
 
+extern IVModelInfoClient *modelinfo;
+
 //==================================================
 // C_SmokeStack
 //==================================================

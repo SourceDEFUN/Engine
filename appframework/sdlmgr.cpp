@@ -56,8 +56,12 @@ ConVar gl_finish( "gl_finish", "0" );
 ConVar sdl_double_click_size( "sdl_double_click_size", "2" );
 ConVar sdl_double_click_time( "sdl_double_click_time", "400" );
 
-#if defined( DX_TO_GL_ABSTRACTION )
+#ifdef DX_TO_GL_ABSTRACTION
 extern COpenGLEntryPoints *gGL;
+#endif
+
+#if gGL == nullptr // Secton FIXME: this is really embarassing for me to do.
+	COpenGLEntryPoints *gGL;
 #endif
 
 const int kBogusSwapInterval = INT_MAX;
@@ -890,7 +894,7 @@ bool CSDLMgr::CreateHiddenGameWindow( const char *pTitle, int width, int height 
 #endif
 	}
 #endif // DBGFLAG_ASSERT
-
+	
 	gGL = GetOpenGLEntryPoints((SDL_FunctionPointer)VoidFnPtrLookup_GlMgr);
 
 	// It is now safe to call any base GL entry point that's supplied by gGL.

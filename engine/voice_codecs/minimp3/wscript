@@ -24,7 +24,7 @@ def build(bld):
 		'.',
 		'../../../public/tier1',
 		'../../../public/',
-		'../../../thirdparty/minimp3'
+		'../../../Thirdparty/minimp3'
 	]
 
 	defines = []

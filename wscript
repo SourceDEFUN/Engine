@@ -507,15 +507,7 @@ def configure(conf):
 		flags += ['-pthread']
 
 	if conf.env.DEST_OS == 'android':
-		flags += [
-			'-I'+os.path.abspath('.')+'/thirdparty/curl/include',
-			'-I'+os.path.abspath('.')+'/thirdparty/SDL',
-			'-I'+os.path.abspath('.')+'/thirdparty/openal-soft/include/',
-			'-I'+os.path.abspath('.')+'/thirdparty/fontconfig',
-			'-I'+os.path.abspath('.')+'/thirdparty/freetype/include',
-			'-llog',
-			'-lz'
-		]
+		flags += ['-llog', '-lz']
 
 		flags += ['-funwind-tables', '-g']
 	elif conf.env.COMPILER_CC != 'msvc' and conf.env.DEST_OS != 'darwin' and conf.env.DEST_CPU in ['x86', 'x86_64']:
@@ -537,7 +529,6 @@ def configure(conf):
 		linkflags += flags
 	else:
 		cflags += [
-			'/I'+os.path.abspath('.')+'/thirdparty/SDL',
 			'/arch:SSE' if conf.env.DEST_CPU == 'x86' else '/arch:AVX',
 			'/GF',
 			'/Gy',
@@ -575,7 +566,7 @@ def configure(conf):
 	# And here C++ flags starts to be treated separately
 	cxxflags = list(cflags)
 	if conf.env.DEST_OS != 'win32':
-		cxxflags += ['-std=c++11','-fpermissive']
+		cxxflags += ['-std=c++23','-fpermissive']
 
 	if conf.env.COMPILER_CC == 'gcc':
 		conf.define('COMPILER_GCC', 1)

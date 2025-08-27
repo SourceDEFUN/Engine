@@ -9,6 +9,10 @@
 
 //===============================================================================
 
+// #if gGL == nullptr // Secton FIXME
+// COpenGLEntryPoints *gGL = GetOpenGLEntryPoints(nullptr);
+// #endif
+
 GLMRendererInfo::GLMRendererInfo( void )
 {
         m_display = NULL;

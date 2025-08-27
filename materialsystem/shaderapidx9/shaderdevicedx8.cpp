@@ -30,7 +30,7 @@
 #include "winutils.h"
 
 
-#if defined ( DX_TO_GL_ABSTRACTION )
+#ifdef DX_TO_GL_ABSTRACTION
 // Placed here so inlines placed in dxabstract.h can access gGL
 COpenGLEntryPoints *gGL = NULL;
 #endif

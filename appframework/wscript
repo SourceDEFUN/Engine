@@ -20,24 +20,26 @@ def build(bld):
 		'../public/filesystem_init.cpp',
 	]
 
-	if bld.env.SDL:
-		source += [
-			'sdlmgr.cpp'
-		]
+	if bld.env.SDL: source += ['sdlmgr.cpp']
 
 	if bld.env.DEST_OS == 'darwin' and bld.env.GL:
 		source += ['glmrendererinfo_osx.mm']
 
 
+	libs = []
 	if bld.env.DEST_OS == 'win32':
 		source += [
 			'vguimatsysapp.cpp',
 			'winapp.cpp'
 		]
+		defines = []
 	else:
 		source += [
 			'posixapp.cpp',#		[$POSIX]
 		]
+		defines = ["DX_TO_GL_ABSTRACTION"]
+		if bld.env.TOGLES: libs += ["togles"]
+		else:              libs += ["togl"  ]
 
 	includes = [
 		'.',
@@ -45,10 +47,6 @@ def build(bld):
 		'../public/tier0',
 		'../public/tier1'
 	] + bld.env.INCLUDES_SDL3
-
-	defines = []
-
-	libs = []
 
 	if bld.env.DEST_OS == 'darwin':
 		libs += ['FOUNDATION', 'APPKIT', 'IOKIT']

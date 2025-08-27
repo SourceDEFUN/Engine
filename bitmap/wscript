@@ -37,11 +37,9 @@ def build(bld):
 		]
 
 	includes = [
-		'.',
-		'../public',
+		'.', '../public',
 		'../public/tier0',
-		'../public/tier1',
-		'../thirdparty/stb'
+		'../public/tier1'
 	]
 
 	defines = []

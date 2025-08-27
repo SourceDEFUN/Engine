@@ -4,9 +4,10 @@ A love letter to Source Engine and Valve Software. A good faith project based on
 Read more info about SourceDEFUN, why it was created, and features here: [SourceDEFUN's project](https://github.com/orgs/SourceDEFUN/projects/2?pane=info). Project also contains timeline and Secton's implementation logs if you're interested in history of SourceDEFUN.
 
 ## Announcement: Wanted!~
-Contributors who have an Apple device with macOS installed to maintain future macOS builds. Windows users should get maintenance from me, but it's wouldn't be as frequent. I'm also planning to maintain \*BSD platforms.
+Contributors who have an Apple device with macOS installed to maintain future macOS builds. Windows users should get maintenance from me, but it wouldn't be as frequent. I'm also planning to maintain \*BSD platforms.
 
-It is not my intention to break platforms support. I also would never buy an Apple device in my life, because i feel very comfortable on Linux 😊.
+> [!NOTE]
+> It is not my intention to break platforms support. I also would never buy an Apple device in my life, because i feel very comfortable on Linux 😊.
 
 -------------------------------------------
 
@@ -25,15 +26,18 @@ SourceDEFUN no longer uses [Valve Project Creator](https://developer.valvesoftwa
 1. Create a folder with any name and move into it (this is because CMake will install the build there)
 2. Clone SourceDEFUN
 3. Install [CMake](https://cmake.org/) or [Python](https://www.python.org/) (3; for WAF)
+4. Install SDL3, Opus, OpenSSL, [TODO] with your preferred package manager.
 
-Choose the game you want to build. On CMake, [TODO]; on WAF, [TODO].
+Choose the game you want to build.
+* On CMake: `hl2` `episodic` (more soon!)
+* On WAF: `hl2` `hl2mp` `hl1` `episodic` `portal` `hl1mp` `cstrike` `dod`
 
-### Linux (CMake)
-1. Install SDL3, Opus, OpenSSL, [TODO] with your preferred package manager.
-2. Configure, Generate, Build and Install. No big deal.
+### CMake (all platforms)
+> [!WARNING]
+> CMake building is experimental. Currently you can not load maps and VGUI2 just refuses to work properly for reasons i couldn't find. I'll fix map launching as soon as i'll port RmlUI.
 
-### Windows (CMake)
-[TODO]
+Configure, Generate, Build and Install. No big deal.
+I also recommend using CMake GUI frontend to change options easily, like which game to build.
 
 ### macOS & \*BSD
 Wanted!

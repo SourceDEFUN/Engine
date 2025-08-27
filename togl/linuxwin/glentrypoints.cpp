@@ -29,6 +29,7 @@
 
 #include "togl/rendermechanism.h"
 #include <cstdio>
+#include <cstdlib>
 
 #ifdef USE_SDL
 #include <SDL3/SDL_video.h>
@@ -166,6 +167,9 @@ COpenGLEntryPoints *GetOpenGLEntryPoints(SDL_FunctionPointer callback)
 {
 	if (gGL == NULL)
 	{
+		if (!callback) {
+			Error("gGL is not available!"); exit(991);
+		}
 		gGL_GetProcAddressCallback = callback;
 		gGL = new COpenGLEntryPoints();
 		if (!gGL->m_bHave_OpenGL)

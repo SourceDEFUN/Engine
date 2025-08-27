@@ -124,6 +124,8 @@ target_sources(client PUBLIC
 		c_sceneentity.cpp
 		c_shadowcontrol.cpp
 		c_slideshow_display.cpp
+		c_smoke_trail.cpp
+		c_smokestack.cpp
 		c_soundscape.cpp
 		c_spotlight_end.cpp
 		c_sprite.cpp
