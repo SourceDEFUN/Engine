@@ -3,6 +3,10 @@ A love letter to Source Engine and Valve Software. A good faith project based on
 
 Read more info about SourceDEFUN, why it was created, and features here: [SourceDEFUN's project](https://github.com/orgs/SourceDEFUN/projects/2?pane=info). Project also contains timeline and Secton's implementation logs if you're interested in history of SourceDEFUN.
 
+## Special thanks
+* [valberrie](https://github.com/valberrie) - CMake port
+* [Maksymilian Wilczyński](https://github.com/maksw2) - For [helping me](https://github.com/SourceDEFUN/OldVersion/commits?author=maksw2) back when i was learning how to code in C++ 😅
+
 ## Announcement: Wanted!~
 Contributors who have an Apple device with macOS installed to maintain future macOS builds. Windows users should get maintenance from me, but it wouldn't be as frequent. I'm also planning to maintain \*BSD platforms.
 
