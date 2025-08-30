@@ -14,6 +14,7 @@
 #endif
 
 #include "datamap.h"
+#include "const.h"
 #include "mathlib/bumpvects.h"
 #include "mathlib/compressed_light_cube.h"
 
@@ -362,7 +363,7 @@ enum
 	LUMP_LIGHTING_VERSION          = 1,
 	LUMP_FACES_VERSION             = 1,
 	LUMP_OCCLUSION_VERSION         = 2,
-	LUMP_LEAFS_VERSION			   = 1,
+	LUMP_LEAFS_VERSION			   = 2,
 	LUMP_LEAF_AMBIENT_LIGHTING_VERSION = 1,
 	LUMP_WORLDLIGHTS_VERSION           = 1
 };
@@ -484,7 +485,7 @@ struct dplane_t
 #include "bspflags.h"
 #endif
 
-struct dnode_t
+struct dnode_version_0_t
 {
 	DECLARE_BYTESWAP_DATADESC();
 	int			planenum;
@@ -494,6 +495,19 @@ struct dnode_t
 	unsigned short	firstface;
 	unsigned short	numfaces;	// counting both sides
 	short			area;		// If all leaves below this node are in the same area, then
+	// this is the area index. If not, this is -1.
+};
+
+struct dnode_t
+{
+	DECLARE_BYTESWAP_DATADESC();
+	int			planenum;
+	int			children[2];	// negative numbers are -(leafs+1), not nodes
+	BOUNDSTYPE		mins[3];		// for frustom culling
+	BOUNDSTYPE		maxs[3];
+	unsigned short	firstface;
+	unsigned short	numfaces;	// counting both sides
+	BOUNDSTYPE		area;		// If all leaves below this node are in the same area, then
 								// this is the area index. If not, this is -1.
 };
 
@@ -823,20 +837,48 @@ struct dleaf_version_0_t
 };
 
 // version 1
-struct dleaf_t
+struct dleaf_version_1_t
 {
 	DECLARE_BYTESWAP_DATADESC();
 	int				contents;			// OR of all brushes (not needed?)
 
 	short			cluster;
 
+	BEGIN_BITFIELD(bf);
+	short			area : 9;
+	short			flags : 7;			// Per leaf flags.
+	END_BITFIELD();
+
+	short			mins[3];			// for frustum culling
+	short			maxs[3];
+
+	unsigned short	firstleafface;
+	unsigned short	numleaffaces;
+
+	unsigned short	firstleafbrush;
+	unsigned short	numleafbrushes;
+	short			leafWaterDataID; // -1 for not in water
+
+	// NOTE: removed this for version 1 and moved into separate lump "LUMP_LEAF_AMBIENT_LIGHTING" or "LUMP_LEAF_AMBIENT_LIGHTING_HDR"
+	// Precaculated light info for entities.
+//	CompressedLightCube m_AmbientLighting;
+};
+
+// version 2
+struct dleaf_t
+{
+	DECLARE_BYTESWAP_DATADESC();
+	int				contents;			// OR of all brushes (not needed?)
+
+	int			cluster;
+
 	BEGIN_BITFIELD( bf );
 	short			area:9;
 	short			flags:7;			// Per leaf flags.
 	END_BITFIELD();
 
-	short			mins[3];			// for frustum culling
-	short			maxs[3];
+	BOUNDSTYPE			mins[3];			// for frustum culling
+	BOUNDSTYPE			maxs[3];
 
 	unsigned short	firstleafface;
 	unsigned short	numleaffaces;

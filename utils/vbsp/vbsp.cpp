@@ -70,19 +70,20 @@ char		g_szEmbedDir[MAX_PATH] = { 0 };
 
 // HLTOOLS: Introduce these calcs to make the block algorithm proportional to the proper 
 // world coordinate extents.  Assumes square spatial constraints.
-#define BLOCKS_SIZE		1024
+#define BLOCKS_SIZE		2048
 #define BLOCKS_SPACE	(COORD_EXTENT/BLOCKS_SIZE)
 #define BLOCKX_OFFSET	((BLOCKS_SPACE/2)+1)
 #define BLOCKY_OFFSET	((BLOCKS_SPACE/2)+1)
 #define BLOCKS_MIN		(-(BLOCKS_SPACE/2))
 #define BLOCKS_MAX		((BLOCKS_SPACE/2)-1)
+#define BLOCKS_ARRAY_WIDTH (BLOCKS_SPACE+2)
 
 int			block_xl = BLOCKS_MIN, block_xh = BLOCKS_MAX, block_yl = BLOCKS_MIN, block_yh = BLOCKS_MAX;
 
 int			entity_num;
 
 
-node_t		*block_nodes[BLOCKS_SPACE+2][BLOCKS_SPACE+2];
+node_t		**block_nodes = nullptr; // [BLOCKS_SPACE+2][BLOCKS_SPACE+2];
 
 //-----------------------------------------------------------------------------
 // Assign occluder areas (must happen *after* the world model is processed)
@@ -106,7 +107,7 @@ node_t	*BlockTree (int xl, int yl, int xh, int yh)
 
 	if (xl == xh && yl == yh)
 	{
-		node = block_nodes[xl+BLOCKX_OFFSET][yl+BLOCKY_OFFSET];
+		node = block_nodes[xl+BLOCKX_OFFSET + (yl+BLOCKY_OFFSET) * BLOCKS_ARRAY_WIDTH];
 		if (!node)
 		{	// return an empty leaf
 			node = AllocNode ();
@@ -180,7 +181,7 @@ void ProcessBlock_Thread (int threadnum, int blocknum)
 		node = AllocNode ();
 		node->planenum = PLANENUM_LEAF;
 		node->contents = CONTENTS_SOLID;
-		block_nodes[xblock+BLOCKX_OFFSET][yblock+BLOCKY_OFFSET] = node;
+		block_nodes[xblock+BLOCKX_OFFSET + (yblock+BLOCKY_OFFSET) * BLOCKS_ARRAY_WIDTH] = node;
 		return;
 	}    
 
@@ -190,7 +191,7 @@ void ProcessBlock_Thread (int threadnum, int blocknum)
 
 	tree = BrushBSP (brushes, mins, maxs);
 	
-	block_nodes[xblock+BLOCKX_OFFSET][yblock+BLOCKY_OFFSET] = tree->headnode;
+	block_nodes[xblock+BLOCKX_OFFSET + (yblock+BLOCKY_OFFSET) * BLOCKS_ARRAY_WIDTH] = tree->headnode;
 }
 
 
@@ -214,6 +215,12 @@ void ProcessWorldModel (void)
 	brush_start = e->firstbrush;
 	brush_end = brush_start + e->numbrushes;
 	leaked = false;
+
+	if (block_nodes == NULL)
+	{
+		block_nodes = new node_t * [BLOCKS_ARRAY_WIDTH * BLOCKS_ARRAY_WIDTH];
+		Q_memset(block_nodes, 0, BLOCKS_ARRAY_WIDTH * BLOCKS_ARRAY_WIDTH * sizeof(node_t*));
+	}
 
 	//
 	// perform per-block operations

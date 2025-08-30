@@ -431,6 +431,11 @@ void CStudioRender::DrawModel( const DrawModelInfo_t& info, const StudioRenderCo
 
 		return;
 	}
+	if (!pBoneToWorld)
+	{
+		Warning("Invalid pBoneToWorld in model %s, will not draw!\n", info.m_pStudioHdr->name);
+		return;
+	}
 
 	m_pRC = const_cast< StudioRenderContext_t* >( &rc );
 	m_pFlexWeights = flex.m_pFlexWeights;
