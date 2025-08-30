@@ -9,7 +9,7 @@
 #include "client_pch.h"
 
 #include "tier0/platform.h"
-#include <memory>
+// #include <memory>
 
 #ifdef IS_WINDOWS_PC
 #include "winlite.h"
@@ -65,7 +65,7 @@
 #include "cl_foguipanel.h"
 #include "cl_txviewpanel.h"
 
-#if UseGUI == VGUI2
+#ifdef UseGUI_VGUI2
 // vgui2 interface
 // note that GameUI project uses ..\public\vgui and ..\public\vgui_controls, not ..\utils\vgui\include
 #include <vgui/VGUI.h>
@@ -82,7 +82,7 @@
 #include <vgui_controls/MenuButton.h>
 #include <vgui_controls/Menu.h>
 #include <vgui_controls/PHandle.h>
-#elif UseGUI_RmlUI
+#elifdef UseGUI_RmlUI
 #include <RmlUi/Core.h>
 #include <RmlUi/Debugger.h>
 #endif
@@ -568,7 +568,7 @@ void CEngineVGui::Init()
 		Error( "Could not get IGameUI interface %s from %s\n", GAMEUI_INTERFACE_VERSION, szDllName );
 	}
 
-#if UseGUI_RmlUI
+#ifdef UseGUI_RmlUI
 	auto file_interface = std::make_unique<CustomFileInterface>();
 	Rml::SetFileInterface(file_interface.get());
 #endif
@@ -599,7 +599,7 @@ void CEngineVGui::Init()
 	// Need to be able to play sounds through vgui
 	g_pMatSystemSurface->InstallPlaySoundFunc( VGui_PlaySound );
 
-#if UseGUI_VGUI2
+#ifdef UseGUI_VGUI2
 	COM_TimestampedLog( "GUI: Load Scheme File" );
 
 	// load scheme
