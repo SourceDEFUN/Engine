@@ -1,6 +1,9 @@
 # SourceDEFUN
 A love letter to Source Engine and Valve Software. A good faith project based on leaked Source Engine code.
 
+> [!NOTE]
+> The repository is archived. Be sure to check out the project's status for more info. The link should be in the next paragraph.
+
 Read more info about SourceDEFUN, why it was created, and features here: [SourceDEFUN's project](https://github.com/orgs/SourceDEFUN/projects/2?pane=info). Project also contains timeline and Secton's implementation logs if you're interested in history of SourceDEFUN.
 
 ## Special thanks
